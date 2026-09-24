@@ -49,13 +49,11 @@ it("rejects unconfirmed responses and surfaces refresh failures", async () => {
   vi.useFakeTimers();
   vi.stubGlobal(
     "fetch",
-    vi
-      .fn()
-      .mockResolvedValue({
-        ok: true,
-        status: 200,
-        json: async () => ({ dishes: [{ ...dish, name: "Unconfirmed", confirmed: false }] }),
-      }),
+    vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({ dishes: [{ ...dish, name: "Unconfirmed", confirmed: false }] }),
+    }),
   );
   render(createElement(LiveDinerMenu, props));
   await act(async () => {
@@ -68,13 +66,11 @@ it("does not reset an unchanged menu just because JSON field order differs", asy
   vi.useFakeTimers();
   vi.stubGlobal(
     "fetch",
-    vi
-      .fn()
-      .mockResolvedValue({
-        ok: true,
-        status: 200,
-        json: async () => ({ dishes: [{ revision: 1, ...dish }] }),
-      }),
+    vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({ dishes: [Object.fromEntries(Object.entries(dish).reverse())] }),
+    }),
   );
   render(createElement(LiveDinerMenu, props));
   await act(async () => {

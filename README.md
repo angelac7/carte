@@ -73,11 +73,13 @@ rules live in `supabase/migrations/`. Owners sign up, create one restaurant, and
 | `/dashboard/qr`     | Owners   | Print the table QR code                            |
 | `/r/<menu-link>`    | Diners   | Confirmed dishes with filters, languages, and chat |
 
-## Deploying the review fixes
+## Deploying the current update
 
-Apply `supabase/migrations/20261001000000_review_fixes.sql` to Supabase before deploying this
-version of the app. It resets confirmation on dish edits and adds filter arguments to the
-Discover search functions. Existing calls without filters remain supported.
+Apply the new database migrations before deploying. For a database already updated through
+`20261002000000`, copy [docs/SUPABASE_UPDATE.sql](docs/SUPABASE_UPDATE.sql) into Supabase SQL Editor
+and run it once. This adds edit versions, source languages, and the claim-review workflow.
+See [deployment and administrator setup](docs/DEPLOYMENT.md) for the complete steps.
+Fresh databases should apply all files in `supabase/migrations/` in filename order.
 
 `npm test` includes an embedded PostgreSQL migration test and browser component regression tests;
 these run locally without Supabase credentials or AI calls.
@@ -91,7 +93,7 @@ regenerated when the owner edits the dish. They never include allergens.
 
 ## At the table
 
-Diners can build an order, show it to staff in English with their allergies, split the bill
+Diners can build an order, show original dish names to staff with fixed allergy translations, split the bill
 with tax and tip, and show a translated allergy card. Allergy and diet filters are saved on the
 diner's device in the `carte-prefs` cookie and applied at every Carte menu. No diner account is needed.
 
@@ -114,7 +116,8 @@ Owners fill in their profile and opt in to listing at `/dashboard/profile`.
 
 Diners can save dishes and menus, keep a food diary with star ratings and notes, track challenges,
 and create an AI taste profile at `/my`. All of it is stored on the diner's device (localStorage);
-the taste profile request sends only the diner's own ratings and stores nothing. In production, a
+the taste profile request sends only the diner's requested ratings and saved-dish context and stores nothing.
+Diners can download a private backup and restore or merge it on another device. In production, a
 service worker keeps opened menus, My Carte, and the allergy card available offline, and Carte can
 be added to the home screen.
 
@@ -130,7 +133,7 @@ guesses, and nothing is stored. Photo features are limited per visitor per hour.
 `/places` searches real restaurants from OpenStreetMap by city or the diner's location, and
 `/place/<id>` shows any restaurant, linking to its Carte menu when one exists. Owners can claim their
 listing at `/dashboard/claim`; claims stay hidden from diners until Carte sets `osm_verified` to true
-in the `restaurants` table. Map requests are throttled to one per second, identify Carte with
+through the authorized `/admin/claims` review queue. Decisions appear in the owner dashboard. Map requests are throttled to one per second, identify Carte with
 `OSM_CONTACT_EMAIL`, and are cached for a week in `place_cache`.
 
 ## Owner dashboard
