@@ -2,11 +2,13 @@
 import { useEffect, useRef, useState } from "react";
 import { Chip } from "@/components/Chip";
 import { DishHeader } from "@/components/DishHeader";
+import { DishSheet } from "@/components/DishSheet";
 import { MenuChat } from "@/components/MenuChat";
 import { ToggleChip } from "@/components/ToggleChip";
 import { ALLERGENS, DIETARY_TAGS, type Allergen, type DietaryTag } from "@/lib/allergens";
 import { fetchTranslations } from "@/lib/api-client";
 import { DINER_STRINGS } from "@/lib/i18n/diner-strings";
+import { DISH_STRINGS } from "@/lib/i18n/dish-strings";
 import {
   htmlLang,
   isLanguageCode,
@@ -35,6 +37,7 @@ export function DinerMenu({ restaurant, dishes, initialLanguage }: DinerMenuProp
   const [avoid, setAvoid] = useState<Allergen[]>([]);
   const [onlyTags, setOnlyTags] = useState<DietaryTag[]>([]);
   const requested = useRef(new Set<LanguageCode>());
+  const [openDishId, setOpenDishId] = useState<string | null>(null);
 
   // Fetch each language's translations once, the first time a diner picks it.
   useEffect(() => {
@@ -70,6 +73,7 @@ export function DinerMenu({ restaurant, dishes, initialLanguage }: DinerMenuProp
     setOnlyTags([]);
   }
 
+  const openDish = dishes.find((dish) => dish.id === openDishId);
   const shown = filterDishes(dishes, { avoid, onlyTags });
   const hiddenCount = dishes.length - shown.length;
   const filtering = avoid.length > 0 || onlyTags.length > 0;
@@ -212,10 +216,26 @@ export function DinerMenu({ restaurant, dishes, initialLanguage }: DinerMenuProp
                     <span className="font-medium">{t.kitchenNote}</span> {text.notes}
                   </p>
                 )}
+                <button
+                  onClick={() => setOpenDishId(dish.id)}
+                  className="mt-3 text-sm font-medium text-ink underline underline-offset-4 hover:text-muted"
+                >
+                  {DISH_STRINGS[language].details}
+                </button>
               </li>
             );
           })}
         </ul>
+      )}
+      {openDish && (
+        <DishSheet
+          key={openDish.id}
+          dish={openDish}
+          text={textFor(openDish)}
+          language={language}
+          restaurantSlug={restaurant.slug}
+          onClose={() => setOpenDishId(null)}
+        />
       )}
       <MenuChat language={language} restaurantSlug={restaurant.slug} />
     </main>

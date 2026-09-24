@@ -2,6 +2,7 @@ import type { LanguageCode } from "@/lib/languages";
 import { MAX_HISTORY, type ChatMessage } from "@/types/chat";
 import type { ExtractedDish, MenuItem } from "@/types/menu";
 import type { MenuTranslations } from "@/types/translation";
+import type { DishInsight } from "@/types/insight";
 
 /** Sends owners to the login page if their session has expired. */
 function checkSignedIn(res: Response): void {
@@ -78,4 +79,17 @@ export async function askMenu(
   const data = await res.json().catch(() => ({}));
   if (!res.ok || typeof data.reply !== "string") throw new Error("Chat failed");
   return data.reply;
+}
+
+/** Gets an explanation of one dish in the diner's language. */
+export async function fetchInsight(
+  restaurantSlug: string,
+  dishId: string,
+  language: LanguageCode,
+): Promise<DishInsight> {
+  const params = new URLSearchParams({ restaurant: restaurantSlug, dish: dishId, lang: language });
+  const res = await fetch(`/api/insight?${params}`);
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok || !data.insight) throw new Error(data.error ?? "Dish details failed.");
+  return data.insight as DishInsight;
 }

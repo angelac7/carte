@@ -130,3 +130,20 @@ export async function deleteDish(
     .eq("restaurant_id", restaurantId);
   if (error) throw error;
 }
+
+/** One confirmed dish, only if it belongs to the given restaurant. */
+export async function getConfirmedDish(
+  supabase: SupabaseClient,
+  restaurantId: string,
+  dishId: string,
+): Promise<MenuItem | null> {
+  const { data, error } = await supabase
+    .from("menu_items")
+    .select(DISH_COLUMNS)
+    .eq("id", dishId)
+    .eq("restaurant_id", restaurantId)
+    .eq("confirmed", true)
+    .maybeSingle();
+  if (error) throw error;
+  return data as unknown as MenuItem | null;
+}

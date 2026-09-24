@@ -26,3 +26,5 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - Use the regular Supabase client (`lib/supabase/server.ts`) so Row Level Security applies. The admin client in `lib/supabase/admin.ts` is only for server jobs like saving translations.
 - Anything diners see must come from `getConfirmedDishes()`, never `listDishes()`.
 - Database changes go in a new file in `supabase/migrations/`, never by editing an old one.
+- AI dish explanations must never mention allergens or call a dish safe; allergens always come from owner-confirmed data.
+- Diners never need an account. Diner preferences are stored on their device.

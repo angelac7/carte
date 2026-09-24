@@ -74,3 +74,10 @@ rules live in `supabase/migrations/`. Owners sign up, create one restaurant, and
 | `/dashboard/review` | Owners   | Confirm allergens and tags                         |
 | `/dashboard/qr`     | Owners   | Print the table QR code                            |
 | `/r/<menu-link>`    | Diners   | Confirmed dishes with filters, languages, and chat |
+
+## Dish details
+
+Diners tap "Details" on any dish for an AI explanation in their language: what it is, taste,
+background, ingredients to know, spice and richness, portion, pairings, and questions for the
+kitchen. Explanations are generated once per dish and language, saved in `dish_insights`, and
+regenerated when the owner edits the dish. They never include allergens.
