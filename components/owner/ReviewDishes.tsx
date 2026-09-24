@@ -209,7 +209,7 @@ export default function ReviewDishes() {
       )}
 
       {loaded && total === 0 && !problem && (
-        <EmptyState className="mt-10 bg-card py-12">
+        <EmptyState className="mt-10 py-14">
           <h2 className="font-serif text-3xl text-ink">No dishes yet</h2>
           <p className="mx-auto mt-2 max-w-sm">
             Upload a photo of your menu and Carte lists every dish here, or add dishes one at a
@@ -220,24 +220,24 @@ export default function ReviewDishes() {
 
       {total > 0 && (
         <>
-          <div className="sticky top-14 z-10 -mx-5 mt-8 border-b border-line bg-paper/95 px-5 py-4 backdrop-blur">
+          <div className="sticky top-16 z-10 -mx-5 mt-10 border-b border-ink/10 bg-paper/95 px-5 py-5 backdrop-blur">
             <ProgressBar done={done} total={total} />
             <div className="mt-4 flex flex-wrap items-center gap-3">
-              <div className="flex gap-1 rounded-xl border border-line bg-card p-1">
+              <div className="flex gap-1 rounded-full bg-paper p-1.5 shadow-raised-sm">
                 {filters.map((f) => (
                   <button
                     key={f.key}
                     aria-pressed={filter === f.key}
                     onClick={() => setFilter(f.key)}
                     className={cn(
-                      "relative isolate rounded-lg px-3 py-1.5 text-sm whitespace-nowrap transition-colors",
+                      "relative isolate rounded-full px-4 py-2 text-sm font-medium whitespace-nowrap transition-colors",
                       filter === f.key ? "text-white" : "text-muted hover:text-ink",
                     )}
                   >
                     {filter === f.key && (
                       <motion.span
                         layoutId="review-filter"
-                        className="absolute inset-0 -z-10 rounded-lg bg-ink"
+                        className="absolute inset-0 -z-10 rounded-full bg-ink shadow-pressed-color"
                         transition={{ type: "spring", bounce: 0.2, duration: 0.4 }}
                       />
                     )}
@@ -251,7 +251,7 @@ export default function ReviewDishes() {
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search dishes"
                 aria-label="Search dishes"
-                className={fieldClass("py-1.5 sm:ml-auto sm:w-48")}
+                className={fieldClass("py-2.5 sm:ml-auto sm:w-56")}
               />
             </div>
           </div>
@@ -266,7 +266,7 @@ export default function ReviewDishes() {
             </EmptyState>
           )}
 
-          <div className="mt-6 space-y-5">
+          <div className="mt-8 space-y-8">
             <AnimatePresence initial={false} mode="popLayout">
               {shown.map((dish) => (
                 <motion.article
@@ -276,11 +276,16 @@ export default function ReviewDishes() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.97 }}
                   transition={{ duration: 0.3, ease: "easeOut" }}
-                  className={cn(
-                    "rounded-2xl border border-l-4 border-line bg-card p-5 shadow-sm sm:p-6",
-                    dish.confirmed ? "border-l-basil" : "border-l-saffron",
-                  )}
+                  className="relative overflow-hidden rounded-panel bg-paper p-6 shadow-raised sm:p-8"
                 >
+                  {/* Status stripe: green once confirmed, saffron while it still needs review. */}
+                  <span
+                    aria-hidden="true"
+                    className={cn(
+                      "absolute inset-y-8 left-0 w-1.5 rounded-r-full",
+                      dish.confirmed ? "bg-basil" : "bg-saffron",
+                    )}
+                  />
                   {editingId === dish.id ? (
                     <DishDetailsForm
                       initial={{
@@ -304,7 +309,7 @@ export default function ReviewDishes() {
                       </div>
                       <button
                         onClick={() => setEditingId(dish.id)}
-                        className="shrink-0 text-sm underline underline-offset-4 hover:text-muted"
+                        className="shrink-0 text-sm font-semibold underline underline-offset-4 hover:text-accent"
                       >
                         Edit details
                       </button>
@@ -317,7 +322,7 @@ export default function ReviewDishes() {
                   />
 
                   <fieldset className="mt-5">
-                    <legend className="text-sm font-medium">Contains</legend>
+                    <legend className="eyebrow text-muted">Contains</legend>
                     <div className="mt-2 flex flex-wrap gap-2">
                       {ALLERGENS.map((allergen) => (
                         <ToggleChip
@@ -332,7 +337,7 @@ export default function ReviewDishes() {
                   </fieldset>
 
                   <fieldset className="mt-4">
-                    <legend className="text-sm font-medium">Suitable for</legend>
+                    <legend className="eyebrow text-muted">Suitable for</legend>
                     <div className="mt-2 flex flex-wrap gap-2">
                       {DIETARY_TAGS.map((tag) => (
                         <ToggleChip
@@ -361,7 +366,7 @@ export default function ReviewDishes() {
                     />
                   </label>
 
-                  <div className="mt-5 flex items-center justify-between border-t border-line pt-4">
+                  <div className="mt-6 flex items-center justify-between border-t border-ink/10 pt-5">
                     {dish.confirmed ? (
                       <p className="text-sm font-medium text-basil">✓ Confirmed</p>
                     ) : (
@@ -378,8 +383,8 @@ export default function ReviewDishes() {
             </AnimatePresence>
           </div>
 
-          <section className="mt-16 border-t border-line pt-6">
-            <h2 className="text-sm font-medium">Replace your menu</h2>
+          <section className="mt-20 border-t-4 border-ink pt-6">
+            <h2 className="eyebrow">Replace your menu</h2>
             <p className="mt-1 max-w-md text-sm text-muted">
               Delete every dish and its photo, for example before uploading a new menu. This can’t
               be undone.

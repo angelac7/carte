@@ -9,10 +9,10 @@ export function ProgressBar({ done, total }: ProgressBarProps) {
         <span className="font-medium">
           {done} of {total} confirmed
         </span>
-        <span className="tabular-nums text-muted">{percent}%</span>
+        <span className="font-mono text-muted tabular-nums">{percent}%</span>
       </div>
       <div
-        className="mt-2 h-1.5 overflow-hidden rounded-full bg-line"
+        className="mt-3 h-2.5 overflow-hidden rounded-full shadow-pressed-sm"
         role="progressbar"
         aria-label="Dishes confirmed"
         aria-valuemin={0}
