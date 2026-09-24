@@ -22,23 +22,16 @@ const LANGUAGE_PHRASES = [
 
 type HeroProps = { image: string | null; video: string | null };
 
-/** Full-screen opening section: cinematic background, cursor glow, and the live menu card. */
+/** Full-screen opening section: cinematic background and the live menu card. */
 export function Hero({ image, video }: HeroProps) {
   const ref = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
   const contentY = useTransform(scrollYProgress, [0, 1], ["0%", "16%"]);
   const fade = useTransform(scrollYProgress, [0, 0.85], [1, 0]);
 
-  function followPointer(event: React.PointerEvent<HTMLElement>) {
-    const box = event.currentTarget.getBoundingClientRect();
-    event.currentTarget.style.setProperty("--gx", `${event.clientX - box.left}px`);
-    event.currentTarget.style.setProperty("--gy", `${event.clientY - box.top}px`);
-  }
-
   return (
     <section
       ref={ref}
-      onPointerMove={followPointer}
       className="relative isolate flex min-h-[calc(100svh-3.5rem)] snap-start items-center overflow-hidden bg-ink text-white"
     >
       <div className="absolute inset-0 -z-20">
@@ -71,14 +64,6 @@ export function Hero({ image, video }: HeroProps) {
       <div
         aria-hidden="true"
         className="absolute inset-0 -z-10 bg-gradient-to-r from-ink/90 via-ink/60 to-ink/25"
-      />
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 -z-10"
-        style={{
-          background:
-            "radial-gradient(600px circle at var(--gx, 70%) var(--gy, 30%), rgb(201 138 12 / 0.2), transparent 60%)",
-        }}
       />
 
       <motion.div

@@ -1,5 +1,5 @@
 "use client";
-import { AnimatePresence, motion, useMotionValue, useSpring, useTransform } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/cn";
 import { toggleValue } from "@/lib/toggle-value";
@@ -66,22 +66,11 @@ const DISHES: { id: string; price: string; allergens: string[]; names: Record<Co
 
 const TRY_ALLERGENS = ["peanuts", "fish", "wheat", "milk", "sesame"];
 
-/** A sample menu card that tilts, translates itself, and hides dishes when a visitor taps an allergy. */
+/** A sample menu card that translates itself and hides dishes when a visitor taps an allergy. */
 export function MenuDemo() {
   const [langIndex, setLangIndex] = useState(0);
   const [avoid, setAvoid] = useState<string[]>([]);
   const [paused, setPaused] = useState(false);
-
-  const pointerX = useMotionValue(0);
-  const pointerY = useMotionValue(0);
-  const rotateX = useSpring(useTransform(pointerY, [-0.5, 0.5], [7, -7]), {
-    stiffness: 180,
-    damping: 18,
-  });
-  const rotateY = useSpring(useTransform(pointerX, [-0.5, 0.5], [-7, 7]), {
-    stiffness: 180,
-    damping: 18,
-  });
 
   useEffect(() => {
     if (paused) return;
@@ -92,19 +81,9 @@ export function MenuDemo() {
   const lang = LANGS[langIndex];
 
   return (
-    <motion.div
-      onPointerMove={(event) => {
-        const box = event.currentTarget.getBoundingClientRect();
-        pointerX.set((event.clientX - box.left) / box.width - 0.5);
-        pointerY.set((event.clientY - box.top) / box.height - 0.5);
-      }}
+    <div
       onPointerEnter={() => setPaused(true)}
-      onPointerLeave={() => {
-        pointerX.set(0);
-        pointerY.set(0);
-        setPaused(false);
-      }}
-      style={{ rotateX, rotateY, transformPerspective: 1000 }}
+      onPointerLeave={() => setPaused(false)}
       className="rounded-2xl bg-card p-6 text-ink shadow-2xl ring-1 ring-black/5 sm:p-8"
     >
       <div className="flex items-center justify-between gap-4">
@@ -204,6 +183,6 @@ export function MenuDemo() {
           ))}
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 }
