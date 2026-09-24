@@ -15,10 +15,10 @@ type DishActionsProps = {
 };
 
 const pill = (active: boolean) =>
-  `rounded-full border px-3 py-1.5 text-xs transition-colors ${
+  `rounded-full px-3.5 py-1.5 text-xs font-medium transition-[box-shadow,background-color,color] duration-200 ${
     active
-      ? "border-ink bg-ink text-white"
-      : "border-line text-muted hover:border-muted hover:text-ink"
+      ? "bg-ink text-white shadow-pressed-color"
+      : "bg-paper text-muted shadow-raised-sm hover:text-ink active:shadow-pressed-sm"
   }`;
 
 /** Save a dish or mark it tried, stored in My Carte on this device. */

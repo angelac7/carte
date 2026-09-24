@@ -27,13 +27,13 @@ const insightCache = new Map<string, DishInsight>();
 function Meter({ label, level, words }: { label: string; level: number; words: string[] }) {
   return (
     <div>
-      <h3 className="text-sm font-medium">{label}</h3>
+      <h3 className="eyebrow text-muted">{label}</h3>
       <div className="mt-1 flex items-center gap-2">
         <span className="flex gap-1" aria-hidden="true">
           {[1, 2, 3].map((step) => (
             <span
               key={step}
-              className={`h-2 w-5 rounded-full ${step <= level ? "bg-ink" : "bg-line"}`}
+              className={`h-2 w-6 rounded-full ${step <= level ? "bg-accent" : "shadow-pressed-sm"}`}
             />
           ))}
         </span>
@@ -47,7 +47,7 @@ function Section({ title, body }: { title: string; body: string }) {
   if (!body) return null;
   return (
     <div>
-      <h3 className="text-sm font-medium">{title}</h3>
+      <h3 className="eyebrow text-muted">{title}</h3>
       <p className="mt-1 text-sm leading-relaxed">{body}</p>
     </div>
   );
@@ -56,7 +56,7 @@ function Section({ title, body }: { title: string; body: string }) {
 function List({ title, items }: { title: string; items: string[] }) {
   return (
     <div>
-      <h3 className="text-sm font-medium">{title}</h3>
+      <h3 className="eyebrow text-muted">{title}</h3>
       <ul className="mt-1 list-disc space-y-1 pl-5 text-sm leading-relaxed">
         {items.map((item) => (
           <li key={item}>{item}</li>
@@ -124,11 +124,11 @@ export function DishSheet({ dish, text, language, restaurantSlug, onClose }: Dis
       }
     >
       <div className="mt-3 flex flex-wrap items-center gap-3">
-        <span className="tabular-nums">{dish.price}</span>
+        <span className="font-mono tabular-nums">{dish.price}</span>
         {canSpeak() && (
           <button
             onClick={() => speak(insight?.nativeName || dish.name, insight?.nativeLang || "en-US")}
-            className="rounded-full border border-line px-3 py-1.5 text-sm transition-colors hover:border-muted"
+            className="rounded-full bg-paper px-4 py-2 text-sm font-medium shadow-raised-sm transition-[box-shadow,color] duration-200 hover:text-accent active:shadow-pressed-sm"
           >
             {t.listen}
           </button>
@@ -142,7 +142,7 @@ export function DishSheet({ dish, text, language, restaurantSlug, onClose }: Dis
       <div className="mt-4 flex flex-wrap items-center gap-2 text-xs">
         {dish.allergens.length > 0 ? (
           <>
-            <span className="text-muted">{d.contains}</span>
+            <span className="eyebrow text-muted">{d.contains}</span>
             {dish.allergens.map((allergen) => (
               <Chip key={allergen} label={d.allergens[allergen]} tone="allergen" />
             ))}
@@ -160,7 +160,7 @@ export function DishSheet({ dish, text, language, restaurantSlug, onClose }: Dis
         </p>
       )}
 
-      <div className="mt-6 border-t border-line pt-5">
+      <div className="mt-6 border-t border-ink/10 pt-6">
         {result === undefined && (
           <p role="status" className="text-sm text-muted">
             {t.loading}
@@ -180,7 +180,7 @@ export function DishSheet({ dish, text, language, restaurantSlug, onClose }: Dis
               <Meter label={t.richness} level={insight.richness} words={t.richnessLevels} />
             </div>
             <div>
-              <h3 className="text-sm font-medium">{t.portion}</h3>
+              <h3 className="eyebrow text-muted">{t.portion}</h3>
               <p className="mt-1 text-sm">{t.portionLabels[insight.portion]}</p>
               {insight.portionNote && (
                 <p className="mt-1 text-sm leading-relaxed text-muted">{insight.portionNote}</p>
@@ -189,7 +189,7 @@ export function DishSheet({ dish, text, language, restaurantSlug, onClose }: Dis
             <Section title={t.background} body={insight.background} />
             {insight.glossary.length > 0 && (
               <div>
-                <h3 className="text-sm font-medium">{t.glossary}</h3>
+                <h3 className="eyebrow text-muted">{t.glossary}</h3>
                 <dl className="mt-1 space-y-1 text-sm leading-relaxed">
                   {insight.glossary.map((entry) => (
                     <div key={entry.term}>

@@ -1,10 +1,10 @@
 import { cn } from "@/lib/cn";
 
-/** Shared styling for text inputs, selects, and textareas. */
+/** Shared styling for text inputs, selects, and textareas: a well pressed into the clay. */
 export function fieldClass(className?: string) {
   return cn(
-    "w-full rounded-md border border-line bg-card px-3 py-2 text-sm text-ink transition-colors",
-    "placeholder:text-muted/70 focus:border-ink focus:outline-none disabled:opacity-60",
+    "w-full rounded-control bg-paper px-4 py-2.5 text-sm text-ink shadow-pressed transition-shadow duration-200",
+    "placeholder:text-muted/80 focus:shadow-well disabled:opacity-60",
     className,
   );
 }

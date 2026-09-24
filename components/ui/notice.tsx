@@ -23,7 +23,11 @@ export function Notice({ children, tone = "caution", role = "note", className }:
   return (
     <p
       role={role}
-      className={cn("rounded-xl border px-4 py-3 text-sm leading-relaxed", TONES[tone], className)}
+      className={cn(
+        "rounded-control border px-4 py-3 text-sm leading-relaxed",
+        TONES[tone],
+        className,
+      )}
     >
       {children}
     </p>

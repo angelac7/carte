@@ -1,13 +1,6 @@
 import Image from "next/image";
-import { DotPattern } from "@/components/motion/DotPattern";
+import type { ReactNode } from "react";
 import { cn } from "@/lib/cn";
-
-const FALLBACKS = {
-  warm: "radial-gradient(circle at 25% 20%, #f7dfae, transparent 55%), radial-gradient(circle at 80% 75%, #e9b765, transparent 50%), #fbf1da",
-  basil:
-    "radial-gradient(circle at 70% 25%, #bfe0cb, transparent 55%), radial-gradient(circle at 20% 80%, #8fc4a4, transparent 50%), #e6f1ea",
-  ink: "radial-gradient(circle at 30% 30%, #3a4d63, transparent 55%), radial-gradient(circle at 75% 70%, #7a5000, transparent 45%), #1c2a39",
-} as const;
 
 type MediaFrameProps = {
   src: string | null;
@@ -16,10 +9,11 @@ type MediaFrameProps = {
   className?: string;
   imageClassName?: string;
   priority?: boolean;
-  tone?: keyof typeof FALLBACKS;
+  /** Shown in a carved clay well when the photo hasn't been added yet. */
+  placeholder?: ReactNode;
 };
 
-/** A photo that fills its frame, or a designed gradient when the photo hasn't been added yet. */
+/** A photo that fills its frame, or a carved clay well with editorial type when there's no photo. */
 export function MediaFrame({
   src,
   alt,
@@ -27,10 +21,10 @@ export function MediaFrame({
   className,
   imageClassName,
   priority = false,
-  tone = "warm",
+  placeholder,
 }: MediaFrameProps) {
   return (
-    <div className={cn("relative overflow-hidden", className)}>
+    <div className={cn("relative overflow-hidden", !src && "shadow-well", className)}>
       {src ? (
         <Image
           src={src}
@@ -43,10 +37,9 @@ export function MediaFrame({
       ) : (
         <div
           aria-hidden="true"
-          className="absolute inset-0"
-          style={{ background: FALLBACKS[tone] }}
+          className="texture-grid absolute inset-0 flex items-center justify-center p-8"
         >
-          <DotPattern className="text-white/40" />
+          {placeholder}
         </div>
       )}
     </div>

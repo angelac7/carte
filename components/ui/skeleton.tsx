@@ -17,7 +17,7 @@ type PageSkeletonProps = {
 export function PageSkeleton({ rows = 4, hero = false, narrow = false }: PageSkeletonProps) {
   const width = narrow ? "max-w-3xl" : "max-w-5xl";
   const cards = Array.from({ length: rows }, (_, index) => (
-    <div key={index} className="rounded-2xl border border-line bg-card p-5">
+    <div key={index} className="rounded-panel bg-paper p-6 shadow-raised">
       <Skeleton className="h-6 w-1/2" />
       <Skeleton className="mt-3 h-4 w-5/6" />
       <div className="mt-4 flex gap-2">
@@ -30,7 +30,7 @@ export function PageSkeleton({ rows = 4, hero = false, narrow = false }: PageSke
   if (hero) {
     return (
       <main aria-busy="true" aria-label="Loading">
-        <div className="bg-ink">
+        <div className="texture-ink">
           <div className={cn("mx-auto px-5 pt-20 pb-20 sm:pt-28", width)}>
             <div className="h-12 w-2/3 rounded-md bg-white/10 sm:h-16" />
             <div className="mt-5 h-4 w-full max-w-md rounded-md bg-white/10" />

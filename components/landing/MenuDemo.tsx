@@ -84,17 +84,20 @@ export function MenuDemo() {
     <div
       onPointerEnter={() => setPaused(true)}
       onPointerLeave={() => setPaused(false)}
-      className="rounded-2xl bg-card p-6 text-ink shadow-2xl ring-1 ring-black/5 sm:p-8"
+      className="rounded-panel bg-paper p-6 text-ink shadow-raised-lg sm:p-8"
     >
       <div className="flex items-center justify-between gap-4">
-        <p className="font-serif text-2xl">Maru Kitchen</p>
+        <div>
+          <p className="eyebrow text-muted">Sample menu</p>
+          <p className="mt-1 font-serif text-3xl tracking-tight">Maru Kitchen</p>
+        </div>
         <AnimatePresence mode="wait">
           <motion.span
             key={lang.code}
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -6 }}
-            className="rounded-full bg-paper px-3 py-1 text-xs text-muted"
+            className="eyebrow rounded-full px-3 py-1.5 text-muted shadow-pressed-sm"
           >
             {lang.label}
           </motion.span>
@@ -128,7 +131,7 @@ export function MenuDemo() {
                   </motion.span>
                 </AnimatePresence>
                 <span className="leader" aria-hidden="true" />
-                <span className="tabular-nums">{dish.price}</span>
+                <span className="font-mono text-sm tabular-nums">{dish.price}</span>
               </div>
               <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
                 {dish.allergens.map((allergen) => (
@@ -162,9 +165,9 @@ export function MenuDemo() {
         })}
       </ul>
 
-      <div className="mt-6 border-t border-line pt-4">
-        <p className="text-sm text-muted">Try it: tap an allergy.</p>
-        <div className="mt-2 flex flex-wrap gap-2">
+      <div className="mt-6 border-t border-ink/15 pt-5">
+        <p className="eyebrow text-muted">Try it: tap an allergy</p>
+        <div className="mt-3 flex flex-wrap gap-2">
           {TRY_ALLERGENS.map((allergen) => (
             <button
               key={allergen}
@@ -172,10 +175,10 @@ export function MenuDemo() {
               aria-pressed={avoid.includes(allergen)}
               onClick={() => setAvoid((current) => toggleValue(current, allergen))}
               className={cn(
-                "rounded-full border px-3 py-1 text-sm transition-[transform,colors] active:scale-95",
+                "rounded-full px-3.5 py-1.5 text-sm font-medium transition-[box-shadow,background-color,color] duration-200",
                 avoid.includes(allergen)
-                  ? "border-ink bg-ink text-white"
-                  : "border-line text-muted hover:border-muted hover:text-ink",
+                  ? "bg-ink text-white shadow-pressed-color"
+                  : "bg-paper text-muted shadow-raised-sm hover:text-ink",
               )}
             >
               {allergen}

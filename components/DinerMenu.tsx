@@ -20,6 +20,7 @@ import { ToggleChip } from "@/components/ToggleChip";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Notice } from "@/components/ui/notice";
+import { panelClass } from "@/components/ui/panel";
 import { ALLERGENS, DIETARY_TAGS, type Allergen, type DietaryTag } from "@/lib/allergens";
 import { fetchTranslations, trackDishView } from "@/lib/api-client";
 import { writePrefsCookie, type DinerPrefs } from "@/lib/diner-prefs";
@@ -58,9 +59,6 @@ type DinerMenuProps = {
   initialDisplay: DisplayPrefs;
 };
 
-const COVER_FALLBACK =
-  "radial-gradient(circle at 20% 30%, #3a4d63, transparent 50%), radial-gradient(circle at 85% 80%, #7a5000, transparent 45%), #111b26";
-
 /** The restaurant's name over a slowly zooming photo of one of its dishes. */
 function MenuHero({
   name,
@@ -74,38 +72,34 @@ function MenuHero({
   picker: ReactNode;
 }) {
   return (
-    <header className="relative isolate flex min-h-[38svh] items-end overflow-hidden bg-ink text-white">
-      {cover ? (
-        <Image
-          src={cover}
-          alt=""
-          fill
-          priority
-          sizes="100vw"
-          className="ken-burns -z-20 object-cover"
-        />
-      ) : (
-        <div
-          aria-hidden="true"
-          className="absolute inset-0 -z-20"
-          style={{ background: COVER_FALLBACK }}
-        />
+    <header className="texture-ink relative isolate flex min-h-[40svh] items-end overflow-hidden text-white">
+      {cover && (
+        <>
+          <Image
+            src={cover}
+            alt=""
+            fill
+            priority
+            sizes="100vw"
+            className="ken-burns -z-20 object-cover"
+          />
+          <div
+            aria-hidden="true"
+            className="absolute inset-0 -z-10 bg-gradient-to-t from-ink/90 via-ink/45 to-ink/10"
+          />
+        </>
       )}
-      <div
-        aria-hidden="true"
-        className="absolute inset-0 -z-10 bg-gradient-to-t from-ink/90 via-ink/45 to-ink/10"
-      />
-      <div className="mx-auto flex w-full max-w-3xl flex-wrap items-end justify-between gap-4 px-5 pt-24 pb-8">
-        <div>
+      <div className="mx-auto flex w-full max-w-3xl flex-wrap items-end justify-between gap-6 px-5 pt-24 pb-10">
+        <div className="min-w-0">
+          {cuisine && <p className="eyebrow text-white/60">{cuisine}</p>}
           <motion.h1
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: "easeOut" }}
-            className="font-serif text-4xl leading-tight tracking-tight text-balance break-words sm:text-6xl"
+            className="mt-3 font-serif text-5xl leading-[0.95] tracking-tighter text-balance break-words sm:text-7xl"
           >
             {name}
           </motion.h1>
-          {cuisine && <p className="mt-2 text-white/75">{cuisine}</p>}
         </div>
         {picker}
       </div>
@@ -200,12 +194,12 @@ export function DinerMenu({
   const cover = dishes.find((dish) => dish.photo_url)?.photo_url ?? null;
 
   const languagePicker = (
-    <label className="flex items-center gap-2 text-sm">
-      <span className="text-white/70">{t.language}</span>
+    <label className="flex items-center gap-3">
+      <span className="eyebrow text-white/60">{t.language}</span>
       <select
         value={language}
         onChange={(e) => chooseLanguage(e.target.value)}
-        className="rounded-md border border-white/25 bg-white/10 px-3 py-1.5 text-sm text-white backdrop-blur focus:border-white [&>option]:text-ink"
+        className="rounded-full border border-white/25 bg-white/10 px-4 py-2 text-sm text-white backdrop-blur focus:border-white [&>option]:text-ink"
       >
         {LANGUAGES.map((option) => (
           <option key={option.code} value={option.code} lang={option.htmlLang}>
@@ -273,13 +267,10 @@ export function DinerMenu({
           onOpenDish={openDetails}
         />
 
-        <section
-          aria-label={t.hideContaining}
-          className="mt-8 rounded-2xl border border-line bg-card p-5 shadow-sm sm:p-6"
-        >
+        <section aria-label={t.hideContaining} className={panelClass("mt-8 p-6 sm:p-8")}>
           <fieldset>
-            <legend className="text-sm font-medium">{t.hideContaining}</legend>
-            <div className="mt-2 flex flex-wrap gap-2">
+            <legend className="eyebrow text-muted">{t.hideContaining}</legend>
+            <div className="mt-4 flex flex-wrap gap-2.5">
               {ALLERGENS.map((allergen) => (
                 <ToggleChip
                   key={allergen}
@@ -292,9 +283,9 @@ export function DinerMenu({
             </div>
           </fieldset>
 
-          <fieldset className="mt-4">
-            <legend className="text-sm font-medium">{t.showOnly}</legend>
-            <div className="mt-2 flex flex-wrap gap-2">
+          <fieldset className="mt-6">
+            <legend className="eyebrow text-muted">{t.showOnly}</legend>
+            <div className="mt-4 flex flex-wrap gap-2.5">
               {DIETARY_TAGS.map((tag) => (
                 <ToggleChip
                   key={tag}
@@ -315,7 +306,7 @@ export function DinerMenu({
                 exit={{ height: 0, opacity: 0 }}
                 className="overflow-hidden"
               >
-                <div className="mt-4 flex flex-wrap items-center justify-between gap-4 border-t border-line pt-4 text-sm">
+                <div className="mt-6 flex flex-wrap items-center justify-between gap-4 border-t border-ink/10 pt-5 text-sm">
                   <p aria-live="polite" className="text-muted">
                     {t.showing(shown.length, dishes.length, hiddenCount)}
                   </p>
@@ -334,7 +325,7 @@ export function DinerMenu({
         {shown.length === 0 ? (
           <EmptyState className="mt-6">{t.noMatch}</EmptyState>
         ) : (
-          <ul className="mt-6 space-y-4">
+          <ul className="mt-8 space-y-6">
             <AnimatePresence initial={false} mode="popLayout">
               {shown.map((dish) => {
                 const text = textFor(dish);
@@ -346,7 +337,7 @@ export function DinerMenu({
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.97 }}
                     transition={{ duration: 0.3, ease: "easeOut" }}
-                    className="rounded-2xl border border-line bg-card p-5 transition-shadow duration-300 hover:shadow-md sm:p-6"
+                    className="rounded-panel bg-paper p-6 shadow-raised transition-shadow duration-300 hover:shadow-raised-lg sm:p-7"
                   >
                     <div className="flex gap-4">
                       <div className="min-w-0 flex-1">
@@ -362,7 +353,7 @@ export function DinerMenu({
                         <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">
                           {dish.allergens.length > 0 ? (
                             <>
-                              <span className="text-muted">{t.contains}</span>
+                              <span className="eyebrow text-muted">{t.contains}</span>
                               {dish.allergens.map((allergen) => (
                                 <Chip
                                   key={allergen}
@@ -390,7 +381,7 @@ export function DinerMenu({
                           type="button"
                           onClick={() => openDetails(dish.id)}
                           aria-label={`${dishText.details}: ${text.name}`}
-                          className="group relative h-24 w-24 shrink-0 overflow-hidden rounded-xl sm:h-28 sm:w-28"
+                          className="group relative h-24 w-24 shrink-0 overflow-hidden rounded-[1.25rem] shadow-raised-sm sm:h-28 sm:w-28"
                         >
                           <Image
                             src={dish.photo_url}
@@ -402,10 +393,10 @@ export function DinerMenu({
                         </button>
                       )}
                     </div>
-                    <div className="mt-4 flex items-center justify-between gap-4 border-t border-line pt-4">
+                    <div className="mt-5 flex items-center justify-between gap-4 border-t border-ink/10 pt-5">
                       <button
                         onClick={() => openDetails(dish.id)}
-                        className="text-sm font-medium underline underline-offset-4 hover:text-muted"
+                        className="text-sm font-semibold underline underline-offset-4 hover:text-accent"
                       >
                         {dishText.details}
                       </button>

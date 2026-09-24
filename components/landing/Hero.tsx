@@ -1,14 +1,8 @@
-"use client";
-import { motion, useScroll, useTransform } from "motion/react";
-import Image from "next/image";
-import { useRef } from "react";
+import { DepthRings } from "@/components/landing/DepthRings";
 import { MenuDemo } from "@/components/landing/MenuDemo";
 import { BlurFade } from "@/components/motion/BlurFade";
 import { WordRotate } from "@/components/motion/WordRotate";
 import { ButtonLink } from "@/components/ui/button";
-
-const HERO_FALLBACK =
-  "radial-gradient(circle at 20% 30%, #3a4d63, transparent 50%), radial-gradient(circle at 85% 70%, #7a5000, transparent 45%), #111b26";
 
 const LANGUAGE_PHRASES = [
   "in Korean.",
@@ -20,83 +14,53 @@ const LANGUAGE_PHRASES = [
   "in English.",
 ];
 
-type HeroProps = { image: string | null; video: string | null };
-
-/** Full-screen opening section: cinematic background and the live menu card. */
-export function Hero({ image, video }: HeroProps) {
-  const ref = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  const contentY = useTransform(scrollYProgress, [0, 1], ["0%", "16%"]);
-  const fade = useTransform(scrollYProgress, [0, 0.85], [1, 0]);
-
+/** Opening section: oversized editorial type beside the live menu card, raised from the clay. */
+export function Hero() {
   return (
-    <section
-      ref={ref}
-      className="relative isolate flex min-h-[calc(100svh-3.5rem)] snap-start items-center overflow-hidden bg-ink text-white"
-    >
-      <div className="absolute inset-0 -z-20">
-        {image && (
-          <Image
-            src={image}
-            alt=""
-            fill
-            priority
-            sizes="100vw"
-            className="ken-burns object-cover"
-          />
-        )}
-        {video && (
-          <video
-            className="ken-burns absolute inset-0 h-full w-full object-cover motion-reduce:hidden"
-            autoPlay
-            muted
-            loop
-            playsInline
-            poster={image ?? undefined}
-          >
-            <source src={video} type="video/mp4" />
-          </video>
-        )}
-        {!image && !video && (
-          <div className="absolute inset-0" style={{ background: HERO_FALLBACK }} />
-        )}
-      </div>
+    <section className="relative isolate snap-start overflow-hidden">
       <div
         aria-hidden="true"
-        className="absolute inset-0 -z-10 bg-gradient-to-r from-ink/90 via-ink/60 to-ink/25"
+        className="texture-grid absolute inset-0 -z-10 [mask-image:linear-gradient(to_bottom,black,transparent_85%)]"
       />
-
-      <motion.div
-        style={{ y: contentY, opacity: fade }}
-        className="mx-auto grid w-full max-w-6xl items-center gap-12 px-5 py-20 lg:grid-cols-[1.15fr_1fr]"
-      >
+      <div className="mx-auto grid w-full max-w-6xl items-center gap-14 px-5 pt-14 pb-20 sm:pt-20 lg:grid-cols-[1.25fr_1fr] lg:pt-24 lg:pb-28">
         <div>
           <BlurFade>
-            <h1 className="font-serif text-[clamp(3rem,8vw,6.5rem)] leading-[0.95] tracking-tight">
-              Every menu, understood.
+            <p className="eyebrow text-muted">Allergen-confirmed menus · 7 languages</p>
+          </BlurFade>
+          <BlurFade delay={0.08}>
+            <h1 className="mt-6 font-serif text-[clamp(3.5rem,15vw,9.5rem)] leading-[0.88] tracking-tighter">
+              Every menu, <em className="text-accent">understood.</em>
             </h1>
           </BlurFade>
-          <BlurFade delay={0.15}>
-            <p className="mt-6 max-w-lg text-lg leading-relaxed text-white/80">
+          <div aria-hidden="true" className="mt-8 flex items-center gap-3">
+            <span className="h-1 w-24 bg-ink" />
+            <span className="h-3 w-3 border-2 border-ink" />
+          </div>
+          <BlurFade delay={0.16}>
+            <p className="mt-8 max-w-lg text-lg leading-relaxed text-muted">
               Allergens confirmed by the kitchen. Every dish explained. The whole menu,{" "}
-              <WordRotate words={LANGUAGE_PHRASES} className="text-white" />
+              <WordRotate words={LANGUAGE_PHRASES} className="font-serif text-ink italic" />
             </p>
           </BlurFade>
-          <BlurFade delay={0.3}>
-            <div className="mt-10 flex flex-wrap gap-3">
-              <ButtonLink href="/discover" size="lg" variant="inverse" shine>
-                Find somewhere to eat
+          <BlurFade delay={0.24}>
+            <div className="mt-10 flex flex-wrap gap-4">
+              <ButtonLink href="/discover" size="lg" shine>
+                Find somewhere to eat <span aria-hidden="true">→</span>
               </ButtonLink>
-              <ButtonLink href="/signup" size="lg" variant="glass">
+              <ButtonLink href="/signup" size="lg" variant="secondary">
                 Put your menu on Carte
               </ButtonLink>
             </div>
           </BlurFade>
         </div>
-        <BlurFade delay={0.2}>
-          <MenuDemo />
-        </BlurFade>
-      </motion.div>
+
+        <div className="relative">
+          <DepthRings className="absolute -top-24 -right-20 -z-10 hidden sm:block" />
+          <BlurFade delay={0.2}>
+            <MenuDemo />
+          </BlurFade>
+        </div>
+      </div>
     </section>
   );
 }

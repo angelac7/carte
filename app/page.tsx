@@ -1,17 +1,15 @@
 import Link from "next/link";
 import { FeatureShowcase, type Feature } from "@/components/landing/FeatureShowcase";
 import { Hero } from "@/components/landing/Hero";
-import { MediaFrame } from "@/components/landing/MediaFrame";
-import { ParallaxBand } from "@/components/landing/ParallaxBand";
+import { PullQuote } from "@/components/landing/PullQuote";
 import { BlurFade } from "@/components/motion/BlurFade";
-import { DotPattern } from "@/components/motion/DotPattern";
 import { Marquee } from "@/components/motion/Marquee";
 import { NumberTicker } from "@/components/motion/NumberTicker";
 import { Particles } from "@/components/motion/Particles";
-import { SpotlightCard } from "@/components/motion/SpotlightCard";
 import { PublicHeader } from "@/components/PublicHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { ButtonLink } from "@/components/ui/button";
+import { panelClass } from "@/components/ui/panel";
 import { redirectIfSignedIn } from "@/lib/auth";
 import { searchRestaurants } from "@/lib/db/discover";
 import { publicAsset } from "@/lib/public-asset";
@@ -94,144 +92,152 @@ export default async function LandingPage() {
     ...feature,
     image: publicAsset(`images/feature-${feature.id}.jpg`),
   }));
-  const ownersImage = publicAsset("images/owners.jpg");
-
   return (
     <>
       <PublicHeader />
       <main className="landing-snap">
-        <Hero image={publicAsset("images/hero.jpg")} video={publicAsset("videos/hero.mp4")} />
+        <Hero />
 
-        <section
-          aria-label="Restaurants and cuisines on Carte"
-          className="snap-start space-y-4 bg-ink py-8 text-white"
-        >
-          <Marquee duration={50}>
-            {restaurants.length >= 3
-              ? restaurants.map((restaurant) => (
-                  <Link
-                    key={restaurant.id}
-                    href={`/r/${restaurant.slug}`}
-                    className="font-serif text-3xl whitespace-nowrap text-white/80 transition-colors hover:text-white"
-                  >
-                    {restaurant.name}{" "}
-                    <span aria-hidden="true" className="px-4 text-saffron">
-                      ✦
+        {/* Inverted ink band: what's on Carte, then the numbers. */}
+        <section aria-label="Carte in numbers" className="texture-ink snap-start text-white">
+          <div aria-label="Restaurants and cuisines on Carte" className="space-y-4 py-8">
+            <Marquee duration={50}>
+              {restaurants.length >= 3
+                ? restaurants.map((restaurant) => (
+                    <Link
+                      key={restaurant.id}
+                      href={`/r/${restaurant.slug}`}
+                      className="font-serif text-3xl whitespace-nowrap text-white/80 italic transition-colors hover:text-white"
+                    >
+                      {restaurant.name}{" "}
+                      <span aria-hidden="true" className="px-4 text-accent-glow not-italic">
+                        ✦
+                      </span>
+                    </Link>
+                  ))
+                : CUISINES.map((cuisine) => (
+                    <span
+                      key={cuisine}
+                      className="font-serif text-3xl whitespace-nowrap text-white/80 italic"
+                    >
+                      {cuisine}{" "}
+                      <span aria-hidden="true" className="px-4 text-accent-glow not-italic">
+                        ✦
+                      </span>
                     </span>
-                  </Link>
-                ))
-              : CUISINES.map((cuisine) => (
-                  <span
-                    key={cuisine}
-                    className="font-serif text-3xl whitespace-nowrap text-white/80"
-                  >
-                    {cuisine}{" "}
-                    <span aria-hidden="true" className="px-4 text-saffron">
-                      ✦
-                    </span>
+                  ))}
+            </Marquee>
+            <Marquee duration={35} reverse>
+              {MENU_WORDS.map((word) => (
+                <span key={word} className="eyebrow whitespace-nowrap text-white/45">
+                  {word}{" "}
+                  <span aria-hidden="true" className="px-6">
+                    ·
                   </span>
-                ))}
-          </Marquee>
-          <Marquee duration={35} reverse>
-            {MENU_WORDS.map((word) => (
-              <span key={word} className="text-lg whitespace-nowrap text-white/50">
-                {word}{" "}
-                <span aria-hidden="true" className="px-6">
-                  ·
                 </span>
-              </span>
-            ))}
-          </Marquee>
-        </section>
-
-        <section className="snap-start px-5 py-20 sm:py-24">
-          <div className="mx-auto grid max-w-6xl gap-10 sm:grid-cols-2 lg:grid-cols-4">
-            {STATS.map((stat, index) => (
-              <BlurFade key={stat.label} delay={index * 0.08}>
-                <NumberTicker
-                  value={stat.value}
-                  className="block font-serif text-6xl leading-none sm:text-7xl"
-                />
-                <p className="mt-3 max-w-[16rem] text-sm leading-relaxed text-muted">
-                  {stat.label}
-                </p>
-              </BlurFade>
-            ))}
+              ))}
+            </Marquee>
+          </div>
+          <div className="border-t border-white/15">
+            <dl className="mx-auto grid max-w-6xl grid-cols-2 px-5 lg:grid-cols-4">
+              {STATS.map((stat, index) => (
+                <BlurFade
+                  key={stat.label}
+                  delay={index * 0.08}
+                  className="border-l border-white/15 py-12 pr-4 pl-5 lg:py-16"
+                >
+                  <dt className="sr-only">{stat.label}</dt>
+                  <dd>
+                    <NumberTicker
+                      value={stat.value}
+                      className="block font-serif text-7xl leading-none tracking-tighter sm:text-8xl"
+                    />
+                    <p className="eyebrow mt-4 max-w-[14rem] leading-relaxed text-white/60">
+                      {stat.label}
+                    </p>
+                  </dd>
+                </BlurFade>
+              ))}
+            </dl>
           </div>
         </section>
 
-        <section className="snap-start px-5 pb-20 sm:pb-24">
+        <section className="snap-start px-5 py-24 sm:py-32">
           <div className="mx-auto max-w-6xl">
+            <div className="flex items-center justify-between border-t-4 border-ink pt-5">
+              <p className="eyebrow">01 — For diners</p>
+              <p className="eyebrow hidden text-muted sm:block">Six things Carte does</p>
+            </div>
             <BlurFade>
-              <h2 className="max-w-2xl font-serif text-4xl leading-tight tracking-tight sm:text-6xl">
-                Built for the person reading the menu.
+              <h2 className="mt-10 max-w-4xl font-serif text-5xl leading-[0.95] tracking-tighter sm:text-7xl">
+                Built for the person <em className="text-accent">reading</em> the menu.
               </h2>
             </BlurFade>
-            <div className="mt-12">
+            <div className="mt-16">
               <FeatureShowcase features={features} />
             </div>
           </div>
         </section>
 
-        <ParallaxBand image={publicAsset("images/band.jpg")} />
+        <PullQuote
+          quote="Allergies aren’t an afterthought. They’re the first thing on the menu."
+          caption="How Carte is built"
+        />
 
-        <section className="snap-start bg-ink px-5 py-20 text-white sm:py-24">
-          <div className="mx-auto grid max-w-6xl items-center gap-12 lg:grid-cols-2">
-            <BlurFade>
-              <MediaFrame
-                src={ownersImage}
-                alt="A restaurant owner in their kitchen"
-                sizes="(min-width: 1024px) 50vw, 100vw"
-                className="aspect-[4/5] rounded-2xl"
-                tone="ink"
-              />
-            </BlurFade>
+        <section className="snap-start px-5 py-24 sm:py-32">
+          <div className="mx-auto grid max-w-6xl gap-16 lg:grid-cols-2">
             <div>
+              <div className="border-t-4 border-ink pt-5">
+                <p className="eyebrow">02 — For restaurants</p>
+              </div>
               <BlurFade>
-                <h2 className="font-serif text-4xl leading-tight tracking-tight sm:text-6xl">
-                  For restaurants, it takes one photo.
+                <h2 className="mt-10 font-serif text-5xl leading-[0.95] tracking-tighter sm:text-7xl">
+                  It takes <em className="text-accent">one photo.</em>
                 </h2>
               </BlurFade>
-              <ul className="mt-10 space-y-3">
-                {OWNER_POINTS.map((point, index) => (
-                  <li key={point}>
-                    <BlurFade delay={index * 0.08}>
-                      <SpotlightCard className="border-white/10 bg-white/5 p-5">
-                        <p className="flex gap-3 leading-relaxed text-white/85">
-                          <span aria-hidden="true" className="text-basil-soft">
-                            ✓
-                          </span>
-                          {point}
-                        </p>
-                      </SpotlightCard>
-                    </BlurFade>
-                  </li>
-                ))}
-              </ul>
-              <BlurFade delay={0.3}>
-                <ButtonLink href="/signup" size="lg" variant="inverse" shine className="mt-10">
-                  Put your menu on Carte
-                </ButtonLink>
-              </BlurFade>
+              <p className="mt-8 max-w-md text-lg leading-relaxed text-muted">
+                Carte reads your paper menu, you confirm every allergen, and diners get a menu they
+                can trust in their own language.
+              </p>
+              <ButtonLink href="/signup" size="lg" shine className="mt-10">
+                Put your menu on Carte <span aria-hidden="true">→</span>
+              </ButtonLink>
             </div>
+            <ol className="space-y-5">
+              {OWNER_POINTS.map((point, index) => (
+                <li key={point}>
+                  <BlurFade delay={index * 0.08}>
+                    <div className={panelClass("flex items-start gap-5 p-6 sm:p-7")}>
+                      <span
+                        aria-hidden="true"
+                        className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full font-mono text-sm text-accent shadow-well"
+                      >
+                        {String(index + 1).padStart(2, "0")}
+                      </span>
+                      <p className="pt-2.5 leading-relaxed">{point}</p>
+                    </div>
+                  </BlurFade>
+                </li>
+              ))}
+            </ol>
           </div>
         </section>
 
-        <section className="relative isolate snap-start overflow-hidden px-5 py-24 sm:py-32">
-          <DotPattern className="-z-10 [mask-image:radial-gradient(ellipse_at_center,white,transparent_70%)]" />
-          <Particles className="-z-10" />
-          <div className="mx-auto max-w-3xl text-center">
+        <section className="texture-ink relative isolate snap-start overflow-hidden border-b border-white/10 px-5 py-28 text-white sm:py-40">
+          <Particles className="-z-10 opacity-40" color="#ffffff" />
+          <div className="mx-auto max-w-4xl text-center">
+            <p className="eyebrow text-white/60">03 — Tonight</p>
             <BlurFade>
-              <h2 className="font-serif text-4xl leading-tight tracking-tight sm:text-7xl">
-                Find somewhere you can eat tonight.
+              <h2 className="mt-8 font-serif text-5xl leading-[0.95] tracking-tighter sm:text-8xl">
+                Find somewhere you <em className="text-accent-glow">can</em> eat tonight.
               </h2>
             </BlurFade>
             <BlurFade delay={0.15}>
-              <div className="mt-10 flex flex-wrap justify-center gap-3">
-                <ButtonLink href="/discover" size="lg" shine>
-                  Discover restaurants
+              <div className="mt-12 flex flex-wrap justify-center gap-4">
+                <ButtonLink href="/discover" size="lg" variant="inverse">
+                  Discover restaurants <span aria-hidden="true">→</span>
                 </ButtonLink>
-                <ButtonLink href="/places" size="lg" variant="secondary">
+                <ButtonLink href="/places" size="lg" variant="glass">
                   See what’s nearby
                 </ButtonLink>
               </div>

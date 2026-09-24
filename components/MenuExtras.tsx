@@ -45,7 +45,7 @@ export function MenuExtras({
     ...state.dishes.map((dish) => dish.dishId),
   ]);
   const similar = similarDishes(liked, candidates, alreadyKnown, 3);
-  const linkClass = "underline underline-offset-4 hover:text-muted";
+  const linkClass = "underline underline-offset-4 hover:text-accent";
 
   return (
     <>
@@ -65,9 +65,9 @@ export function MenuExtras({
       </div>
 
       {similar.length > 0 && (
-        <div className="mt-4 rounded-xl border border-line bg-card p-4">
-          <h2 className="text-sm font-medium">{t.similarTitle}</h2>
-          <ul className="mt-2 space-y-1">
+        <div className="mt-5 rounded-control p-5 shadow-pressed">
+          <h2 className="eyebrow text-muted">{t.similarTitle}</h2>
+          <ul className="mt-3 space-y-1.5">
             {similar.map((dish) => (
               <li key={dish.id}>
                 <button

@@ -8,9 +8,9 @@ type DishHeaderProps = {
 export function DishHeader({ name, price, as: Name = "span" }: DishHeaderProps) {
   return (
     <div className="flex items-baseline">
-      <Name className="font-serif text-xl">{name}</Name>
+      <Name className="font-serif text-2xl leading-tight tracking-tight">{name}</Name>
       <span className="leader" aria-hidden="true" />
-      <span className="tabular-nums">{price}</span>
+      <span className="font-mono text-sm tabular-nums">{price}</span>
     </div>
   );
 }

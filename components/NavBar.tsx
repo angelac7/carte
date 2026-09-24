@@ -3,7 +3,6 @@ import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, type ReactNode } from "react";
-import { cn } from "@/lib/cn";
 
 type NavLink = { href: string; label: string };
 
@@ -21,17 +20,23 @@ export function NavBar({ homeHref, links, subtitle, trailing }: NavBarProps) {
   const isActive = (href: string) => pathname === href;
 
   const linkClass =
-    "relative isolate rounded-md px-3 py-1.5 text-sm text-muted transition-colors hover:text-ink aria-[current=page]:text-ink";
+    "eyebrow relative isolate rounded-full px-3.5 py-2 text-muted transition-colors hover:text-ink aria-[current=page]:text-accent";
+  const mobileLinkClass =
+    "rounded-control px-4 py-3 font-mono text-sm tracking-wider text-muted uppercase transition-[color,box-shadow] hover:text-ink aria-[current=page]:text-accent aria-[current=page]:shadow-pressed-sm";
 
   return (
-    <header className="sticky top-0 z-30 border-b border-line bg-card/85 backdrop-blur print:hidden">
+    <header className="sticky top-0 z-30 border-b border-ink bg-paper/85 backdrop-blur print:hidden">
       <nav className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-5 py-3">
         <div className="flex min-w-0 items-baseline gap-3">
-          <Link href={homeHref} className="font-serif text-2xl" onClick={() => setOpen(false)}>
+          <Link
+            href={homeHref}
+            className="font-serif text-[1.75rem] leading-none tracking-tight"
+            onClick={() => setOpen(false)}
+          >
             Carte
           </Link>
           {subtitle && (
-            <span className="hidden truncate text-sm text-muted sm:inline">{subtitle}</span>
+            <span className="eyebrow hidden truncate text-muted sm:inline">{subtitle}</span>
           )}
         </div>
 
@@ -46,7 +51,7 @@ export function NavBar({ homeHref, links, subtitle, trailing }: NavBarProps) {
               {isActive(link.href) && (
                 <motion.span
                   layoutId="nav-highlight"
-                  className="absolute inset-0 -z-10 rounded-md bg-paper"
+                  className="absolute inset-0 -z-10 rounded-full bg-paper shadow-pressed-sm"
                   transition={{ type: "spring", bounce: 0.2, duration: 0.4 }}
                 />
               )}
@@ -58,7 +63,7 @@ export function NavBar({ homeHref, links, subtitle, trailing }: NavBarProps) {
 
         <button
           type="button"
-          className="rounded-md p-2 transition-colors hover:bg-paper md:hidden"
+          className="rounded-full bg-paper p-2.5 shadow-raised-sm transition-shadow active:shadow-pressed-sm md:hidden"
           aria-expanded={open}
           aria-controls="mobile-nav"
           aria-label={open ? "Close menu" : "Open menu"}
@@ -89,7 +94,7 @@ export function NavBar({ homeHref, links, subtitle, trailing }: NavBarProps) {
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.25, ease: "easeOut" }}
-            className="overflow-hidden border-t border-line md:hidden"
+            className="overflow-hidden border-t border-ink/10 md:hidden"
           >
             <div className="flex flex-col gap-1 px-5 py-3">
               {links.map((link) => (
@@ -98,7 +103,7 @@ export function NavBar({ homeHref, links, subtitle, trailing }: NavBarProps) {
                   href={link.href}
                   aria-current={isActive(link.href) ? "page" : undefined}
                   onClick={() => setOpen(false)}
-                  className={cn(linkClass, "px-2 py-2.5 text-base aria-[current=page]:bg-paper")}
+                  className={mobileLinkClass}
                 >
                   {link.label}
                 </Link>

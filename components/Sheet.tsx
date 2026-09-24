@@ -26,7 +26,7 @@ export function Sheet({ title, closeLabel, onClose, children, media, subtitle }:
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="fixed inset-0 z-30 flex items-end justify-center bg-ink/40 backdrop-blur-[2px] sm:items-center print:hidden"
+      className="fixed inset-0 z-30 flex items-end justify-center bg-ink/45 backdrop-blur-sm sm:items-center print:hidden"
       onClick={onClose}
     >
       <motion.section
@@ -38,16 +38,16 @@ export function Sheet({ title, closeLabel, onClose, children, media, subtitle }:
         transition={{ type: "spring", bounce: 0.15, duration: 0.45 }}
         onClick={(e) => e.stopPropagation()}
         onKeyDown={(e) => e.key === "Escape" && onClose()}
-        className="max-h-[90svh] w-full overflow-y-auto rounded-t-2xl bg-card p-5 shadow-2xl sm:max-w-lg sm:rounded-2xl sm:p-6"
+        className="max-h-[90svh] w-full overflow-y-auto rounded-t-panel bg-paper p-6 shadow-raised-lg sm:max-w-lg sm:rounded-panel sm:p-8"
       >
         {media && (
-          <div className="relative -mx-5 -mt-5 mb-5 aspect-[16/10] overflow-hidden sm:-mx-6 sm:-mt-6">
+          <div className="relative -mx-3 -mt-3 mb-6 aspect-[16/10] overflow-hidden rounded-[1.5rem] sm:-mx-5 sm:-mt-5">
             {media}
           </div>
         )}
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0">
-            <h2 className="font-serif text-2xl leading-tight">{title}</h2>
+            <h2 className="font-serif text-3xl leading-tight tracking-tight">{title}</h2>
             {subtitle}
           </div>
           <Button

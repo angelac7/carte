@@ -1,19 +1,25 @@
 import type { Metadata } from "next";
-import { Libre_Caslon_Text, Public_Sans } from "next/font/google";
+import { DM_Sans, JetBrains_Mono, Playfair_Display } from "next/font/google";
 import { MotionProvider } from "@/components/motion/MotionProvider";
 import { ServiceWorkerRegistration } from "@/components/ServiceWorkerRegistration";
 import { Toasts } from "@/components/Toasts";
 import "./globals.css";
 
-const caslon = Libre_Caslon_Text({
+// Editorial serif for headlines, a clean sans for reading, and mono for small labels.
+const playfair = Playfair_Display({
   subsets: ["latin"],
-  weight: ["400", "700"],
-  variable: "--font-caslon",
+  style: ["normal", "italic"],
+  variable: "--font-playfair",
 });
 
-const publicSans = Public_Sans({
+const dmSans = DM_Sans({
   subsets: ["latin"],
-  variable: "--font-public-sans",
+  variable: "--font-dm-sans",
+});
+
+const jetbrains = JetBrains_Mono({
+  subsets: ["latin"],
+  variable: "--font-jetbrains",
 });
 
 export const metadata: Metadata = {
@@ -27,7 +33,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html
       lang="en"
       data-scroll-behavior="smooth"
-      className={`${caslon.variable} ${publicSans.variable}`}
+      className={`${playfair.variable} ${dmSans.variable} ${jetbrains.variable}`}
     >
       <body className="min-h-screen antialiased">
         <MotionProvider>{children}</MotionProvider>

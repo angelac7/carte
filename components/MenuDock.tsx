@@ -42,12 +42,14 @@ function DockButton({
       type="button"
       onClick={item.onClick}
       style={{ width: still ? 56 : size, height: still ? 56 : size }}
-      className="relative flex flex-col items-center justify-center gap-1 rounded-xl text-ink transition-colors hover:bg-paper active:scale-95"
+      className="relative flex flex-col items-center justify-center gap-1 rounded-control text-ink transition-[box-shadow,color] duration-200 hover:text-accent active:shadow-pressed-sm"
     >
       <span className="h-6 w-6">{item.icon}</span>
-      <span className="text-[11px] leading-none">{item.label}</span>
+      <span className="font-mono text-[10px] leading-none tracking-wide uppercase">
+        {item.label}
+      </span>
       {item.badge ? (
-        <span className="absolute -top-1 -right-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-ink px-1 text-[11px] font-medium text-white tabular-nums">
+        <span className="absolute -top-1 -right-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-accent px-1 font-mono text-[11px] font-medium text-white tabular-nums">
           {item.badge}
         </span>
       ) : null}
@@ -71,7 +73,7 @@ export function MenuDock({ items, label }: { items: DockItem[]; label: string })
         transition={{ type: "spring", bounce: 0.25, duration: 0.6, delay: 0.3 }}
         onMouseMove={(event) => pointerX.set(event.clientX)}
         onMouseLeave={() => pointerX.set(Infinity)}
-        className="flex items-end gap-1 rounded-2xl border border-line bg-card/90 p-1.5 shadow-xl backdrop-blur"
+        className="flex items-end gap-1 rounded-panel bg-paper/95 p-2 shadow-raised-lg backdrop-blur"
       >
         {items.map((item) => (
           <DockButton key={item.id} item={item} pointerX={pointerX} still={still} />

@@ -1,23 +1,101 @@
 @import "tailwindcss";
 
-/* Colors are CSS variables so display settings like high contrast can override them. */
+/*
+ * Carte's look: soft clay surfaces with editorial ink.
+ * - Clay: one cool-grey surface; controls and panels are raised from it or pressed into it.
+ * - Ink: near-black serif headlines, thick rules, and inverted black sections for emphasis.
+ * - Accent: one electric blue for actions and focus. Safety colors (saffron, tomato) stay separate.
+ * Colors and depths are CSS variables so display settings like high contrast can override them.
+ */
 @theme {
-  --color-paper: #f6f7f4;
-  --color-card: #ffffff;
-  --color-ink: #1c2a39;
-  --color-muted: #5e6b78;
-  --color-line: #d8dde2;
-  --color-basil: #2e7a4e;
+  --color-paper: #e0e5ec;
+  --color-card: #e0e5ec;
+  --color-ink: #0a0c10;
+  --color-muted: #55606e;
+  --color-line: #c3cad4;
+  --color-accent: #1a47e8;
+  --color-accent-glow: #5b8cff;
+  --color-basil: #22683f;
   --color-basil-soft: #e6f1ea;
   --color-saffron: #c98a0c;
   --color-saffron-soft: #fbf1da;
   --color-saffron-ink: #7a5000;
   --color-tomato: #b3261e;
+
+  /* Corners: panels are pillowy, controls are softer, nested pieces sit in between. */
+  --radius-panel: 2rem;
+  --radius-control: 1rem;
+  --radius-inner: 0.75rem;
 }
 
 @theme inline {
-  --font-sans: var(--font-public-sans), system-ui, sans-serif;
-  --font-serif: var(--font-caslon), Georgia, serif;
+  --font-sans: var(--font-dm-sans), system-ui, sans-serif;
+  --font-serif: var(--font-playfair), Georgia, serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, monospace;
+}
+
+/* Depth: a light from the top left, a soft shadow to the bottom right. */
+:root {
+  --depth-light: rgb(255 255 255 / 0.55);
+  --depth-dark: rgb(163 177 198 / 0.65);
+  --depth-raised-sm: 5px 5px 10px var(--depth-dark), -5px -5px 10px var(--depth-light);
+  --depth-raised: 9px 9px 16px var(--depth-dark), -9px -9px 16px var(--depth-light);
+  --depth-raised-lg:
+    12px 12px 22px rgb(163 177 198 / 0.75), -12px -12px 22px rgb(255 255 255 / 0.65);
+  --depth-pressed-sm: inset 3px 3px 6px var(--depth-dark), inset -3px -3px 6px var(--depth-light);
+  --depth-pressed: inset 6px 6px 10px var(--depth-dark), inset -6px -6px 10px var(--depth-light);
+  --depth-well:
+    inset 10px 10px 20px rgb(163 177 198 / 0.75), inset -10px -10px 20px rgb(255 255 255 / 0.65);
+  --depth-pressed-color:
+    inset 3px 3px 7px rgb(0 0 0 / 0.35), inset -3px -3px 7px rgb(255 255 255 / 0.18);
+}
+
+@utility shadow-raised-sm {
+  box-shadow: var(--depth-raised-sm);
+}
+@utility shadow-raised {
+  box-shadow: var(--depth-raised);
+}
+@utility shadow-raised-lg {
+  box-shadow: var(--depth-raised-lg);
+}
+@utility shadow-pressed-sm {
+  box-shadow: var(--depth-pressed-sm);
+}
+@utility shadow-pressed {
+  box-shadow: var(--depth-pressed);
+}
+@utility shadow-well {
+  box-shadow: var(--depth-well);
+}
+/* Pressed look for filled (blue, ink, green) controls. */
+@utility shadow-pressed-color {
+  box-shadow: var(--depth-pressed-color);
+}
+
+/* Small uppercase mono labels: nav, eyebrows, badges, and metadata. */
+@utility eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  line-height: 1rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+/* Faint graph-paper grid for editorial sections. */
+@utility texture-grid {
+  background-image:
+    linear-gradient(rgb(10 12 16 / 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(10 12 16 / 0.045) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* Inverted ink sections: fine vertical lines and a cool glow from above. */
+@utility texture-ink {
+  background-color: var(--color-ink);
+  background-image:
+    radial-gradient(ellipse at top, rgb(91 140 255 / 0.16), transparent 60%),
+    repeating-linear-gradient(90deg, transparent 0 3px, rgb(255 255 255 / 0.03) 3px 4px);
 }
 
 html {
@@ -28,23 +106,44 @@ html.large-text {
   font-size: 118.75%;
 }
 
+/* High contrast: white surfaces, and solid outlines instead of soft shadows. */
 html.high-contrast {
   --color-paper: #ffffff;
+  --color-card: #ffffff;
   --color-muted: #2a3542;
   --color-line: #7a8794;
   --color-saffron-soft: #fff6df;
   --color-saffron-ink: #4d3200;
+  --depth-raised-sm: 0 0 0 2px var(--color-ink);
+  --depth-raised: 0 0 0 2px var(--color-ink);
+  --depth-raised-lg: 0 0 0 3px var(--color-ink);
+  --depth-pressed-sm: inset 0 0 0 2px var(--color-ink);
+  --depth-pressed: inset 0 0 0 2px var(--color-ink);
+  --depth-well: inset 0 0 0 2px var(--color-ink);
 }
 
+/* Paper texture: a little grain and faint print lines over the clay. */
 body {
-  background: var(--color-paper);
+  background-color: var(--color-paper);
+  background-image:
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E"),
+    repeating-linear-gradient(0deg, transparent 0 3px, rgb(10 12 16 / 0.018) 3px 4px);
   color: var(--color-ink);
   font-family: var(--font-sans);
 }
 
+html.high-contrast body {
+  background-image: none;
+}
+
 :focus-visible {
-  outline: 2px solid var(--color-ink);
-  outline-offset: 2px;
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+}
+
+::selection {
+  background: var(--color-accent);
+  color: #fff;
 }
 
 /* Dotted line between dish name and price, like a printed menu */
@@ -92,7 +191,7 @@ html {
   transition: opacity 0.3s ease;
   background: radial-gradient(
     260px circle at var(--x, 50%) var(--y, 50%),
-    color-mix(in oklab, var(--color-basil) 14%, transparent),
+    color-mix(in oklab, var(--color-accent-glow) 18%, transparent),
     transparent 70%
   );
 }
@@ -112,6 +211,20 @@ html {
   animation: marquee var(--duration, 40s) linear infinite;
 }
 
+/* A slow drift for decorative shapes only. Never used on menu or allergy content. */
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
 @keyframes shimmer {
   from {
     background-position: 200% 0;
@@ -123,9 +236,9 @@ html {
 .skeleton {
   background: linear-gradient(
     90deg,
-    var(--color-line) 25%,
-    color-mix(in oklab, var(--color-line) 40%, white) 50%,
-    var(--color-line) 75%
+    color-mix(in oklab, var(--color-line) 70%, var(--color-paper)) 25%,
+    color-mix(in oklab, var(--color-line) 20%, white) 50%,
+    color-mix(in oklab, var(--color-line) 70%, var(--color-paper)) 75%
   );
   background-size: 200% 100%;
   animation: shimmer 1.4s ease-in-out infinite;

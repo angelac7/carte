@@ -2,22 +2,27 @@ import Link from "next/link";
 import type { ComponentProps } from "react";
 import { cn } from "@/lib/cn";
 
+// Raised from the clay surface; lifts on hover and presses in when tapped.
+const RAISED = "shadow-raised-sm hover:-translate-y-px hover:shadow-raised active:translate-y-px";
+
 const VARIANTS = {
-  primary: "bg-ink text-white shadow-sm hover:bg-ink/90 hover:shadow-md",
-  secondary: "border border-line bg-card text-ink hover:border-muted",
-  basil: "bg-basil text-white shadow-sm hover:bg-basil/90 hover:shadow-md",
-  ghost: "text-muted hover:bg-paper hover:text-ink",
-  danger: "text-muted hover:text-tomato",
+  primary: cn("bg-accent text-white active:shadow-pressed-color", RAISED),
+  secondary: cn("bg-paper text-ink active:shadow-pressed-sm", RAISED),
+  basil: cn("bg-basil text-white active:shadow-pressed-color", RAISED),
+  /** Editorial black, for emphasis without the accent. */
+  ink: cn("bg-ink text-white active:shadow-pressed-color", RAISED),
+  ghost: "text-muted underline-offset-4 hover:text-ink hover:underline",
+  danger: "text-muted underline-offset-4 hover:text-tomato hover:underline",
   /** Primary action on a dark or photo background. */
-  inverse: "bg-white text-ink shadow-sm hover:bg-white/90 hover:shadow-md",
+  inverse: "bg-paper text-ink hover:-translate-y-px hover:bg-white active:translate-y-px",
   /** Secondary action on a dark or photo background. */
   glass: "border border-white/30 bg-white/10 text-white backdrop-blur hover:border-white/60",
 } as const;
 
 const SIZES = {
-  sm: "px-3 py-1.5 text-sm",
-  md: "px-4 py-2 text-sm",
-  lg: "px-6 py-3 text-base",
+  sm: "px-4 py-2 text-sm",
+  md: "px-5 py-2.5 text-sm",
+  lg: "px-7 py-3.5 text-base",
 } as const;
 
 type ButtonStyle = {
@@ -29,9 +34,9 @@ type ButtonStyle = {
 
 export function buttonClass({ variant = "primary", size = "md", shine = false }: ButtonStyle = {}) {
   return cn(
-    "relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-md font-medium",
-    "transition-[transform,background-color,border-color,color,box-shadow] duration-150",
-    "active:scale-[0.97] disabled:pointer-events-none disabled:opacity-50",
+    "relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-control font-semibold",
+    "transition-[transform,background-color,border-color,color,box-shadow] duration-200 ease-out",
+    "disabled:pointer-events-none disabled:opacity-50",
     VARIANTS[variant],
     SIZES[size],
     shine && "shine",
@@ -40,7 +45,7 @@ export function buttonClass({ variant = "primary", size = "md", shine = false }:
 
 /** Extra classes for a <label> styled as a button that wraps a hidden file input. */
 export const fileButtonClass =
-  "cursor-pointer has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-ink has-disabled:pointer-events-none has-disabled:opacity-50";
+  "cursor-pointer has-focus-visible:outline-2 has-focus-visible:outline-offset-3 has-focus-visible:outline-accent has-disabled:pointer-events-none has-disabled:opacity-50";
 
 export function Button({
   variant,

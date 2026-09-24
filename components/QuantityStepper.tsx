@@ -16,7 +16,7 @@ export function QuantityStepper({ quantity, onChange, labels }: QuantityStepperP
     return (
       <button
         onClick={() => onChange(1)}
-        className="rounded-full border border-ink px-4 py-1.5 text-sm font-medium transition-colors hover:bg-ink hover:text-white"
+        className="rounded-full bg-paper px-5 py-2 text-sm font-semibold shadow-raised-sm transition-[box-shadow,color,transform] duration-200 ease-out hover:-translate-y-px hover:text-accent active:translate-y-px active:shadow-pressed-sm"
       >
         {labels.add}
       </button>
@@ -24,9 +24,9 @@ export function QuantityStepper({ quantity, onChange, labels }: QuantityStepperP
   }
 
   const stepClass =
-    "h-9 w-9 rounded-full border border-line text-lg leading-none transition-colors hover:border-muted";
+    "h-10 w-10 rounded-full bg-paper text-lg leading-none shadow-raised-sm transition-[box-shadow,color] duration-200 hover:text-accent active:shadow-pressed-sm";
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-1 rounded-full p-1 shadow-pressed-sm">
       <button
         aria-label={labels.decrease}
         onClick={() => onChange(quantity - 1)}
@@ -34,7 +34,7 @@ export function QuantityStepper({ quantity, onChange, labels }: QuantityStepperP
       >
         −
       </button>
-      <span className="w-5 text-center tabular-nums" aria-live="polite">
+      <span className="w-7 text-center font-mono text-sm tabular-nums" aria-live="polite">
         {quantity}
       </span>
       <button
