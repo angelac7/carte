@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { toast } from "sonner";
 import { DiaryEditor } from "@/components/DiaryEditor";
 import { MY_CARTE_STRINGS } from "@/lib/i18n/my-carte-strings";
 import type { LanguageCode } from "@/lib/languages";
@@ -42,7 +43,10 @@ export function DishActions({ dish, restaurant, language }: DishActionsProps) {
     <div className="mt-3 flex flex-wrap gap-2">
       <button
         aria-pressed={saved}
-        onClick={() => updateMyCarte((current) => toggleSavedDish(current, ref, Date.now()))}
+        onClick={() => {
+          updateMyCarte((current) => toggleSavedDish(current, ref, Date.now()));
+          if (!saved) toast(`♥ ${t.saved}`);
+        }}
         className={pill(saved)}
       >
         {saved ? `♥ ${t.saved}` : `♡ ${t.save}`}

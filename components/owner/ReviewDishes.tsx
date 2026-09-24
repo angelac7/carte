@@ -98,7 +98,7 @@ export default function ReviewPage() {
 
       {total > 0 && (
         <>
-          <div className="sticky top-0 z-10 -mx-5 mt-8 border-b border-line bg-paper/95 px-5 py-4 backdrop-blur">
+          <div className="sticky top-14 z-10 -mx-5 mt-8 border-b border-line bg-paper/95 px-5 py-4 backdrop-blur">
             <ProgressBar done={done} total={total} />
             <div className="mt-4 flex gap-2">
               {filters.map((f) => (

@@ -1,33 +1,28 @@
-import Link from "next/link";
+import { NavBar } from "@/components/NavBar";
+import { ButtonLink } from "@/components/ui/button";
+
+const LINKS = [
+  { href: "/discover", label: "Discover" },
+  { href: "/places", label: "Nearby" },
+  { href: "/scan", label: "Scan a menu" },
+  { href: "/my", label: "My Carte" },
+];
 
 export function PublicHeader() {
   return (
-    <header className="border-b border-line bg-card">
-      <nav className="mx-auto flex max-w-3xl flex-wrap items-center justify-between gap-3 px-5 py-4">
-        <Link href="/" className="font-serif text-2xl">
-          Carte
-        </Link>
-        <div className="flex flex-wrap gap-x-5 gap-y-2 text-sm">
-          <Link href="/discover" className="text-muted hover:text-ink">
-            Discover
-          </Link>
-          <Link href="/places" className="text-muted hover:text-ink">
-            Nearby
-          </Link>
-          <Link href="/scan" className="text-muted hover:text-ink">
-            Scan a menu
-          </Link>
-          <Link href="/my" className="text-muted hover:text-ink">
-            My Carte
-          </Link>
-          <Link href="/login" className="text-muted hover:text-ink">
+    <NavBar
+      homeHref="/"
+      links={LINKS}
+      trailing={
+        <>
+          <ButtonLink href="/login" variant="ghost" size="sm">
             Log in
-          </Link>
-          <Link href="/signup" className="text-muted hover:text-ink">
+          </ButtonLink>
+          <ButtonLink href="/signup" size="sm" shine>
             Sign up
-          </Link>
-        </div>
-      </nav>
-    </header>
+          </ButtonLink>
+        </>
+      }
+    />
   );
 }

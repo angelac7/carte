@@ -44,3 +44,6 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - All map lookups go through `lib/places/osm.ts` (throttled and cached). Never call OpenStreetMap from anywhere else.
 - Owners can never set `osm_verified`; only Carte approves claims. Keep the column privileges in the places migration.
 - Map data is unconfirmed. Show the OpenStreetMap credit and source note wherever it appears.
+- Use `Button` and `ButtonLink` from `components/ui/button.tsx` for new buttons, and `cn` from `lib/cn.ts` to combine classes.
+- Animation comes from `motion` via the components in `components/motion/`. Never animate or hide allergy information, and keep motion subtle.
+- Don't run `shadcn init`: its color names (`muted`, `card`) conflict with Carte's theme.

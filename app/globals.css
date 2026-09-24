@@ -62,3 +62,98 @@ body {
     animation: none !important;
   }
 }
+
+/* ---------- Interaction and motion ---------- */
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* A light sweep across primary buttons on hover. */
+.shine::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-120%) skewX(-20deg);
+  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.25), transparent);
+  transition: transform 0.7s ease;
+}
+.shine:hover::after {
+  transform: translateX(120%) skewX(-20deg);
+}
+
+/* A soft glow that follows the pointer across a card. */
+.spotlight::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  background: radial-gradient(
+    260px circle at var(--x, 50%) var(--y, 50%),
+    color-mix(in oklab, var(--color-basil) 14%, transparent),
+    transparent 70%
+  );
+}
+.spotlight:hover::before {
+  opacity: 1;
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(calc(-100% - var(--gap)));
+  }
+}
+.animate-marquee {
+  animation: marquee var(--duration, 40s) linear infinite;
+}
+
+@keyframes shimmer {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--color-line) 25%,
+    color-mix(in oklab, var(--color-line) 40%, white) 50%,
+    var(--color-line) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* ---------- Landing page ---------- */
+
+/* Gentle snapping between full-screen landing sections. */
+html:has(.landing-snap) {
+  scroll-snap-type: y proximity;
+  scroll-padding-top: 3.5rem;
+}
+
+/* A slow cinematic zoom on hero photos and video. */
+@keyframes ken-burns {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.12) translate(-1%, -1%);
+  }
+}
+.ken-burns {
+  animation: ken-burns 24s ease-in-out infinite alternate;
+}
