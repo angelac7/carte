@@ -2,10 +2,12 @@
 import { useEffect, useRef, useState } from "react";
 import { AllergyCard } from "@/components/AllergyCard";
 import { Chip } from "@/components/Chip";
+import { DishActions } from "@/components/DishActions";
 import { DishHeader } from "@/components/DishHeader";
 import { DishSheet } from "@/components/DishSheet";
 import { DisplaySettings } from "@/components/DisplaySettings";
 import { MenuChat } from "@/components/MenuChat";
+import { MenuExtras } from "@/components/MenuExtras";
 import { OrderHelper } from "@/components/OrderHelper";
 import { OrderSheet } from "@/components/OrderSheet";
 import { QuantityStepper } from "@/components/QuantityStepper";
@@ -40,7 +42,7 @@ type TranslationState = Partial<Record<LanguageCode, MenuTranslations | "failed"
 type Panel = "order" | "allergy-card" | "helper" | "display" | null;
 
 type DinerMenuProps = {
-  restaurant: { name: string; slug: string };
+  restaurant: { name: string; slug: string; cuisine: string };
   dishes: MenuItem[];
   initialLanguage: LanguageCode;
   initialPrefs: DinerPrefs;
@@ -185,6 +187,14 @@ export function DinerMenu({
             {helpText.display}
           </button>
         </div>
+        <MenuExtras
+          restaurant={restaurant}
+          language={language}
+          menuSize={dishes.length}
+          candidates={shown}
+          textFor={textFor}
+          onOpenDish={openDetails}
+        />
         {translating && (
           <p role="status" className="mt-3 text-sm text-muted">
             {t.translating}
@@ -296,6 +306,7 @@ export function DinerMenu({
                     <span className="font-medium">{t.kitchenNote}</span> {text.notes}
                   </p>
                 )}
+                <DishActions dish={dish} restaurant={restaurant} language={language} />
                 <div className="mt-3 flex items-center justify-between gap-4">
                   <button
                     onClick={() => openDetails(dish.id)}

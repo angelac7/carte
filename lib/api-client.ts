@@ -2,6 +2,7 @@ import type { LanguageCode } from "@/lib/languages";
 import { MAX_HISTORY, type ChatMessage } from "@/types/chat";
 import type { ExtractedDish, MenuItem } from "@/types/menu";
 import type { MenuTranslations } from "@/types/translation";
+import type { TasteProfile, TasteRequest } from "@/types/taste";
 import type { Recommendation, RecommendRequest } from "@/types/recommend";
 import type { DishInsight } from "@/types/insight";
 
@@ -115,4 +116,16 @@ export function trackDishView(dishId: string): void {
     body: JSON.stringify({ dish: dishId }),
     keepalive: true,
   }).catch(() => {});
+}
+
+/** Asks for a taste profile built from the diner's own ratings and saved dishes. */
+export async function requestTasteProfile(request: TasteRequest): Promise<TasteProfile> {
+  const res = await fetch("/api/taste", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(request),
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok || !data.profile) throw new Error("Taste profile failed");
+  return data.profile as TasteProfile;
 }

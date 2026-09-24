@@ -1,9 +1,9 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { ExtractedDish, MenuItem } from "@/types/menu";
 
-export type Restaurant = { id: string; name: string; slug: string };
+export type Restaurant = { id: string; name: string; slug: string; cuisine: string };
 
-const RESTAURANT_COLUMNS = "id, name, slug";
+const RESTAURANT_COLUMNS = "id, name, slug, cuisine";
 const DISH_COLUMNS = "id, name, description, price, allergens, dietary_tags, notes, confirmed";
 
 export async function getOwnerRestaurant(

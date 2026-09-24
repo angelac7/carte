@@ -102,3 +102,11 @@ on their device.
 and diet filters, open now, occasion, and city. If a phrase finds no dishes, AI turns the craving
 into dish words and searches again. Trending counts anonymous dish views from the last 7 days.
 Owners fill in their profile and opt in to listing at `/dashboard/profile`.
+
+## My Carte
+
+Diners can save dishes and menus, keep a food diary with star ratings and notes, track challenges,
+and create an AI taste profile at `/my`. All of it is stored on the diner's device (localStorage);
+the taste profile request sends only the diner's own ratings and stores nothing. In production, a
+service worker keeps opened menus, My Carte, and the allergy card available offline, and Carte can
+be added to the home screen.

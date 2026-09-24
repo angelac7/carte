@@ -3,13 +3,16 @@ import Link from "next/link";
 export function PublicHeader() {
   return (
     <header className="border-b border-line bg-card">
-      <nav className="mx-auto flex max-w-3xl items-center justify-between px-5 py-4">
+      <nav className="mx-auto flex max-w-3xl flex-wrap items-center justify-between gap-3 px-5 py-4">
         <Link href="/" className="font-serif text-2xl">
           Carte
         </Link>
-        <div className="flex gap-5 text-sm">
+        <div className="flex flex-wrap gap-x-5 gap-y-2 text-sm">
           <Link href="/discover" className="text-muted hover:text-ink">
             Discover
+          </Link>
+          <Link href="/my" className="text-muted hover:text-ink">
+            My Carte
           </Link>
           <Link href="/login" className="text-muted hover:text-ink">
             Log in

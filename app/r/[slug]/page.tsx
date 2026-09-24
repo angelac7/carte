@@ -39,7 +39,7 @@ export default async function RestaurantMenuPage({ params }: RestaurantMenuProps
 
   return (
     <DinerMenu
-      restaurant={{ name: restaurant.name, slug: restaurant.slug }}
+      restaurant={{ name: restaurant.name, slug: restaurant.slug, cuisine: restaurant.cuisine }}
       dishes={dishes}
       initialLanguage={initialLanguage}
       initialPrefs={initialPrefs}

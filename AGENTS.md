@@ -36,3 +36,6 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - Colors are CSS variables in `app/globals.css`; high contrast overrides them there, never in components.
 - Discover only shows restaurants with `listed = true` and confirmed dishes; the database search functions enforce this.
 - View tracking stores anonymous counts only. Never add personal data to `dish_stats`.
+- Diner data (saved dishes, diary, challenges) lives in localStorage through `lib/my-carte-store.ts`. Never send it to the server except for an explicit diner request like the taste profile.
+- Keep My Carte logic pure in `lib/my-carte.ts`, with tests.
+- If you change `public/sw.js`, bump its `CACHE` name so phones pick up the new version.
