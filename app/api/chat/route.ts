@@ -1,12 +1,14 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { answerMenuQuestion } from "@/lib/ai/chat";
+import { streamMenuAnswer } from "@/lib/ai/chat";
 import { getConfirmedDishes, getRestaurantBySlug } from "@/lib/db";
 import { languageName } from "@/lib/languages";
+import { ndjsonResponse } from "@/lib/ndjson-response";
 import { checkRateLimit, clientKey } from "@/lib/rate-limit";
 import { isValidSlug } from "@/lib/slug";
 import { createClient } from "@/lib/supabase/server";
-import { ChatRequestSchema } from "@/types/chat";
+import { ChatRequestSchema, type ChatMessage, type ChatStreamEvent } from "@/types/chat";
+import type { MenuItem } from "@/types/menu";
 
 const QUESTIONS_PER_WINDOW = 20;
 const WINDOW_MS = 10 * 60 * 1000; // 10 minutes
@@ -29,10 +31,29 @@ export async function POST(req: Request) {
 
     const dishes = await getConfirmedDishes(supabase, restaurant.id);
     const { language, messages } = parsed.data;
-    const reply = await answerMenuQuestion(dishes, languageName(language), messages);
-    return NextResponse.json({ reply });
+    return ndjsonResponse(answer(dishes, languageName(language), messages, req.signal));
   } catch (err) {
     console.error("Menu chat failed:", err);
     return NextResponse.json({ error: "unavailable" }, { status: 502 });
+  }
+}
+
+/** Sends the answer to the browser as it's written, then "done" or an error. */
+async function* answer(
+  dishes: MenuItem[],
+  language: string,
+  messages: ChatMessage[],
+  signal: AbortSignal,
+): AsyncGenerator<ChatStreamEvent> {
+  let wrote = false;
+  try {
+    for await (const text of streamMenuAnswer(dishes, language, messages, signal)) {
+      wrote ||= text.trim() !== "";
+      yield { type: "text", text };
+    }
+    yield wrote ? { type: "done" } : { type: "error" };
+  } catch (err) {
+    console.error("Menu chat failed:", err);
+    yield { type: "error" };
   }
 }

@@ -26,3 +26,12 @@ export const ChatRequestSchema = z.object({
 });
 
 export type ChatMessage = z.infer<typeof ChatMessageSchema>;
+
+/** Events from /api/chat while an answer is written: pieces of text, then "done" or an error. */
+export const ChatStreamEventSchema = z.discriminatedUnion("type", [
+  z.object({ type: z.literal("text"), text: z.string() }),
+  z.object({ type: z.literal("done") }),
+  z.object({ type: z.literal("error") }),
+]);
+
+export type ChatStreamEvent = z.input<typeof ChatStreamEventSchema>;

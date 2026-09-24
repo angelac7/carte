@@ -13,7 +13,7 @@ import { writePrefsCookie, type DinerPrefs } from "@/lib/diner-prefs";
 import { formatList } from "@/lib/format-list";
 import { CAMERA_STRINGS } from "@/lib/i18n/camera-strings";
 import { DINER_STRINGS } from "@/lib/i18n/diner-strings";
-import { shrinkImage } from "@/lib/image";
+import { MENU_PHOTO_SIDE, shrinkImage } from "@/lib/image";
 import {
   htmlLang,
   matchBrowserLanguage,
@@ -39,8 +39,8 @@ export function ScanMenu({ language, initialPrefs }: ScanMenuProps) {
     setStatus("loading");
     setMenu({ menuLanguage: "", dishes: [] });
     try {
-      // Dishes appear as soon as they're read. The AI reads at most about 1600px anyway.
-      await streamScan(language, await shrinkImage(file), {
+      // Dishes appear as soon as they're read.
+      await streamScan(language, await shrinkImage(file, MENU_PHOTO_SIDE), {
         onLanguage: (menuLanguage) => setMenu((current) => current && { ...current, menuLanguage }),
         onDish: (dish) =>
           setMenu((current) => current && { ...current, dishes: [...current.dishes, dish] }),

@@ -1,5 +1,8 @@
 import { isSupportedImage } from "@/lib/upload-rules";
 
+/** The longest side the AI reads at full detail, so menu photos keep small print legible. */
+export const MENU_PHOTO_SIDE = 2576;
+
 /**
  * Resizes large photos in the browser so uploads and AI reading stay fast.
  * Also converts formats the AI can't read, like iPhone HEIC photos, into JPEG.

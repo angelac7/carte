@@ -1,14 +1,17 @@
-import { anthropic, MODEL, parseJsonReply } from "@/lib/ai/client";
+import { createMessage, parseJsonReply } from "@/lib/ai/client";
+import { jsonReply, list, object, string } from "@/lib/ai/json-schema";
 import { TasteProfileSchema, type TasteProfile, type TasteRequest } from "@/types/taste";
+
+const TASTE_SCHEMA = object({ summary: string, loves: list(string), tryNext: list(string) });
 
 /** A friendly summary of what a diner likes, from their own ratings and saved dishes. */
 export async function createTasteProfile(
   request: TasteRequest,
   languageName: string,
 ): Promise<TasteProfile> {
-  const reply = await anthropic.messages.create({
-    model: MODEL,
-    max_tokens: 800,
+  const reply = await createMessage({
+    max_tokens: 4000,
+    output_config: jsonReply(TASTE_SCHEMA, "medium"),
     messages: [
       {
         role: "user",

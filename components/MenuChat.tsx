@@ -3,7 +3,7 @@ import { motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { fieldClass } from "@/components/ui/field";
-import { askMenu, ChatLimitError } from "@/lib/api-client";
+import { ChatLimitError, streamMenuAnswer } from "@/lib/api-client";
 import { CHAT_STRINGS } from "@/lib/i18n/chat-strings";
 import { HELP_STRINGS } from "@/lib/i18n/help-strings";
 import type { LanguageCode } from "@/lib/languages";
@@ -49,9 +49,14 @@ export function MenuChat({ language, restaurantSlug, open, onClose }: MenuChatPr
     setProblem("");
     setSending(true);
     try {
-      const reply = await askMenu(restaurantSlug, language, next);
+      // Show the answer as it's written.
+      const reply = await streamMenuAnswer(restaurantSlug, language, next, (answer) =>
+        setMessages([...next, { role: "assistant", content: answer }]),
+      );
       setMessages([...next, { role: "assistant", content: reply }]);
     } catch (err) {
+      // Drop any partial answer: an unfinished reply could leave out an allergy caveat.
+      setMessages(next);
       setProblem(err instanceof ChatLimitError ? t.limit : t.error);
     } finally {
       setSending(false);
@@ -110,18 +115,22 @@ export function MenuChat({ language, restaurantSlug, open, onClose }: MenuChatPr
             >
               {message.content}
             </p>
-            {message.role === "assistant" && canSpeak() && (
-              <button
-                onClick={() => speak(message.content, SPEECH_LANG[language])}
-                className="mt-1 text-xs text-muted underline hover:text-ink"
-              >
-                {help.listen}
-              </button>
-            )}
+            {message.role === "assistant" &&
+              canSpeak() &&
+              !(sending && index === messages.length - 1) && (
+                <button
+                  onClick={() => speak(message.content, SPEECH_LANG[language])}
+                  className="mt-1 text-xs text-muted underline hover:text-ink"
+                >
+                  {help.listen}
+                </button>
+              )}
           </motion.div>
         ))}
 
-        {sending && <p className="text-sm text-muted">{t.thinking}</p>}
+        {sending && messages[messages.length - 1]?.role !== "assistant" && (
+          <p className="text-sm text-muted">{t.thinking}</p>
+        )}
         {problem && (
           <p role="alert" className="text-sm text-tomato">
             {problem}

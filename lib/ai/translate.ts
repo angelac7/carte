@@ -1,6 +1,11 @@
-import { anthropic, MODEL, parseJsonReply } from "@/lib/ai/client";
+import { createMessage, parseJsonReply } from "@/lib/ai/client";
+import { jsonReply, list, object, string } from "@/lib/ai/json-schema";
 import type { MenuItem } from "@/types/menu";
 import { TranslationReplySchema, type DishTranslation } from "@/types/translation";
+
+const TRANSLATION_SCHEMA = object({
+  dishes: list(object({ id: string, name: string, description: string, notes: string })),
+});
 
 function buildPrompt(languageName: string, dishes: MenuItem[]): string {
   const source = dishes.map(({ id, name, description, notes }) => ({
@@ -27,9 +32,10 @@ export async function translateDishes(
   languageName: string,
 ): Promise<DishTranslation[]> {
   if (dishes.length === 0) return [];
-  const reply = await anthropic.messages.create({
-    model: MODEL,
-    max_tokens: 8000,
+  // Saved per restaurant and language, so the careful setting is paid for once.
+  const reply = await createMessage({
+    max_tokens: 32000,
+    output_config: jsonReply(TRANSLATION_SCHEMA, "high"),
     messages: [{ role: "user", content: buildPrompt(languageName, dishes) }],
   });
   const knownIds = new Set(dishes.map((dish) => dish.id));

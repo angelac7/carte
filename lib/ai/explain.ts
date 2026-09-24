@@ -1,6 +1,23 @@
-import { anthropic, MODEL, parseJsonReply } from "@/lib/ai/client";
+import { createMessage, parseJsonReply } from "@/lib/ai/client";
+import { integer, jsonReply, list, object, oneOf, string } from "@/lib/ai/json-schema";
 import { DishInsightSchema, type DishInsight } from "@/types/insight";
 import type { MenuItem } from "@/types/menu";
+
+const INSIGHT_SCHEMA = object({
+  summary: string,
+  taste: string,
+  background: string,
+  nativeName: string,
+  nativeLang: string,
+  phonetic: string,
+  spice: integer,
+  richness: integer,
+  portion: oneOf(["small", "single", "share"]),
+  portionNote: string,
+  glossary: list(object({ term: string, meaning: string })),
+  pairings: list(string),
+  askKitchen: list(string),
+});
 
 function buildPrompt(dish: MenuItem, languageName: string, restaurantName: string): string {
   const source = { name: dish.name, description: dish.description, kitchen_notes: dish.notes };
@@ -27,9 +44,10 @@ export async function explainDish(
   languageName: string,
   restaurantName: string,
 ): Promise<DishInsight> {
-  const reply = await anthropic.messages.create({
-    model: MODEL,
-    max_tokens: 1500,
+  // Saved per dish and language, so the careful setting is paid for once.
+  const reply = await createMessage({
+    max_tokens: 8000,
+    output_config: jsonReply(INSIGHT_SCHEMA, "high"),
     messages: [{ role: "user", content: buildPrompt(dish, languageName, restaurantName) }],
   });
   return DishInsightSchema.parse(parseJsonReply(reply));

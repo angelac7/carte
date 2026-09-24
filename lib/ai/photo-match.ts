@@ -1,7 +1,12 @@
-import { anthropic, MODEL, parseJsonReply } from "@/lib/ai/client";
+import { createMessage, parseJsonReply } from "@/lib/ai/client";
+import { jsonReply, list, object, oneOf, string } from "@/lib/ai/json-schema";
 import type { SupportedImageType } from "@/lib/upload-rules";
-import { PhotoMatchSchema, type PhotoMatch } from "@/types/camera";
+import { CONFIDENCE_LEVELS, PhotoMatchSchema, type PhotoMatch } from "@/types/camera";
 import type { MenuItem } from "@/types/menu";
+
+const MATCH_SCHEMA = object({
+  matches: list(object({ id: string, confidence: oneOf(CONFIDENCE_LEVELS), reason: string })),
+});
 
 /** Finds which confirmed dishes on a menu a photo most likely shows. */
 export async function matchDishPhoto(
@@ -12,9 +17,9 @@ export async function matchDishPhoto(
   restaurantName: string,
 ): Promise<PhotoMatch[]> {
   const menu = dishes.map(({ id, name, description }) => ({ id, name, description }));
-  const reply = await anthropic.messages.create({
-    model: MODEL,
-    max_tokens: 600,
+  const reply = await createMessage({
+    max_tokens: 4000,
+    output_config: jsonReply(MATCH_SCHEMA, "high"),
     messages: [
       {
         role: "user",

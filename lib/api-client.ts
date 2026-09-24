@@ -1,6 +1,6 @@
 import { createLineReader, parseJsonLine } from "@/lib/json-lines";
 import type { LanguageCode } from "@/lib/languages";
-import { MAX_HISTORY, type ChatMessage } from "@/types/chat";
+import { ChatStreamEventSchema, MAX_HISTORY, type ChatMessage } from "@/types/chat";
 import type { ExtractedDish, MenuItem } from "@/types/menu";
 import type { MenuTranslations } from "@/types/translation";
 import type { PhotoMatch, ScannedDish } from "@/types/camera";
@@ -103,10 +103,15 @@ export async function fetchTranslations(
 export class ChatLimitError extends Error {}
 
 /** Asks a restaurant's menu assistant a question, sending recent conversation for context. */
-export async function askMenu(
+/**
+ * Asks the menu assistant a question, calling `onText` with the answer so far as it's
+ * written. Returns the full answer.
+ */
+export async function streamMenuAnswer(
   restaurantSlug: string,
   language: LanguageCode,
   messages: ChatMessage[],
+  onText: (answer: string) => void,
 ): Promise<string> {
   const res = await fetch("/api/chat", {
     method: "POST",
@@ -118,9 +123,18 @@ export async function askMenu(
     }),
   });
   if (res.status === 429) throw new ChatLimitError();
-  const data = await res.json().catch(() => ({}));
-  if (!res.ok || typeof data.reply !== "string") throw new Error("Chat failed");
-  return data.reply;
+  if (!res.ok) throw new Error("Chat failed");
+  let answer = "";
+  let finished = false;
+  await readJsonLines(res, (value) => {
+    const event = ChatStreamEventSchema.safeParse(value);
+    if (!event.success) return;
+    if (event.data.type === "text") onText((answer += event.data.text));
+    else if (event.data.type === "error") throw new Error("Chat failed");
+    else finished = true;
+  });
+  if (!finished || !answer.trim()) throw new Error("Chat failed");
+  return answer.trim();
 }
 
 /** Gets an explanation of one dish in the diner's language. */

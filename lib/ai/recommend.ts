@@ -1,4 +1,5 @@
-import { anthropic, MODEL, parseJsonReply } from "@/lib/ai/client";
+import { createMessage, parseJsonReply } from "@/lib/ai/client";
+import { jsonReply, list, object, string } from "@/lib/ai/json-schema";
 import { detectCurrency } from "@/lib/prices";
 import type { MenuItem } from "@/types/menu";
 import {
@@ -6,6 +7,11 @@ import {
   type Recommendation,
   type RecommendRequest,
 } from "@/types/recommend";
+
+const RECOMMENDATION_SCHEMA = object({
+  picks: list(object({ id: string, reason: string })),
+  note: string,
+});
 
 const HUNGER_WORDS = { light: "a little hungry", hungry: "hungry", very: "very hungry" } as const;
 
@@ -49,9 +55,9 @@ export async function recommendDishes(
   languageName: string,
   restaurantName: string,
 ): Promise<Recommendation> {
-  const reply = await anthropic.messages.create({
-    model: MODEL,
-    max_tokens: 1000,
+  const reply = await createMessage({
+    max_tokens: 6000,
+    output_config: jsonReply(RECOMMENDATION_SCHEMA, "high"),
     messages: [
       { role: "user", content: buildPrompt(dishes, request, languageName, restaurantName) },
     ],

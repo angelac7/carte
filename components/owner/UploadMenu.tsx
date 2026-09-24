@@ -7,7 +7,7 @@ import { Button, ButtonLink } from "@/components/ui/button";
 import { Notice } from "@/components/ui/notice";
 import { Skeleton } from "@/components/ui/skeleton";
 import { saveDishes, streamMenuImage } from "@/lib/api-client";
-import { shrinkImage } from "@/lib/image";
+import { MENU_PHOTO_SIDE, shrinkImage } from "@/lib/image";
 import { isSupportedImage } from "@/lib/upload-rules";
 import type { ExtractedDish } from "@/types/menu";
 
@@ -32,7 +32,7 @@ export default function UploadPage() {
     setDishes([]);
     try {
       // Each dish appears as soon as it's read, so owners can start checking right away.
-      await streamMenuImage(await shrinkImage(file), (dish) =>
+      await streamMenuImage(await shrinkImage(file, MENU_PHOTO_SIDE), (dish) =>
         setDishes((current) => [...current, dish]),
       );
       setStatus("ready");

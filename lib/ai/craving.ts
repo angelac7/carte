@@ -1,7 +1,9 @@
 import { z } from "zod";
-import { anthropic, MODEL, parseJsonReply } from "@/lib/ai/client";
+import { createMessage, parseJsonReply } from "@/lib/ai/client";
+import { jsonReply, list, object, string } from "@/lib/ai/json-schema";
 
 const TermsSchema = z.object({ terms: z.array(z.string()).catch([]) });
+const TERMS_SCHEMA = object({ terms: list(string) });
 
 /** Keeps only short, plain search words, so AI output can't produce odd queries. */
 export function cleanTerms(terms: string[]): string[] {
@@ -13,9 +15,10 @@ export function cleanTerms(terms: string[]): string[] {
 
 /** Turns a craving like "something warm and cozy" into dish search words. */
 export async function cravingToTerms(craving: string): Promise<string[]> {
-  const reply = await anthropic.messages.create({
-    model: MODEL,
-    max_tokens: 200,
+  const reply = await createMessage({
+    // Thinking counts toward max_tokens, so leave room beyond the short answer.
+    max_tokens: 2000,
+    output_config: jsonReply(TERMS_SCHEMA, "medium"),
     messages: [
       {
         role: "user",
