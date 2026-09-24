@@ -1,26 +1,48 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-paper: #f6f7f4;
+  --color-card: #ffffff;
+  --color-ink: #1c2a39;
+  --color-muted: #5e6b78;
+  --color-line: #d8dde2;
+  --color-basil: #2e7a4e;
+  --color-basil-soft: #e6f1ea;
+  --color-saffron: #c98a0c;
+  --color-saffron-soft: #fbf1da;
+  --color-saffron-ink: #7a5000;
+  --color-tomato: #b3261e;
+  --font-sans: var(--font-public-sans), system-ui, sans-serif;
+  --font-serif: var(--font-caslon), Georgia, serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  color-scheme: light;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-ink);
+  outline-offset: 2px;
+}
+
+/* Dotted line between dish name and price, like a printed menu */
+.leader {
+  flex: 1;
+  min-width: 1rem;
+  margin: 0 0.6rem;
+  border-bottom: 2px dotted var(--color-line);
+  transform: translateY(-0.35em);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
 }
