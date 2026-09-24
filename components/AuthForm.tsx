@@ -4,7 +4,7 @@ import { useActionState } from "react";
 import { logIn, signUp, type AuthState } from "@/app/auth/actions";
 import { BlurFade } from "@/components/motion/BlurFade";
 import { Button } from "@/components/ui/button";
-import { fieldClass, labelClass } from "@/components/ui/field";
+import { fieldClass } from "@/components/ui/field";
 import { Notice } from "@/components/ui/notice";
 
 const COPY = {
@@ -24,7 +24,7 @@ const COPY = {
   },
 } as const;
 
-const inputClass = fieldClass("mt-1 text-base");
+const inputClass = fieldClass("mt-2");
 
 export function AuthForm({ mode }: { mode: "login" | "signup" }) {
   const [state, formAction, pending] = useActionState<AuthState, FormData>(
@@ -36,20 +36,20 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
   return (
     <main id="main" className="mx-auto max-w-md px-5 py-16 sm:py-24">
       <BlurFade>
-        <h1 className="font-serif text-4xl leading-tight tracking-tight sm:text-5xl">
+        <h1 className="font-serif text-5xl leading-[0.95] tracking-tighter sm:text-7xl">
           {copy.title}
         </h1>
       </BlurFade>
       <form
         action={formAction}
-        className="mt-8 space-y-4 rounded-2xl border border-line bg-card p-5 shadow-sm sm:p-6"
+        className="mt-10 space-y-5 rounded-panel bg-paper p-6 shadow-raised-lg sm:p-8"
       >
         <label className="block">
-          <span className={labelClass}>Email</span>
+          <span className="eyebrow text-muted">Email</span>
           <input name="email" type="email" required autoComplete="email" className={inputClass} />
         </label>
         <label className="block">
-          <span className={labelClass}>Password</span>
+          <span className="eyebrow text-muted">Password</span>
           <input
             name="password"
             type="password"
