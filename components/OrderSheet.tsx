@@ -95,7 +95,7 @@ export function OrderSheet({
           ))}
         </ul>
         {avoid.length > 0 && (
-          <div lang="en" className="mt-6 rounded-xl border-2 border-tomato p-4">
+          <div lang="en" className="mt-6 rounded-control border-2 border-tomato p-4">
             <p className="font-medium">{TABLE_STRINGS.en.statement}</p>
             <p className="mt-1 text-xl">
               {formatList(
@@ -127,7 +127,7 @@ export function OrderSheet({
               {people.map((person) => (
                 <span
                   key={person}
-                  className="flex items-center gap-2 rounded-full border border-line px-3 py-1 text-sm"
+                  className="flex items-center gap-2 rounded-full px-4 py-1.5 text-sm shadow-pressed-sm"
                 >
                   {person}
                   <button
@@ -207,17 +207,17 @@ export function OrderSheet({
           </label>
           <fieldset className="text-sm">
             <legend className="font-medium">{t.tip}</legend>
-            <div className="mt-1 flex flex-wrap gap-1">
+            <div className="mt-2 flex flex-wrap gap-2">
               {TIP_OPTIONS.map((percent) => (
                 <button
                   key={percent}
                   type="button"
                   aria-pressed={tipPercent === percent}
                   onClick={() => setTipPercent(percent)}
-                  className={`rounded-md border px-2.5 py-2 transition-colors ${
+                  className={`rounded-control px-3 py-2.5 font-mono transition-[box-shadow,background-color,color] duration-200 ${
                     tipPercent === percent
-                      ? "border-ink bg-ink text-white"
-                      : "border-line hover:border-muted"
+                      ? "bg-ink text-white shadow-pressed-color"
+                      : "bg-paper shadow-raised-sm hover:text-accent"
                   }`}
                 >
                   {percent}%

@@ -68,16 +68,16 @@ export function MenuChat({ language, restaurantSlug, open, onClose }: MenuChatPr
       animate={{ y: 0, opacity: 1 }}
       transition={{ type: "spring", bounce: 0.15, duration: 0.45 }}
       onKeyDown={(e) => e.key === "Escape" && onClose()}
-      className="fixed inset-x-0 bottom-0 z-30 flex max-h-[80svh] flex-col rounded-t-2xl border border-line bg-card shadow-2xl sm:inset-x-auto sm:right-5 sm:bottom-5 sm:w-96 sm:rounded-2xl print:hidden"
+      className="fixed inset-x-0 bottom-0 z-30 flex max-h-[80svh] flex-col rounded-t-panel bg-paper shadow-raised-lg sm:inset-x-auto sm:right-5 sm:bottom-5 sm:w-[26rem] sm:rounded-panel print:hidden"
     >
-      <header className="flex items-center justify-between border-b border-line px-4 py-3">
-        <h2 className="font-serif text-lg">{t.title}</h2>
+      <header className="flex items-center justify-between border-b border-ink/10 px-6 py-4">
+        <h2 className="font-serif text-2xl tracking-tight">{t.title}</h2>
         <Button onClick={onClose} variant="ghost" size="sm" className="-mr-2">
           {t.close}
         </Button>
       </header>
 
-      <div className="flex-1 space-y-3 overflow-y-auto px-4 py-4" aria-live="polite">
+      <div className="flex-1 space-y-3 overflow-y-auto px-6 py-5" aria-live="polite">
         <p className="text-sm leading-relaxed text-muted">{t.intro}</p>
 
         {messages.length === 0 && (
@@ -86,7 +86,7 @@ export function MenuChat({ language, restaurantSlug, open, onClose }: MenuChatPr
               <button
                 key={suggestion}
                 onClick={() => ask(suggestion)}
-                className="rounded-full border border-line px-3 py-1.5 text-left text-sm transition-colors hover:border-muted active:scale-[0.98]"
+                className="rounded-full bg-paper px-4 py-2 text-left text-sm shadow-raised-sm transition-[box-shadow,color] duration-200 hover:text-accent active:shadow-pressed-sm"
               >
                 {suggestion}
               </button>
@@ -102,8 +102,10 @@ export function MenuChat({ language, restaurantSlug, open, onClose }: MenuChatPr
             className={message.role === "user" ? "flex justify-end" : ""}
           >
             <p
-              className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm leading-relaxed whitespace-pre-line ${
-                message.role === "user" ? "bg-ink text-white" : "bg-paper"
+              className={`max-w-[85%] rounded-[1.25rem] px-4 py-2.5 text-sm leading-relaxed whitespace-pre-line ${
+                message.role === "user"
+                  ? "rounded-br-md bg-accent text-white"
+                  : "rounded-bl-md shadow-pressed-sm"
               }`}
             >
               {message.content}
@@ -133,7 +135,7 @@ export function MenuChat({ language, restaurantSlug, open, onClose }: MenuChatPr
           e.preventDefault();
           ask(draft);
         }}
-        className="flex gap-2 border-t border-line p-3"
+        className="flex gap-2 border-t border-ink/10 p-4"
       >
         <label htmlFor="menu-chat-input" className="sr-only">
           {t.placeholder}
@@ -161,8 +163,10 @@ export function MenuChat({ language, restaurantSlug, open, onClose }: MenuChatPr
             aria-label={help.voice}
             aria-pressed={voice.listening}
             onClick={voice.listening ? voice.stop : voice.start}
-            className={`rounded-md border px-3 py-2 text-sm transition-colors ${
-              voice.listening ? "border-tomato text-tomato" : "border-line hover:border-muted"
+            className={`rounded-control px-3.5 py-2 text-sm transition-[box-shadow,color] duration-200 ${
+              voice.listening
+                ? "text-tomato shadow-pressed-sm"
+                : "bg-paper shadow-raised-sm active:shadow-pressed-sm"
             }`}
           >
             {voice.listening ? "■" : "🎤"}

@@ -83,7 +83,11 @@ export function PhotoLookup({
       {preview && (
         // A local preview of the diner's own photo, so Next's image optimizer isn't needed.
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={preview} alt="" className="mt-4 max-h-48 rounded-xl object-cover" />
+        <img
+          src={preview}
+          alt=""
+          className="mt-4 max-h-48 rounded-[1.25rem] object-cover shadow-raised-sm"
+        />
       )}
 
       {status === "loading" && (

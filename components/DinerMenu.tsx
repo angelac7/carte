@@ -220,7 +220,7 @@ export function DinerMenu({
           picker={languagePicker}
         />
         <main id="main" className="mx-auto max-w-3xl px-5 py-12">
-          <p className="rounded-2xl border border-line bg-card p-6 text-muted">{t.notReady}</p>
+          <EmptyState>{t.notReady}</EmptyState>
         </main>
       </div>
     );
