@@ -219,3 +219,87 @@ export function similarDishes<T extends { id: string; name: string; description:
     .slice(0, limit)
     .map(({ dish }) => dish);
 }
+
+/** Portable backups are validated strictly; corrupt fields must not silently erase data. */
+const BackupDishSchema = SavedDishSchema.extend({
+  dishId: z.string().min(1).max(200),
+  name: z.string().min(1).max(500),
+  description: z.string().max(5000),
+  price: z.string().max(100),
+  restaurantName: z.string().max(500),
+  restaurantSlug: z
+    .string()
+    .regex(/^[a-z0-9]+(-[a-z0-9]+)*$/)
+    .max(40),
+  cuisine: z.string().max(200),
+  savedAt: z.number().finite().nonnegative(),
+});
+const BackupRestaurantSchema = SavedRestaurantSchema.extend({
+  slug: z
+    .string()
+    .regex(/^[a-z0-9]+(-[a-z0-9]+)*$/)
+    .max(40),
+  name: z.string().max(500),
+  cuisine: z.string().max(200),
+  savedAt: z.number().finite().nonnegative(),
+});
+const BackupDiarySchema = BackupDishSchema.omit({ savedAt: true }).extend({
+  rating: z.number().int().min(1).max(5),
+  note: z.string().max(500),
+  triedAt: z.number().finite().nonnegative(),
+});
+const BackupDataSchema = z
+  .object({
+    dishes: z.array(BackupDishSchema).max(MAX_ITEMS),
+    restaurants: z.array(BackupRestaurantSchema).max(MAX_ITEMS),
+    diary: z.array(BackupDiarySchema).max(MAX_ITEMS),
+    menuSizes: z.record(
+      z
+        .string()
+        .regex(/^[a-z0-9]+(-[a-z0-9]+)*$/)
+        .max(40),
+      z.number().int().nonnegative().max(10000),
+    ),
+  })
+  .superRefine((data, ctx) => {
+    for (const ids of [
+      data.dishes.map((d) => d.dishId),
+      data.restaurants.map((r) => r.slug),
+      data.diary.map((d) => d.dishId),
+    ]) {
+      if (new Set(ids).size !== ids.length)
+        ctx.addIssue({ code: "custom", message: "Duplicate entries" });
+    }
+  });
+const BackupSchema = z.object({
+  format: z.literal("carte-backup"),
+  version: z.literal(1),
+  data: BackupDataSchema,
+});
+export const MAX_BACKUP_BYTES = 2 * 1024 * 1024;
+export function exportMyCarte(state: MyCarte): string {
+  const text = JSON.stringify(
+    BackupSchema.parse({ format: "carte-backup", version: 1, data: state }),
+    null,
+    2,
+  );
+  if (new TextEncoder().encode(text).length > MAX_BACKUP_BYTES) throw new Error("Backup too large");
+  return text;
+}
+export function importMyCarte(text: string): MyCarte {
+  if (new TextEncoder().encode(text).length > MAX_BACKUP_BYTES) throw new Error("Backup too large");
+  return BackupSchema.parse(JSON.parse(text)).data;
+}
+/** Existing entries win when merging. Refuse over-capacity restores instead of dropping entries. */
+export function mergeMyCarte(current: MyCarte, incoming: MyCarte): MyCarte {
+  function merge<T>(a: T[], b: T[], key: (item: T) => string) {
+    const ids = new Set(a.map(key));
+    return [...a, ...b.filter((item) => !ids.has(key(item)))];
+  }
+  return BackupDataSchema.parse({
+    dishes: merge(current.dishes, incoming.dishes, (d) => d.dishId),
+    restaurants: merge(current.restaurants, incoming.restaurants, (r) => r.slug),
+    diary: merge(current.diary, incoming.diary, (d) => d.dishId),
+    menuSizes: { ...incoming.menuSizes, ...current.menuSizes },
+  });
+}

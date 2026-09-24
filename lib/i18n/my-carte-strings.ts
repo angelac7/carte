@@ -499,3 +499,136 @@ export const MY_CARTE_STRINGS: Record<LanguageCode, MyCarteStrings> = {
     openCard: "Mở thẻ dị ứng",
   },
 };
+
+export const BACKUP_STRINGS: Record<
+  LanguageCode,
+  {
+    title: string;
+    intro: string;
+    download: string;
+    upload: string;
+    merge: string;
+    replace: string;
+    warning: string;
+    restore: string;
+    cancel: string;
+    invalid: string;
+    done: string;
+    counts: (d: number, r: number, e: number) => string;
+  }
+> = {
+  en: {
+    title: "Backup and restore",
+    intro:
+      "Download your saved dishes, restaurants, diary and challenge progress. Open the file here on another device to restore it. The file stays with you; keep a private copy.",
+    download: "Download backup",
+    upload: "Open backup",
+    merge: "Merge with this device",
+    replace: "Replace this device’s collection",
+    warning:
+      "Merging keeps existing entries when both copies contain the same dish. Replacing removes this device’s current collection. Allergy preferences are unchanged.",
+    restore: "Restore backup",
+    cancel: "Cancel",
+    invalid:
+      "Could not use this backup. Choose a valid Carte file under 2 MB. Merged collections must have at most 200 entries of each kind.",
+    done: "Backup restored.",
+    counts: (d, r, e) => `${d} saved dishes · ${r} restaurants · ${e} diary entries`,
+  },
+  es: {
+    title: "Copia de seguridad",
+    intro:
+      "Descarga tus platos, restaurantes, diario y retos. Abre el archivo aquí en otro dispositivo para restaurarlos. Guarda una copia privada.",
+    download: "Descargar copia",
+    upload: "Abrir copia",
+    merge: "Combinar con este dispositivo",
+    replace: "Reemplazar la colección",
+    warning:
+      "Al combinar se conservan las entradas existentes. Reemplazar elimina la colección actual. Las preferencias de alergias no cambian.",
+    restore: "Restaurar copia",
+    cancel: "Cancelar",
+    invalid:
+      "Elige una copia de Carte válida de menos de 2 MB. Máximo 200 entradas de cada tipo al combinar.",
+    done: "Copia restaurada.",
+    counts: (d, r, e) => `${d} platos · ${r} restaurantes · ${e} entradas`,
+  },
+  zh: {
+    title: "备份与恢复",
+    intro:
+      "下载收藏的菜品、餐厅、日记和挑战进度。在另一台设备上打开此文件即可恢复。请妥善保管私人副本。",
+    download: "下载备份",
+    upload: "打开备份",
+    merge: "与此设备合并",
+    replace: "替换此设备的收藏",
+    warning: "合并时保留现有的重复条目。替换会删除当前收藏。过敏偏好保持不变。",
+    restore: "恢复备份",
+    cancel: "取消",
+    invalid: "请选择小于2 MB的有效Carte备份。合并后每类最多200条。",
+    done: "备份已恢复。",
+    counts: (d, r, e) => `${d} 道菜 · ${r} 家餐厅 · ${e} 条日记`,
+  },
+  ko: {
+    title: "백업 및 복원",
+    intro:
+      "저장한 요리, 식당, 일기와 도전 진행 상황을 다운로드하세요. 다른 기기에서 이 파일을 열어 복원할 수 있습니다. 개인 사본을 안전하게 보관하세요.",
+    download: "백업 다운로드",
+    upload: "백업 열기",
+    merge: "이 기기와 병합",
+    replace: "이 기기의 모음 교체",
+    warning:
+      "병합 시 기존 중복 항목을 유지합니다. 교체하면 현재 모음이 삭제됩니다. 알레르기 설정은 바뀌지 않습니다.",
+    restore: "백업 복원",
+    cancel: "취소",
+    invalid: "2 MB 미만의 유효한 Carte 백업을 선택하세요. 병합 후 각 종류는 최대 200개입니다.",
+    done: "백업을 복원했습니다.",
+    counts: (d, r, e) => `요리 ${d}개 · 식당 ${r}곳 · 일기 ${e}개`,
+  },
+  ja: {
+    title: "バックアップと復元",
+    intro:
+      "保存した料理、レストラン、日記、チャレンジの進捗をダウンロードできます。別の端末でファイルを開いて復元してください。コピーは大切に保管してください。",
+    download: "バックアップを保存",
+    upload: "バックアップを開く",
+    merge: "この端末と統合",
+    replace: "この端末のコレクションを置換",
+    warning:
+      "統合時は既存の重複項目を優先します。置換すると現在のコレクションは削除されます。アレルギー設定は変わりません。",
+    restore: "復元する",
+    cancel: "キャンセル",
+    invalid: "2 MB未満の有効なCarteファイルを選択してください。統合後は各種類200件までです。",
+    done: "復元しました。",
+    counts: (d, r, e) => `料理${d}件 · レストラン${r}件 · 日記${e}件`,
+  },
+  fr: {
+    title: "Sauvegarde et restauration",
+    intro:
+      "Téléchargez vos plats, restaurants, journal et défis. Ouvrez le fichier ici sur un autre appareil pour les restaurer. Gardez une copie privée.",
+    download: "Télécharger la sauvegarde",
+    upload: "Ouvrir une sauvegarde",
+    merge: "Fusionner avec cet appareil",
+    replace: "Remplacer la collection",
+    warning:
+      "La fusion conserve les entrées existantes en double. Le remplacement supprime la collection actuelle. Les préférences d’allergies restent inchangées.",
+    restore: "Restaurer",
+    cancel: "Annuler",
+    invalid:
+      "Choisissez un fichier Carte valide de moins de 2 Mo. Maximum 200 entrées de chaque type après fusion.",
+    done: "Sauvegarde restaurée.",
+    counts: (d, r, e) => `${d} plats · ${r} restaurants · ${e} entrées`,
+  },
+  vi: {
+    title: "Sao lưu và khôi phục",
+    intro:
+      "Tải xuống món ăn, nhà hàng, nhật ký và tiến độ thử thách. Mở tệp này trên thiết bị khác để khôi phục. Hãy giữ một bản sao riêng tư.",
+    download: "Tải bản sao lưu",
+    upload: "Mở bản sao lưu",
+    merge: "Hợp nhất với thiết bị này",
+    replace: "Thay thế bộ sưu tập",
+    warning:
+      "Hợp nhất giữ lại mục hiện có khi trùng lặp. Thay thế sẽ xóa bộ sưu tập hiện tại. Tùy chọn dị ứng không thay đổi.",
+    restore: "Khôi phục",
+    cancel: "Hủy",
+    invalid: "Chọn tệp Carte hợp lệ dưới 2 MB. Sau khi hợp nhất, mỗi loại tối đa 200 mục.",
+    done: "Đã khôi phục.",
+    counts: (d, r, e) => `${d} món · ${r} nhà hàng · ${e} mục nhật ký`,
+  },
+};

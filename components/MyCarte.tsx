@@ -2,6 +2,7 @@
 import { motion } from "motion/react";
 import Link from "@/components/OfflineLink";
 import { useState } from "react";
+import { MyCarteBackup } from "@/components/MyCarteBackup";
 import { AllergyCard } from "@/components/AllergyCard";
 import { DiaryEditor } from "@/components/DiaryEditor";
 import { Button } from "@/components/ui/button";
@@ -341,6 +342,17 @@ export function MyCarte({ language, initialPrefs }: MyCarteProps) {
           </div>
         )}
       </section>
+
+      <MyCarteBackup
+        language={language}
+        onRestored={() => {
+          setTaste(null);
+          setTasteStatus("idle");
+          setCopied(false);
+          setShareFailed(false);
+          setEditing(null);
+        }}
+      />
 
       <div className="mt-16 border-t border-ink/15 pt-5">
         <Button onClick={clearAll} variant="danger" size="sm" className="-ml-3">
