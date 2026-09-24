@@ -34,6 +34,7 @@ export default async function MyCartePage() {
         intro={t.intro}
         image={publicAsset("images/my.jpg")}
         lang={htmlLang(language)}
+        narrow
       >
         <p className="text-sm text-white/70">{t.offlineNote}</p>
       </PageHero>

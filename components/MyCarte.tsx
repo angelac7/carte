@@ -1,8 +1,12 @@
 "use client";
+import { motion } from "motion/react";
 import Link from "next/link";
 import { useState } from "react";
 import { AllergyCard } from "@/components/AllergyCard";
 import { DiaryEditor } from "@/components/DiaryEditor";
+import { Button } from "@/components/ui/button";
+import { EmptyState } from "@/components/ui/empty-state";
+import { Notice } from "@/components/ui/notice";
 import type { Allergen } from "@/lib/allergens";
 import { requestTasteProfile } from "@/lib/api-client";
 import { writePrefsCookie, type DinerPrefs } from "@/lib/diner-prefs";
@@ -25,6 +29,7 @@ type TasteStatus = "idle" | "loading" | "done" | "failed";
 type MyCarteProps = { language: LanguageCode; initialPrefs: DinerPrefs };
 
 const linkClass = "underline underline-offset-4 hover:text-muted";
+const panelClass = "divide-y divide-line rounded-2xl border border-line bg-card px-5";
 
 export function MyCarte({ language, initialPrefs }: MyCarteProps) {
   const t = MY_CARTE_STRINGS[language];
@@ -96,44 +101,59 @@ export function MyCarte({ language, initialPrefs }: MyCarteProps) {
 
   return (
     <main lang={htmlLang(language)} className="mx-auto max-w-3xl px-5 pt-4 pb-20">
-      <div className="mt-8 flex flex-wrap gap-2" role="tablist">
-        {tabs.map(([key, label]) => (
-          <button
-            key={key}
-            role="tab"
-            aria-selected={tab === key}
-            onClick={() => setTab(key)}
-            className={`rounded-md px-3 py-1.5 text-sm transition-colors ${
-              tab === key ? "bg-ink text-white" : "text-muted hover:bg-card hover:text-ink"
-            }`}
-          >
-            {label}
-          </button>
-        ))}
+      {/* Scrolls sideways on narrow phones instead of wrapping onto two rows. */}
+      <div className="-mx-5 mt-8 overflow-x-auto px-5 pb-1">
+        <div
+          role="tablist"
+          className="flex w-max gap-1 rounded-xl border border-line bg-card p-1 shadow-sm"
+        >
+          {tabs.map(([key, label]) => (
+            <button
+              key={key}
+              id={`my-tab-${key}`}
+              role="tab"
+              aria-selected={tab === key}
+              aria-controls="my-tab-panel"
+              onClick={() => setTab(key)}
+              className={`relative isolate rounded-lg px-3.5 py-2 text-sm whitespace-nowrap transition-colors ${
+                tab === key ? "text-white" : "text-muted hover:text-ink"
+              }`}
+            >
+              {tab === key && (
+                <motion.span
+                  layoutId="my-carte-tab"
+                  className="absolute inset-0 -z-10 rounded-lg bg-ink"
+                  transition={{ type: "spring", bounce: 0.2, duration: 0.4 }}
+                />
+              )}
+              {label}
+            </button>
+          ))}
+        </div>
       </div>
 
-      <section className="mt-6" role="tabpanel">
+      <section id="my-tab-panel" className="mt-6" role="tabpanel" aria-labelledby={`my-tab-${tab}`}>
         {tab === "saved" &&
           (state.dishes.length === 0 && state.restaurants.length === 0 ? (
-            <p className="text-muted">{t.emptySaved}</p>
+            <EmptyState>{t.emptySaved}</EmptyState>
           ) : (
             <div className="space-y-8">
               {state.restaurants.length > 0 && (
                 <div>
                   <h2 className="font-serif text-2xl">{t.savedRestaurants}</h2>
-                  <ul className="mt-3 divide-y divide-line rounded-lg border border-line bg-card px-5">
+                  <ul className={`mt-3 ${panelClass}`}>
                     {state.restaurants.map((restaurant) => (
                       <li
                         key={restaurant.slug}
                         className="flex items-center justify-between gap-4 py-4"
                       >
-                        <div>
+                        <div className="min-w-0">
                           <p className="font-medium">{restaurant.name}</p>
                           {restaurant.cuisine && (
                             <p className="text-sm text-muted">{restaurant.cuisine}</p>
                           )}
                         </div>
-                        <div className="flex gap-4 text-sm">
+                        <div className="flex shrink-0 gap-4 text-sm">
                           <Link href={`/r/${restaurant.slug}`} className={linkClass}>
                             {t.viewMenu}
                           </Link>
@@ -154,7 +174,7 @@ export function MyCarte({ language, initialPrefs }: MyCarteProps) {
               {state.dishes.length > 0 && (
                 <div>
                   <h2 className="font-serif text-2xl">{t.savedDishes}</h2>
-                  <ul className="mt-3 divide-y divide-line rounded-lg border border-line bg-card px-5">
+                  <ul className={`mt-3 ${panelClass}`}>
                     {state.dishes.map((dish) => (
                       <li
                         key={dish.dishId}
@@ -188,9 +208,9 @@ export function MyCarte({ language, initialPrefs }: MyCarteProps) {
 
         {tab === "diary" &&
           (state.diary.length === 0 ? (
-            <p className="text-muted">{t.emptyDiary}</p>
+            <EmptyState>{t.emptyDiary}</EmptyState>
           ) : (
-            <ul className="divide-y divide-line rounded-lg border border-line bg-card px-5">
+            <ul className={panelClass}>
               {state.diary.map((entry) => (
                 <li key={entry.dishId} className="py-4">
                   <div className="flex items-start justify-between gap-4">
@@ -216,23 +236,24 @@ export function MyCarte({ language, initialPrefs }: MyCarteProps) {
           <div>
             <p className="max-w-xl leading-relaxed text-muted">{t.tasteIntro}</p>
             {state.diary.length < 3 ? (
-              <p className="mt-4 text-sm text-muted">{t.tasteNeedMore}</p>
+              <EmptyState className="mt-4">{t.tasteNeedMore}</EmptyState>
             ) : (
-              <button
+              <Button
                 onClick={createTaste}
                 disabled={tasteStatus === "loading"}
-                className="mt-4 rounded-md bg-ink px-4 py-2 text-sm font-medium text-white hover:bg-ink/90 disabled:opacity-60"
+                shine
+                className="mt-4"
               >
                 {tasteStatus === "loading" ? t.tasteLoading : t.tasteButton}
-              </button>
+              </Button>
             )}
             {tasteStatus === "failed" && (
-              <p role="alert" className="mt-4 text-sm text-tomato">
+              <Notice tone="warning" role="alert" className="mt-4">
                 {t.tasteFailed}
-              </p>
+              </Notice>
             )}
             {taste && tasteStatus === "done" && (
-              <div className="mt-6 rounded-lg border border-line bg-card p-5">
+              <div className="mt-6 rounded-2xl border border-line bg-card p-5 sm:p-6">
                 <p className="leading-relaxed">{taste.summary}</p>
                 {taste.loves.length > 0 && (
                   <p className="mt-4 text-sm">
@@ -244,12 +265,9 @@ export function MyCarte({ language, initialPrefs }: MyCarteProps) {
                     <span className="font-medium">{t.tryNext}:</span> {taste.tryNext.join(", ")}
                   </p>
                 )}
-                <button
-                  onClick={() => shareTaste(taste)}
-                  className="mt-4 rounded-md border border-line px-4 py-2 text-sm hover:border-muted"
-                >
+                <Button onClick={() => shareTaste(taste)} variant="secondary" className="mt-4">
                   {copied ? t.copied : t.share}
-                </button>
+                </Button>
               </div>
             )}
           </div>
@@ -260,7 +278,7 @@ export function MyCarte({ language, initialPrefs }: MyCarteProps) {
             {challenges.map((challenge) => (
               <li
                 key={challenge.id}
-                className={`rounded-lg border bg-card p-4 ${challenge.done ? "border-basil" : "border-line"}`}
+                className={`rounded-2xl border bg-card p-5 ${challenge.done ? "border-basil" : "border-line"}`}
               >
                 <div className="flex items-baseline justify-between gap-2">
                   <h2 className="font-serif text-lg">{t.challengeNames[challenge.id]}</h2>
@@ -276,7 +294,9 @@ export function MyCarte({ language, initialPrefs }: MyCarteProps) {
                 <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-line" aria-hidden="true">
                   <div
                     className="h-full rounded-full bg-basil"
-                    style={{ width: `${(challenge.progress / challenge.goal) * 100}%` }}
+                    style={{
+                      width: `${Math.min(100, (challenge.progress / challenge.goal) * 100)}%`,
+                    }}
                   />
                 </div>
               </li>
@@ -287,19 +307,18 @@ export function MyCarte({ language, initialPrefs }: MyCarteProps) {
         {tab === "card" && (
           <div>
             <p className="max-w-xl leading-relaxed text-muted">{t.cardIntro}</p>
-            <button
-              onClick={() => setCardOpen(true)}
-              className="mt-4 rounded-md bg-ink px-4 py-2 text-sm font-medium text-white hover:bg-ink/90"
-            >
+            <Button onClick={() => setCardOpen(true)} className="mt-4">
               {t.openCard}
-            </button>
+            </Button>
           </div>
         )}
       </section>
 
-      <button onClick={clearAll} className="mt-12 text-sm text-muted hover:text-tomato">
-        {t.clearAll}
-      </button>
+      <div className="mt-12 border-t border-line pt-5">
+        <Button onClick={clearAll} variant="danger" size="sm" className="-ml-3">
+          {t.clearAll}
+        </Button>
+      </div>
 
       {editing && (
         <DiaryEditor
