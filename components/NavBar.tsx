@@ -25,7 +25,7 @@ export function NavBar({ homeHref, links, subtitle, trailing }: NavBarProps) {
 
   return (
     <header className="sticky top-0 z-30 border-b border-line bg-card/85 backdrop-blur print:hidden">
-      <nav className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-5 py-3">
+      <nav className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-5 py-3">
         <div className="flex min-w-0 items-baseline gap-3">
           <Link href={homeHref} className="font-serif text-2xl" onClick={() => setOpen(false)}>
             Carte

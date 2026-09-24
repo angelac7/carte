@@ -32,10 +32,10 @@ export function FeatureShowcase({ features }: { features: Feature[] }) {
                 onClick={() => setActive(index)}
                 className="flex w-full items-start gap-4 py-6 text-left"
               >
-                <motion.span animate={{ x: isActive ? 12 : 0 }} className="flex-1">
+                <motion.span animate={{ x: isActive ? 12 : 0 }} className="min-w-0 flex-1">
                   <span
                     className={cn(
-                      "block font-serif text-3xl leading-tight transition-colors sm:text-4xl",
+                      "block font-serif text-2xl leading-tight transition-colors sm:text-4xl",
                       isActive ? "text-ink" : "text-muted",
                     )}
                   >
@@ -57,7 +57,7 @@ export function FeatureShowcase({ features }: { features: Feature[] }) {
                           src={feature.image}
                           alt={feature.imageAlt}
                           sizes="100vw"
-                          className="mt-4 block aspect-[4/3] rounded-xl lg:hidden"
+                          className="mt-4 block aspect-[4/3] rounded-2xl lg:hidden"
                         />
                       </motion.span>
                     )}

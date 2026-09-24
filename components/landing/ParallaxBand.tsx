@@ -8,7 +8,8 @@ import { BlurFade } from "@/components/motion/BlurFade";
 export function ParallaxBand({ image }: { image: string | null }) {
   const ref = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
-  const y = useTransform(scrollYProgress, [0, 1], ["-12%", "12%"]);
+  // The photo is 24% taller than the band; moving ±9% of its own height keeps its edges hidden.
+  const y = useTransform(scrollYProgress, [0, 1], ["-9%", "9%"]);
 
   return (
     <section ref={ref} className="relative h-[75svh] snap-start overflow-hidden">

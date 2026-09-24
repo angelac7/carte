@@ -84,20 +84,10 @@ export function Hero({ image, video }: HeroProps) {
           </BlurFade>
           <BlurFade delay={0.3}>
             <div className="mt-10 flex flex-wrap gap-3">
-              <ButtonLink
-                href="/discover"
-                size="lg"
-                shine
-                className="bg-white text-ink hover:bg-white/90"
-              >
+              <ButtonLink href="/discover" size="lg" variant="inverse" shine>
                 Find somewhere to eat
               </ButtonLink>
-              <ButtonLink
-                href="/signup"
-                size="lg"
-                variant="secondary"
-                className="border-white/30 bg-white/10 text-white backdrop-blur hover:border-white/60"
-              >
+              <ButtonLink href="/signup" size="lg" variant="glass">
                 Put your menu on Carte
               </ButtonLink>
             </div>

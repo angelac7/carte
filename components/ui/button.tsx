@@ -8,6 +8,10 @@ const VARIANTS = {
   basil: "bg-basil text-white shadow-sm hover:bg-basil/90 hover:shadow-md",
   ghost: "text-muted hover:bg-paper hover:text-ink",
   danger: "text-muted hover:text-tomato",
+  /** Primary action on a dark or photo background. */
+  inverse: "bg-white text-ink shadow-sm hover:bg-white/90 hover:shadow-md",
+  /** Secondary action on a dark or photo background. */
+  glass: "border border-white/30 bg-white/10 text-white backdrop-blur hover:border-white/60",
 } as const;
 
 const SIZES = {

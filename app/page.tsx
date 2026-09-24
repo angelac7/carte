@@ -144,13 +144,13 @@ export default async function LandingPage() {
           </Marquee>
         </section>
 
-        <section className="snap-start px-5 py-24">
+        <section className="snap-start px-5 py-20 sm:py-24">
           <div className="mx-auto grid max-w-6xl gap-10 sm:grid-cols-2 lg:grid-cols-4">
             {STATS.map((stat, index) => (
               <BlurFade key={stat.label} delay={index * 0.08}>
                 <NumberTicker
                   value={stat.value}
-                  className="block font-serif text-7xl leading-none"
+                  className="block font-serif text-6xl leading-none sm:text-7xl"
                 />
                 <p className="mt-3 max-w-[16rem] text-sm leading-relaxed text-muted">
                   {stat.label}
@@ -160,10 +160,10 @@ export default async function LandingPage() {
           </div>
         </section>
 
-        <section className="snap-start px-5 pb-24">
+        <section className="snap-start px-5 pb-20 sm:pb-24">
           <div className="mx-auto max-w-6xl">
             <BlurFade>
-              <h2 className="max-w-2xl font-serif text-5xl leading-tight sm:text-6xl">
+              <h2 className="max-w-2xl font-serif text-4xl leading-tight tracking-tight sm:text-6xl">
                 Built for the person reading the menu.
               </h2>
             </BlurFade>
@@ -175,7 +175,7 @@ export default async function LandingPage() {
 
         <ParallaxBand image={publicAsset("images/band.jpg")} />
 
-        <section className="snap-start bg-ink px-5 py-24 text-white">
+        <section className="snap-start bg-ink px-5 py-20 text-white sm:py-24">
           <div className="mx-auto grid max-w-6xl items-center gap-12 lg:grid-cols-2">
             <BlurFade>
               <MediaFrame
@@ -188,31 +188,28 @@ export default async function LandingPage() {
             </BlurFade>
             <div>
               <BlurFade>
-                <h2 className="font-serif text-5xl leading-tight">
+                <h2 className="font-serif text-4xl leading-tight tracking-tight sm:text-6xl">
                   For restaurants, it takes one photo.
                 </h2>
               </BlurFade>
-              <ul className="mt-10 space-y-4">
+              <ul className="mt-10 space-y-3">
                 {OWNER_POINTS.map((point, index) => (
-                  <BlurFade key={point} delay={index * 0.08}>
-                    <SpotlightCard className="border-white/10 bg-white/5 p-5">
-                      <p className="flex gap-3 leading-relaxed text-white/85">
-                        <span aria-hidden="true" className="text-basil-soft">
-                          ✓
-                        </span>
-                        {point}
-                      </p>
-                    </SpotlightCard>
-                  </BlurFade>
+                  <li key={point}>
+                    <BlurFade delay={index * 0.08}>
+                      <SpotlightCard className="border-white/10 bg-white/5 p-5">
+                        <p className="flex gap-3 leading-relaxed text-white/85">
+                          <span aria-hidden="true" className="text-basil-soft">
+                            ✓
+                          </span>
+                          {point}
+                        </p>
+                      </SpotlightCard>
+                    </BlurFade>
+                  </li>
                 ))}
               </ul>
               <BlurFade delay={0.3}>
-                <ButtonLink
-                  href="/signup"
-                  size="lg"
-                  shine
-                  className="mt-10 bg-white text-ink hover:bg-white/90"
-                >
+                <ButtonLink href="/signup" size="lg" variant="inverse" shine className="mt-10">
                   Put your menu on Carte
                 </ButtonLink>
               </BlurFade>
@@ -220,12 +217,12 @@ export default async function LandingPage() {
           </div>
         </section>
 
-        <section className="relative isolate snap-start overflow-hidden px-5 py-32">
+        <section className="relative isolate snap-start overflow-hidden px-5 py-24 sm:py-32">
           <DotPattern className="-z-10 [mask-image:radial-gradient(ellipse_at_center,white,transparent_70%)]" />
           <Particles className="-z-10" />
           <div className="mx-auto max-w-3xl text-center">
             <BlurFade>
-              <h2 className="font-serif text-5xl leading-tight sm:text-7xl">
+              <h2 className="font-serif text-4xl leading-tight tracking-tight sm:text-7xl">
                 Find somewhere you can eat tonight.
               </h2>
             </BlurFade>

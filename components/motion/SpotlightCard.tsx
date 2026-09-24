@@ -21,7 +21,7 @@ export function SpotlightCard({ children, className }: SpotlightCardProps) {
       ref={ref}
       onPointerMove={follow}
       className={cn(
-        "spotlight relative overflow-hidden rounded-lg border border-line bg-card transition-shadow duration-300 hover:shadow-lg",
+        "spotlight relative overflow-hidden rounded-xl border border-line bg-card transition-shadow duration-300 hover:shadow-lg",
         className,
       )}
     >

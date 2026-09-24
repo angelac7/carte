@@ -20,6 +20,7 @@ export function Marquee({ children, className, reverse = false, duration = 40 }:
         <div
           key={copy}
           aria-hidden={copy === 1}
+          inert={copy === 1}
           className={cn(
             "animate-marquee flex shrink-0 gap-(--gap) group-hover:[animation-play-state:paused]",
             reverse && "[animation-direction:reverse]",
