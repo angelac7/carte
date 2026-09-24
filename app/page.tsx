@@ -1,41 +1,24 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
-
-type Item = {
-  name: string;
-  description: string;
-  price: string;
-  likely_allergens: string[];
-  dietary_tags: string[];
-};
+import { Chip } from "@/components/Chip";
+import { DishHeader } from "@/components/DishHeader";
+import { readMenuImage, saveDishes } from "@/lib/api-client";
+import { shrinkImage } from "@/lib/image";
+import { isSupportedImage } from "@/lib/upload-rules";
+import type { ExtractedDish } from "@/types/menu";
 
 type Status = "idle" | "reading" | "ready" | "saving" | "saved" | "error";
 
-// Resize large images so they upload and process faster
-async function shrink(file: File, maxSize = 1600): Promise<File> {
-  const img = await createImageBitmap(file);
-  const scale = Math.min(1, maxSize / Math.max(img.width, img.height));
-  if (scale === 1 && file.size < 1_500_000) return file;
-  const canvas = document.createElement("canvas");
-  canvas.width = Math.round(img.width * scale);
-  canvas.height = Math.round(img.height * scale);
-  canvas.getContext("2d")!.drawImage(img, 0, 0, canvas.width, canvas.height);
-  const blob: Blob = await new Promise((resolve) =>
-    canvas.toBlob((b) => resolve(b!), "image/jpeg", 0.85)
-  );
-  return new File([blob], "menu.jpg", { type: "image/jpeg" });
-}
-
-export default function Home() {
-  const [items, setItems] = useState<Item[]>([]);
+export default function UploadPage() {
+  const [dishes, setDishes] = useState<ExtractedDish[]>([]);
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState("");
   const [fileName, setFileName] = useState("");
   const [dragging, setDragging] = useState(false);
 
   async function readMenu(file: File) {
-    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+    if (!isSupportedImage(file.type)) {
       setStatus("error");
       setError("Use a JPG, PNG, or WebP image of your menu.");
       return;
@@ -43,31 +26,25 @@ export default function Home() {
     setFileName(file.name);
     setStatus("reading");
     setError("");
-    setItems([]);
+    setDishes([]);
     try {
-      const form = new FormData();
-      form.append("menu", await shrink(file));
-      const res = await fetch("/api/extract", { method: "POST", body: form });
-      const data = await res.json();
-      if (!res.ok || data.error) throw new Error();
-      setItems(data.items);
+      setDishes(await readMenuImage(await shrinkImage(file)));
       setStatus("ready");
-    } catch {
+    } catch (err) {
       setStatus("error");
-      setError(
-        "Carte couldn't read that image. Try a sharper, well-lit photo where the text is easy to see."
-      );
+      setError(err instanceof Error ? err.message : "Carte couldn't read that menu. Try again.");
     }
   }
 
   async function saveAll() {
     setStatus("saving");
-    await fetch("/api/items", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ items }),
-    });
-    setStatus("saved");
+    try {
+      await saveDishes(dishes);
+      setStatus("saved");
+    } catch {
+      setStatus("error");
+      setError("Your dishes weren't saved. Check that Carte is still running, then try again.");
+    }
   }
 
   const reading = status === "reading";
@@ -78,8 +55,8 @@ export default function Home() {
         Turn your menu into an allergen guide.
       </h1>
       <p className="mt-4 max-w-xl text-lg leading-relaxed text-muted">
-        Upload a photo of your menu. Carte lists every dish and suggests allergens, then you
-        confirm each one before diners see it.
+        Upload a photo of your menu. Carte lists every dish and suggests allergens, then you confirm
+        each one before diners see it.
       </p>
 
       <label
@@ -91,8 +68,8 @@ export default function Home() {
         onDrop={(e) => {
           e.preventDefault();
           setDragging(false);
-          const f = e.dataTransfer.files[0];
-          if (f) readMenu(f);
+          const file = e.dataTransfer.files[0];
+          if (file) readMenu(file);
         }}
         className={`mt-10 flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed px-6 py-14 text-center transition-colors has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-ink ${
           dragging ? "border-ink bg-card" : "border-line bg-card/60 hover:border-muted"
@@ -104,8 +81,8 @@ export default function Home() {
           className="sr-only"
           disabled={reading}
           onChange={(e) => {
-            const f = e.target.files?.[0];
-            if (f) readMenu(f);
+            const file = e.target.files?.[0];
+            if (file) readMenu(file);
             e.target.value = "";
           }}
         />
@@ -115,7 +92,7 @@ export default function Home() {
         <span className="mt-2 text-sm text-muted">
           {reading
             ? `Reading ${fileName}. This usually takes about 20 seconds.`
-            : "Or click to choose a file. JPG, PNG, or WebP."}
+            : "Or click to choose a file. JPG, PNG, or WebP, up to 10 MB."}
         </span>
       </label>
 
@@ -125,11 +102,11 @@ export default function Home() {
         </p>
       )}
 
-      {items.length > 0 && (
+      {dishes.length > 0 && (
         <section className="mt-12">
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div>
-              <h2 className="font-serif text-2xl">{items.length} dishes found</h2>
+              <h2 className="font-serif text-2xl">{dishes.length} dishes found</h2>
               <p className="mt-1 text-sm text-muted">
                 Allergens are suggestions. You’ll confirm each dish on the next step.
               </p>
@@ -159,33 +136,19 @@ export default function Home() {
           )}
 
           <ul className="mt-6 divide-y divide-line rounded-lg border border-line bg-card px-5 sm:px-6">
-            {items.map((item, i) => (
-              <li key={i} className="py-5">
-                <div className="flex items-baseline">
-                  <span className="font-serif text-xl">{item.name}</span>
-                  <span className="leader" aria-hidden="true" />
-                  <span className="tabular-nums">{item.price}</span>
-                </div>
+            {dishes.map((dish, index) => (
+              <li key={index} className="py-5">
+                <DishHeader name={dish.name} price={dish.price} />
                 <p className="mt-1 max-w-prose text-sm leading-relaxed text-muted">
-                  {item.description}
+                  {dish.description}
                 </p>
-                {(item.likely_allergens.length > 0 || item.dietary_tags.length > 0) && (
+                {(dish.likely_allergens.length > 0 || dish.dietary_tags.length > 0) && (
                   <div className="mt-3 flex flex-wrap gap-2">
-                    {item.likely_allergens.map((a) => (
-                      <span
-                        key={a}
-                        className="rounded-full bg-saffron-soft px-2.5 py-0.5 text-xs text-saffron-ink"
-                      >
-                        {a}
-                      </span>
+                    {dish.likely_allergens.map((allergen) => (
+                      <Chip key={allergen} label={allergen} tone="allergen" />
                     ))}
-                    {item.dietary_tags.map((t) => (
-                      <span
-                        key={t}
-                        className="rounded-full bg-basil-soft px-2.5 py-0.5 text-xs text-basil"
-                      >
-                        {t}
-                      </span>
+                    {dish.dietary_tags.map((tag) => (
+                      <Chip key={tag} label={tag} tone="tag" />
                     ))}
                   </div>
                 )}

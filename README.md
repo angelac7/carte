@@ -1,36 +1,37 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Carte
 
-## Getting Started
+Carte turns a restaurant's menu photo into a confirmed, multilingual allergen guide.
+Owners upload a menu, AI suggests allergens, and owners confirm every dish before diners see it.
 
-First, run the development server:
+## Setup
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+1. Install Node.js 20.19+ and run `npm install`.
+2. Copy `.env.example` to `.env.local` and add your Anthropic API key.
+3. Run `npm run dev` and open http://localhost:3000.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Scripts
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| Command                       | What it does                         |
+| ----------------------------- | ------------------------------------ |
+| `npm run dev`                 | Start the development server         |
+| `npm run build` / `npm start` | Build and run the production version |
+| `npm test`                    | Run unit tests                       |
+| `npm run lint`                | Check code with ESLint               |
+| `npm run typecheck`           | Check TypeScript types               |
+| `npm run format`              | Format code with Prettier            |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Project structure
 
-## Learn More
+| Folder             | Holds                                         |
+| ------------------ | --------------------------------------------- |
+| `app/`             | Pages and API routes                          |
+| `components/`      | Reusable UI pieces                            |
+| `lib/ai/`          | AI prompts and calls                          |
+| `lib/db/`          | Data storage (a JSON file for now)            |
+| `lib/allergens.ts` | The single list of allergens and dietary tags |
+| `types/`           | Shared types and validation schemas           |
+| `tests/`           | Unit tests                                    |
 
-To learn more about Next.js, take a look at the following resources:
+## Safety rule
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+AI output is only a suggestion. Diners must only ever see dishes an owner has confirmed.

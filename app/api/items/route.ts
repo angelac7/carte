@@ -1,26 +1,32 @@
 import { NextResponse } from "next/server";
-import { readItems, writeItems, MenuItem } from "@/lib/db";
+import { z } from "zod";
+import { readItems, writeItems } from "@/lib/db";
+import { ExtractedDishSchema, MenuItemSchema, type MenuItem } from "@/types/menu";
 
-type Extracted = {
-  name?: string; description?: string; price?: string;
-  likely_allergens?: string[]; dietary_tags?: string[];
-};
+const SaveRequest = z.object({ items: z.array(ExtractedDishSchema).max(300) });
+const DeleteRequest = z.object({ id: z.string().min(1) });
 
-// Get all saved dishes
+function fail(message: string, status = 400) {
+  return NextResponse.json({ error: message }, { status });
+}
+
+/** Every saved dish. */
 export async function GET() {
   return NextResponse.json(readItems());
 }
 
-// Save new dishes from a menu scan (always unconfirmed)
+/** Saves dishes from a menu scan. New dishes always start unconfirmed. */
 export async function POST(req: Request) {
-  const { items } = (await req.json()) as { items: Extracted[] };
-  const added: MenuItem[] = items.map((it) => ({
+  const parsed = SaveRequest.safeParse(await req.json().catch(() => null));
+  if (!parsed.success) return fail("The dishes to save were not in the expected format.");
+
+  const added: MenuItem[] = parsed.data.items.map((dish) => ({
     id: crypto.randomUUID(),
-    name: it.name ?? "",
-    description: it.description ?? "",
-    price: it.price ?? "",
-    allergens: it.likely_allergens ?? [],
-    dietary_tags: it.dietary_tags ?? [],
+    name: dish.name,
+    description: dish.description,
+    price: dish.price,
+    allergens: dish.likely_allergens,
+    dietary_tags: dish.dietary_tags,
     notes: "",
     confirmed: false,
   }));
@@ -28,16 +34,23 @@ export async function POST(req: Request) {
   return NextResponse.json(added);
 }
 
-// Update one dish
+/** Updates one dish. */
 export async function PUT(req: Request) {
-  const updated = (await req.json()) as MenuItem;
-  writeItems(readItems().map((i) => (i.id === updated.id ? updated : i)));
-  return NextResponse.json(updated);
+  const parsed = MenuItemSchema.safeParse(await req.json().catch(() => null));
+  if (!parsed.success) return fail("That dish was not in the expected format.");
+
+  const items = readItems();
+  if (!items.some((item) => item.id === parsed.data.id))
+    return fail("That dish no longer exists.", 404);
+  writeItems(items.map((item) => (item.id === parsed.data.id ? parsed.data : item)));
+  return NextResponse.json(parsed.data);
 }
 
-// Delete one dish
+/** Deletes one dish. */
 export async function DELETE(req: Request) {
-  const { id } = (await req.json()) as { id: string };
-  writeItems(readItems().filter((i) => i.id !== id));
+  const parsed = DeleteRequest.safeParse(await req.json().catch(() => null));
+  if (!parsed.success) return fail("No dish was specified.");
+
+  writeItems(readItems().filter((item) => item.id !== parsed.data.id));
   return NextResponse.json({ ok: true });
 }
