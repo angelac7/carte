@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { ALLERGENS, DIETARY_TAGS } from "@/lib/allergens";
-import { sourceHash } from "@/lib/db/translations";
+import { sourceHash } from "@/lib/source-hash";
 import { DINER_STRINGS } from "@/lib/i18n/diner-strings";
 import { languageFromAcceptHeader, LANGUAGES, matchBrowserLanguage } from "@/lib/languages";
 

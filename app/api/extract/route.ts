@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { extractMenu } from "@/lib/ai/extract";
-import { checkRateLimit, clientKey } from "@/lib/rate-limit";
+import { getOwnerContext } from "@/lib/auth";
+import { checkRateLimit } from "@/lib/rate-limit";
 import { isSupportedImage, MAX_UPLOAD_BYTES } from "@/lib/upload-rules";
 
 function fail(message: string, status: number) {
@@ -8,13 +9,14 @@ function fail(message: string, status: number) {
 }
 
 export async function POST(req: Request) {
-  if (!checkRateLimit(`extract:${clientKey(req)}`, 30, 60 * 60 * 1000)) {
+  const owner = await getOwnerContext();
+  if (!owner) return fail("Log in to upload a menu.", 401);
+  if (!checkRateLimit(`extract:${owner.user.id}`, 30, 60 * 60 * 1000)) {
     return fail("Too many menu uploads in the last hour. Try again later.", 429);
   }
 
   const form = await req.formData().catch(() => null);
   const file = form?.get("menu");
-
   if (!(file instanceof File)) return fail("No menu image was uploaded.", 400);
   const mediaType = file.type;
   if (!isSupportedImage(mediaType)) return fail("Use a JPG, PNG, or WebP image of your menu.", 400);

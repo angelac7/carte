@@ -6,7 +6,13 @@ import type { LanguageCode } from "@/lib/languages";
 import { MAX_QUESTION_LENGTH, type ChatMessage } from "@/types/chat";
 
 /** A chat panel where diners ask questions answered from the confirmed menu. */
-export function MenuChat({ language }: { language: LanguageCode }) {
+export function MenuChat({
+  language,
+  restaurantSlug,
+}: {
+  language: LanguageCode;
+  restaurantSlug: string;
+}) {
   const t = CHAT_STRINGS[language];
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -33,7 +39,7 @@ export function MenuChat({ language }: { language: LanguageCode }) {
     setProblem("");
     setSending(true);
     try {
-      const reply = await askMenu(language, next);
+      const reply = await askMenu(restaurantSlug, language, next);
       setMessages([...next, { role: "assistant", content: reply }]);
     } catch (err) {
       setProblem(err instanceof ChatLimitError ? t.limit : t.error);

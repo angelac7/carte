@@ -1,45 +1,42 @@
-import { createHash } from "crypto";
-import fs from "fs";
-import path from "path";
+import "server-only";
 import type { LanguageCode } from "@/lib/languages";
+import { sourceHash } from "@/lib/source-hash";
+import { createAdminClient } from "@/lib/supabase/admin";
 import type { MenuItem } from "@/types/menu";
-import type { DishTranslation, MenuTranslations, TranslatedText } from "@/types/translation";
+import type { DishTranslation, MenuTranslations } from "@/types/translation";
 
-type CachedTranslation = TranslatedText & { sourceHash: string };
-type TranslationStore = Partial<Record<LanguageCode, Record<string, CachedTranslation>>>;
-
-// Temporary file storage for local development, like lib/db/index.ts.
-const DATA_FILE = path.join(process.cwd(), "data", "translations.json");
-
-function readStore(): TranslationStore {
-  if (!fs.existsSync(DATA_FILE)) return {};
-  return JSON.parse(fs.readFileSync(DATA_FILE, "utf8")) as TranslationStore;
-}
-
-function writeStore(store: TranslationStore): void {
-  fs.mkdirSync(path.dirname(DATA_FILE), { recursive: true });
-  fs.writeFileSync(DATA_FILE, JSON.stringify(store, null, 2));
-}
-
-/** A fingerprint of a dish's text, so any owner edit triggers a fresh translation. */
-export function sourceHash(dish: Pick<MenuItem, "name" | "description" | "notes">): string {
-  return createHash("sha256")
-    .update(JSON.stringify([dish.name, dish.description, dish.notes]))
-    .digest("hex");
-}
+type TranslationRow = {
+  menu_item_id: string;
+  source_hash: string;
+  name: string;
+  description: string;
+  notes: string;
+};
 
 /** Splits dishes into those with an up-to-date saved translation and those still missing one. */
-export function getCachedTranslations(
+export async function getCachedTranslations(
   language: LanguageCode,
   dishes: MenuItem[],
-): { found: MenuTranslations; missing: MenuItem[] } {
-  const saved = readStore()[language] ?? {};
+): Promise<{ found: MenuTranslations; missing: MenuItem[] }> {
+  if (dishes.length === 0) return { found: {}, missing: [] };
+
+  const { data, error } = await createAdminClient()
+    .from("translations")
+    .select("menu_item_id, source_hash, name, description, notes")
+    .eq("language", language)
+    .in(
+      "menu_item_id",
+      dishes.map((dish) => dish.id),
+    );
+  if (error) throw error;
+
+  const saved = new Map(((data ?? []) as TranslationRow[]).map((row) => [row.menu_item_id, row]));
   const found: MenuTranslations = {};
   const missing: MenuItem[] = [];
   for (const dish of dishes) {
-    const entry = saved[dish.id];
-    if (entry && entry.sourceHash === sourceHash(dish)) {
-      found[dish.id] = { name: entry.name, description: entry.description, notes: entry.notes };
+    const row = saved.get(dish.id);
+    if (row && row.source_hash === sourceHash(dish)) {
+      found[dish.id] = { name: row.name, description: row.description, notes: row.notes };
     } else {
       missing.push(dish);
     }
@@ -47,17 +44,22 @@ export function getCachedTranslations(
   return { found, missing };
 }
 
-export function saveTranslations(
+export async function saveTranslations(
   language: LanguageCode,
   dishes: MenuItem[],
   translated: DishTranslation[],
-): void {
-  const store = readStore();
-  const forLanguage = { ...(store[language] ?? {}) };
+): Promise<void> {
   const dishesById = new Map(dishes.map((dish) => [dish.id, dish]));
-  for (const { id, name, description, notes } of translated) {
+  const rows = translated.flatMap(({ id, name, description, notes }) => {
     const dish = dishesById.get(id);
-    if (dish) forLanguage[id] = { name, description, notes, sourceHash: sourceHash(dish) };
-  }
-  writeStore({ ...store, [language]: forLanguage });
+    return dish
+      ? [{ menu_item_id: id, language, source_hash: sourceHash(dish), name, description, notes }]
+      : [];
+  });
+  if (rows.length === 0) return;
+
+  const { error } = await createAdminClient()
+    .from("translations")
+    .upsert(rows, { onConflict: "menu_item_id,language" });
+  if (error) throw error;
 }

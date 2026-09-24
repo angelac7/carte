@@ -1,36 +1,42 @@
 import { NextResponse } from "next/server";
 import { translateDishes } from "@/lib/ai/translate";
-import { readItems } from "@/lib/db";
+import { getConfirmedDishes, getRestaurantBySlug } from "@/lib/db";
 import { getCachedTranslations, saveTranslations } from "@/lib/db/translations";
 import { isLanguageCode, languageName, ORIGINAL_LANGUAGE } from "@/lib/languages";
-import { confirmedOnly } from "@/lib/menu-filters";
+import { checkRateLimit, clientKey } from "@/lib/rate-limit";
+import { isValidSlug } from "@/lib/slug";
+import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 
-/** Translations for confirmed dishes. Each dish is translated once per language, then reused. */
+/** Translations for a restaurant's confirmed dishes, made once per language and then reused. */
 export async function GET(req: Request) {
-  const language = new URL(req.url).searchParams.get("lang") ?? "";
-  if (!isLanguageCode(language) || language === ORIGINAL_LANGUAGE) {
+  const params = new URL(req.url).searchParams;
+  const slug = params.get("restaurant") ?? "";
+  const language = params.get("lang") ?? "";
+  if (!isValidSlug(slug) || !isLanguageCode(language) || language === ORIGINAL_LANGUAGE) {
     return NextResponse.json({ error: "Choose a supported language." }, { status: 400 });
   }
-
-  const dishes = confirmedOnly(readItems());
-  const { found, missing } = getCachedTranslations(language, dishes);
-
-  if (missing.length > 0) {
-    try {
-      const fresh = await translateDishes(missing, languageName(language));
-      saveTranslations(language, missing, fresh);
-      for (const { id, name, description, notes } of fresh)
-        found[id] = { name, description, notes };
-    } catch (err) {
-      console.error("Menu translation failed:", err);
-      return NextResponse.json(
-        { error: "Translation isn't available right now." },
-        { status: 502 },
-      );
-    }
+  if (!checkRateLimit(`translate:${clientKey(req)}`, 60, 10 * 60 * 1000)) {
+    return NextResponse.json({ error: "Too many requests. Try again soon." }, { status: 429 });
   }
 
-  return NextResponse.json({ translations: found });
+  try {
+    const supabase = await createClient();
+    const restaurant = await getRestaurantBySlug(supabase, slug);
+    if (!restaurant) return NextResponse.json({ error: "Menu not found." }, { status: 404 });
+
+    const dishes = await getConfirmedDishes(supabase, restaurant.id);
+    const { found, missing } = await getCachedTranslations(language, dishes);
+    if (missing.length > 0) {
+      const fresh = await translateDishes(missing, languageName(language));
+      await saveTranslations(language, missing, fresh);
+      for (const { id, name, description, notes } of fresh)
+        found[id] = { name, description, notes };
+    }
+    return NextResponse.json({ translations: found });
+  } catch (err) {
+    console.error("Menu translation failed:", err);
+    return NextResponse.json({ error: "Translation isn't available right now." }, { status: 502 });
+  }
 }

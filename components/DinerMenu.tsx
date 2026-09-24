@@ -22,10 +22,14 @@ import type { MenuTranslations } from "@/types/translation";
 
 type TranslationState = Partial<Record<LanguageCode, MenuTranslations | "failed">>;
 
-type DinerMenuProps = { dishes: MenuItem[]; initialLanguage: LanguageCode };
+type DinerMenuProps = {
+  restaurant: { name: string; slug: string };
+  dishes: MenuItem[];
+  initialLanguage: LanguageCode;
+};
 
 /** The public menu diners see. Receives confirmed dishes only. */
-export function DinerMenu({ dishes, initialLanguage }: DinerMenuProps) {
+export function DinerMenu({ restaurant, dishes, initialLanguage }: DinerMenuProps) {
   const [language, setLanguage] = useState<LanguageCode>(initialLanguage);
   const [byLanguage, setByLanguage] = useState<TranslationState>({});
   const [avoid, setAvoid] = useState<Allergen[]>([]);
@@ -36,10 +40,10 @@ export function DinerMenu({ dishes, initialLanguage }: DinerMenuProps) {
   useEffect(() => {
     if (language === ORIGINAL_LANGUAGE || requested.current.has(language)) return;
     requested.current.add(language);
-    fetchTranslations(language)
+    fetchTranslations(restaurant.slug, language)
       .then((result) => setByLanguage((prev) => ({ ...prev, [language]: result })))
       .catch(() => setByLanguage((prev) => ({ ...prev, [language]: "failed" })));
-  }, [language]);
+  }, [language, restaurant.slug]);
 
   const t = DINER_STRINGS[language];
   const status = language === ORIGINAL_LANGUAGE ? undefined : byLanguage[language];
@@ -91,7 +95,7 @@ export function DinerMenu({ dishes, initialLanguage }: DinerMenuProps) {
     return (
       <main lang={htmlLang(language)} className="mx-auto max-w-3xl px-5 py-12">
         <div className="flex flex-wrap items-center justify-between gap-4">
-          <h1 className="font-serif text-4xl leading-tight">{t.menuTitle}</h1>
+          <h1 className="font-serif text-4xl leading-tight">{restaurant.name}</h1>
           {languagePicker}
         </div>
         <p className="mt-4 text-muted">{t.notReady}</p>
@@ -103,7 +107,7 @@ export function DinerMenu({ dishes, initialLanguage }: DinerMenuProps) {
     <main lang={htmlLang(language)} className="mx-auto max-w-3xl px-5 pb-28">
       <div className="pt-12">
         <div className="flex flex-wrap items-center justify-between gap-4">
-          <h1 className="font-serif text-4xl leading-tight">{t.menuTitle}</h1>
+          <h1 className="font-serif text-4xl leading-tight">{restaurant.name}</h1>
           {languagePicker}
         </div>
         <p
@@ -213,7 +217,7 @@ export function DinerMenu({ dishes, initialLanguage }: DinerMenuProps) {
           })}
         </ul>
       )}
-      <MenuChat language={language} />
+      <MenuChat language={language} restaurantSlug={restaurant.slug} />
     </main>
   );
 }

@@ -87,7 +87,7 @@ export default function ReviewPage() {
             Upload a photo of your menu and Carte will list every dish here for you to confirm.
           </p>
           <Link
-            href="/"
+            href="/dashboard"
             className="mt-6 inline-block rounded-md bg-ink px-4 py-2 text-sm font-medium text-white hover:bg-ink/90"
           >
             Upload menu

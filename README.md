@@ -58,3 +58,19 @@ Diners can ask questions on the menu page. Answers use only confirmed dishes, re
 diner's language, and send preparation or cross-contamination questions to staff.
 Limits: 20 questions per 10 minutes per visitor, 30 menu uploads per hour, 500 characters per question.
 Rate limits are in memory for now and must move to a shared store before launch.
+
+## Accounts and database
+
+Carte stores restaurants, dishes, and translations in Supabase. The schema and Row Level Security
+rules live in `supabase/migrations/`. Owners sign up, create one restaurant, and manage it at
+`/dashboard`. Diners open each restaurant's menu at `/r/<menu-link>`.
+
+| Page                | Who      | What it does                                       |
+| ------------------- | -------- | -------------------------------------------------- |
+| `/`                 | Everyone | Landing page                                       |
+| `/login`, `/signup` | Owners   | Log in or create an account                        |
+| `/dashboard/setup`  | Owners   | Name the restaurant and choose its menu link       |
+| `/dashboard`        | Owners   | Upload a menu photo                                |
+| `/dashboard/review` | Owners   | Confirm allergens and tags                         |
+| `/dashboard/qr`     | Owners   | Print the table QR code                            |
+| `/r/<menu-link>`    | Diners   | Confirmed dishes with filters, languages, and chat |

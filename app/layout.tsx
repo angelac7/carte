@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Libre_Caslon_Text, Public_Sans } from "next/font/google";
-import { SiteHeader } from "@/components/SiteHeader";
 import "./globals.css";
 
 const caslon = Libre_Caslon_Text({
@@ -16,16 +15,13 @@ const publicSans = Public_Sans({
 
 export const metadata: Metadata = {
   title: "Carte",
-  description: "Turn your menu into a confirmed allergen guide.",
+  description: "Menus with confirmed allergens, translations, and answers for every diner.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${caslon.variable} ${publicSans.variable}`}>
-      <body className="min-h-screen antialiased">
-        <SiteHeader />
-        {children}
-      </body>
+      <body className="min-h-screen antialiased">{children}</body>
     </html>
   );
 }

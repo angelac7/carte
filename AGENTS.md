@@ -22,3 +22,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - AI calls use the shared client and `parseJsonReply` in `lib/ai/client.ts`.
 - Every public route that calls AI must use `checkRateLimit` from `lib/rate-limit.ts` and validate input with Zod.
 - The menu assistant must never call a dish "safe" or "free of" an allergen, and must answer only from confirmed dishes.
+- Owner pages call `requireRestaurant()` or `requireUser()` from `lib/auth.ts`; owner API routes call `getOwnerContext()` and return 401 when it's null.
+- Use the regular Supabase client (`lib/supabase/server.ts`) so Row Level Security applies. The admin client in `lib/supabase/admin.ts` is only for server jobs like saving translations.
+- Anything diners see must come from `getConfirmedDishes()`, never `listDishes()`.
+- Database changes go in a new file in `supabase/migrations/`, never by editing an old one.
