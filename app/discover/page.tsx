@@ -8,6 +8,7 @@ import { PageHero } from "@/components/PageHero";
 import { PublicHeader } from "@/components/PublicHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { buttonClass } from "@/components/ui/button";
+import { EmptyState } from "@/components/ui/empty-state";
 import { fieldClass } from "@/components/ui/field";
 import { Notice } from "@/components/ui/notice";
 import { cravingToTerms } from "@/lib/ai/craving";
@@ -59,7 +60,6 @@ const one = (value: Params[string]) => (Array.isArray(value) ? value[0] : value)
 const chipClass =
   "cursor-pointer rounded-full border border-line bg-card px-3.5 py-1.5 text-sm text-muted transition-colors hover:border-muted hover:text-ink has-checked:border-ink has-checked:bg-ink has-checked:text-white has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-ink";
 const selectClass = fieldClass();
-const emptyClass = "rounded-2xl border border-dashed border-line p-8 text-center text-muted";
 const stagger = (index: number) => Math.min(index, 8) * 0.05;
 
 function DishGrid({
@@ -430,7 +430,7 @@ export default async function DiscoverPage({ searchParams }: DiscoverProps) {
           <section className="mt-12">
             {cravingUsed && <p className="mb-2 text-sm text-muted">{t.cravingNote(query)}</p>}
             {dishes.length === 0 ? (
-              <p className={emptyClass}>{t.noResults}</p>
+              <EmptyState>{t.noResults}</EmptyState>
             ) : (
               <DishGrid dishes={dishes} d={d} t={t} />
             )}
@@ -440,7 +440,7 @@ export default async function DiscoverPage({ searchParams }: DiscoverProps) {
         {tab === "restaurants" && (
           <section className="mt-12">
             {restaurants.length === 0 ? (
-              <p className={emptyClass}>{t.noResults}</p>
+              <EmptyState>{t.noResults}</EmptyState>
             ) : (
               <RestaurantGrid restaurants={restaurants} t={t} />
             )}

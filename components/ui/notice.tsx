@@ -8,13 +8,19 @@ const TONES = {
   warning: "border-tomato/40 bg-tomato/10 text-tomato",
 } as const;
 
-type NoticeProps = { children: ReactNode; tone?: keyof typeof TONES; className?: string };
+type NoticeProps = {
+  children: ReactNode;
+  tone?: keyof typeof TONES;
+  /** "alert" for errors that should be announced as soon as they appear. */
+  role?: "note" | "alert";
+  className?: string;
+};
 
 /** A boxed note that stays in view. Never animated, so safety text is always readable. */
-export function Notice({ children, tone = "caution", className }: NoticeProps) {
+export function Notice({ children, tone = "caution", role = "note", className }: NoticeProps) {
   return (
     <p
-      role="note"
+      role={role}
       className={cn("rounded-xl border px-4 py-3 text-sm leading-relaxed", TONES[tone], className)}
     >
       {children}

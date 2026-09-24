@@ -18,6 +18,7 @@ import { PhotoLookup } from "@/components/PhotoLookup";
 import { QuantityStepper } from "@/components/QuantityStepper";
 import { ToggleChip } from "@/components/ToggleChip";
 import { Button } from "@/components/ui/button";
+import { EmptyState } from "@/components/ui/empty-state";
 import { Notice } from "@/components/ui/notice";
 import { ALLERGENS, DIETARY_TAGS, type Allergen, type DietaryTag } from "@/lib/allergens";
 import { fetchTranslations, trackDishView } from "@/lib/api-client";
@@ -331,9 +332,7 @@ export function DinerMenu({
         </section>
 
         {shown.length === 0 ? (
-          <p className="mt-6 rounded-2xl border border-dashed border-line p-6 text-center text-muted">
-            {t.noMatch}
-          </p>
+          <EmptyState className="mt-6">{t.noMatch}</EmptyState>
         ) : (
           <ul className="mt-6 space-y-4">
             <AnimatePresence initial={false} mode="popLayout">

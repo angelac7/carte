@@ -1,5 +1,6 @@
 "use client";
 import { useRef, useState } from "react";
+import { Button } from "@/components/ui/button";
 
 type LocateButtonProps = { label: string; locatingLabel: string; failedLabel: string };
 
@@ -34,15 +35,16 @@ export function LocateButton({ label, locatingLabel, failedLabel }: LocateButton
 
   return (
     <span className="flex flex-wrap items-center gap-3">
-      <button
+      <Button
         ref={buttonRef}
         type="button"
         onClick={locate}
         disabled={state === "locating"}
-        className="rounded-md border border-line px-4 py-2 text-sm hover:border-muted disabled:opacity-60"
+        variant="secondary"
+        size="lg"
       >
         {state === "locating" ? locatingLabel : label}
-      </button>
+      </Button>
       {state === "failed" && (
         <span role="alert" className="text-sm text-tomato">
           {failedLabel}

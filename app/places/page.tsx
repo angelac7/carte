@@ -9,6 +9,9 @@ import { PageHero } from "@/components/PageHero";
 import { PublicHeader } from "@/components/PublicHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { buttonClass } from "@/components/ui/button";
+import { EmptyState } from "@/components/ui/empty-state";
+import { fieldClass, labelClass } from "@/components/ui/field";
+import { Notice } from "@/components/ui/notice";
 import { carteLinksForPlaces } from "@/lib/db/places";
 import { DINER_STRINGS } from "@/lib/i18n/diner-strings";
 import { PLACES_STRINGS } from "@/lib/i18n/places-strings";
@@ -82,8 +85,7 @@ export default async function PlacesPage({ searchParams }: { searchParams: Promi
     }
   }
 
-  const inputClass =
-    "mt-2 w-full rounded-xl border border-line bg-paper px-4 py-3 focus:border-ink focus:outline-none";
+  const inputClass = fieldClass("mt-2 bg-paper px-4 py-3 text-base");
 
   return (
     <>
@@ -103,7 +105,7 @@ export default async function PlacesPage({ searchParams }: { searchParams: Promi
         >
           <div className="grid gap-4 sm:grid-cols-2">
             <label className="block">
-              <span className="text-sm font-medium">{t.near}</span>
+              <span className={labelClass}>{t.near}</span>
               <input
                 name="near"
                 defaultValue={near}
@@ -113,7 +115,7 @@ export default async function PlacesPage({ searchParams }: { searchParams: Promi
               />
             </label>
             <label className="block">
-              <span className="text-sm font-medium">{t.queryLabel}</span>
+              <span className={labelClass}>{t.queryLabel}</span>
               <input
                 name="q"
                 defaultValue={query}
@@ -145,14 +147,14 @@ export default async function PlacesPage({ searchParams }: { searchParams: Promi
           </div>
         </form>
 
-        {status === "notFound" && <p className="mt-10 text-muted">{t.notFoundLocation}</p>}
+        {status === "notFound" && <EmptyState className="mt-10">{t.notFoundLocation}</EmptyState>}
         {status === "failed" && (
-          <p role="alert" className="mt-10 text-tomato">
+          <Notice tone="warning" role="alert" className="mt-10">
             {t.lookupFailed}
-          </p>
+          </Notice>
         )}
         {status === "done" && results.length === 0 && (
-          <p className="mt-10 text-muted">{t.noResults}</p>
+          <EmptyState className="mt-10">{t.noResults}</EmptyState>
         )}
 
         {results.length > 0 && (
@@ -215,13 +217,13 @@ export default async function PlacesPage({ searchParams }: { searchParams: Promi
           </ul>
         )}
 
-        <p className="mt-12 text-xs text-muted">
+        <p className="mt-12 border-t border-line pt-5 text-xs leading-relaxed text-muted">
           {t.sourceNote}{" "}
           <a
             href="https://www.openstreetmap.org/copyright"
             target="_blank"
             rel="noopener noreferrer"
-            className="underline"
+            className="underline underline-offset-2 hover:text-ink"
           >
             {t.credit}
           </a>
