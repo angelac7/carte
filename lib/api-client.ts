@@ -26,20 +26,27 @@ async function sendToItems<T>(method: "POST" | "PUT" | "DELETE", body: unknown):
     body: JSON.stringify(body),
   });
   checkSignedIn(res);
-  if (!res.ok) throw new Error(`Request failed with status ${res.status}`);
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(body.error ?? `Request failed with status ${res.status}`);
+  }
   return res.json() as Promise<T>;
 }
 
 export async function fetchDishes(): Promise<MenuItem[]> {
   const res = await fetch("/api/items");
   checkSignedIn(res);
-  if (!res.ok) throw new Error(`Request failed with status ${res.status}`);
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(body.error ?? `Request failed with status ${res.status}`);
+  }
   return res.json() as Promise<MenuItem[]>;
 }
 
 export const saveDishes = (items: ExtractedDish[]) => sendToItems<MenuItem[]>("POST", { items });
 export const updateDish = (dish: MenuItem) => sendToItems<MenuItem>("PUT", dish);
-export const deleteDish = (id: string) => sendToItems<{ ok: boolean }>("DELETE", { id });
+export const deleteDish = (id: string, revision?: number) =>
+  sendToItems<{ ok: boolean }>("DELETE", { id, revision });
 
 /** Calls `onLine` with each parsed line of a streamed JSON-lines response, as it arrives. */
 async function readJsonLines(res: Response, onLine: (value: unknown) => void): Promise<void> {
@@ -244,26 +251,40 @@ export async function streamScan(
 }
 
 /** Uploads a photo for one of the owner's dishes and returns its address. */
-export async function uploadDishPhoto(dishId: string, image: File): Promise<string> {
+export async function uploadDishPhoto(
+  dishId: string,
+  image: File,
+  revision?: number,
+): Promise<{ photoUrl: string; revision: number }> {
   const form = new FormData();
   form.append("dish", dishId);
+  form.append("revision", String(revision ?? ""));
   form.append("image", image);
   const res = await fetch("/api/dish-photo", { method: "POST", body: form });
   checkSignedIn(res);
   const data = await res.json().catch(() => ({}));
   if (!res.ok || typeof data.photoUrl !== "string") throw new Error(data.error ?? "Upload failed");
-  return data.photoUrl;
+  return data;
 }
 
-export async function removeDishPhoto(dishId: string): Promise<void> {
+export async function removeDishPhoto(
+  dishId: string,
+  revision?: number,
+): Promise<{ revision: number }> {
   const res = await fetch("/api/dish-photo", {
     method: "DELETE",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ dish: dishId }),
+    body: JSON.stringify({ dish: dishId, revision }),
   });
   checkSignedIn(res);
-  if (!res.ok) throw new Error("Removing the photo failed");
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error ?? "Removing the photo failed");
+  return data;
 }
 
 /** Deletes every dish on the owner's menu, for example before uploading a new one. */
-export const deleteAllDishes = () => sendToItems<{ ok: boolean }>("DELETE", { all: true });
+export const deleteAllDishes = (dishes: MenuItem[]) =>
+  sendToItems<{ ok: boolean }>("DELETE", {
+    all: true,
+    expected: dishes.map(({ id, revision }) => ({ id, revision })),
+  });

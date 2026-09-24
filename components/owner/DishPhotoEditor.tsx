@@ -8,7 +8,7 @@ import type { MenuItem } from "@/types/menu";
 
 type DishPhotoEditorProps = {
   dish: MenuItem;
-  onChange: (photoUrl: string | null) => void;
+  onChange: (photoUrl: string | null, revision: number) => void;
   onBusy: (busy: boolean) => void;
 };
 
@@ -17,6 +17,7 @@ export function DishPhotoEditor({ dish, onChange, onBusy }: DishPhotoEditorProps
   const [status, setStatus] = useState<"idle" | "uploading" | "failed">("idle");
 
   const pending = useRef(false);
+  const [problem, setProblem] = useState("");
 
   async function upload(file: File) {
     if (pending.current) return;
@@ -24,10 +25,16 @@ export function DishPhotoEditor({ dish, onChange, onBusy }: DishPhotoEditorProps
     onBusy(true);
     setStatus("uploading");
     try {
-      onChange(await uploadDishPhoto(dish.id, await shrinkImage(file, 1600)));
+      const result = await uploadDishPhoto(dish.id, await shrinkImage(file, 1600), dish.revision);
+      onChange(result.photoUrl, result.revision);
       setStatus("idle");
       toast("Photo added");
-    } catch {
+    } catch (error) {
+      setProblem(
+        error instanceof Error
+          ? error.message
+          : "The photo could not be saved. Reload and try again.",
+      );
       setStatus("failed");
     } finally {
       pending.current = false;
@@ -41,11 +48,16 @@ export function DishPhotoEditor({ dish, onChange, onBusy }: DishPhotoEditorProps
     onBusy(true);
     setStatus("uploading");
     try {
-      await removeDishPhoto(dish.id);
-      onChange(null);
+      const result = await removeDishPhoto(dish.id, dish.revision);
+      onChange(null, result.revision);
       setStatus("idle");
       toast("Photo removed");
-    } catch {
+    } catch (error) {
+      setProblem(
+        error instanceof Error
+          ? error.message
+          : "The photo could not be saved. Reload and try again.",
+      );
       setStatus("failed");
     } finally {
       pending.current = false;
@@ -86,7 +98,7 @@ export function DishPhotoEditor({ dish, onChange, onBusy }: DishPhotoEditorProps
         )}
         {status === "failed" && (
           <p role="alert" className="text-sm text-tomato">
-            The photo couldn’t be saved. Try a JPG or PNG photo.
+            {problem}
           </p>
         )}
       </div>

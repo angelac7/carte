@@ -1,10 +1,11 @@
 "use server";
+import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { requireRestaurant } from "@/lib/auth";
 import { updateRestaurantProfile } from "@/lib/db/profile";
 import { ProfileSchema, WEEKDAYS } from "@/lib/restaurant-profile";
 
-export type ProfileState = { error?: string; saved?: boolean };
+export type ProfileState = { error?: string; saved?: boolean; revision?: number };
 
 function readHours(formData: FormData) {
   return Object.fromEntries(
@@ -26,7 +27,8 @@ export async function saveProfileAction(
   formData: FormData,
 ): Promise<ProfileState> {
   const { supabase, restaurant } = await requireRestaurant();
-  const parsed = ProfileSchema.safeParse({
+  const parsed = ProfileSchema.extend({ revision: z.number().int().positive() }).safeParse({
+    revision: Number(formData.get("revision")),
     listed: formData.get("listed") === "on",
     description: String(formData.get("description") ?? ""),
     cuisine: String(formData.get("cuisine") ?? ""),
@@ -38,16 +40,26 @@ export async function saveProfileAction(
   });
   if (!parsed.success) {
     return {
+      revision: _prev.revision,
       error:
         "Check your hours: each open day needs an opening and closing time, or mark it closed.",
     };
   }
+  let revision: number | null;
   try {
-    await updateRestaurantProfile(supabase, restaurant.id, parsed.data);
+    revision = await updateRestaurantProfile(supabase, restaurant.id, parsed.data);
+    if (!revision)
+      return {
+        revision: parsed.data.revision,
+        error: "Your profile changed in another tab. Reload and review it before saving again.",
+      };
   } catch {
-    return { error: "Your profile could not be saved. Please try again." };
+    return {
+      revision: parsed.data.revision,
+      error: "Your profile could not be saved. Please try again.",
+    };
   }
   revalidatePath("/dashboard", "layout");
   revalidatePath("/discover");
-  return { saved: true };
+  return { saved: true, revision };
 }

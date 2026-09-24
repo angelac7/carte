@@ -5,7 +5,7 @@ export type Restaurant = { id: string; name: string; slug: string; cuisine: stri
 
 const RESTAURANT_COLUMNS = "id, name, slug, cuisine";
 const DISH_COLUMNS =
-  "id, name, description, price, allergens, dietary_tags, notes, confirmed, photo_url";
+  "id, name, description, price, allergens, dietary_tags, notes, confirmed, photo_url, revision";
 
 export async function getOwnerRestaurant(
   supabase: SupabaseClient,
@@ -112,6 +112,7 @@ export async function updateDish(
       confirmed: dish.confirmed,
     })
     .eq("id", dish.id)
+    .eq("revision", dish.revision!)
     .eq("restaurant_id", restaurantId)
     .select(DISH_COLUMNS)
     .maybeSingle();
@@ -123,13 +124,18 @@ export async function deleteDish(
   supabase: SupabaseClient,
   restaurantId: string,
   id: string,
-): Promise<void> {
-  const { error } = await supabase
+  revision: number,
+): Promise<boolean> {
+  const { data, error } = await supabase
     .from("menu_items")
     .delete()
     .eq("id", id)
-    .eq("restaurant_id", restaurantId);
+    .eq("revision", revision)
+    .eq("restaurant_id", restaurantId)
+    .select("id")
+    .maybeSingle();
   if (error) throw error;
+  return Boolean(data);
 }
 
 /** One confirmed dish, only if it belongs to the given restaurant. */
@@ -153,12 +159,12 @@ export async function getConfirmedDish(
 export async function deleteAllDishes(
   supabase: SupabaseClient,
   restaurantId: string,
+  expected: { id: string; revision: number }[],
 ): Promise<string[]> {
-  const { data, error } = await supabase
-    .from("menu_items")
-    .delete()
-    .eq("restaurant_id", restaurantId)
-    .select("photo_url");
+  const { data, error } = await supabase.rpc("delete_menu_snapshot", {
+    restaurant: restaurantId,
+    expected,
+  });
   if (error) throw error;
   return ((data ?? []) as { photo_url: string | null }[]).flatMap((row) =>
     row.photo_url ? [row.photo_url] : [],

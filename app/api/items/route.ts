@@ -7,7 +7,14 @@ import { deleteStoredPhoto } from "@/lib/storage/dish-photos";
 import { ExtractedDishSchema, MenuItemSchema } from "@/types/menu";
 
 const SaveRequest = z.object({ items: z.array(ExtractedDishSchema).max(300) });
-const DeleteRequest = z.union([z.object({ id: z.uuid() }), z.object({ all: z.literal(true) })]);
+const Version = z.number().int().positive();
+const DeleteRequest = z.union([
+  z.object({ id: z.uuid(), revision: Version }),
+  z.object({
+    all: z.literal(true),
+    expected: z.array(z.object({ id: z.uuid(), revision: Version })).max(10000),
+  }),
+]);
 const LOGIN_REQUIRED = "Log in to manage your menu.";
 
 function fail(message: string, status = 400) {
@@ -34,10 +41,16 @@ export async function POST(req: Request) {
 export async function PUT(req: Request) {
   const owner = await getOwnerContext();
   if (!owner) return fail(LOGIN_REQUIRED, 401);
-  const parsed = MenuItemSchema.safeParse(await req.json().catch(() => null));
+  const parsed = MenuItemSchema.extend({ revision: Version }).safeParse(
+    await req.json().catch(() => null),
+  );
   if (!parsed.success) return fail("That dish was not in the expected format.");
   const updated = await updateDish(owner.supabase, owner.restaurant.id, parsed.data);
-  if (!updated) return fail("That dish no longer exists.", 404);
+  if (!updated)
+    return fail(
+      "This dish changed in another tab or was deleted. Reload to review the latest version.",
+      409,
+    );
   return NextResponse.json(updated);
 }
 
@@ -49,7 +62,14 @@ export async function DELETE(req: Request) {
   if (!parsed.success) return fail("No dish was specified.");
 
   if ("all" in parsed.data) {
-    const photos = await deleteAllDishes(owner.supabase, owner.restaurant.id);
+    let photos: string[];
+    try {
+      photos = await deleteAllDishes(owner.supabase, owner.restaurant.id, parsed.data.expected);
+    } catch (error) {
+      if ((error as { code?: string }).code === "40001")
+        return fail("The menu changed. Reload before deleting.", 409);
+      throw error;
+    }
     await Promise.all(
       photos.map((photo) => deleteStoredPhoto(photo, owner.restaurant.id).catch(() => {})),
     );
@@ -57,7 +77,10 @@ export async function DELETE(req: Request) {
   }
 
   const { photoUrl } = await getDishPhoto(owner.supabase, owner.restaurant.id, parsed.data.id);
-  await deleteDish(owner.supabase, owner.restaurant.id, parsed.data.id);
+  if (
+    !(await deleteDish(owner.supabase, owner.restaurant.id, parsed.data.id, parsed.data.revision))
+  )
+    return fail("This dish changed. Reload before deleting.", 409);
   await deleteStoredPhoto(photoUrl, owner.restaurant.id).catch(() => {});
   return NextResponse.json({ ok: true });
 }

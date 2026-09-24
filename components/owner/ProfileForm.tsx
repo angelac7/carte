@@ -38,6 +38,7 @@ export function ProfileForm({ profile }: { profile: RestaurantProfile }) {
 
   return (
     <form action={formAction} className="mt-10 space-y-8">
+      <input type="hidden" name="revision" value={state.revision ?? draft.revision ?? ""} />
       <label className="flex cursor-pointer items-start gap-4 rounded-panel bg-paper p-6 shadow-raised transition-[outline-color] has-checked:outline-2 has-checked:outline-offset-2 has-checked:outline-basil">
         <input
           type="checkbox"
@@ -216,6 +217,9 @@ export function ProfileForm({ profile }: { profile: RestaurantProfile }) {
       {state.error && (
         <Notice tone="warning" role="alert">
           {state.error}
+          <Button type="button" onClick={() => window.location.reload()} className="ml-3">
+            Reload latest profile
+          </Button>
         </Notice>
       )}
       {state.saved && (

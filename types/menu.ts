@@ -35,6 +35,7 @@ export const ExtractedMenuSchema = z.object({
 /** A saved dish. Only confirmed dishes will be shown to diners. */
 export const MenuItemSchema = z.object({
   id: z.string().min(1),
+  revision: z.number().int().positive().optional(),
   name: z.string(),
   description: z.string(),
   price: z.string(),

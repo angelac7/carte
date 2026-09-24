@@ -155,3 +155,52 @@ it("rejects cross-restaurant photo references at the database boundary", async (
     ),
   ).rejects.toThrow();
 });
+
+it("rejects stale dish updates and stale whole-menu deletion snapshots", async () => {
+  const {
+    rows: [restaurant],
+  } = await db.query<{ id: string; owner_id: string }>(
+    "select id, owner_id from restaurants where slug = 'restaurant-43'",
+  );
+  await db.exec(
+    `create or replace function auth.uid() returns uuid language sql as 'select ''${restaurant.owner_id}''::uuid'`,
+  );
+  try {
+    const {
+      rows: [dish],
+    } = await db.query<{ id: string; revision: number }>(
+      "insert into menu_items (restaurant_id, name) values ($1, 'Original') returning id, revision",
+      [restaurant.id],
+    );
+    await db.query("update menu_items set name = 'First tab' where id = $1 and revision = $2", [
+      dish.id,
+      dish.revision,
+    ]);
+    const stale = await db.query(
+      "update menu_items set name = 'Stale tab' where id = $1 and revision = $2 returning id",
+      [dish.id, dish.revision],
+    );
+    expect(stale.rows).toHaveLength(0);
+    await expect(
+      db.query("select * from delete_menu_snapshot($1, $2::jsonb)", [
+        restaurant.id,
+        JSON.stringify([dish]),
+      ]),
+    ).rejects.toThrow(/Menu changed/);
+    const { rows: current } = await db.query(
+      "select id, revision from menu_items where restaurant_id = $1",
+      [restaurant.id],
+    );
+    await db.query("select * from delete_menu_snapshot($1, $2::jsonb)", [
+      restaurant.id,
+      JSON.stringify(current),
+    ]);
+    expect(
+      (await db.query("select id from menu_items where restaurant_id = $1", [restaurant.id])).rows,
+    ).toHaveLength(0);
+  } finally {
+    await db.exec(
+      "create or replace function auth.uid() returns uuid language sql as 'select null::uuid'",
+    );
+  }
+});

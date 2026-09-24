@@ -59,6 +59,7 @@ export const DEFAULT_HOURS = Object.fromEntries(
 ) as FullHours;
 
 export const ProfileSchema = z.object({
+  revision: z.number().int().positive().optional(),
   listed: z.boolean(),
   description: z.string().trim().max(500),
   cuisine: z.string().trim().max(60),

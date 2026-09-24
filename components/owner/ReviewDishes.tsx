@@ -134,10 +134,12 @@ export default function ReviewDishes() {
       showLocally(saved);
       setProblem("");
       return saved;
-    } catch {
+    } catch (error) {
       const previous = persisted.current.get(updated.id);
       if (previous) showLocally(previous);
-      setProblem("A change wasn't saved. Your last saved details have been restored. Try again.");
+      setProblem(
+        `Your last loaded details have been restored. ${error instanceof Error ? error.message : "Reload to review the latest details."}`,
+      );
       return null;
     } finally {
       setPending(updated.id, false);
@@ -187,12 +189,12 @@ export default function ReviewDishes() {
     if (!window.confirm(`Delete ${dish.name} from your menu?`)) return;
     setPending(dish.id, true);
     try {
-      await deleteDish(dish.id);
+      await deleteDish(dish.id, dish.revision);
       setDishes((prev) => prev.filter((d) => d.id !== dish.id));
       persisted.current.delete(dish.id);
       toast(`${dish.name} deleted`);
-    } catch {
-      setProblem("That dish wasn't deleted. Check that Carte is running, then try again.");
+    } catch (error) {
+      setProblem(error instanceof Error ? error.message : "That dish could not be deleted.");
     } finally {
       setPending(dish.id, false);
     }
@@ -207,12 +209,12 @@ export default function ReviewDishes() {
     mutationPending.current = true;
     setMutating(true);
     try {
-      await deleteAllDishes();
+      await deleteAllDishes(dishes);
       persisted.current.clear();
       setDishes([]);
       toast("All dishes deleted");
-    } catch {
-      setProblem("Your dishes weren't deleted. Check that Carte is running, then try again.");
+    } catch (error) {
+      setProblem(error instanceof Error ? error.message : "Your dishes could not be deleted.");
     } finally {
       mutationPending.current = false;
       setMutating(false);
@@ -252,6 +254,9 @@ export default function ReviewDishes() {
       {problem && (
         <Notice tone="warning" role="alert" className="mt-6">
           {problem}
+          <Button type="button" onClick={() => window.location.reload()} className="ml-3">
+            Reload latest menu
+          </Button>
         </Notice>
       )}
 
@@ -371,8 +376,8 @@ export default function ReviewDishes() {
                     <DishPhotoEditor
                       dish={dish}
                       onBusy={(value) => setPending(dish.id, value)}
-                      onChange={(photo_url) => {
-                        const updated = { ...dish, photo_url, confirmed: false };
+                      onChange={(photo_url, revision) => {
+                        const updated = { ...dish, photo_url, revision, confirmed: false };
                         persisted.current.set(dish.id, updated);
                         showLocally(updated);
                       }}

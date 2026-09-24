@@ -22,11 +22,16 @@ export async function setDishPhoto(
   restaurantId: string,
   dishId: string,
   photoUrl: string | null,
-): Promise<void> {
-  const { error } = await supabase
+  revision: number,
+): Promise<number | null> {
+  const { data, error } = await supabase
     .from("menu_items")
     .update({ photo_url: photoUrl, confirmed: false })
     .eq("id", dishId)
-    .eq("restaurant_id", restaurantId);
+    .eq("restaurant_id", restaurantId)
+    .eq("revision", revision)
+    .select("revision")
+    .maybeSingle();
   if (error) throw error;
+  return data?.revision ?? null;
 }
