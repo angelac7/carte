@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { cookies, headers } from "next/headers";
 import { notFound } from "next/navigation";
-import { DinerMenu } from "@/components/DinerMenu";
+import { LiveDinerMenu } from "@/components/LiveDinerMenu";
 import { getConfirmedDishes, getRestaurantBySlug } from "@/lib/db";
 import { parsePrefs, PREFS_COOKIE } from "@/lib/diner-prefs";
 import { DISPLAY_COOKIE, parseDisplay } from "@/lib/display-prefs";
@@ -38,7 +38,8 @@ export default async function RestaurantMenuPage({ params }: RestaurantMenuProps
   const initialDisplay = parseDisplay(cookieStore.get(DISPLAY_COOKIE)?.value);
 
   return (
-    <DinerMenu
+    <LiveDinerMenu
+      key={slug}
       restaurant={{ name: restaurant.name, slug: restaurant.slug, cuisine: restaurant.cuisine }}
       dishes={dishes}
       initialLanguage={initialLanguage}

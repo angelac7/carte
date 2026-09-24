@@ -58,6 +58,11 @@ type DinerMenuProps = {
   initialLanguage: LanguageCode;
   initialPrefs: DinerPrefs;
   initialDisplay: DisplayPrefs;
+  onPreferencesChange?: (preferences: {
+    initialLanguage: LanguageCode;
+    initialPrefs: DinerPrefs;
+    initialDisplay: DisplayPrefs;
+  }) => void;
 };
 
 /** The restaurant's name over a slowly zooming photo of one of its dishes. */
@@ -115,6 +120,7 @@ export function DinerMenu({
   initialLanguage,
   initialPrefs,
   initialDisplay,
+  onPreferencesChange,
 }: DinerMenuProps) {
   const offline = useOffline();
   const [language, setLanguage] = useState<LanguageCode>(initialLanguage);
@@ -127,6 +133,13 @@ export function DinerMenu({
   const [display, setDisplay] = useState<DisplayPrefs>(initialDisplay);
   const requested = useRef(new Set<LanguageCode>());
   const [translationAttempt, setTranslationAttempt] = useState(0);
+  useEffect(() => {
+    onPreferencesChange?.({
+      initialLanguage: language,
+      initialPrefs: prefs,
+      initialDisplay: display,
+    });
+  }, [language, prefs, display, onPreferencesChange]);
 
   const sourceLanguage = dishes.find(
     (dish) => dish.source_language && isLanguageCode(dish.source_language),

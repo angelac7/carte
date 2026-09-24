@@ -20,6 +20,8 @@ export type DinerStrings = {
   translating: string;
   translationFailed: string;
   offlineMenu: string;
+  menuUpdated: string;
+  refreshFailed: string;
   orderFiltered: string;
   retryTranslation: string;
   translatedNote: string;
@@ -29,6 +31,10 @@ export type DinerStrings = {
 
 export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
   en: {
+    menuUpdated:
+      "The restaurant updated this menu. Your order and assistant results were cleared; review the current dishes before ordering.",
+    refreshFailed:
+      "Could not check for menu updates. Confirm current dishes and allergens with staff.",
     offlineMenu:
       "Offline menu copy: dishes and allergen information may have changed. Confirm the current menu and allergens with staff.",
     orderFiltered: "Items excluded by your current filters are omitted from your order.",
@@ -76,6 +82,10 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     },
   },
   es: {
+    menuUpdated:
+      "El restaurante actualizó el menú. Se borraron tu pedido y los resultados del asistente; revisa los platos antes de pedir.",
+    refreshFailed:
+      "No se pudo comprobar si hay cambios. Confirma los platos y alérgenos con el personal.",
     offlineMenu:
       "Copia del menú sin conexión: los platos y alérgenos pueden haber cambiado. Confirma el menú actual y los alérgenos con el personal.",
     orderFiltered: "Los platos excluidos por tus filtros actuales no se incluyen en tu pedido.",
@@ -123,6 +133,8 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     },
   },
   zh: {
+    menuUpdated: "餐厅更新了菜单。你的点单和助手结果已清除；点餐前请查看最新菜品。",
+    refreshFailed: "无法检查菜单更新。请向工作人员确认当前菜品和过敏原。",
     offlineMenu: "离线菜单副本：菜品及过敏原信息可能已更改。请向工作人员确认当前菜单及过敏原。",
     orderFiltered: "当前筛选条件排除的菜品不会计入您的订单。",
     retryTranslation: "重试翻译",
@@ -165,6 +177,10 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     },
   },
   ko: {
+    menuUpdated:
+      "식당에서 메뉴를 업데이트했습니다. 주문과 도우미 결과가 초기화되었습니다. 주문 전에 현재 메뉴를 확인하세요.",
+    refreshFailed:
+      "메뉴 업데이트를 확인할 수 없습니다. 직원에게 현재 요리와 알레르기 유발 성분을 확인하세요.",
     offlineMenu:
       "오프라인 메뉴 사본입니다. 요리와 알레르기 정보가 변경되었을 수 있습니다. 현재 메뉴와 알레르기 정보를 직원에게 확인하세요.",
     orderFiltered: "현재 필터에서 제외된 요리는 주문에 포함되지 않습니다.",
@@ -210,6 +226,10 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     },
   },
   ja: {
+    menuUpdated:
+      "メニューが更新されました。注文とアシスタントの結果はクリアされました。注文前に現在の料理を確認してください。",
+    refreshFailed:
+      "メニューの更新を確認できません。現在の料理とアレルゲンをスタッフに確認してください。",
     offlineMenu:
       "オフラインのメニューです。料理やアレルゲン情報が変更されている可能性があります。最新の情報をスタッフに確認してください。",
     orderFiltered: "現在の絞り込み条件で除外された料理は注文に含まれません。",
@@ -255,6 +275,10 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     },
   },
   fr: {
+    menuUpdated:
+      "Le restaurant a mis à jour le menu. Votre commande et les résultats de l’assistant ont été effacés. Vérifiez les plats avant de commander.",
+    refreshFailed:
+      "Impossible de vérifier les mises à jour. Confirmez les plats et allergènes auprès du personnel.",
     offlineMenu:
       "Copie hors ligne du menu : les plats et les allergènes peuvent avoir changé. Confirmez les informations actuelles avec le personnel.",
     orderFiltered:
@@ -303,6 +327,10 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     },
   },
   vi: {
+    menuUpdated:
+      "Nhà hàng đã cập nhật thực đơn. Đơn món và kết quả trợ lý đã được xóa; hãy xem lại trước khi gọi món.",
+    refreshFailed:
+      "Không thể kiểm tra cập nhật. Hãy xác nhận món và chất gây dị ứng với nhân viên.",
     offlineMenu:
       "Bản sao thực đơn ngoại tuyến: món ăn và thông tin dị ứng có thể đã thay đổi. Hãy xác nhận thực đơn và chất gây dị ứng hiện tại với nhân viên.",
     orderFiltered: "Các món bị bộ lọc hiện tại loại trừ sẽ không được tính vào đơn gọi món.",
