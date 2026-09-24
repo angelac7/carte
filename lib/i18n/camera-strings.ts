@@ -46,7 +46,7 @@ export const CAMERA_STRINGS: Record<LanguageCode, CameraStrings> = {
     scanIntro:
       "At a restaurant that isn't on Carte? Take a photo of its menu to translate it and flag possible allergens.",
     reading: "Reading the menu…",
-    readingHint: "This usually takes 20 to 40 seconds.",
+    readingHint: "Dishes appear below as they’re read.",
     scanFailed: "The menu couldn't be read. Try a sharper, well-lit photo of the whole menu.",
     warning:
       "This restaurant isn't on Carte, so nothing here is confirmed by the kitchen. Allergens are AI guesses from the menu text, and dishes often contain things the menu doesn't list. Always ask staff.",
@@ -78,7 +78,7 @@ export const CAMERA_STRINGS: Record<LanguageCode, CameraStrings> = {
     scanIntro:
       "¿Está en un restaurante que no usa Carte? Tome una foto del menú para traducirlo y señalar posibles alérgenos.",
     reading: "Leyendo el menú…",
-    readingHint: "Suele tardar entre 20 y 40 segundos.",
+    readingHint: "Los platos aparecen abajo a medida que se leen.",
     scanFailed:
       "No se pudo leer el menú. Pruebe con una foto más nítida y bien iluminada de todo el menú.",
     warning:
@@ -108,7 +108,7 @@ export const CAMERA_STRINGS: Record<LanguageCode, CameraStrings> = {
     scanTitle: "扫描纸质菜单",
     scanIntro: "餐厅没有使用 Carte？拍下菜单即可翻译并标出可能的过敏原。",
     reading: "正在识别菜单…",
-    readingHint: "通常需要 20 到 40 秒。",
+    readingHint: "菜品识别后会陆续显示在下方。",
     scanFailed: "无法识别菜单。请拍一张清晰、光线充足的完整菜单照片。",
     warning:
       "这家餐厅没有使用 Carte，因此以下内容均未经厨房确认。过敏原是 AI 根据菜单文字推测的，菜品常含有菜单未列出的成分。请务必询问员工。",
@@ -137,7 +137,7 @@ export const CAMERA_STRINGS: Record<LanguageCode, CameraStrings> = {
     scanIntro:
       "Carte를 사용하지 않는 레스토랑인가요? 메뉴 사진을 찍으면 번역하고 알레르기 가능성을 표시해 드립니다.",
     reading: "메뉴를 읽는 중…",
-    readingHint: "보통 20~40초 정도 걸립니다.",
+    readingHint: "읽은 요리부터 아래에 바로 표시됩니다.",
     scanFailed:
       "메뉴를 읽을 수 없습니다. 메뉴 전체가 선명하고 밝게 나온 사진으로 다시 시도해 주세요.",
     warning:
@@ -167,7 +167,7 @@ export const CAMERA_STRINGS: Record<LanguageCode, CameraStrings> = {
     scanIntro:
       "Carteを使っていないお店ですか？メニューを撮影すると、翻訳してアレルゲンの可能性を表示します。",
     reading: "メニューを読み取り中…",
-    readingHint: "通常20〜40秒ほどかかります。",
+    readingHint: "読み取った料理から順に下に表示されます。",
     scanFailed:
       "メニューを読み取れませんでした。メニュー全体が明るく鮮明に写った写真で試してください。",
     warning:
@@ -201,7 +201,7 @@ export const CAMERA_STRINGS: Record<LanguageCode, CameraStrings> = {
     scanIntro:
       "Dans un restaurant qui n'utilise pas Carte ? Prenez le menu en photo pour le traduire et repérer les allergènes possibles.",
     reading: "Lecture du menu…",
-    readingHint: "Cela prend généralement 20 à 40 secondes.",
+    readingHint: "Les plats s’affichent ci-dessous au fur et à mesure de la lecture.",
     scanFailed:
       "Le menu n'a pas pu être lu. Essayez une photo nette et bien éclairée de tout le menu.",
     warning:
@@ -231,7 +231,7 @@ export const CAMERA_STRINGS: Record<LanguageCode, CameraStrings> = {
     scanIntro:
       "Nhà hàng không dùng Carte? Chụp ảnh thực đơn để dịch và đánh dấu các chất có thể gây dị ứng.",
     reading: "Đang đọc thực đơn…",
-    readingHint: "Thường mất khoảng 20 đến 40 giây.",
+    readingHint: "Các món sẽ hiện bên dưới ngay khi được đọc.",
     scanFailed: "Không đọc được thực đơn. Hãy thử ảnh rõ nét, đủ sáng và chụp toàn bộ thực đơn.",
     warning:
       "Nhà hàng này không dùng Carte nên bếp chưa xác nhận bất kỳ thông tin nào ở đây. Chất gây dị ứng là phỏng đoán của AI từ chữ trên thực đơn, và món ăn thường có thành phần không ghi trên thực đơn. Hãy luôn hỏi nhân viên.",

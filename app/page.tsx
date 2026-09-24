@@ -39,7 +39,7 @@ const STATS = [
 ];
 
 const OWNER_POINTS = [
-  "Snap a photo of your menu, and Carte lists every dish in about 20 seconds.",
+  "Snap a photo of your menu, and your dishes start appearing within seconds.",
   "Confirm allergens dish by dish. Nothing reaches diners until you do.",
   "Print a QR code. Diners read your menu in 7 languages and get answers to their questions.",
   "Show up on Carte Discover and the map, with your hours and occasions.",

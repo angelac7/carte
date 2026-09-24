@@ -6,7 +6,7 @@ import { OwnerPageHeader } from "@/components/owner/OwnerPageHeader";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { Notice } from "@/components/ui/notice";
 import { Skeleton } from "@/components/ui/skeleton";
-import { readMenuImage, saveDishes } from "@/lib/api-client";
+import { saveDishes, streamMenuImage } from "@/lib/api-client";
 import { shrinkImage } from "@/lib/image";
 import { isSupportedImage } from "@/lib/upload-rules";
 import type { ExtractedDish } from "@/types/menu";
@@ -31,9 +31,13 @@ export default function UploadPage() {
     setError("");
     setDishes([]);
     try {
-      setDishes(await readMenuImage(await shrinkImage(file)));
+      // Each dish appears as soon as it's read, so owners can start checking right away.
+      await streamMenuImage(await shrinkImage(file), (dish) =>
+        setDishes((current) => [...current, dish]),
+      );
       setStatus("ready");
     } catch (err) {
+      // Keep any dishes already read; the message says whether the menu was cut short.
       setStatus("error");
       setError(err instanceof Error ? err.message : "Carte couldn't read that menu. Try again.");
     }
@@ -93,7 +97,7 @@ export default function UploadPage() {
         </span>
         <span className="mt-2 text-sm text-muted">
           {reading
-            ? `Reading ${fileName}. This usually takes about 20 seconds.`
+            ? `Dishes from ${fileName} appear below as Carte reads them.`
             : "Or click to choose a file. JPG, PNG, or WebP, up to 10 MB."}
         </span>
       </label>
@@ -104,7 +108,7 @@ export default function UploadPage() {
         </Notice>
       )}
 
-      {reading && (
+      {reading && dishes.length === 0 && (
         <div className="mt-8 space-y-3" aria-hidden="true">
           {[0, 1, 2].map((row) => (
             <div key={row} className="rounded-panel bg-paper p-6 shadow-raised">
@@ -123,8 +127,11 @@ export default function UploadPage() {
         <section className="mt-14 border-t-4 border-ink pt-8">
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div>
-              <h2 className="font-serif text-4xl leading-none tracking-tighter sm:text-5xl">
-                {dishes.length} dishes found
+              <h2
+                aria-live="polite"
+                className="font-serif text-4xl leading-none tracking-tighter sm:text-5xl"
+              >
+                {reading ? `${dishes.length} dishes so far` : `${dishes.length} dishes found`}
               </h2>
               <p className="mt-1 text-sm text-muted">
                 Allergens are suggestions. You’ll confirm each dish on the next step.
@@ -135,8 +142,8 @@ export default function UploadPage() {
                 Review dishes
               </ButtonLink>
             ) : (
-              <Button onClick={saveAll} disabled={status === "saving"} shine>
-                {status === "saving" ? "Saving…" : "Save to menu"}
+              <Button onClick={saveAll} disabled={reading || status === "saving"} shine>
+                {reading ? "Still reading…" : status === "saving" ? "Saving…" : "Save to menu"}
               </Button>
             )}
           </div>
@@ -166,6 +173,12 @@ export default function UploadPage() {
                 )}
               </li>
             ))}
+            {reading && (
+              <li aria-hidden="true" className="py-5">
+                <Skeleton className="h-6 w-1/2" />
+                <Skeleton className="mt-3 h-4 w-4/5" />
+              </li>
+            )}
           </ul>
         </section>
       )}

@@ -1,8 +1,10 @@
+import { createLineReader, parseJsonLine } from "@/lib/json-lines";
 import type { LanguageCode } from "@/lib/languages";
 import { MAX_HISTORY, type ChatMessage } from "@/types/chat";
 import type { ExtractedDish, MenuItem } from "@/types/menu";
 import type { MenuTranslations } from "@/types/translation";
-import type { PhotoMatch, ScannedMenu } from "@/types/camera";
+import type { PhotoMatch, ScannedDish } from "@/types/camera";
+import { MenuStreamEventSchema, ScanStreamEventSchema } from "@/types/menu-stream";
 import type { TasteProfile, TasteRequest } from "@/types/taste";
 import type { Recommendation, RecommendRequest } from "@/types/recommend";
 import type { DishInsight } from "@/types/insight";
@@ -37,15 +39,52 @@ export const saveDishes = (items: ExtractedDish[]) => sendToItems<MenuItem[]>("P
 export const updateDish = (dish: MenuItem) => sendToItems<MenuItem>("PUT", dish);
 export const deleteDish = (id: string) => sendToItems<{ ok: boolean }>("DELETE", { id });
 
-/** Sends a menu photo to be read by AI. Throws with a message the user can act on. */
-export async function readMenuImage(image: File): Promise<ExtractedDish[]> {
+/** Calls `onLine` with each parsed line of a streamed JSON-lines response, as it arrives. */
+async function readJsonLines(res: Response, onLine: (value: unknown) => void): Promise<void> {
+  if (!res.body) throw new Error("No response");
+  const reader = res.body.getReader();
+  const decoder = new TextDecoder();
+  const lines = createLineReader();
+  try {
+    for (;;) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      for (const line of lines.push(decoder.decode(value, { stream: true })))
+        onLine(parseJsonLine(line));
+    }
+    for (const line of lines.flush()) onLine(parseJsonLine(line));
+  } finally {
+    reader.cancel().catch(() => {});
+  }
+}
+
+const MENU_STOPPED = "Carte stopped before reading the whole menu. Try again.";
+
+/**
+ * Sends a menu photo to be read by AI, calling `onDish` as each dish is read.
+ * Throws with a message the user can act on.
+ */
+export async function streamMenuImage(
+  image: File,
+  onDish: (dish: ExtractedDish) => void,
+): Promise<void> {
   const form = new FormData();
   form.append("menu", image);
   const res = await fetch("/api/extract", { method: "POST", body: form });
   checkSignedIn(res);
-  const data = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(data.error ?? "Carte couldn't read that menu. Try again.");
-  return data.items as ExtractedDish[];
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.error ?? "Carte couldn't read that menu. Try again.");
+  }
+  let finished = false;
+  await readJsonLines(res, (value) => {
+    const event = MenuStreamEventSchema.safeParse(value);
+    if (!event.success) return;
+    if (event.data.type === "dish") onDish(event.data.dish);
+    else if (event.data.type === "error") throw new Error(event.data.message);
+    else finished = true;
+  });
+  if (!finished) throw new Error(MENU_STOPPED);
 }
 
 /** Gets translated dish text for a restaurant's diner menu. */
@@ -151,16 +190,33 @@ export async function askPhotoMatch(
   return data.matches as PhotoMatch[];
 }
 
-/** Reads and translates a paper menu photo. */
-export async function scanMenu(language: LanguageCode, image: File): Promise<ScannedMenu> {
+type ScanHandlers = {
+  onLanguage: (menuLanguage: string) => void;
+  onDish: (dish: ScannedDish) => void;
+};
+
+/** Reads and translates a paper menu photo, calling the handlers as each part is read. */
+export async function streamScan(
+  language: LanguageCode,
+  image: File,
+  { onLanguage, onDish }: ScanHandlers,
+): Promise<void> {
   const form = new FormData();
   form.append("lang", language);
   form.append("image", image);
   const res = await fetch("/api/scan", { method: "POST", body: form });
   if (res.status === 429) throw new PhotoLimitError();
-  const data = await res.json().catch(() => ({}));
-  if (!res.ok || !data.menu) throw new Error("Scan failed");
-  return data.menu as ScannedMenu;
+  if (!res.ok) throw new Error("Scan failed");
+  let finished = false;
+  await readJsonLines(res, (value) => {
+    const event = ScanStreamEventSchema.safeParse(value);
+    if (!event.success) return;
+    if (event.data.type === "language") onLanguage(event.data.menuLanguage);
+    else if (event.data.type === "dish") onDish(event.data.dish);
+    else if (event.data.type === "error") throw new Error("Scan failed");
+    else finished = true;
+  });
+  if (!finished) throw new Error("Scan failed");
 }
 
 /** Uploads a photo for one of the owner's dishes and returns its address. */

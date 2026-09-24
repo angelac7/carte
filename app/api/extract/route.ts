@@ -1,8 +1,11 @@
 import { NextResponse } from "next/server";
-import { extractMenu } from "@/lib/ai/extract";
+import { streamMenuDishes } from "@/lib/ai/extract";
 import { getOwnerContext } from "@/lib/auth";
+import { ndjsonResponse } from "@/lib/ndjson-response";
 import { checkRateLimit } from "@/lib/rate-limit";
+import type { SupportedImageType } from "@/lib/upload-rules";
 import { isSupportedImage, MAX_UPLOAD_BYTES } from "@/lib/upload-rules";
+import type { MenuStreamEvent } from "@/types/menu-stream";
 
 function fail(message: string, status: number) {
   return NextResponse.json({ error: message }, { status });
@@ -23,15 +26,30 @@ export async function POST(req: Request) {
   if (file.size > MAX_UPLOAD_BYTES)
     return fail("That image is over 10 MB. Use a smaller photo.", 413);
 
+  const imageBase64 = Buffer.from(await file.arrayBuffer()).toString("base64");
+  return ndjsonResponse(readMenu(imageBase64, mediaType, req.signal));
+}
+
+const UNREADABLE =
+  "Carte couldn't read that image. Try a sharper, well-lit photo where the text is easy to see.";
+const PARTIAL =
+  "Carte stopped before reading the whole menu. Save the dishes below and upload the rest, or try again.";
+
+/** Sends each dish to the browser as soon as it's read, then "done" or an error. */
+async function* readMenu(
+  imageBase64: string,
+  mediaType: SupportedImageType,
+  signal: AbortSignal,
+): AsyncGenerator<MenuStreamEvent> {
+  let count = 0;
   try {
-    const imageBase64 = Buffer.from(await file.arrayBuffer()).toString("base64");
-    const items = await extractMenu(imageBase64, mediaType);
-    return NextResponse.json({ items });
+    for await (const dish of streamMenuDishes(imageBase64, mediaType, signal)) {
+      count++;
+      yield { type: "dish", dish };
+    }
+    yield count > 0 ? { type: "done" } : { type: "error", message: UNREADABLE };
   } catch (err) {
     console.error("Menu extraction failed:", err);
-    return fail(
-      "Carte couldn't read that image. Try a sharper, well-lit photo where the text is easy to see.",
-      500,
-    );
+    yield { type: "error", message: count > 0 ? PARTIAL : UNREADABLE };
   }
 }

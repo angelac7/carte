@@ -8,7 +8,7 @@ import { Notice } from "@/components/ui/notice";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/cn";
 import type { Allergen } from "@/lib/allergens";
-import { PhotoLimitError, scanMenu } from "@/lib/api-client";
+import { PhotoLimitError, streamScan } from "@/lib/api-client";
 import { writePrefsCookie, type DinerPrefs } from "@/lib/diner-prefs";
 import { formatList } from "@/lib/format-list";
 import { CAMERA_STRINGS } from "@/lib/i18n/camera-strings";
@@ -37,11 +37,17 @@ export function ScanMenu({ language, initialPrefs }: ScanMenuProps) {
 
   async function scan(file: File) {
     setStatus("loading");
-    setMenu(null);
+    setMenu({ menuLanguage: "", dishes: [] });
     try {
-      setMenu(await scanMenu(language, await shrinkImage(file, 2000)));
+      // Dishes appear as soon as they're read. The AI reads at most about 1600px anyway.
+      await streamScan(language, await shrinkImage(file), {
+        onLanguage: (menuLanguage) => setMenu((current) => current && { ...current, menuLanguage }),
+        onDish: (dish) =>
+          setMenu((current) => current && { ...current, dishes: [...current.dishes, dish] }),
+      });
       setStatus("done");
     } catch (err) {
+      // Keep any dishes already read, with the warning still showing above them.
       setStatus(err instanceof PhotoLimitError ? "limit" : "failed");
     }
   }
@@ -51,6 +57,8 @@ export function ScanMenu({ language, initialPrefs }: ScanMenuProps) {
     setAvoid(next);
     writePrefsCookie({ avoid: next, onlyTags: initialPrefs.onlyTags });
   }
+
+  const hasDishes = Boolean(menu && menu.dishes.length > 0);
 
   // Show the allergy card in the menu's language when Carte supports it, otherwise English.
   const staffLanguage = menu?.menuLanguage
@@ -106,7 +114,7 @@ export function ScanMenu({ language, initialPrefs }: ScanMenuProps) {
         <div role="status" className="mt-8">
           <p className="font-serif text-3xl tracking-tight">{t.reading}</p>
           <p className="mt-1 text-sm text-muted">{t.readingHint}</p>
-          <div className="mt-6 space-y-3" aria-hidden="true">
+          <div className="mt-6 space-y-3" aria-hidden="true" hidden={hasDishes}>
             {[0, 1, 2].map((row) => (
               <div key={row} className="rounded-panel p-6 shadow-pressed">
                 <Skeleton className="h-6 w-1/2" />
@@ -127,7 +135,7 @@ export function ScanMenu({ language, initialPrefs }: ScanMenuProps) {
         </Notice>
       )}
 
-      {status === "done" && menu && (
+      {menu && (hasDishes || status === "done") && (
         <section className="mt-2">
           {menu.dishes.length === 0 ? (
             <EmptyState className="mt-6">{t.scanFailed}</EmptyState>
@@ -181,6 +189,12 @@ export function ScanMenu({ language, initialPrefs }: ScanMenuProps) {
                   );
                 })}
               </ul>
+              {status === "loading" && (
+                <div aria-hidden="true" className="mt-4 rounded-panel p-6 shadow-pressed">
+                  <Skeleton className="h-6 w-1/2" />
+                  <Skeleton className="mt-3 h-4 w-4/5" />
+                </div>
+              )}
             </>
           )}
         </section>
