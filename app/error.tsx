@@ -14,17 +14,22 @@ export default function ErrorPage({ error, reset }: ErrorPageProps) {
       id="main"
       className="mx-auto flex min-h-[70vh] max-w-xl flex-col justify-center px-5 py-16"
     >
-      <h1 className="font-serif text-4xl leading-tight">Something went wrong</h1>
-      <p className="mt-3 leading-relaxed text-muted">
+      <p className="eyebrow text-tomato">Error</p>
+      <h1 className="mt-4 font-serif text-5xl leading-[0.95] tracking-tighter sm:text-6xl">
+        Something went wrong
+      </h1>
+      <p className="mt-5 leading-relaxed text-muted">
         This page hit an unexpected problem. Try again, or head back to the start.
       </p>
-      <div className="mt-8 flex flex-wrap gap-3">
+      <div className="mt-10 flex flex-wrap gap-4">
         <Button onClick={reset}>Try again</Button>
         <ButtonLink href="/" variant="secondary">
           Go home
         </ButtonLink>
       </div>
-      {error.digest && <p className="mt-6 text-xs text-muted">Error code: {error.digest}</p>}
+      {error.digest && (
+        <p className="mt-8 font-mono text-xs text-muted">Error code: {error.digest}</p>
+      )}
     </main>
   );
 }
