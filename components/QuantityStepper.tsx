@@ -16,7 +16,7 @@ export function QuantityStepper({ quantity, onChange, labels }: QuantityStepperP
     return (
       <button
         onClick={() => onChange(1)}
-        className="rounded-full bg-paper px-5 py-2 text-sm font-semibold shadow-raised-sm transition-[box-shadow,color,transform] duration-200 ease-out hover:-translate-y-px hover:text-accent active:translate-y-px active:shadow-pressed-sm"
+        className="rounded-full bg-paper px-5 py-2.5 text-sm font-semibold shadow-raised-sm transition-[box-shadow,color,transform] duration-200 ease-out hover:-translate-y-px hover:text-accent active:translate-y-px active:shadow-pressed-sm"
       >
         {labels.add}
       </button>
@@ -24,7 +24,7 @@ export function QuantityStepper({ quantity, onChange, labels }: QuantityStepperP
   }
 
   const stepClass =
-    "h-10 w-10 rounded-full bg-paper text-lg leading-none shadow-raised-sm transition-[box-shadow,color] duration-200 hover:text-accent active:shadow-pressed-sm";
+    "h-11 w-11 rounded-full bg-paper text-lg leading-none shadow-raised-sm transition-[box-shadow,color] duration-200 hover:text-accent active:shadow-pressed-sm";
   return (
     <div className="flex items-center gap-1 rounded-full p-1 shadow-pressed-sm">
       <button

@@ -20,7 +20,7 @@ export function ToggleChip({ label, pressed, tone, onToggle }: ToggleChipProps) 
       type="button"
       aria-pressed={pressed}
       onClick={onToggle}
-      className={`rounded-full px-4 py-2 text-sm font-medium transition-[box-shadow,background-color,color,transform] duration-200 ease-out active:translate-y-px ${
+      className={`rounded-full px-4 py-2.5 text-sm font-medium transition-[box-shadow,background-color,color,transform] duration-200 ease-out active:translate-y-px ${
         pressed ? PRESSED[tone] : "bg-paper text-muted shadow-raised-sm hover:text-ink"
       }`}
     >

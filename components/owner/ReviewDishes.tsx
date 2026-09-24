@@ -187,7 +187,7 @@ export default function ReviewDishes() {
   ];
 
   return (
-    <main className="mx-auto max-w-3xl px-5 pb-20">
+    <main id="main" className="mx-auto max-w-3xl px-5 pb-20">
       <div className="pt-12">
         <OwnerPageHeader
           title="Review dishes"

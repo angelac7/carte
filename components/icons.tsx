@@ -36,3 +36,30 @@ export const ShieldIcon = () => (
     <path d="m9 12 2 2 4-4" />
   </svg>
 );
+
+export const CompassIcon = () => (
+  <svg {...base}>
+    <circle cx="12" cy="12" r="9" />
+    <path d="m15.5 8.5-2 5-5 2 2-5 5-2Z" />
+  </svg>
+);
+
+export const PinIcon = () => (
+  <svg {...base}>
+    <path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21Z" />
+    <circle cx="12" cy="9.5" r="2.5" />
+  </svg>
+);
+
+export const ScanIcon = () => (
+  <svg {...base}>
+    <path d="M4 8V5h3M17 5h3v3M20 16v3h-3M7 19H4v-3" />
+    <path d="M8 12h8" />
+  </svg>
+);
+
+export const HeartIcon = () => (
+  <svg {...base}>
+    <path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z" />
+  </svg>
+);

@@ -1,9 +1,9 @@
 import Link from "next/link";
 import { FeatureShowcase, type Feature } from "@/components/landing/FeatureShowcase";
 import { Hero } from "@/components/landing/Hero";
-import { PullQuote } from "@/components/landing/PullQuote";
 import { BlurFade } from "@/components/motion/BlurFade";
 import { Marquee } from "@/components/motion/Marquee";
+import { ScrollProgress } from "@/components/motion/ScrollProgress";
 import { NumberTicker } from "@/components/motion/NumberTicker";
 import { Particles } from "@/components/motion/Particles";
 import { PublicHeader } from "@/components/PublicHeader";
@@ -94,8 +94,9 @@ export default async function LandingPage() {
   }));
   return (
     <>
+      <ScrollProgress />
       <PublicHeader />
-      <main className="landing-snap">
+      <main id="main" className="landing-snap">
         <Hero />
 
         {/* Inverted ink band: what's on Carte, then the numbers. */}
@@ -178,11 +179,6 @@ export default async function LandingPage() {
             </div>
           </div>
         </section>
-
-        <PullQuote
-          quote="Allergies aren’t an afterthought. They’re the first thing on the menu."
-          caption="How Carte is built"
-        />
 
         <section className="snap-start px-5 py-24 sm:py-32">
           <div className="mx-auto grid max-w-6xl gap-16 lg:grid-cols-2">

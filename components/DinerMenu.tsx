@@ -219,7 +219,7 @@ export function DinerMenu({
           cover={null}
           picker={languagePicker}
         />
-        <main className="mx-auto max-w-3xl px-5 py-12">
+        <main id="main" className="mx-auto max-w-3xl px-5 py-12">
           <p className="rounded-2xl border border-line bg-card p-6 text-muted">{t.notReady}</p>
         </main>
       </div>
@@ -235,7 +235,7 @@ export function DinerMenu({
         picker={languagePicker}
       />
 
-      <main className="mx-auto max-w-3xl px-5 pb-36">
+      <main id="main" className="mx-auto max-w-3xl px-5 pb-36">
         <Notice className="mt-6">{t.safetyNotice}</Notice>
         {translating && (
           <p role="status" className="mt-3 text-sm text-muted">

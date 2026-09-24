@@ -1,4 +1,5 @@
 import { NavBar } from "@/components/NavBar";
+import { PublicTabBar } from "@/components/PublicTabBar";
 import { ButtonLink } from "@/components/ui/button";
 
 const LINKS = [
@@ -10,19 +11,22 @@ const LINKS = [
 
 export function PublicHeader() {
   return (
-    <NavBar
-      homeHref="/"
-      links={LINKS}
-      trailing={
-        <>
-          <ButtonLink href="/login" variant="ghost" size="sm">
-            Log in
-          </ButtonLink>
-          <ButtonLink href="/signup" size="sm" shine>
-            Sign up
-          </ButtonLink>
-        </>
-      }
-    />
+    <>
+      <NavBar
+        homeHref="/"
+        links={LINKS}
+        trailing={
+          <>
+            <ButtonLink href="/login" variant="ghost" size="sm">
+              Log in
+            </ButtonLink>
+            <ButtonLink href="/signup" size="sm" shine>
+              Sign up
+            </ButtonLink>
+          </>
+        }
+      />
+      <PublicTabBar />
+    </>
   );
 }

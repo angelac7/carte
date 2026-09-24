@@ -12,7 +12,7 @@ export default async function SetupPage() {
   if (await getOwnerRestaurant(supabase, user.id)) redirect("/dashboard");
 
   return (
-    <main className="mx-auto max-w-xl px-5 py-12">
+    <main id="main" className="mx-auto max-w-xl px-5 py-12">
       <OwnerPageHeader
         title="Set up your restaurant"
         intro="Add your restaurant’s name and choose the link diners will use to open your menu."

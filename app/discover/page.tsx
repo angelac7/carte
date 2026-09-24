@@ -287,7 +287,11 @@ export default async function DiscoverPage({ searchParams }: DiscoverProps) {
         </Link>
       </PageHero>
 
-      <main lang={htmlLang(language)} className="relative z-10 mx-auto -mt-10 max-w-5xl px-5 pb-20">
+      <main
+        id="main"
+        lang={htmlLang(language)}
+        className="relative z-10 mx-auto -mt-10 max-w-5xl px-5 pb-20"
+      >
         <form
           action="/discover"
           method="get"

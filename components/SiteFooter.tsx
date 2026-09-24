@@ -18,7 +18,7 @@ export function SiteFooter() {
     "text-white/70 underline-offset-4 transition-colors hover:text-white hover:underline";
   return (
     <footer className="texture-ink text-white">
-      <div className="mx-auto max-w-6xl px-5 pt-16 pb-10">
+      <div className="mx-auto max-w-6xl px-5 pt-16 pb-32 md:pb-10">
         <div className="grid gap-10 border-b border-white/15 pb-12 sm:grid-cols-3">
           <div>
             <p className="eyebrow text-white/50">Carte</p>

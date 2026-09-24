@@ -27,7 +27,7 @@ export default async function QrPage() {
   const isLocalOnly = host.startsWith("localhost") || host.startsWith("127.");
 
   return (
-    <main className="mx-auto max-w-3xl px-5 py-12">
+    <main id="main" className="mx-auto max-w-3xl px-5 py-12">
       <OwnerPageHeader
         title="Table QR code"
         intro="Print this and place it on your tables. Diners scan it to open your menu with allergen and diet filters."

@@ -36,6 +36,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       className={`${playfair.variable} ${dmSans.variable} ${jetbrains.variable}`}
     >
       <body className="min-h-screen antialiased">
+        <a
+          href="#main"
+          className="sr-only rounded-control bg-ink px-5 py-3 font-semibold text-white focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50"
+        >
+          Skip to content
+        </a>
         <MotionProvider>{children}</MotionProvider>
         <Toasts />
         <ServiceWorkerRegistration />

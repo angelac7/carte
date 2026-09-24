@@ -1,17 +1,19 @@
 "use client";
 import { Toaster } from "sonner";
 
-/** Small confirmation messages that slide up from the bottom, like "Saved". */
+/** Small confirmation messages, like "Saved". Shown at the top, clear of the phone tab bar and menu dock. */
 export function Toasts() {
   return (
     <Toaster
-      position="bottom-center"
+      position="top-center"
       toastOptions={{
         style: {
           background: "var(--color-ink)",
           color: "#ffffff",
           border: "none",
-          borderRadius: "0.5rem",
+          borderRadius: "1rem",
+          boxShadow: "var(--depth-raised)",
+          fontFamily: "var(--font-sans)",
         },
       }}
     />

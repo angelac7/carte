@@ -29,7 +29,7 @@ export function PageSkeleton({ rows = 4, hero = false, narrow = false }: PageSke
 
   if (hero) {
     return (
-      <main aria-busy="true" aria-label="Loading">
+      <main id="main" aria-busy="true" aria-label="Loading">
         <div className="texture-ink">
           <div className={cn("mx-auto px-5 pt-20 pb-20 sm:pt-28", width)}>
             <div className="h-12 w-2/3 rounded-md bg-white/10 sm:h-16" />
@@ -42,7 +42,7 @@ export function PageSkeleton({ rows = 4, hero = false, narrow = false }: PageSke
   }
 
   return (
-    <main className="mx-auto max-w-3xl px-5 py-12" aria-busy="true" aria-label="Loading">
+    <main id="main" className="mx-auto max-w-3xl px-5 py-12" aria-busy="true" aria-label="Loading">
       <Skeleton className="h-10 w-2/3" />
       <Skeleton className="mt-4 h-4 w-full max-w-md" />
       <div className="mt-10 space-y-4">{cards}</div>

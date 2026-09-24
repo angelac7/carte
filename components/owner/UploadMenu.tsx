@@ -53,7 +53,7 @@ export default function UploadPage() {
   const reading = status === "reading";
 
   return (
-    <main className="mx-auto max-w-3xl px-5 py-12 sm:py-16">
+    <main id="main" className="mx-auto max-w-3xl px-5 py-12 sm:py-16">
       <OwnerPageHeader
         title="Turn your menu into an allergen guide."
         intro="Upload a photo of your menu. Carte lists every dish and suggests allergens, then you confirm each one before diners see it."

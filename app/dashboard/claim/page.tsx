@@ -38,7 +38,7 @@ export default async function ClaimPage({ searchParams }: { searchParams: Promis
   }
 
   return (
-    <main className="mx-auto max-w-2xl px-5 py-12">
+    <main id="main" className="mx-auto max-w-2xl px-5 py-12">
       <OwnerPageHeader
         title="Link your map listing"
         intro={`Link ${restaurant.name} to its listing on the map, so diners who find your restaurant nearby can open your confirmed Carte menu.`}

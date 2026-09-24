@@ -34,7 +34,7 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
   const copy = COPY[mode];
 
   return (
-    <main className="mx-auto max-w-md px-5 py-16 sm:py-24">
+    <main id="main" className="mx-auto max-w-md px-5 py-16 sm:py-24">
       <BlurFade>
         <h1 className="font-serif text-4xl leading-tight tracking-tight sm:text-5xl">
           {copy.title}

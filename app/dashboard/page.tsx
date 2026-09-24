@@ -54,7 +54,7 @@ export default async function DashboardHome() {
   ];
 
   return (
-    <main className="mx-auto max-w-5xl px-5 py-12">
+    <main id="main" className="mx-auto max-w-5xl px-5 py-12">
       <OwnerPageHeader eyebrow="Welcome back" title={restaurant.name}>
         <ButtonLink href={`/r/${restaurant.slug}`} shine>
           View your diner menu

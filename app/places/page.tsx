@@ -98,7 +98,11 @@ export default async function PlacesPage({ searchParams }: { searchParams: Promi
         lang={htmlLang(language)}
       />
 
-      <main lang={htmlLang(language)} className="relative z-10 mx-auto -mt-10 max-w-5xl px-5 pb-20">
+      <main
+        id="main"
+        lang={htmlLang(language)}
+        className="relative z-10 mx-auto -mt-10 max-w-5xl px-5 pb-20"
+      >
         <form
           action="/places"
           method="get"

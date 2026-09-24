@@ -59,7 +59,7 @@ export default async function PlacePage({ params }: { params: Promise<{ id: stri
     <>
       <PublicHeader />
       {!place ? (
-        <main className="mx-auto max-w-3xl px-5 py-16">
+        <main id="main" className="mx-auto max-w-3xl px-5 py-16">
           <Notice tone="warning" role="alert">
             {t.lookupFailed}
           </Notice>
@@ -101,6 +101,7 @@ export default async function PlacePage({ params }: { params: Promise<{ id: stri
           </PageHero>
 
           <main
+            id="main"
             lang={htmlLang(language)}
             className="relative z-10 mx-auto -mt-10 max-w-3xl px-5 pb-20"
           >

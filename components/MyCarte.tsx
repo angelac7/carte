@@ -100,7 +100,7 @@ export function MyCarte({ language, initialPrefs }: MyCarteProps) {
   const challenges = computeChallenges(state, new Date());
 
   return (
-    <main lang={htmlLang(language)} className="mx-auto max-w-3xl px-5 pt-4 pb-20">
+    <main id="main" lang={htmlLang(language)} className="mx-auto max-w-3xl px-5 pt-4 pb-20">
       {/* Scrolls sideways on narrow phones instead of wrapping onto two rows. */}
       <div className="-mx-5 mt-8 overflow-x-auto px-5 pb-1">
         <div

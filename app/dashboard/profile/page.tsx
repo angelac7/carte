@@ -11,7 +11,7 @@ export default async function ProfilePage() {
   const profile = await getRestaurantProfile(supabase, restaurant.id);
 
   return (
-    <main className="mx-auto max-w-2xl px-5 py-12">
+    <main id="main" className="mx-auto max-w-2xl px-5 py-12">
       <OwnerPageHeader
         title="Restaurant profile"
         intro="This appears on Carte Discover, where diners search for restaurants and dishes. It’s only shown once you turn on listing."

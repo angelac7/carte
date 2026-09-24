@@ -3,7 +3,10 @@ import { ButtonLink } from "@/components/ui/button";
 
 export default function NotFound() {
   return (
-    <main className="relative isolate flex min-h-[80vh] items-center justify-center overflow-hidden px-5">
+    <main
+      id="main"
+      className="relative isolate flex min-h-[80vh] items-center justify-center overflow-hidden px-5"
+    >
       <DotPattern className="-z-10 [mask-image:radial-gradient(circle,white,transparent_70%)]" />
       <div className="max-w-md text-center">
         <p className="font-serif text-8xl text-line">404</p>

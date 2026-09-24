@@ -1,8 +1,9 @@
 "use client";
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence, motion, useMotionValueEvent, useScroll } from "motion/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, type ReactNode } from "react";
+import { cn } from "@/lib/cn";
 
 type NavLink = { href: string; label: string };
 
@@ -17,6 +18,10 @@ type NavBarProps = {
 export function NavBar({ homeHref, links, subtitle, trailing }: NavBarProps) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  // Lift the header off the page once the diner starts scrolling.
+  const [scrolled, setScrolled] = useState(false);
+  const { scrollY } = useScroll();
+  useMotionValueEvent(scrollY, "change", (y) => setScrolled(y > 8));
   const isActive = (href: string) => pathname === href;
 
   const linkClass =
@@ -25,7 +30,12 @@ export function NavBar({ homeHref, links, subtitle, trailing }: NavBarProps) {
     "rounded-control px-4 py-3 font-mono text-sm tracking-wider text-muted uppercase transition-[color,box-shadow] hover:text-ink aria-[current=page]:text-accent aria-[current=page]:shadow-pressed-sm";
 
   return (
-    <header className="sticky top-0 z-30 border-b border-ink bg-paper/85 backdrop-blur print:hidden">
+    <header
+      className={cn(
+        "sticky top-0 z-30 border-b bg-paper/85 backdrop-blur transition-[box-shadow,border-color] duration-300 print:hidden",
+        scrolled ? "border-transparent shadow-raised-sm" : "border-ink",
+      )}
+    >
       <nav className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-5 py-3">
         <div className="flex min-w-0 items-baseline gap-3">
           <Link

@@ -76,7 +76,7 @@ export function ScanMenu({ language, initialPrefs }: ScanMenuProps) {
   );
 
   return (
-    <main lang={htmlLang(language)} className="mx-auto max-w-3xl px-5 pt-4 pb-20">
+    <main id="main" lang={htmlLang(language)} className="mx-auto max-w-3xl px-5 pt-4 pb-20">
       <div className="mt-8 flex flex-wrap gap-3">
         {uploadButton}
         <Button onClick={() => setCardOpen(true)} variant="secondary" size="lg">
