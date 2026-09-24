@@ -57,8 +57,12 @@ const many = (value: Params[string]) => (Array.isArray(value) ? value : value ? 
 const one = (value: Params[string]) => (Array.isArray(value) ? value[0] : value) ?? "";
 
 // Matches ToggleChip, as a checkbox label so the filters work without JavaScript.
+// Matches ToggleChip, as a checkbox label so the filters work without JavaScript.
 const chipClass =
-  "cursor-pointer rounded-full border border-line bg-card px-3.5 py-1.5 text-sm text-muted transition-colors hover:border-muted hover:text-ink has-checked:border-ink has-checked:bg-ink has-checked:text-white has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-ink";
+  "cursor-pointer rounded-full bg-paper px-4 py-2.5 text-sm font-medium text-muted shadow-raised-sm transition-[box-shadow,background-color,color] duration-200 hover:text-ink has-checked:bg-ink has-checked:text-white has-checked:shadow-pressed-color has-focus-visible:outline-2 has-focus-visible:outline-offset-3 has-focus-visible:outline-accent";
+// A segmented switch between dishes and restaurants.
+const segmentClass =
+  "cursor-pointer rounded-full px-5 py-2.5 text-sm font-medium text-muted transition-[box-shadow,background-color,color] duration-200 hover:text-ink has-checked:bg-ink has-checked:text-white has-checked:shadow-pressed-color has-focus-visible:outline-2 has-focus-visible:outline-offset-3 has-focus-visible:outline-accent";
 const selectClass = fieldClass();
 const stagger = (index: number) => Math.min(index, 8) * 0.05;
 
@@ -72,7 +76,7 @@ function DishGrid({
   t: DiscoverStrings;
 }) {
   return (
-    <ul className="mt-6 grid gap-5 sm:grid-cols-2">
+    <ul className="mt-8 grid gap-6 sm:grid-cols-2">
       {dishes.map((dish, index) => (
         <li key={dish.dish_id}>
           <BlurFade delay={stagger(index)} className="h-full">
@@ -90,8 +94,10 @@ function DishGrid({
                   <Badge className="right-3 left-auto tabular-nums">{dish.price}</Badge>
                 )}
               </CardImage>
-              <div className="flex flex-1 flex-col p-5">
-                <h3 className="font-serif text-xl leading-snug">{dish.dish_name}</h3>
+              <div className="flex flex-1 flex-col px-6 pt-3 pb-6">
+                <h3 className="font-serif text-2xl leading-tight tracking-tight">
+                  {dish.dish_name}
+                </h3>
                 <p className="mt-1 text-sm text-muted">
                   {dish.restaurant_name}
                   {dish.city && `, ${dish.city}`}
@@ -99,7 +105,7 @@ function DishGrid({
                 <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">
                   {dish.allergens.length > 0 ? (
                     <>
-                      <span className="text-muted">{d.contains}</span>
+                      <span className="eyebrow text-muted">{d.contains}</span>
                       {dish.allergens.map((allergen) => (
                         <Chip key={allergen} label={d.allergens[allergen]} tone="allergen" />
                       ))}
@@ -111,7 +117,7 @@ function DishGrid({
                     <Chip key={tag} label={d.tags[tag]} tone="tag" />
                   ))}
                 </div>
-                <p className="mt-auto pt-4 text-sm font-medium underline underline-offset-4">
+                <p className="mt-auto pt-5 text-sm font-semibold text-accent underline-offset-4 group-hover:underline">
                   {t.viewMenu}
                 </p>
               </div>
@@ -131,7 +137,7 @@ function RestaurantGrid({
   t: DiscoverStrings;
 }) {
   return (
-    <ul className="mt-6 grid gap-5 sm:grid-cols-2">
+    <ul className="mt-8 grid gap-6 sm:grid-cols-2">
       {restaurants.map((restaurant, index) => {
         const open = isOpenNow(restaurant.hours, restaurant.timezone);
         return (
@@ -155,8 +161,8 @@ function RestaurantGrid({
                     </Badge>
                   </CardImage>
                 </Link>
-                <div className="flex flex-1 flex-col p-5">
-                  <h3 className="font-serif text-2xl leading-snug">
+                <div className="flex flex-1 flex-col px-6 pt-3 pb-6">
+                  <h3 className="font-serif text-3xl leading-tight tracking-tight">
                     <Link href={`/r/${restaurant.slug}`} className="hover:underline">
                       {restaurant.name}
                     </Link>
@@ -295,7 +301,7 @@ export default async function DiscoverPage({ searchParams }: DiscoverProps) {
         <form
           action="/discover"
           method="get"
-          className="rounded-2xl border border-line bg-card p-5 shadow-xl sm:p-6"
+          className="rounded-panel bg-paper p-5 shadow-raised-lg sm:p-7"
         >
           <input type="hidden" name="filters" value="1" />
           <div className="flex flex-col gap-3 sm:flex-row">
@@ -305,16 +311,16 @@ export default async function DiscoverPage({ searchParams }: DiscoverProps) {
               maxLength={100}
               aria-label={t.searchLabel}
               placeholder={t.placeholder}
-              className={fieldClass("flex-1 bg-paper px-4 py-3 text-base sm:text-lg")}
+              className={fieldClass("flex-1 px-5 py-4 sm:text-lg")}
             />
             <button type="submit" className={buttonClass({ size: "lg", shine: true })}>
               {t.search}
             </button>
           </div>
 
-          <div className="mt-4 flex gap-2">
+          <div className="mt-5 inline-flex gap-1 rounded-full p-1 shadow-pressed-sm">
             {(["dishes", "restaurants"] as const).map((option) => (
-              <label key={option} className={chipClass}>
+              <label key={option} className={segmentClass}>
                 <input
                   type="radio"
                   name="type"
@@ -327,30 +333,27 @@ export default async function DiscoverPage({ searchParams }: DiscoverProps) {
             ))}
           </div>
 
-          <details
-            open={activeFilters > 0}
-            className="group mt-5 rounded-xl border border-line bg-paper/60"
-          >
-            <summary className="flex cursor-pointer list-none items-center justify-between gap-3 rounded-xl px-4 py-3 text-sm font-medium [&::-webkit-details-marker]:hidden">
-              <span className="flex items-center gap-2">
+          <details open={activeFilters > 0} className="group mt-5 rounded-control shadow-pressed">
+            <summary className="flex cursor-pointer list-none items-center justify-between gap-3 rounded-control px-5 py-4 [&::-webkit-details-marker]:hidden">
+              <span className="eyebrow flex items-center gap-2">
                 {t.filters}
                 {activeFilters > 0 && (
-                  <span className="rounded-full bg-ink px-2 py-0.5 text-xs text-white tabular-nums">
+                  <span className="rounded-full bg-accent px-2 py-0.5 text-white tabular-nums">
                     {activeFilters}
                   </span>
                 )}
               </span>
               <span
                 aria-hidden="true"
-                className="text-lg leading-none text-muted transition-transform group-open:rotate-45"
+                className="flex h-8 w-8 items-center justify-center rounded-full text-lg leading-none text-muted shadow-raised-sm transition-transform duration-300 group-open:rotate-45"
               >
                 +
               </span>
             </summary>
-            <div className="space-y-5 border-t border-line px-4 py-4">
+            <div className="space-y-6 border-t border-ink/10 px-5 py-5">
               <fieldset>
-                <legend className="text-sm font-medium">{d.hideContaining}</legend>
-                <div className="mt-2 flex flex-wrap gap-2">
+                <legend className="eyebrow text-muted">{d.hideContaining}</legend>
+                <div className="mt-3 flex flex-wrap gap-2.5">
                   {ALLERGENS.map((allergen) => (
                     <label key={allergen} className={chipClass}>
                       <input
@@ -366,8 +369,8 @@ export default async function DiscoverPage({ searchParams }: DiscoverProps) {
                 </div>
               </fieldset>
               <fieldset>
-                <legend className="text-sm font-medium">{d.showOnly}</legend>
-                <div className="mt-2 flex flex-wrap gap-2">
+                <legend className="eyebrow text-muted">{d.showOnly}</legend>
+                <div className="mt-3 flex flex-wrap gap-2.5">
                   {DIETARY_TAGS.map((tag) => (
                     <label key={tag} className={chipClass}>
                       <input
@@ -382,14 +385,14 @@ export default async function DiscoverPage({ searchParams }: DiscoverProps) {
                   ))}
                 </div>
               </fieldset>
-              <div className="grid items-center gap-4 sm:grid-cols-3">
+              <div className="grid items-center gap-4 border-t border-ink/10 pt-5 sm:grid-cols-3">
                 <label className="flex items-center gap-2 text-sm">
                   <input
                     type="checkbox"
                     name="open"
                     value="1"
                     defaultChecked={openOnly}
-                    className="h-4 w-4 accent-ink"
+                    className="h-5 w-5 accent-accent"
                   />
                   {t.openNow}
                 </label>
@@ -425,16 +428,18 @@ export default async function DiscoverPage({ searchParams }: DiscoverProps) {
         <Notice className="mt-6">{d.safetyNotice}</Notice>
 
         {tab === "dishes" && !query && trending.length > 0 && (
-          <section className="mt-12">
+          <section className="mt-16 border-t-4 border-ink pt-8">
             <BlurFade>
-              <h2 className="font-serif text-3xl tracking-tight sm:text-4xl">{t.trending}</h2>
+              <h2 className="font-serif text-4xl leading-none tracking-tighter sm:text-6xl">
+                {t.trending}
+              </h2>
             </BlurFade>
             <DishGrid dishes={trending} d={d} t={t} />
           </section>
         )}
 
         {tab === "dishes" && query && (
-          <section className="mt-12">
+          <section className="mt-16 border-t-4 border-ink pt-8">
             {cravingUsed && <p className="mb-2 text-sm text-muted">{t.cravingNote(query)}</p>}
             {dishes.length === 0 ? (
               <EmptyState>{t.noResults}</EmptyState>
@@ -445,7 +450,7 @@ export default async function DiscoverPage({ searchParams }: DiscoverProps) {
         )}
 
         {tab === "restaurants" && (
-          <section className="mt-12">
+          <section className="mt-16 border-t-4 border-ink pt-8">
             {restaurants.length === 0 ? (
               <EmptyState>{t.noResults}</EmptyState>
             ) : (
