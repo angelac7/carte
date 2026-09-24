@@ -12,7 +12,7 @@ type AllergyCardProps = {
   avoid: Allergen[];
   onToggle: (allergen: Allergen) => void;
   onClose: () => void;
-  /** The language staff read. Carte menus are in English; scanned menus may differ. */
+  /** The language staff read. Uses fixed translations when the menu source language is supported. */
   staffLanguage?: LanguageCode;
 };
 

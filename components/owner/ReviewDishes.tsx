@@ -19,7 +19,7 @@ import { toggleValue } from "@/lib/toggle-value";
 import type { MenuItem } from "@/types/menu";
 
 type Filter = "all" | "review" | "confirmed";
-type DishDetails = { name: string; description: string; price: string };
+type DishDetails = { name: string; description: string; price: string; source_language?: string };
 
 const inputClass = fieldClass("mt-1");
 
@@ -37,13 +37,19 @@ function DishDetailsForm({
   const [name, setName] = useState(initial.name);
   const [description, setDescription] = useState(initial.description);
   const [price, setPrice] = useState(initial.price);
+  const [sourceLanguage, setSourceLanguage] = useState(initial.source_language ?? "und");
 
   return (
     <form
       onSubmit={(e) => {
         e.preventDefault();
         if (!name.trim()) return;
-        onSave({ name: name.trim(), description: description.trim(), price: price.trim() });
+        onSave({
+          name: name.trim(),
+          description: description.trim(),
+          price: price.trim(),
+          source_language: sourceLanguage,
+        });
       }}
       className="space-y-3"
     >
@@ -76,6 +82,21 @@ function DishDetailsForm({
           placeholder="$14"
           className={cn(inputClass, "max-w-40")}
         />
+      </label>
+      <label className="block">
+        <span className={labelClass}>Language of the dish text</span>
+        <input
+          required
+          maxLength={35}
+          pattern="[a-z]{2,3}(-[A-Za-z0-9]{2,8})*"
+          value={sourceLanguage}
+          onChange={(event) => setSourceLanguage(event.target.value)}
+          className={inputClass}
+        />
+        <span className="text-xs text-muted">
+          Use a language code such as en, es, ja, ar, or th. Use und for automatic detection or
+          mixed languages. Include kitchen notes in this language.
+        </span>
       </label>
       <div className="flex gap-2 pt-1">
         <Button type="submit" size="sm">

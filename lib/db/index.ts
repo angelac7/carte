@@ -5,7 +5,7 @@ export type Restaurant = { id: string; name: string; slug: string; cuisine: stri
 
 const RESTAURANT_COLUMNS = "id, name, slug, cuisine";
 const DISH_COLUMNS =
-  "id, name, description, price, allergens, dietary_tags, notes, confirmed, photo_url, revision";
+  "id, name, description, price, allergens, dietary_tags, notes, confirmed, photo_url, revision, source_language";
 
 export async function getOwnerRestaurant(
   supabase: SupabaseClient,
@@ -82,6 +82,7 @@ export async function addDishes(
   if (dishes.length === 0) return [];
   const rows = dishes.map((dish) => ({
     restaurant_id: restaurantId,
+    source_language: dish.source_language ?? "und",
     name: dish.name,
     description: dish.description,
     price: dish.price,
@@ -103,6 +104,7 @@ export async function updateDish(
   const { data, error } = await supabase
     .from("menu_items")
     .update({
+      source_language: dish.source_language ?? "und",
       name: dish.name,
       description: dish.description,
       price: dish.price,

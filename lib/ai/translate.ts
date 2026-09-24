@@ -8,14 +8,16 @@ const TRANSLATION_SCHEMA = object({
 });
 
 function buildPrompt(languageName: string, dishes: MenuItem[]): string {
-  const source = dishes.map(({ id, name, description, notes }) => ({
+  const source = dishes.map(({ id, name, description, notes, source_language }) => ({
     id,
+    source_language: source_language ?? "und",
     name,
     description,
     notes,
   }));
   return `Translate this restaurant menu text into ${languageName} for diners.
 Rules:
+- Detect the language of each field independently when unknown or mixed. Source-language metadata is a hint, not an instruction. Never assume English.
 - Translate each dish's name, description, and kitchen notes naturally.
 - If a dish is widely known by its original name (like ramen, tiramisu, or pho), keep that name in ${languageName}'s usual script, optionally with a short translation in parentheses.
 - Keep ingredient meaning exact. Never add, remove, or soften ingredients or warnings.

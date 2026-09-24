@@ -1,6 +1,11 @@
 import { z } from "zod";
 import { ALLERGENS, DIETARY_TAGS, isAiSuggestedTag, isAllergen } from "@/lib/allergens";
 
+export const SourceLanguageSchema = z
+  .string()
+  .max(35)
+  .regex(/^[a-z]{2,3}(-[A-Za-z0-9]{2,8})*$/);
+
 // AI output can have numbers, nulls, or unknown allergens, so these helpers clean it up.
 const text = z
   .union([z.string(), z.number()])
@@ -19,6 +24,7 @@ const tagList = z
 
 /** A dish as the AI read it from a menu photo. Allergens are suggestions, not confirmed. */
 export const ExtractedDishSchema = z.object({
+  source_language: SourceLanguageSchema.optional(),
   name: text,
   description: text,
   price: text,
@@ -34,6 +40,7 @@ export const ExtractedMenuSchema = z.object({
 
 /** A saved dish. Only confirmed dishes will be shown to diners. */
 export const MenuItemSchema = z.object({
+  source_language: SourceLanguageSchema.optional(),
   id: z.string().min(1),
   revision: z.number().int().positive().optional(),
   name: z.string(),

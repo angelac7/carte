@@ -18,6 +18,7 @@ type OrderSheetProps = {
   order: Record<string, number>;
   textFor: (dish: MenuItem) => DishText;
   language: LanguageCode;
+  staffLanguage?: LanguageCode;
   avoid: Allergen[];
   onQuantity: (dishId: string, quantity: number) => void;
   onClear: () => void;
@@ -28,7 +29,6 @@ type Mode = "list" | "split" | "server";
 
 const TIP_OPTIONS = [0, 15, 18, 20];
 const MAX_PEOPLE = 12;
-const STAFF_TITLE = "Order";
 
 function clampPercent(value: string): number {
   const number = Number(value);
@@ -50,6 +50,7 @@ export function OrderSheet({
   order,
   textFor,
   language,
+  staffLanguage = "en",
   avoid,
   onQuantity,
   onClear,
@@ -85,25 +86,29 @@ export function OrderSheet({
 
   if (mode === "server") {
     return (
-      <Sheet title={STAFF_TITLE} closeLabel={t.back} onClose={() => setMode("list")}>
-        <ul lang="en" className="mt-4 space-y-3">
+      <Sheet
+        title={TABLE_STRINGS[staffLanguage].yourOrder}
+        closeLabel={t.back}
+        onClose={() => setMode("list")}
+      >
+        <ul className="mt-4 space-y-3">
           {lines.map(({ dish, quantity }) => (
-            <li key={dish.id} className="flex gap-3 text-xl">
+            <li lang={dish.source_language ?? "und"} key={dish.id} className="flex gap-3 text-xl">
               <span className="font-medium tabular-nums">{quantity} ×</span>
               <span>{dish.name}</span>
             </li>
           ))}
         </ul>
         {avoid.length > 0 && (
-          <div lang="en" className="mt-6 rounded-control border-2 border-tomato p-4">
-            <p className="font-medium">{TABLE_STRINGS.en.statement}</p>
+          <div lang={staffLanguage} className="mt-6 rounded-control border-2 border-tomato p-4">
+            <p className="font-medium">{TABLE_STRINGS[staffLanguage].statement}</p>
             <p className="mt-1 text-xl">
               {formatList(
-                avoid.map((allergen) => DINER_STRINGS.en.allergens[allergen]),
-                "en",
+                avoid.map((allergen) => DINER_STRINGS[staffLanguage].allergens[allergen]),
+                staffLanguage,
               )}
             </p>
-            <p className="mt-2 text-sm leading-relaxed">{TABLE_STRINGS.en.request}</p>
+            <p className="mt-2 text-sm leading-relaxed">{TABLE_STRINGS[staffLanguage].request}</p>
           </div>
         )}
       </Sheet>
@@ -165,7 +170,11 @@ export function OrderSheet({
         {people.length > 0 && (
           <ul className="mt-5 divide-y divide-line">
             {lines.map(({ dish, quantity }) => (
-              <li key={dish.id} className="flex items-center justify-between gap-3 py-2 text-sm">
+              <li
+                lang={dish.source_language ?? "und"}
+                key={dish.id}
+                className="flex items-center justify-between gap-3 py-2 text-sm"
+              >
                 <span className="min-w-0">
                   {quantity} × {textFor(dish).name}
                 </span>
@@ -259,7 +268,11 @@ export function OrderSheet({
         <>
           <ul className="mt-4 divide-y divide-line">
             {lines.map(({ dish, quantity }) => (
-              <li key={dish.id} className="flex items-center justify-between gap-4 py-3">
+              <li
+                lang={dish.source_language ?? "und"}
+                key={dish.id}
+                className="flex items-center justify-between gap-4 py-3"
+              >
                 <div className="min-w-0">
                   <p className="font-medium">{textFor(dish).name}</p>
                   <p className="text-sm text-muted tabular-nums">{dish.price}</p>

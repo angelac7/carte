@@ -10,7 +10,7 @@ export const LANGUAGES = [
 
 export type LanguageCode = (typeof LANGUAGES)[number]["code"];
 
-/** Menus are uploaded in this language, so it never needs AI translation. */
+/** Fallback UI/staff language when no preference is available. Dish source languages are independent. */
 export const ORIGINAL_LANGUAGE: LanguageCode = "en";
 export const LANGUAGE_COOKIE = "carte-language";
 

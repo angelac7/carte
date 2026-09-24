@@ -42,7 +42,6 @@ import {
   isLanguageCode,
   LANGUAGE_COOKIE,
   LANGUAGES,
-  ORIGINAL_LANGUAGE,
   type LanguageCode,
 } from "@/lib/languages";
 import { filterDishes } from "@/lib/menu-filters";
@@ -129,14 +128,20 @@ export function DinerMenu({
   const requested = useRef(new Set<LanguageCode>());
   const [translationAttempt, setTranslationAttempt] = useState(0);
 
+  const sourceLanguage = dishes.find(
+    (dish) => dish.source_language && isLanguageCode(dish.source_language),
+  )?.source_language;
+  const staffLanguage = sourceLanguage && isLanguageCode(sourceLanguage) ? sourceLanguage : "en";
+  const needsTranslation = dishes.some((dish) => (dish.source_language ?? "en") !== language);
+
   // Fetch each language's translations once, the first time a diner picks it.
   useEffect(() => {
-    if (language === ORIGINAL_LANGUAGE || requested.current.has(language)) return;
+    if (!needsTranslation || requested.current.has(language)) return;
     requested.current.add(language);
     fetchTranslations(restaurant.slug, language)
       .then((result) => setByLanguage((prev) => ({ ...prev, [language]: result })))
       .catch(() => setByLanguage((prev) => ({ ...prev, [language]: "failed" })));
-  }, [language, restaurant.slug, translationAttempt]);
+  }, [language, restaurant.slug, translationAttempt, needsTranslation]);
 
   // Larger text and high contrast apply to the whole page while this menu is open.
   useEffect(() => {
@@ -149,9 +154,9 @@ export function DinerMenu({
   const helpText = HELP_STRINGS[language];
   const dishText = DISH_STRINGS[language];
   const dockText = DOCK_STRINGS[language];
-  const status = language === ORIGINAL_LANGUAGE ? undefined : byLanguage[language];
+  const status = !needsTranslation ? undefined : byLanguage[language];
   const translations = status && status !== "failed" ? status : undefined;
-  const translating = language !== ORIGINAL_LANGUAGE && status === undefined;
+  const translating = needsTranslation && status === undefined;
 
   function chooseLanguage(value: string) {
     if (!isLanguageCode(value)) return;
@@ -485,6 +490,7 @@ export function DinerMenu({
       )}
       {panel === "order" && (
         <OrderSheet
+          staffLanguage={staffLanguage}
           dishes={shown}
           order={filteredOrder}
           textFor={textFor}
@@ -497,6 +503,7 @@ export function DinerMenu({
       )}
       {panel === "allergy-card" && (
         <AllergyCard
+          staffLanguage={staffLanguage}
           language={language}
           avoid={avoid}
           onToggle={(allergen) => updateFilters(toggleValue(avoid, allergen), onlyTags)}
