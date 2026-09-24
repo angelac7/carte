@@ -38,6 +38,10 @@ export function buttonClass({ variant = "primary", size = "md", shine = false }:
   );
 }
 
+/** Extra classes for a <label> styled as a button that wraps a hidden file input. */
+export const fileButtonClass =
+  "cursor-pointer has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-ink has-disabled:pointer-events-none has-disabled:opacity-50";
+
 export function Button({
   variant,
   size,

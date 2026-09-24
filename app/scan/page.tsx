@@ -34,6 +34,7 @@ export default async function ScanPage() {
         intro={t.scanIntro}
         image={publicAsset("images/scan.jpg")}
         lang={htmlLang(language)}
+        narrow
       />
       <ScanMenu
         language={language}

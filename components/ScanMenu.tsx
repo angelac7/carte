@@ -2,6 +2,11 @@
 import { useState } from "react";
 import { AllergyCard } from "@/components/AllergyCard";
 import { Chip } from "@/components/Chip";
+import { Button, buttonClass, fileButtonClass } from "@/components/ui/button";
+import { EmptyState } from "@/components/ui/empty-state";
+import { Notice } from "@/components/ui/notice";
+import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/cn";
 import type { Allergen } from "@/lib/allergens";
 import { PhotoLimitError, scanMenu } from "@/lib/api-client";
 import { writePrefsCookie, type DinerPrefs } from "@/lib/diner-prefs";
@@ -53,7 +58,7 @@ export function ScanMenu({ language, initialPrefs }: ScanMenuProps) {
     : ORIGINAL_LANGUAGE;
 
   const uploadButton = (
-    <label className="inline-block cursor-pointer rounded-md bg-ink px-5 py-2.5 text-sm font-medium text-white hover:bg-ink/90 has-focus-visible:outline-2 has-focus-visible:outline-ink">
+    <label className={cn(buttonClass({ size: "lg", shine: status !== "done" }), fileButtonClass)}>
       <input
         type="file"
         accept="image/*"
@@ -74,66 +79,70 @@ export function ScanMenu({ language, initialPrefs }: ScanMenuProps) {
     <main lang={htmlLang(language)} className="mx-auto max-w-3xl px-5 pt-4 pb-20">
       <div className="mt-8 flex flex-wrap gap-3">
         {uploadButton}
-        <button
-          onClick={() => setCardOpen(true)}
-          className="rounded-md border border-line px-5 py-2.5 text-sm hover:border-muted"
-        >
+        <Button onClick={() => setCardOpen(true)} variant="secondary" size="lg">
           {t.showCard}
-        </button>
+        </Button>
       </div>
+
+      {/* Scanned menus are never confirmed, so this warning shows before and after every scan. */}
+      <Notice tone="warning" className="mt-8">
+        {t.warning}
+      </Notice>
+      <p className="mt-4 text-sm">
+        {avoid.length > 0 ? (
+          <>
+            <span className="font-medium">{t.checking}</span>{" "}
+            {formatList(
+              avoid.map((allergen) => d.allergens[allergen]),
+              language,
+            )}
+          </>
+        ) : (
+          <span className="text-muted">{t.noAllergiesSet}</span>
+        )}
+      </p>
 
       {status === "loading" && (
         <div role="status" className="mt-8">
           <p className="font-serif text-2xl">{t.reading}</p>
           <p className="mt-1 text-sm text-muted">{t.readingHint}</p>
+          <div className="mt-6 space-y-3" aria-hidden="true">
+            {[0, 1, 2].map((row) => (
+              <div key={row} className="rounded-xl border border-line bg-card p-4">
+                <Skeleton className="h-6 w-1/2" />
+                <Skeleton className="mt-3 h-4 w-4/5" />
+              </div>
+            ))}
+          </div>
         </div>
       )}
       {status === "failed" && (
-        <p role="alert" className="mt-6 rounded-md bg-tomato/10 px-4 py-3 text-sm text-tomato">
+        <Notice tone="warning" role="alert" className="mt-6">
           {t.scanFailed}
-        </p>
+        </Notice>
       )}
       {status === "limit" && (
-        <p role="alert" className="mt-6 rounded-md bg-tomato/10 px-4 py-3 text-sm text-tomato">
+        <Notice tone="warning" role="alert" className="mt-6">
           {t.photoLimit}
-        </p>
+        </Notice>
       )}
 
       {status === "done" && menu && (
-        <section className="mt-8">
-          <p
-            role="note"
-            className="rounded-md border border-tomato/40 bg-tomato/10 px-4 py-3 text-sm leading-relaxed text-tomato"
-          >
-            {t.warning}
-          </p>
-
-          <p className="mt-4 text-sm">
-            {avoid.length > 0 ? (
-              <>
-                <span className="font-medium">{t.checking}</span>{" "}
-                {formatList(
-                  avoid.map((allergen) => d.allergens[allergen]),
-                  language,
-                )}
-              </>
-            ) : (
-              <span className="text-muted">{t.noAllergiesSet}</span>
-            )}
-          </p>
-
+        <section className="mt-2">
           {menu.dishes.length === 0 ? (
-            <p className="mt-6 text-muted">{t.scanFailed}</p>
+            <EmptyState className="mt-6">{t.scanFailed}</EmptyState>
           ) : (
             <>
-              <h2 className="mt-6 font-serif text-2xl">{t.dishesFound(menu.dishes.length)}</h2>
+              <h2 className="mt-8 font-serif text-3xl tracking-tight">
+                {t.dishesFound(menu.dishes.length)}
+              </h2>
               <ul className="mt-4 space-y-3">
                 {menu.dishes.map((dish, index) => {
                   const flagged = dish.allergens.filter((allergen) => avoid.includes(allergen));
                   return (
                     <li
                       key={index}
-                      className={`rounded-lg border bg-card p-4 ${
+                      className={`rounded-xl border bg-card p-4 sm:p-5 ${
                         flagged.length > 0 ? "border-2 border-tomato" : "border-line"
                       }`}
                     >

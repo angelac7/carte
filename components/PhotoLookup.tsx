@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { Sheet } from "@/components/Sheet";
-import { buttonClass } from "@/components/ui/button";
+import { buttonClass, fileButtonClass } from "@/components/ui/button";
 import { cn } from "@/lib/cn";
 import { askPhotoMatch, PhotoLimitError } from "@/lib/api-client";
 import { CAMERA_STRINGS } from "@/lib/i18n/camera-strings";
@@ -64,12 +64,7 @@ export function PhotoLookup({
     <Sheet title={t.photoButton} closeLabel={TABLE_STRINGS[language].close} onClose={onClose}>
       <p className="mt-2 text-sm leading-relaxed text-muted">{t.photoIntro}</p>
 
-      <label
-        className={cn(
-          buttonClass(),
-          "mt-4 cursor-pointer has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-ink has-disabled:pointer-events-none has-disabled:opacity-50",
-        )}
-      >
+      <label className={cn(buttonClass(), fileButtonClass, "mt-4")}>
         <input
           type="file"
           accept="image/*"
