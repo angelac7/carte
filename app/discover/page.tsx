@@ -75,8 +75,11 @@ function DishGrid({
     <ul className="mt-6 grid gap-5 sm:grid-cols-2">
       {dishes.map((dish, index) => (
         <li key={dish.dish_id}>
-          <BlurFade delay={stagger(index)}>
-            <Link href={`/r/${dish.restaurant_slug}`} className={cn(cardClass, "block")}>
+          <BlurFade delay={stagger(index)} className="h-full">
+            <Link
+              href={`/r/${dish.restaurant_slug}`}
+              className={cn(cardClass, "flex h-full flex-col")}
+            >
               <CardImage
                 src={dish.photo_url}
                 alt={dish.dish_name}
@@ -87,7 +90,7 @@ function DishGrid({
                   <Badge className="right-3 left-auto tabular-nums">{dish.price}</Badge>
                 )}
               </CardImage>
-              <div className="p-5">
+              <div className="flex flex-1 flex-col p-5">
                 <h3 className="font-serif text-xl leading-snug">{dish.dish_name}</h3>
                 <p className="mt-1 text-sm text-muted">
                   {dish.restaurant_name}
@@ -108,7 +111,7 @@ function DishGrid({
                     <Chip key={tag} label={d.tags[tag]} tone="tag" />
                   ))}
                 </div>
-                <p className="mt-4 text-sm font-medium underline underline-offset-4">
+                <p className="mt-auto pt-4 text-sm font-medium underline underline-offset-4">
                   {t.viewMenu}
                 </p>
               </div>
@@ -133,8 +136,8 @@ function RestaurantGrid({
         const open = isOpenNow(restaurant.hours, restaurant.timezone);
         return (
           <li key={restaurant.id}>
-            <BlurFade delay={stagger(index)}>
-              <article className={cardClass}>
+            <BlurFade delay={stagger(index)} className="h-full">
+              <article className={cn(cardClass, "flex h-full flex-col")}>
                 <Link
                   href={`/r/${restaurant.slug}`}
                   className="block"
@@ -152,7 +155,7 @@ function RestaurantGrid({
                     </Badge>
                   </CardImage>
                 </Link>
-                <div className="p-5">
+                <div className="flex flex-1 flex-col p-5">
                   <h3 className="font-serif text-2xl leading-snug">
                     <Link href={`/r/${restaurant.slug}`} className="hover:underline">
                       {restaurant.name}
@@ -175,7 +178,7 @@ function RestaurantGrid({
                       ))}
                     </div>
                   )}
-                  <div className="mt-4 flex gap-4 text-sm">
+                  <div className="mt-auto flex gap-4 pt-4 text-sm">
                     <Link
                       href={`/r/${restaurant.slug}`}
                       className="font-medium underline underline-offset-4 hover:text-muted"

@@ -7,6 +7,8 @@ import { PageHero } from "@/components/PageHero";
 import { PublicHeader } from "@/components/PublicHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { buttonClass } from "@/components/ui/button";
+import { Notice } from "@/components/ui/notice";
+import { cn } from "@/lib/cn";
 import { carteLinksForPlaces } from "@/lib/db/places";
 import { DINER_STRINGS } from "@/lib/i18n/diner-strings";
 import { PLACES_STRINGS } from "@/lib/i18n/places-strings";
@@ -23,8 +25,7 @@ import { createClient } from "@/lib/supabase/server";
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "Restaurant | Carte" };
 
-const pillClass =
-  "rounded-full border border-white/25 bg-white/10 px-4 py-2 text-sm text-white backdrop-blur transition-colors hover:bg-white/20";
+const pillClass = buttonClass({ variant: "glass" });
 
 export default async function PlacePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -59,9 +60,9 @@ export default async function PlacePage({ params }: { params: Promise<{ id: stri
       <PublicHeader />
       {!place ? (
         <main className="mx-auto max-w-3xl px-5 py-16">
-          <p role="alert" className="text-tomato">
+          <Notice tone="warning" role="alert">
             {t.lookupFailed}
-          </p>
+          </Notice>
         </main>
       ) : (
         <>
@@ -69,6 +70,7 @@ export default async function PlacePage({ params }: { params: Promise<{ id: stri
             title={place.name}
             intro={place.cuisine.join(", ") || undefined}
             lang={htmlLang(language)}
+            narrow
           >
             {address && <p className="text-white/80">{address}</p>}
             <div className="mt-5 flex flex-wrap gap-3">
@@ -113,7 +115,10 @@ export default async function PlacePage({ params }: { params: Promise<{ id: stri
               ) : (
                 <>
                   <p className="text-lg leading-relaxed">{t.noMenu}</p>
-                  <Link href="/scan" className={`${buttonClass({ size: "lg", shine: true })} mt-5`}>
+                  <Link
+                    href="/scan"
+                    className={cn(buttonClass({ size: "lg", shine: true }), "mt-5")}
+                  >
                     {t.scanMenu}
                   </Link>
                   <p className="mt-6 border-t border-line pt-5 text-sm">
@@ -150,14 +155,14 @@ export default async function PlacePage({ params }: { params: Promise<{ id: stri
               </div>
             )}
 
-            <p className="mt-8 text-sm leading-relaxed text-muted">{d.safetyNotice}</p>
-            <p className="mt-4 text-xs text-muted">
+            <Notice className="mt-8">{d.safetyNotice}</Notice>
+            <p className="mt-8 border-t border-line pt-5 text-xs leading-relaxed text-muted">
               {t.sourceNote}{" "}
               <a
                 href="https://www.openstreetmap.org/copyright"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="underline"
+                className="underline underline-offset-2 hover:text-ink"
               >
                 {t.credit}
               </a>

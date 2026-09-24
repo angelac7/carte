@@ -9,10 +9,13 @@ type PageSkeletonProps = {
   rows?: number;
   /** Match pages that open with a dark PageHero, so the layout doesn't jump when they load. */
   hero?: boolean;
+  /** With `hero`, use the narrow page width. */
+  narrow?: boolean;
 };
 
 /** A page-shaped placeholder: a title, an intro line, and a list of cards. */
-export function PageSkeleton({ rows = 4, hero = false }: PageSkeletonProps) {
+export function PageSkeleton({ rows = 4, hero = false, narrow = false }: PageSkeletonProps) {
+  const width = narrow ? "max-w-3xl" : "max-w-5xl";
   const cards = Array.from({ length: rows }, (_, index) => (
     <div key={index} className="rounded-2xl border border-line bg-card p-5">
       <Skeleton className="h-6 w-1/2" />
@@ -28,12 +31,12 @@ export function PageSkeleton({ rows = 4, hero = false }: PageSkeletonProps) {
     return (
       <main aria-busy="true" aria-label="Loading">
         <div className="bg-ink">
-          <div className="mx-auto max-w-5xl px-5 pt-20 pb-20 sm:pt-28">
+          <div className={cn("mx-auto px-5 pt-20 pb-20 sm:pt-28", width)}>
             <div className="h-12 w-2/3 rounded-md bg-white/10 sm:h-16" />
             <div className="mt-5 h-4 w-full max-w-md rounded-md bg-white/10" />
           </div>
         </div>
-        <div className="mx-auto max-w-5xl space-y-4 px-5 py-10">{cards}</div>
+        <div className={cn("mx-auto space-y-4 px-5 py-10", width)}>{cards}</div>
       </main>
     );
   }

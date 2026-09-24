@@ -2,6 +2,7 @@ import Image from "next/image";
 import type { ReactNode } from "react";
 import { BlurFade } from "@/components/motion/BlurFade";
 import { DotPattern } from "@/components/motion/DotPattern";
+import { cn } from "@/lib/cn";
 
 const FALLBACK =
   "radial-gradient(circle at 15% 20%, #3a4d63, transparent 50%), radial-gradient(circle at 90% 90%, #7a5000, transparent 45%), #111b26";
@@ -11,11 +12,13 @@ type PageHeroProps = {
   intro?: string;
   image?: string | null;
   lang?: string;
+  /** Line up with a narrow (max-w-3xl) page body instead of the wide default. */
+  narrow?: boolean;
   children?: ReactNode;
 };
 
 /** A cinematic page header: large type over a slowly zooming photo, or a designed gradient. */
-export function PageHero({ title, intro, image, lang, children }: PageHeroProps) {
+export function PageHero({ title, intro, image, lang, narrow = false, children }: PageHeroProps) {
   return (
     <header lang={lang} className="relative isolate overflow-hidden bg-ink text-white">
       {image ? (
@@ -36,9 +39,11 @@ export function PageHero({ title, intro, image, lang, children }: PageHeroProps)
         aria-hidden="true"
         className="absolute inset-0 -z-10 bg-gradient-to-t from-ink via-ink/70 to-ink/30"
       />
-      <div className="mx-auto max-w-5xl px-5 pt-20 pb-20 sm:pt-28">
+      <div className={cn("mx-auto px-5 pt-20 pb-20 sm:pt-28", narrow ? "max-w-3xl" : "max-w-5xl")}>
         <BlurFade>
-          <h1 className="font-serif text-5xl leading-[1.02] tracking-tight sm:text-7xl">{title}</h1>
+          <h1 className="font-serif text-5xl leading-[1.02] tracking-tight text-balance break-words sm:text-7xl">
+            {title}
+          </h1>
         </BlurFade>
         {intro && (
           <BlurFade delay={0.1}>

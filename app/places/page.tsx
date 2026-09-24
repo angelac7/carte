@@ -9,6 +9,7 @@ import { PageHero } from "@/components/PageHero";
 import { PublicHeader } from "@/components/PublicHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { buttonClass } from "@/components/ui/button";
+import { cn } from "@/lib/cn";
 import { EmptyState } from "@/components/ui/empty-state";
 import { fieldClass, labelClass } from "@/components/ui/field";
 import { Notice } from "@/components/ui/notice";
@@ -164,8 +165,8 @@ export default async function PlacesPage({ searchParams }: { searchParams: Promi
               const href = carteSlug ? `/r/${carteSlug}` : `/place/${place.id}`;
               return (
                 <li key={place.id}>
-                  <BlurFade delay={Math.min(index, 8) * 0.05}>
-                    <article className={cardClass}>
+                  <BlurFade delay={Math.min(index, 8) * 0.05} className="h-full">
+                    <article className={cn(cardClass, "flex h-full flex-col")}>
                       <Link href={href} className="block" tabIndex={-1} aria-hidden="true">
                         <CardImage
                           src={null}
@@ -184,7 +185,7 @@ export default async function PlacesPage({ searchParams }: { searchParams: Promi
                           )}
                         </CardImage>
                       </Link>
-                      <div className="p-5">
+                      <div className="flex flex-1 flex-col p-5">
                         <h2 className="font-serif text-xl leading-snug">
                           <Link href={href} className="hover:underline">
                             {place.name}
@@ -204,7 +205,7 @@ export default async function PlacesPage({ searchParams }: { searchParams: Promi
                         )}
                         <Link
                           href={href}
-                          className="mt-4 inline-block text-sm font-medium underline underline-offset-4 hover:text-muted"
+                          className="mt-auto self-start pt-4 text-sm font-medium underline underline-offset-4 hover:text-muted"
                         >
                           {carteSlug ? t.viewMenu : t.details}
                         </Link>
