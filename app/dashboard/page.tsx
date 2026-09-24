@@ -17,7 +17,7 @@ import { buildChecklist } from "@/lib/owner-checklist";
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "Dashboard | Carte" };
 
-const panelClass = "rounded-2xl border border-line bg-card p-6 shadow-sm";
+const panelClass = "rounded-panel bg-paper p-6 shadow-raised sm:p-8";
 
 export default async function DashboardHome() {
   const { supabase, restaurant } = await requireRestaurant();
@@ -64,7 +64,7 @@ export default async function DashboardHome() {
         </ButtonLink>
       </OwnerPageHeader>
 
-      <div className="mt-10 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+      <div className="mt-12 grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-4">
         {stats.map((stat, index) => (
           <BlurFade key={stat.label} delay={0.1 + index * 0.06} className="h-full">
             <div
@@ -76,9 +76,9 @@ export default async function DashboardHome() {
             >
               <NumberTicker
                 value={stat.value}
-                className="block font-serif text-4xl leading-none sm:text-5xl"
+                className="block font-serif text-5xl leading-none tracking-tighter sm:text-6xl"
               />
-              <p className={cn("mt-3 text-sm", stat.alert ? "text-saffron-ink" : "text-muted")}>
+              <p className={cn("eyebrow mt-4", stat.alert ? "text-saffron-ink" : "text-muted")}>
                 {stat.label}
               </p>
               {stat.alert && (
@@ -94,11 +94,11 @@ export default async function DashboardHome() {
         ))}
       </div>
 
-      <div className="mt-6 grid gap-6 lg:grid-cols-3">
-        <div className="space-y-6 lg:col-span-2">
+      <div className="mt-8 grid gap-8 lg:grid-cols-3">
+        <div className="space-y-8 lg:col-span-2">
           <BlurFade>
             <section className={panelClass}>
-              <h2 className="font-serif text-2xl">Diner views</h2>
+              <h2 className="font-serif text-3xl tracking-tight">Diner views</h2>
               <p className="mt-1 text-sm text-muted">
                 How often diners opened your dishes’ details each day.
               </p>
@@ -110,9 +110,9 @@ export default async function DashboardHome() {
 
           <BlurFade>
             <section className={panelClass}>
-              <h2 className="font-serif text-2xl">Most viewed this week</h2>
+              <h2 className="font-serif text-3xl tracking-tight">Most viewed this week</h2>
               {topDishes.length === 0 ? (
-                <p className="mt-4 rounded-xl border border-dashed border-line px-4 py-6 text-center text-sm leading-relaxed text-muted">
+                <p className="mt-5 rounded-control px-4 py-8 text-center text-sm leading-relaxed text-muted shadow-pressed">
                   No views yet. Put your QR code on tables, and you’ll see which dishes diners open
                   most.
                 </p>
@@ -124,9 +124,9 @@ export default async function DashboardHome() {
                         <span className="truncate font-medium">{dish.name}</span>
                         <span className="text-muted tabular-nums">{dish.views}</span>
                       </div>
-                      <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-line">
+                      <div className="mt-2 h-2.5 overflow-hidden rounded-full shadow-pressed-sm">
                         <div
-                          className="h-full rounded-full bg-ink"
+                          className="h-full rounded-full bg-accent"
                           style={{ width: `${(dish.views / topMax) * 100}%` }}
                         />
                       </div>
@@ -143,7 +143,7 @@ export default async function DashboardHome() {
             <div className="flex items-center gap-5">
               <ProgressRing done={stepsDone} total={checklist.length} />
               <div>
-                <h2 className="font-serif text-2xl leading-tight">
+                <h2 className="font-serif text-3xl leading-tight tracking-tight">
                   {stepsDone === checklist.length ? "You’re all set" : "Finish setting up"}
                 </h2>
                 <p className="mt-1 text-sm text-muted">
@@ -158,15 +158,15 @@ export default async function DashboardHome() {
                 <li key={item.id}>
                   <Link
                     href={item.href}
-                    className="group flex items-center gap-3 rounded-lg px-2 py-2 transition-colors hover:bg-paper"
+                    className="group flex items-center gap-3 rounded-control px-3 py-2.5 transition-[box-shadow] duration-200 hover:shadow-pressed-sm"
                   >
                     <span
                       aria-hidden="true"
                       className={cn(
-                        "flex h-6 w-6 shrink-0 items-center justify-center rounded-full border text-xs",
+                        "flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs",
                         item.done
-                          ? "border-basil bg-basil text-white"
-                          : "border-line text-transparent",
+                          ? "bg-basil text-white shadow-pressed-color"
+                          : "text-transparent shadow-pressed-sm",
                       )}
                     >
                       ✓

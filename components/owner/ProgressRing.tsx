@@ -6,7 +6,7 @@ export function ProgressRing({ done, total }: { done: number; total: number }) {
   const progress = total ? done / total : 0;
   return (
     <div
-      className="relative h-24 w-24 shrink-0"
+      className="relative h-24 w-24 shrink-0 rounded-full shadow-raised-sm"
       role="img"
       aria-label={`${done} of ${total} steps done`}
     >
@@ -17,7 +17,7 @@ export function ProgressRing({ done, total }: { done: number; total: number }) {
           cy="50"
           r="42"
           fill="none"
-          stroke="var(--color-basil)"
+          stroke="var(--color-accent)"
           strokeWidth="10"
           strokeLinecap="round"
           initial={{ pathLength: 0 }}

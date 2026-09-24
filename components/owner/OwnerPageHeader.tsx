@@ -16,17 +16,21 @@ export function OwnerPageHeader({ title, intro, eyebrow, children }: OwnerPageHe
   return (
     <BlurFade>
       <header className="print:hidden">
-        {eyebrow && <p className="text-sm text-muted">{eyebrow}</p>}
+        {eyebrow && <p className="eyebrow text-muted">{eyebrow}</p>}
         <h1
           className={cn(
-            "font-serif text-4xl leading-tight tracking-tight text-balance break-words sm:text-5xl",
-            eyebrow && "mt-1",
+            "font-serif text-5xl leading-[0.95] tracking-tighter text-balance break-words sm:text-6xl",
+            eyebrow && "mt-3",
           )}
         >
           {title}
         </h1>
-        {intro && <p className="mt-3 max-w-2xl leading-relaxed text-muted">{intro}</p>}
-        {children && <div className="mt-6 flex flex-wrap gap-3">{children}</div>}
+        <div aria-hidden="true" className="mt-6 flex items-center gap-3">
+          <span className="h-1 w-16 bg-ink" />
+          <span className="h-2.5 w-2.5 border-2 border-ink" />
+        </div>
+        {intro && <p className="mt-6 max-w-2xl leading-relaxed text-muted">{intro}</p>}
+        {children && <div className="mt-8 flex flex-wrap gap-4">{children}</div>}
       </header>
     </BlurFade>
   );

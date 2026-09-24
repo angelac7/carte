@@ -25,15 +25,15 @@ export function ViewsChart({ days }: { days: DailyViews[] }) {
               viewport={{ once: true }}
               transition={{ delay: index * 0.03, duration: 0.5, ease: "easeOut" }}
               style={{ height: `${Math.max(4, (day.views / max) * 100)}%`, originY: 1 }}
-              className="w-full rounded-t-md bg-basil/70 transition-colors group-hover:bg-basil"
+              className="w-full rounded-t-lg bg-accent/70 transition-colors group-hover:bg-accent"
             />
-            <span className="pointer-events-none absolute -top-7 rounded bg-ink px-1.5 py-0.5 text-[11px] text-white tabular-nums opacity-0 transition-opacity group-hover:opacity-100">
+            <span className="pointer-events-none absolute -top-8 rounded-md bg-ink px-2 py-1 font-mono text-[11px] text-white tabular-nums opacity-0 shadow-raised-sm transition-opacity group-hover:opacity-100">
               {day.views}
             </span>
           </div>
         ))}
       </div>
-      <div className="mt-2 flex justify-between text-xs text-muted">
+      <div className="eyebrow mt-3 flex justify-between text-muted">
         <span>{days.length} days ago</span>
         <span>Today</span>
       </div>
