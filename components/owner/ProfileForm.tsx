@@ -25,9 +25,9 @@ const DAY_LABELS: Record<Weekday, string> = {
 
 const inputClass = fieldClass("mt-1 text-base");
 const timeClass = fieldClass("w-auto bg-paper px-2 py-1.5");
-const checkboxClass = "h-4 w-4 accent-ink";
+const checkboxClass = "h-5 w-5 accent-accent";
 const chipClass =
-  "cursor-pointer rounded-full border border-line bg-card px-3.5 py-1.5 text-sm text-muted transition-colors hover:border-muted hover:text-ink has-checked:border-basil has-checked:bg-basil has-checked:text-white has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-ink";
+  "cursor-pointer rounded-full bg-paper px-4 py-2.5 text-sm font-medium text-muted shadow-raised-sm transition-[box-shadow,background-color,color] duration-200 hover:text-ink has-checked:bg-basil has-checked:text-white has-checked:shadow-pressed-color has-focus-visible:outline-2 has-focus-visible:outline-offset-3 has-focus-visible:outline-accent";
 
 export function ProfileForm({ profile }: { profile: RestaurantProfile }) {
   const [state, formAction, pending] = useActionState<ProfileState, FormData>(
@@ -36,8 +36,8 @@ export function ProfileForm({ profile }: { profile: RestaurantProfile }) {
   );
 
   return (
-    <form action={formAction} className="mt-8 space-y-6">
-      <label className="flex cursor-pointer items-start gap-3 rounded-2xl border border-line bg-card p-5 shadow-sm transition-colors has-checked:border-basil">
+    <form action={formAction} className="mt-10 space-y-8">
+      <label className="flex cursor-pointer items-start gap-4 rounded-panel bg-paper p-6 shadow-raised transition-[outline-color] has-checked:outline-2 has-checked:outline-offset-2 has-checked:outline-basil">
         <input
           type="checkbox"
           name="listed"
@@ -110,11 +110,11 @@ export function ProfileForm({ profile }: { profile: RestaurantProfile }) {
       </label>
 
       <fieldset>
-        <legend className="text-sm font-medium">Opening hours</legend>
+        <legend className="eyebrow text-muted">Opening hours</legend>
         <p className="mt-1 text-xs text-muted">
           If you close after midnight, set a closing time earlier than the opening time.
         </p>
-        <div className="mt-2 divide-y divide-line rounded-2xl border border-line bg-card px-4 sm:px-5">
+        <div className="mt-3 divide-y divide-ink/10 rounded-panel bg-paper px-5 shadow-raised sm:px-6">
           {WEEKDAYS.map((day) => {
             const hours = profile.hours[day];
             return (
@@ -151,8 +151,8 @@ export function ProfileForm({ profile }: { profile: RestaurantProfile }) {
       </fieldset>
 
       <fieldset>
-        <legend className="text-sm font-medium">Good for</legend>
-        <div className="mt-2 flex flex-wrap gap-2">
+        <legend className="eyebrow text-muted">Good for</legend>
+        <div className="mt-3 flex flex-wrap gap-2.5">
           {OCCASIONS.map((occasion) => (
             <label key={occasion} className={chipClass}>
               <input
