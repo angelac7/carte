@@ -1,9 +1,20 @@
 /** Reads a menu price like "$12.50", "57", "1,200", or "12,50 €". Returns null if there's no clear number. */
 export function parsePrice(text: string): number | null {
-  const withoutThousands = text.replace(/(\d),(\d{3})\b/g, "$1$2");
-  const match = withoutThousands.match(/\d+(?:[.,]\d{1,2})?/);
-  if (!match) return null;
-  const value = Number(match[0].replace(",", "."));
+  // A single amount only: ranges, size choices, and quantities need staff clarification.
+  const numbers = text.match(/\d[\d.,]*(?:[ \u00a0\u202f]\d[\d.,]*)*/g);
+  if (!numbers || numbers.length !== 1 || /[-–—/]/.test(text)) return null;
+  const raw = numbers[0];
+  const grouped = /^\d{1,3}([., \u00a0\u202f])\d{3}(?:\1\d{3})*(?:([.,])\d{1,2})?$/;
+  const match = raw.match(grouped);
+  let normalized: string;
+  if (match && match[1] !== match[2]) {
+    normalized = raw.split(match[1]).join("").replace(",", ".");
+  } else if (/^\d+(?:[.,]\d{1,2})?$/.test(raw)) {
+    normalized = raw.replace(",", ".");
+  } else {
+    return null;
+  }
+  const value = Number(normalized);
   return Number.isFinite(value) ? value : null;
 }
 

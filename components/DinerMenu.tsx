@@ -507,6 +507,9 @@ export function DinerMenu({
         />
       )}
       <MenuChat
+        key={JSON.stringify([restaurant.slug, language, avoid, onlyTags])}
+        avoid={avoid}
+        onlyTags={onlyTags}
         language={language}
         restaurantSlug={restaurant.slug}
         open={panel === "chat"}

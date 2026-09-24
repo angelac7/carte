@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { streamMenuAnswer } from "@/lib/ai/chat";
 import { getConfirmedDishes, getRestaurantBySlug } from "@/lib/db";
+import { filterDishes } from "@/lib/menu-filters";
 import { languageName } from "@/lib/languages";
 import { ndjsonResponse } from "@/lib/ndjson-response";
 import { checkRateLimit, clientKey } from "@/lib/rate-limit";
@@ -29,7 +30,7 @@ export async function POST(req: Request) {
     const restaurant = await getRestaurantBySlug(supabase, parsed.data.restaurant);
     if (!restaurant) return NextResponse.json({ error: "not found" }, { status: 404 });
 
-    const dishes = await getConfirmedDishes(supabase, restaurant.id);
+    const dishes = filterDishes(await getConfirmedDishes(supabase, restaurant.id), parsed.data);
     const { language, messages } = parsed.data;
     return ndjsonResponse(answer(dishes, languageName(language), messages, req.signal));
   } catch (err) {

@@ -1,4 +1,5 @@
 "use client";
+import type { DinerFilters } from "@/lib/menu-filters";
 import { motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -11,7 +12,7 @@ import { canSpeak, speak, SPEECH_LANG } from "@/lib/speak";
 import { speechInputSupported, useSpeechInput } from "@/lib/use-speech-input";
 import { MAX_QUESTION_LENGTH, type ChatMessage } from "@/types/chat";
 
-type MenuChatProps = {
+type MenuChatProps = DinerFilters & {
   language: LanguageCode;
   restaurantSlug: string;
   open: boolean;
@@ -19,7 +20,14 @@ type MenuChatProps = {
 };
 
 /** A chat panel, opened from the dock, answered from the confirmed menu only. The conversation stays while it's closed. */
-export function MenuChat({ language, restaurantSlug, open, onClose }: MenuChatProps) {
+export function MenuChat({
+  language,
+  restaurantSlug,
+  open,
+  onClose,
+  avoid,
+  onlyTags,
+}: MenuChatProps) {
   const t = CHAT_STRINGS[language];
   const help = HELP_STRINGS[language];
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -50,8 +58,12 @@ export function MenuChat({ language, restaurantSlug, open, onClose }: MenuChatPr
     setSending(true);
     try {
       // Show the answer as it's written.
-      const reply = await streamMenuAnswer(restaurantSlug, language, next, (answer) =>
-        setMessages([...next, { role: "assistant", content: answer }]),
+      const reply = await streamMenuAnswer(
+        restaurantSlug,
+        language,
+        next,
+        (answer) => setMessages([...next, { role: "assistant", content: answer }]),
+        { avoid, onlyTags },
       );
       setMessages([...next, { role: "assistant", content: reply }]);
     } catch (err) {

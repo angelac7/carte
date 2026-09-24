@@ -21,3 +21,17 @@ describe("currency", () => {
     expect(formatMoney(12.5, "$")).toBe("$12.50");
   });
 });
+
+it("handles repeated and international thousands separators", () => {
+  expect(parsePrice("1,200,000 ₫")).toBe(1200000);
+  expect(parsePrice("1.200 €")).toBe(1200);
+  expect(parsePrice("1.234,56 €")).toBe(1234.56);
+  expect(parsePrice("$1,234.56")).toBe(1234.56);
+  expect(parsePrice("1 234,56 €")).toBe(1234.56);
+});
+
+it("leaves ambiguous prices unpriced instead of guessing a bill amount", () => {
+  for (const price of ["12 / 18", "$12–18", "2 for $10", "12 18", "1,23,456", "-12"]) {
+    expect(parsePrice(price)).toBeNull();
+  }
+});

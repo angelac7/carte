@@ -25,7 +25,7 @@ export async function setDishPhoto(
 ): Promise<void> {
   const { error } = await supabase
     .from("menu_items")
-    .update({ photo_url: photoUrl })
+    .update({ photo_url: photoUrl, confirmed: false })
     .eq("id", dishId)
     .eq("restaurant_id", restaurantId);
   if (error) throw error;

@@ -75,6 +75,15 @@ rules live in `supabase/migrations/`. Owners sign up, create one restaurant, and
 | `/dashboard/qr`     | Owners   | Print the table QR code                            |
 | `/r/<menu-link>`    | Diners   | Confirmed dishes with filters, languages, and chat |
 
+## Deploying the review fixes
+
+Apply `supabase/migrations/20261001000000_review_fixes.sql` to Supabase before deploying this
+version of the app. It resets confirmation on dish edits and adds filter arguments to the
+Discover search functions. Existing calls without filters remain supported.
+
+`npm test` includes an embedded PostgreSQL migration test and browser component regression tests;
+these run locally without Supabase credentials or AI calls.
+
 ## Dish details
 
 Diners tap "Details" on any dish for an AI explanation in their language: what it is, taste,

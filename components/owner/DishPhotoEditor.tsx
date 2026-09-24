@@ -1,18 +1,27 @@
 "use client";
 import Image from "next/image";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { removeDishPhoto, uploadDishPhoto } from "@/lib/api-client";
 import { shrinkImage } from "@/lib/image";
 import type { MenuItem } from "@/types/menu";
 
-type DishPhotoEditorProps = { dish: MenuItem; onChange: (photoUrl: string | null) => void };
+type DishPhotoEditorProps = {
+  dish: MenuItem;
+  onChange: (photoUrl: string | null) => void;
+  onBusy: (busy: boolean) => void;
+};
 
-/** Add, replace, or remove a dish's photo. Photos don't affect allergen confirmation. */
-export function DishPhotoEditor({ dish, onChange }: DishPhotoEditorProps) {
+/** Add, replace, or remove a dish's photo. Photo edits require fresh confirmation. */
+export function DishPhotoEditor({ dish, onChange, onBusy }: DishPhotoEditorProps) {
   const [status, setStatus] = useState<"idle" | "uploading" | "failed">("idle");
 
+  const pending = useRef(false);
+
   async function upload(file: File) {
+    if (pending.current) return;
+    pending.current = true;
+    onBusy(true);
     setStatus("uploading");
     try {
       onChange(await uploadDishPhoto(dish.id, await shrinkImage(file, 1600)));
@@ -20,16 +29,27 @@ export function DishPhotoEditor({ dish, onChange }: DishPhotoEditorProps) {
       toast("Photo added");
     } catch {
       setStatus("failed");
+    } finally {
+      pending.current = false;
+      onBusy(false);
     }
   }
 
   async function remove() {
+    if (pending.current) return;
+    pending.current = true;
+    onBusy(true);
+    setStatus("uploading");
     try {
       await removeDishPhoto(dish.id);
       onChange(null);
+      setStatus("idle");
       toast("Photo removed");
     } catch {
       setStatus("failed");
+    } finally {
+      pending.current = false;
+      onBusy(false);
     }
   }
 

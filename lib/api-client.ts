@@ -1,3 +1,4 @@
+import type { DinerFilters } from "@/lib/menu-filters";
 import { createLineReader, parseJsonLine } from "@/lib/json-lines";
 import type { LanguageCode } from "@/lib/languages";
 import { ChatStreamEventSchema, MAX_HISTORY, type ChatMessage } from "@/types/chat";
@@ -112,6 +113,7 @@ export async function streamMenuAnswer(
   language: LanguageCode,
   messages: ChatMessage[],
   onText: (answer: string) => void,
+  filters: DinerFilters,
 ): Promise<string> {
   const res = await fetch("/api/chat", {
     method: "POST",
@@ -120,6 +122,7 @@ export async function streamMenuAnswer(
       restaurant: restaurantSlug,
       language,
       messages: messages.slice(-MAX_HISTORY),
+      ...filters,
     }),
   });
   if (res.status === 429) throw new ChatLimitError();

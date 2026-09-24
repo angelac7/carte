@@ -45,11 +45,30 @@ export type TrendingDish = {
   photo_url: string | null;
 };
 
+export type DiscoverFilters = {
+  avoid?: Allergen[];
+  onlyTags?: DietaryTag[];
+  city?: string;
+  occasion?: Occasion | "";
+  openOnly?: boolean;
+};
+
+function filterParams(filters: DiscoverFilters) {
+  return {
+    avoid: filters.avoid ?? [],
+    only_tags: filters.onlyTags ?? [],
+    filter_city: filters.city ?? "",
+    filter_occasion: filters.occasion ?? "",
+    open_only: filters.openOnly ?? false,
+  };
+}
+
 export async function searchDishes(
   supabase: SupabaseClient,
   search: string,
+  filters: DiscoverFilters = {},
 ): Promise<DishResult[]> {
-  const { data, error } = await supabase.rpc("search_dishes", { search });
+  const { data, error } = await supabase.rpc("search_dishes", { search, ...filterParams(filters) });
   if (error) throw error;
   return (data ?? []) as DishResult[];
 }
@@ -57,14 +76,24 @@ export async function searchDishes(
 export async function searchRestaurants(
   supabase: SupabaseClient,
   search: string,
+  filters: DiscoverFilters = {},
 ): Promise<RestaurantResult[]> {
-  const { data, error } = await supabase.rpc("search_restaurants", { search });
+  const { data, error } = await supabase.rpc("search_restaurants", {
+    search,
+    ...filterParams(filters),
+  });
   if (error) throw error;
   return (data ?? []) as RestaurantResult[];
 }
 
-export async function trendingDishes(supabase: SupabaseClient): Promise<TrendingDish[]> {
-  const { data, error } = await supabase.rpc("trending_dishes", { result_limit: 8 });
+export async function trendingDishes(
+  supabase: SupabaseClient,
+  filters: DiscoverFilters = {},
+): Promise<TrendingDish[]> {
+  const { data, error } = await supabase.rpc("trending_dishes", {
+    result_limit: 8,
+    ...filterParams(filters),
+  });
   if (error) throw error;
   return (data ?? []) as TrendingDish[];
 }

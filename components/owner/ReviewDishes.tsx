@@ -1,6 +1,6 @@
 "use client";
 import { AnimatePresence, motion } from "motion/react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { DishHeader } from "@/components/DishHeader";
 import { DishPhotoEditor } from "@/components/owner/DishPhotoEditor";
@@ -97,10 +97,22 @@ export default function ReviewDishes() {
   const [problem, setProblem] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [adding, setAdding] = useState(false);
+  const persisted = useRef(new Map<string, MenuItem>());
+  const pending = useRef(new Set<string>());
+  const [busy, setBusy] = useState(new Set<string>());
+
+  function setPending(id: string, value: boolean) {
+    if (value) pending.current.add(id);
+    else pending.current.delete(id);
+    setBusy(new Set(pending.current));
+  }
 
   useEffect(() => {
     fetchDishes()
-      .then(setDishes)
+      .then((loaded) => {
+        persisted.current = new Map(loaded.map((dish) => [dish.id, dish]));
+        setDishes(loaded);
+      })
       .catch(() =>
         setProblem("Your dishes couldn't be loaded. Check that Carte is running, then refresh."),
       )
@@ -111,34 +123,48 @@ export default function ReviewDishes() {
     setDishes((prev) => prev.map((dish) => (dish.id === updated.id ? updated : dish)));
   }
 
-  function save(updated: MenuItem) {
-    showLocally(updated);
-    updateDish(updated).catch(() =>
-      setProblem("A change wasn't saved. Check that Carte is running, then try again."),
-    );
+  async function save(updated: MenuItem): Promise<MenuItem | null> {
+    if (pending.current.has(updated.id)) return null;
+    setPending(updated.id, true);
+    try {
+      const saved = await updateDish(updated);
+      persisted.current.set(saved.id, saved);
+      showLocally(saved);
+      setProblem("");
+      return saved;
+    } catch {
+      const previous = persisted.current.get(updated.id);
+      if (previous) showLocally(previous);
+      setProblem("A change wasn't saved. Your last saved details have been restored. Try again.");
+      return null;
+    } finally {
+      setPending(updated.id, false);
+    }
   }
 
-  // Any edit un-confirms the dish until the owner confirms it again.
+  // Lock the dish while saving so whole-dish writes cannot arrive out of order.
   const toggleAllergen = (dish: MenuItem, allergen: Allergen) =>
     save({ ...dish, allergens: toggleValue(dish.allergens, allergen), confirmed: false });
 
   const toggleTag = (dish: MenuItem, tag: DietaryTag) =>
     save({ ...dish, dietary_tags: toggleValue(dish.dietary_tags, tag), confirmed: false });
 
-  function confirmDish(dish: MenuItem) {
-    save({ ...dish, confirmed: true });
-    toast(`✓ ${dish.name} confirmed`);
+  async function confirmDish(dish: MenuItem) {
+    const saved = await save({ ...dish, confirmed: true });
+    if (saved?.confirmed) toast(`✓ ${saved.name} confirmed`);
   }
 
-  function saveDetails(dish: MenuItem, details: DishDetails) {
-    save({ ...dish, ...details, confirmed: false });
-    setEditingId(null);
-    toast("Details saved. Check the allergens and confirm again.");
+  async function saveDetails(dish: MenuItem, details: DishDetails) {
+    if (await save({ ...dish, ...details, confirmed: false })) {
+      setEditingId(null);
+      toast("Details saved. Check the allergens and confirm again.");
+    }
   }
 
   async function addDish(details: DishDetails) {
     try {
       const added = await saveDishes([{ ...details, likely_allergens: [], dietary_tags: [] }]);
+      for (const dish of added) persisted.current.set(dish.id, dish);
       setDishes((prev) => [...added, ...prev]);
       setAdding(false);
       setFilter("all");
@@ -148,14 +174,20 @@ export default function ReviewDishes() {
     }
   }
 
-  function removeDish(dish: MenuItem) {
+  async function removeDish(dish: MenuItem) {
+    if (pending.current.has(dish.id)) return;
     if (!window.confirm(`Delete ${dish.name} from your menu?`)) return;
-    setDishes((prev) => prev.filter((d) => d.id !== dish.id));
-    deleteDish(dish.id)
-      .then(() => toast(`${dish.name} deleted`))
-      .catch(() =>
-        setProblem("That dish wasn't deleted. Check that Carte is running, then refresh."),
-      );
+    setPending(dish.id, true);
+    try {
+      await deleteDish(dish.id);
+      setDishes((prev) => prev.filter((d) => d.id !== dish.id));
+      persisted.current.delete(dish.id);
+      toast(`${dish.name} deleted`);
+    } catch {
+      setProblem("That dish wasn't deleted. Check that Carte is running, then try again.");
+    } finally {
+      setPending(dish.id, false);
+    }
   }
 
   async function clearMenu() {
@@ -278,106 +310,119 @@ export default function ReviewDishes() {
                   transition={{ duration: 0.3, ease: "easeOut" }}
                   className="relative overflow-hidden rounded-panel bg-paper p-6 shadow-raised sm:p-8"
                 >
-                  {/* Status stripe: green once confirmed, saffron while it still needs review. */}
-                  <span
-                    aria-hidden="true"
-                    className={cn(
-                      "absolute inset-y-8 left-0 w-1.5 rounded-r-full",
-                      dish.confirmed ? "bg-basil" : "bg-saffron",
-                    )}
-                  />
-                  {editingId === dish.id ? (
-                    <DishDetailsForm
-                      initial={{
-                        name: dish.name,
-                        description: dish.description,
-                        price: dish.price,
-                      }}
-                      submitLabel="Save details"
-                      onSave={(details) => saveDetails(dish, details)}
-                      onCancel={() => setEditingId(null)}
+                  <fieldset
+                    disabled={busy.has(dish.id)}
+                    className="min-w-0"
+                    aria-busy={busy.has(dish.id)}
+                  >
+                    {/* Status stripe: green once confirmed, saffron while it still needs review. */}
+                    <span
+                      aria-hidden="true"
+                      className={cn(
+                        "absolute inset-y-8 left-0 w-1.5 rounded-r-full",
+                        dish.confirmed ? "bg-basil" : "bg-saffron",
+                      )}
                     />
-                  ) : (
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="min-w-0 flex-1">
-                        <DishHeader name={dish.name} price={dish.price} as="h2" />
-                        {dish.description && (
-                          <p className="mt-1 max-w-prose text-sm leading-relaxed text-muted">
-                            {dish.description}
-                          </p>
-                        )}
-                      </div>
-                      <button
-                        onClick={() => setEditingId(dish.id)}
-                        className="shrink-0 text-sm font-semibold underline underline-offset-4 hover:text-accent"
-                      >
-                        Edit details
-                      </button>
-                    </div>
-                  )}
-
-                  <DishPhotoEditor
-                    dish={dish}
-                    onChange={(photo_url) => showLocally({ ...dish, photo_url })}
-                  />
-
-                  <fieldset className="mt-5">
-                    <legend className="eyebrow text-muted">Contains</legend>
-                    <div className="mt-2 flex flex-wrap gap-2">
-                      {ALLERGENS.map((allergen) => (
-                        <ToggleChip
-                          key={allergen}
-                          label={allergen}
-                          tone="ink"
-                          pressed={dish.allergens.includes(allergen)}
-                          onToggle={() => toggleAllergen(dish, allergen)}
-                        />
-                      ))}
-                    </div>
-                  </fieldset>
-
-                  <fieldset className="mt-4">
-                    <legend className="eyebrow text-muted">Suitable for</legend>
-                    <div className="mt-2 flex flex-wrap gap-2">
-                      {DIETARY_TAGS.map((tag) => (
-                        <ToggleChip
-                          key={tag}
-                          label={tag}
-                          tone="basil"
-                          pressed={dish.dietary_tags.includes(tag)}
-                          onToggle={() => toggleTag(dish, tag)}
-                        />
-                      ))}
-                    </div>
-                  </fieldset>
-
-                  <label className="mt-4 block">
-                    <span className={labelClass}>Kitchen notes</span>
-                    <textarea
-                      rows={2}
-                      maxLength={2000}
-                      className={inputClass}
-                      placeholder="For example: fried in a shared fryer, sauce can be left off"
-                      value={dish.notes}
-                      onChange={(e) =>
-                        showLocally({ ...dish, notes: e.target.value, confirmed: false })
-                      }
-                      onBlur={() => save(dish)}
-                    />
-                  </label>
-
-                  <div className="mt-6 flex items-center justify-between border-t border-ink/10 pt-5">
-                    {dish.confirmed ? (
-                      <p className="text-sm font-medium text-basil">✓ Confirmed</p>
+                    {editingId === dish.id ? (
+                      <DishDetailsForm
+                        initial={{
+                          name: dish.name,
+                          description: dish.description,
+                          price: dish.price,
+                        }}
+                        submitLabel="Save details"
+                        onSave={(details) => saveDetails(dish, details)}
+                        onCancel={() => setEditingId(null)}
+                      />
                     ) : (
-                      <Button variant="basil" size="sm" onClick={() => confirmDish(dish)}>
-                        Confirm dish
-                      </Button>
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="min-w-0 flex-1">
+                          <DishHeader name={dish.name} price={dish.price} as="h2" />
+                          {dish.description && (
+                            <p className="mt-1 max-w-prose text-sm leading-relaxed text-muted">
+                              {dish.description}
+                            </p>
+                          )}
+                        </div>
+                        <button
+                          onClick={() => setEditingId(dish.id)}
+                          className="shrink-0 text-sm font-semibold underline underline-offset-4 hover:text-accent"
+                        >
+                          Edit details
+                        </button>
+                      </div>
                     )}
-                    <Button variant="danger" size="sm" onClick={() => removeDish(dish)}>
-                      Delete
-                    </Button>
-                  </div>
+
+                    <DishPhotoEditor
+                      dish={dish}
+                      onBusy={(value) => setPending(dish.id, value)}
+                      onChange={(photo_url) => {
+                        const updated = { ...dish, photo_url, confirmed: false };
+                        persisted.current.set(dish.id, updated);
+                        showLocally(updated);
+                      }}
+                    />
+
+                    <fieldset className="mt-5">
+                      <legend className="eyebrow text-muted">Contains</legend>
+                      <div className="mt-2 flex flex-wrap gap-2">
+                        {ALLERGENS.map((allergen) => (
+                          <ToggleChip
+                            key={allergen}
+                            label={allergen}
+                            tone="ink"
+                            pressed={dish.allergens.includes(allergen)}
+                            onToggle={() => toggleAllergen(dish, allergen)}
+                          />
+                        ))}
+                      </div>
+                    </fieldset>
+
+                    <fieldset className="mt-4">
+                      <legend className="eyebrow text-muted">Suitable for</legend>
+                      <div className="mt-2 flex flex-wrap gap-2">
+                        {DIETARY_TAGS.map((tag) => (
+                          <ToggleChip
+                            key={tag}
+                            label={tag}
+                            tone="basil"
+                            pressed={dish.dietary_tags.includes(tag)}
+                            onToggle={() => toggleTag(dish, tag)}
+                          />
+                        ))}
+                      </div>
+                    </fieldset>
+
+                    <label className="mt-4 block">
+                      <span className={labelClass}>Kitchen notes</span>
+                      <textarea
+                        rows={2}
+                        maxLength={2000}
+                        className={inputClass}
+                        placeholder="For example: fried in a shared fryer, sauce can be left off"
+                        value={dish.notes}
+                        onChange={(e) =>
+                          showLocally({ ...dish, notes: e.target.value, confirmed: false })
+                        }
+                        onBlur={() => {
+                          if (persisted.current.get(dish.id)?.notes !== dish.notes) void save(dish);
+                        }}
+                      />
+                    </label>
+
+                    <div className="mt-6 flex items-center justify-between border-t border-ink/10 pt-5">
+                      {dish.confirmed ? (
+                        <p className="text-sm font-medium text-basil">✓ Confirmed</p>
+                      ) : (
+                        <Button variant="basil" size="sm" onClick={() => confirmDish(dish)}>
+                          Confirm dish
+                        </Button>
+                      )}
+                      <Button variant="danger" size="sm" onClick={() => removeDish(dish)}>
+                        Delete
+                      </Button>
+                    </div>
+                  </fieldset>
                 </motion.article>
               ))}
             </AnimatePresence>
@@ -392,6 +437,7 @@ export default function ReviewDishes() {
             <Button
               variant="secondary"
               size="sm"
+              disabled={busy.size > 0}
               onClick={clearMenu}
               className="mt-3 text-tomato hover:border-tomato"
             >

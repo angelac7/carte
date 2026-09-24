@@ -33,17 +33,9 @@ import {
   LANGUAGE_COOKIE,
   languageFromAcceptHeader,
 } from "@/lib/languages";
-import { filterDishes } from "@/lib/menu-filters";
 import { publicAsset } from "@/lib/public-asset";
 import { checkRateLimit, clientKeyFromHeaders } from "@/lib/rate-limit";
-import {
-  directionsUrl,
-  isOccasion,
-  isOpenNow,
-  OCCASIONS,
-  type Occasion,
-  type WeeklyHours,
-} from "@/lib/restaurant-profile";
+import { directionsUrl, isOccasion, isOpenNow, OCCASIONS } from "@/lib/restaurant-profile";
 import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -51,7 +43,6 @@ export const metadata: Metadata = { title: "Discover | Carte" };
 
 type Params = Record<string, string | string[] | undefined>;
 type DiscoverProps = { searchParams: Promise<Params> };
-type Place = { city: string; occasions: Occasion[]; hours: WeeklyHours; timezone: string };
 
 const many = (value: Params[string]) => (Array.isArray(value) ? value : value ? [value] : []);
 const one = (value: Params[string]) => (Array.isArray(value) ? value[0] : value) ?? "";
@@ -243,10 +234,7 @@ export default async function DiscoverPage({ searchParams }: DiscoverProps) {
   const supabase = await createClient();
   const cities = await listCities(supabase);
 
-  const matchesPlace = (place: Place) =>
-    (!city || place.city === city) &&
-    (!occasion || place.occasions.includes(occasion)) &&
-    (!openOnly || isOpenNow(place.hours, place.timezone) === true);
+  const filters = { avoid, onlyTags, city, occasion, openOnly } as const;
 
   let dishes: DishResult[] = [];
   let restaurants: RestaurantResult[] = [];
@@ -254,9 +242,9 @@ export default async function DiscoverPage({ searchParams }: DiscoverProps) {
   let cravingUsed = false;
 
   if (tab === "restaurants") {
-    restaurants = (await searchRestaurants(supabase, query)).filter(matchesPlace);
+    restaurants = await searchRestaurants(supabase, query, filters);
   } else if (query) {
-    dishes = await searchDishes(supabase, query);
+    dishes = await searchDishes(supabase, query, filters);
     // No direct matches for a phrase: let AI turn the craving into dish words, then search again.
     const isPhrase = query.split(/\s+/).length >= 2;
     const allowed = checkRateLimit(
@@ -267,13 +255,12 @@ export default async function DiscoverPage({ searchParams }: DiscoverProps) {
     if (dishes.length === 0 && isPhrase && allowed) {
       const terms = await cravingToTerms(query).catch(() => [] as string[]);
       if (terms.length > 0) {
-        dishes = await searchDishes(supabase, terms.join(" or "));
+        dishes = await searchDishes(supabase, terms.join(" or "), filters);
         cravingUsed = dishes.length > 0;
       }
     }
-    dishes = filterDishes(dishes, { avoid, onlyTags }).filter(matchesPlace);
   } else {
-    trending = filterDishes(await trendingDishes(supabase), { avoid, onlyTags });
+    trending = await trendingDishes(supabase, filters);
   }
 
   return (
