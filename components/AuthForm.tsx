@@ -2,6 +2,10 @@
 import Link from "next/link";
 import { useActionState } from "react";
 import { logIn, signUp, type AuthState } from "@/app/auth/actions";
+import { BlurFade } from "@/components/motion/BlurFade";
+import { Button } from "@/components/ui/button";
+import { fieldClass, labelClass } from "@/components/ui/field";
+import { Notice } from "@/components/ui/notice";
 
 const COPY = {
   login: {
@@ -20,8 +24,7 @@ const COPY = {
   },
 } as const;
 
-const inputClass =
-  "mt-1 w-full rounded-md border border-line bg-card px-3 py-2 focus:border-ink focus:outline-none";
+const inputClass = fieldClass("mt-1 text-base");
 
 export function AuthForm({ mode }: { mode: "login" | "signup" }) {
   const [state, formAction, pending] = useActionState<AuthState, FormData>(
@@ -31,15 +34,22 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
   const copy = COPY[mode];
 
   return (
-    <main className="mx-auto max-w-md px-5 py-16">
-      <h1 className="font-serif text-4xl leading-tight">{copy.title}</h1>
-      <form action={formAction} className="mt-8 space-y-4">
+    <main className="mx-auto max-w-md px-5 py-16 sm:py-24">
+      <BlurFade>
+        <h1 className="font-serif text-4xl leading-tight tracking-tight sm:text-5xl">
+          {copy.title}
+        </h1>
+      </BlurFade>
+      <form
+        action={formAction}
+        className="mt-8 space-y-4 rounded-2xl border border-line bg-card p-5 shadow-sm sm:p-6"
+      >
         <label className="block">
-          <span className="text-sm font-medium">Email</span>
+          <span className={labelClass}>Email</span>
           <input name="email" type="email" required autoComplete="email" className={inputClass} />
         </label>
         <label className="block">
-          <span className="text-sm font-medium">Password</span>
+          <span className={labelClass}>Password</span>
           <input
             name="password"
             type="password"
@@ -54,25 +64,26 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
         </label>
 
         {state.error && (
-          <p role="alert" className="rounded-md bg-tomato/10 px-3 py-2 text-sm text-tomato">
+          <Notice tone="warning" role="alert">
             {state.error}
-          </p>
+          </Notice>
         )}
         {state.message && (
-          <p className="rounded-md bg-basil-soft px-3 py-2 text-sm text-basil">{state.message}</p>
+          <Notice tone="success" role="status">
+            {state.message}
+          </Notice>
         )}
 
-        <button
-          type="submit"
-          disabled={pending}
-          className="w-full rounded-md bg-ink px-4 py-2.5 text-sm font-medium text-white hover:bg-ink/90 disabled:opacity-60"
-        >
+        <Button type="submit" disabled={pending} size="lg" shine className="w-full">
           {pending ? "One moment…" : copy.submit}
-        </button>
+        </Button>
       </form>
       <p className="mt-6 text-sm text-muted">
         {copy.switchText}{" "}
-        <Link href={copy.switchHref} className="text-ink underline">
+        <Link
+          href={copy.switchHref}
+          className="text-ink underline underline-offset-4 hover:text-muted"
+        >
           {copy.switchLabel}
         </Link>
       </p>
