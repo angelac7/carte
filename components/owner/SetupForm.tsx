@@ -1,6 +1,9 @@
 "use client";
 import { useActionState, useState } from "react";
 import { createRestaurantAction, type SetupState } from "@/app/dashboard/setup/actions";
+import { Button } from "@/components/ui/button";
+import { fieldClass, labelClass } from "@/components/ui/field";
+import { Notice } from "@/components/ui/notice";
 import { slugify } from "@/lib/slug";
 
 export function SetupForm() {
@@ -13,22 +16,25 @@ export function SetupForm() {
   const slug = customSlug ?? slugify(name);
 
   return (
-    <form action={formAction} className="mt-8 space-y-5">
+    <form
+      action={formAction}
+      className="mt-8 space-y-5 rounded-2xl border border-line bg-card p-5 shadow-sm sm:p-6"
+    >
       <label className="block">
-        <span className="text-sm font-medium">Restaurant name</span>
+        <span className={labelClass}>Restaurant name</span>
         <input
           name="name"
           required
           maxLength={120}
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="mt-1 w-full rounded-md border border-line bg-card px-3 py-2 focus:border-ink focus:outline-none"
+          className={fieldClass("mt-1 text-base")}
         />
       </label>
 
       <label className="block">
-        <span className="text-sm font-medium">Menu link</span>
-        <span className="mt-1 flex items-center rounded-md border border-line bg-card focus-within:border-ink">
+        <span className={labelClass}>Menu link</span>
+        <span className="mt-1 flex items-center rounded-md border border-line bg-card transition-colors focus-within:border-ink">
           <span className="pl-3 text-sm text-muted">/r/</span>
           <input
             name="slug"
@@ -47,18 +53,14 @@ export function SetupForm() {
       </label>
 
       {state.error && (
-        <p role="alert" className="rounded-md bg-tomato/10 px-3 py-2 text-sm text-tomato">
+        <Notice tone="warning" role="alert">
           {state.error}
-        </p>
+        </Notice>
       )}
 
-      <button
-        type="submit"
-        disabled={pending}
-        className="rounded-md bg-ink px-4 py-2.5 text-sm font-medium text-white hover:bg-ink/90 disabled:opacity-60"
-      >
+      <Button type="submit" disabled={pending} shine>
         {pending ? "Creating…" : "Create restaurant"}
-      </button>
+      </Button>
     </form>
   );
 }
