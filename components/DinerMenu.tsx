@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Chip } from "@/components/Chip";
 import { DishHeader } from "@/components/DishHeader";
+import { MenuChat } from "@/components/MenuChat";
 import { ToggleChip } from "@/components/ToggleChip";
 import { ALLERGENS, DIETARY_TAGS, type Allergen, type DietaryTag } from "@/lib/allergens";
 import { fetchTranslations } from "@/lib/api-client";
@@ -99,7 +100,7 @@ export function DinerMenu({ dishes, initialLanguage }: DinerMenuProps) {
   }
 
   return (
-    <main lang={htmlLang(language)} className="mx-auto max-w-3xl px-5 pb-16">
+    <main lang={htmlLang(language)} className="mx-auto max-w-3xl px-5 pb-28">
       <div className="pt-12">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <h1 className="font-serif text-4xl leading-tight">{t.menuTitle}</h1>
@@ -212,6 +213,7 @@ export function DinerMenu({ dishes, initialLanguage }: DinerMenuProps) {
           })}
         </ul>
       )}
+      <MenuChat language={language} />
     </main>
   );
 }

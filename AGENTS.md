@@ -20,3 +20,5 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - Build one feature at a time on its own branch, with tests for new logic.
 - Diner page text comes from `lib/i18n/diner-strings.ts`. Allergen and tag names are fixed translations and must never be AI-generated.
 - AI calls use the shared client and `parseJsonReply` in `lib/ai/client.ts`.
+- Every public route that calls AI must use `checkRateLimit` from `lib/rate-limit.ts` and validate input with Zod.
+- The menu assistant must never call a dish "safe" or "free of" an allergen, and must answer only from confirmed dishes.

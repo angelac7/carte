@@ -1,6 +1,7 @@
 import type { LanguageCode } from "@/lib/languages";
 import type { ExtractedDish, MenuItem } from "@/types/menu";
 import type { MenuTranslations } from "@/types/translation";
+import { MAX_HISTORY, type ChatMessage } from "@/types/chat";
 
 async function sendToItems<T>(method: "POST" | "PUT" | "DELETE", body: unknown): Promise<T> {
   const res = await fetch("/api/items", {
@@ -38,4 +39,20 @@ export async function fetchTranslations(language: LanguageCode): Promise<MenuTra
   const data = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error(data.error ?? "Translation failed.");
   return data.translations as MenuTranslations;
+}
+
+/** Thrown when a diner has asked too many questions in a short time. */
+export class ChatLimitError extends Error {}
+
+/** Asks the menu assistant a question, sending recent conversation for context. */
+export async function askMenu(language: LanguageCode, messages: ChatMessage[]): Promise<string> {
+  const res = await fetch("/api/chat", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ language, messages: messages.slice(-MAX_HISTORY) }),
+  });
+  if (res.status === 429) throw new ChatLimitError();
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok || typeof data.reply !== "string") throw new Error("Chat failed");
+  return data.reply;
 }

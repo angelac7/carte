@@ -51,3 +51,10 @@ The diner menu supports English, Spanish, Chinese, Korean, Japanese, French, and
 Page text and allergen names use fixed translations in `lib/i18n/diner-strings.ts`.
 Dish text is translated by AI once per language and saved in `data/translations.json`;
 editing a dish triggers a fresh translation of that dish only.
+
+## Menu chat
+
+Diners can ask questions on the menu page. Answers use only confirmed dishes, reply in the
+diner's language, and send preparation or cross-contamination questions to staff.
+Limits: 20 questions per 10 minutes per visitor, 30 menu uploads per hour, 500 characters per question.
+Rate limits are in memory for now and must move to a shared store before launch.

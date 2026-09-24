@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { extractMenu } from "@/lib/ai/extract";
+import { checkRateLimit, clientKey } from "@/lib/rate-limit";
 import { isSupportedImage, MAX_UPLOAD_BYTES } from "@/lib/upload-rules";
 
 function fail(message: string, status: number) {
@@ -7,6 +8,10 @@ function fail(message: string, status: number) {
 }
 
 export async function POST(req: Request) {
+  if (!checkRateLimit(`extract:${clientKey(req)}`, 30, 60 * 60 * 1000)) {
+    return fail("Too many menu uploads in the last hour. Try again later.", 429);
+  }
+
   const form = await req.formData().catch(() => null);
   const file = form?.get("menu");
 
