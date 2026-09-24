@@ -1,8 +1,6 @@
 "use client";
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { PhotoLookup } from "@/components/PhotoLookup";
-import { CAMERA_STRINGS } from "@/lib/i18n/camera-strings";
+import { useEffect } from "react";
 import { MY_CARTE_STRINGS } from "@/lib/i18n/my-carte-strings";
 import type { LanguageCode } from "@/lib/languages";
 import {
@@ -17,27 +15,23 @@ import type { DishText, MenuItem } from "@/types/menu";
 type MenuExtrasProps = {
   restaurant: { name: string; slug: string; cuisine: string };
   language: LanguageCode;
-  allDishes: MenuItem[];
   menuSize: number;
   candidates: MenuItem[];
   textFor: (dish: MenuItem) => DishText;
   onOpenDish: (dishId: string) => void;
 };
 
-/** Save this menu, find a dish by photo, and see dishes similar to what the diner liked. */
+/** Save this menu, link to My Carte, and show dishes similar to what the diner liked. */
 export function MenuExtras({
   restaurant,
   language,
-  allDishes,
   menuSize,
   candidates,
   textFor,
   onOpenDish,
 }: MenuExtrasProps) {
   const t = MY_CARTE_STRINGS[language];
-  const camera = CAMERA_STRINGS[language];
   const state = useMyCarte();
-  const [photoOpen, setPhotoOpen] = useState(false);
 
   // Remember the menu's size for the Menu master challenge.
   useEffect(() => {
@@ -55,7 +49,7 @@ export function MenuExtras({
 
   return (
     <>
-      <div className="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-sm">
+      <div className="mt-4 flex flex-wrap gap-x-4 gap-y-2 text-sm">
         <button
           aria-pressed={saved}
           onClick={() =>
@@ -65,16 +59,13 @@ export function MenuExtras({
         >
           {saved ? `♥ ${t.menuSaved}` : `♡ ${t.saveMenu}`}
         </button>
-        <button onClick={() => setPhotoOpen(true)} className={linkClass}>
-          {camera.photoButton}
-        </button>
         <Link href="/my" className={linkClass}>
           {t.myCarte}
         </Link>
       </div>
 
       {similar.length > 0 && (
-        <div className="mt-4 rounded-lg border border-line bg-card p-4">
+        <div className="mt-4 rounded-xl border border-line bg-card p-4">
           <h2 className="text-sm font-medium">{t.similarTitle}</h2>
           <ul className="mt-2 space-y-1">
             {similar.map((dish) => (
@@ -89,21 +80,6 @@ export function MenuExtras({
             ))}
           </ul>
         </div>
-      )}
-
-      {photoOpen && (
-        <PhotoLookup
-          restaurantSlug={restaurant.slug}
-          language={language}
-          dishes={allDishes}
-          visibleIds={new Set(candidates.map((dish) => dish.id))}
-          textFor={textFor}
-          onOpenDish={(dishId) => {
-            setPhotoOpen(false);
-            onOpenDish(dishId);
-          }}
-          onClose={() => setPhotoOpen(false)}
-        />
       )}
     </>
   );

@@ -162,3 +162,25 @@ export async function scanMenu(language: LanguageCode, image: File): Promise<Sca
   if (!res.ok || !data.menu) throw new Error("Scan failed");
   return data.menu as ScannedMenu;
 }
+
+/** Uploads a photo for one of the owner's dishes and returns its address. */
+export async function uploadDishPhoto(dishId: string, image: File): Promise<string> {
+  const form = new FormData();
+  form.append("dish", dishId);
+  form.append("image", image);
+  const res = await fetch("/api/dish-photo", { method: "POST", body: form });
+  checkSignedIn(res);
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok || typeof data.photoUrl !== "string") throw new Error(data.error ?? "Upload failed");
+  return data.photoUrl;
+}
+
+export async function removeDishPhoto(dishId: string): Promise<void> {
+  const res = await fetch("/api/dish-photo", {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ dish: dishId }),
+  });
+  checkSignedIn(res);
+  if (!res.ok) throw new Error("Removing the photo failed");
+}

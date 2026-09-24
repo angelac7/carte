@@ -42,6 +42,8 @@ export const MenuItemSchema = z.object({
   dietary_tags: z.array(z.enum(DIETARY_TAGS)),
   notes: z.string().max(2000),
   confirmed: z.boolean(),
+  // Set only by the photo upload route, never by dish edits.
+  photo_url: z.string().nullable().optional(),
 });
 
 export type ExtractedDish = z.infer<typeof ExtractedDishSchema>;

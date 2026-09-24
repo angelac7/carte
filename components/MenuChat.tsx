@@ -1,4 +1,5 @@
 "use client";
+import { motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import { askMenu, ChatLimitError } from "@/lib/api-client";
 import { CHAT_STRINGS } from "@/lib/i18n/chat-strings";
@@ -8,13 +9,17 @@ import { canSpeak, speak, SPEECH_LANG } from "@/lib/speak";
 import { speechInputSupported, useSpeechInput } from "@/lib/use-speech-input";
 import { MAX_QUESTION_LENGTH, type ChatMessage } from "@/types/chat";
 
-type MenuChatProps = { language: LanguageCode; restaurantSlug: string };
+type MenuChatProps = {
+  language: LanguageCode;
+  restaurantSlug: string;
+  open: boolean;
+  onClose: () => void;
+};
 
-/** A chat panel where diners ask questions, by typing or speaking, answered from the confirmed menu. */
-export function MenuChat({ language, restaurantSlug }: MenuChatProps) {
+/** A chat panel, opened from the dock, answered from the confirmed menu only. The conversation stays while it's closed. */
+export function MenuChat({ language, restaurantSlug, open, onClose }: MenuChatProps) {
   const t = CHAT_STRINGS[language];
   const help = HELP_STRINGS[language];
-  const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [draft, setDraft] = useState("");
   const [sending, setSending] = useState(false);
@@ -51,27 +56,21 @@ export function MenuChat({ language, restaurantSlug }: MenuChatProps) {
     }
   }
 
-  if (!open) {
-    return (
-      <button
-        onClick={() => setOpen(true)}
-        className="fixed right-5 bottom-5 z-20 rounded-full bg-ink px-5 py-3 text-sm font-medium text-white shadow-lg hover:bg-ink/90 print:hidden"
-      >
-        {t.open}
-      </button>
-    );
-  }
+  if (!open) return null;
 
   return (
-    <section
+    <motion.section
       role="dialog"
       aria-label={t.title}
-      onKeyDown={(e) => e.key === "Escape" && setOpen(false)}
-      className="fixed inset-x-0 bottom-0 z-20 flex max-h-[80vh] flex-col rounded-t-xl border border-line bg-card shadow-2xl sm:inset-x-auto sm:right-5 sm:bottom-5 sm:w-96 sm:rounded-xl print:hidden"
+      initial={{ y: 48, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ type: "spring", bounce: 0.15, duration: 0.45 }}
+      onKeyDown={(e) => e.key === "Escape" && onClose()}
+      className="fixed inset-x-0 bottom-0 z-30 flex max-h-[80vh] flex-col rounded-t-2xl border border-line bg-card shadow-2xl sm:inset-x-auto sm:right-5 sm:bottom-5 sm:w-96 sm:rounded-2xl print:hidden"
     >
       <header className="flex items-center justify-between border-b border-line px-4 py-3">
         <h2 className="font-serif text-lg">{t.title}</h2>
-        <button onClick={() => setOpen(false)} className="text-sm text-muted hover:text-ink">
+        <button onClick={onClose} className="text-sm text-muted hover:text-ink">
           {t.close}
         </button>
       </header>
@@ -85,7 +84,7 @@ export function MenuChat({ language, restaurantSlug }: MenuChatProps) {
               <button
                 key={suggestion}
                 onClick={() => ask(suggestion)}
-                className="rounded-full border border-line px-3 py-1.5 text-left text-sm hover:border-muted"
+                className="rounded-full border border-line px-3 py-1.5 text-left text-sm transition-colors hover:border-muted active:scale-[0.98]"
               >
                 {suggestion}
               </button>
@@ -94,9 +93,14 @@ export function MenuChat({ language, restaurantSlug }: MenuChatProps) {
         )}
 
         {messages.map((message, index) => (
-          <div key={index} className={message.role === "user" ? "flex justify-end" : ""}>
+          <motion.div
+            key={index}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            className={message.role === "user" ? "flex justify-end" : ""}
+          >
             <p
-              className={`max-w-[85%] rounded-lg px-3 py-2 text-sm leading-relaxed whitespace-pre-line ${
+              className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm leading-relaxed whitespace-pre-line ${
                 message.role === "user" ? "bg-ink text-white" : "bg-paper"
               }`}
             >
@@ -110,7 +114,7 @@ export function MenuChat({ language, restaurantSlug }: MenuChatProps) {
                 {help.listen}
               </button>
             )}
-          </div>
+          </motion.div>
         ))}
 
         {sending && <p className="text-sm text-muted">{t.thinking}</p>}
@@ -165,11 +169,11 @@ export function MenuChat({ language, restaurantSlug }: MenuChatProps) {
         <button
           type="submit"
           disabled={sending || !draft.trim()}
-          className="rounded-md bg-ink px-4 py-2 text-sm font-medium text-white hover:bg-ink/90 disabled:opacity-50"
+          className="rounded-md bg-ink px-4 py-2 text-sm font-medium text-white hover:bg-ink/90 active:scale-[0.97] disabled:opacity-50"
         >
           {t.send}
         </button>
       </form>
-    </section>
+    </motion.section>
   );
 }

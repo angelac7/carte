@@ -4,7 +4,8 @@ import type { ExtractedDish, MenuItem } from "@/types/menu";
 export type Restaurant = { id: string; name: string; slug: string; cuisine: string };
 
 const RESTAURANT_COLUMNS = "id, name, slug, cuisine";
-const DISH_COLUMNS = "id, name, description, price, allergens, dietary_tags, notes, confirmed";
+const DISH_COLUMNS =
+  "id, name, description, price, allergens, dietary_tags, notes, confirmed, photo_url";
 
 export async function getOwnerRestaurant(
   supabase: SupabaseClient,

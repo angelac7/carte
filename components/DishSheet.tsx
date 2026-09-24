@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { Chip } from "@/components/Chip";
 import { fetchInsight } from "@/lib/api-client";
@@ -103,8 +104,19 @@ export function DishSheet({ dish, text, language, restaurantSlug, onClose }: Dis
         aria-labelledby="dish-sheet-title"
         onClick={(e) => e.stopPropagation()}
         onKeyDown={(e) => e.key === "Escape" && onClose()}
-        className="max-h-[90vh] w-full overflow-y-auto rounded-t-xl bg-card p-5 shadow-2xl sm:max-w-lg sm:rounded-xl sm:p-6"
+        className="max-h-[90vh] w-full overflow-y-auto rounded-t-2xl bg-card p-5 shadow-2xl sm:max-w-lg sm:rounded-2xl sm:p-6"
       >
+        {dish.photo_url && (
+          <div className="relative -mx-5 -mt-5 mb-5 aspect-[16/10] overflow-hidden sm:-mx-6 sm:-mt-6">
+            <Image
+              src={dish.photo_url}
+              alt={text.name}
+              fill
+              sizes="(min-width: 640px) 32rem, 100vw"
+              className="object-cover"
+            />
+          </div>
+        )}
         <div className="flex items-start justify-between gap-4">
           <div>
             <h2 id="dish-sheet-title" className="font-serif text-2xl leading-tight">

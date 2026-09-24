@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { DishHeader } from "@/components/DishHeader";
+import { DishPhotoEditor } from "@/components/owner/DishPhotoEditor";
 import { ProgressBar } from "@/components/ProgressBar";
 import { ToggleChip } from "@/components/ToggleChip";
 import { ALLERGENS, DIETARY_TAGS, type Allergen, type DietaryTag } from "@/lib/allergens";
@@ -134,6 +135,10 @@ export default function ReviewPage() {
                 }`}
               >
                 <DishHeader name={dish.name} price={dish.price} as="h2" />
+                <DishPhotoEditor
+                  dish={dish}
+                  onChange={(photo_url) => showLocally({ ...dish, photo_url })}
+                />
                 <p className="mt-1 max-w-prose text-sm leading-relaxed text-muted">
                   {dish.description}
                 </p>
