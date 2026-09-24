@@ -104,11 +104,11 @@ export function ScanMenu({ language, initialPrefs }: ScanMenuProps) {
 
       {status === "loading" && (
         <div role="status" className="mt-8">
-          <p className="font-serif text-2xl">{t.reading}</p>
+          <p className="font-serif text-3xl tracking-tight">{t.reading}</p>
           <p className="mt-1 text-sm text-muted">{t.readingHint}</p>
           <div className="mt-6 space-y-3" aria-hidden="true">
             {[0, 1, 2].map((row) => (
-              <div key={row} className="rounded-xl border border-line bg-card p-4">
+              <div key={row} className="rounded-panel p-6 shadow-pressed">
                 <Skeleton className="h-6 w-1/2" />
                 <Skeleton className="mt-3 h-4 w-4/5" />
               </div>
@@ -133,20 +133,23 @@ export function ScanMenu({ language, initialPrefs }: ScanMenuProps) {
             <EmptyState className="mt-6">{t.scanFailed}</EmptyState>
           ) : (
             <>
-              <h2 className="mt-8 font-serif text-3xl tracking-tight">
+              <h2 className="mt-10 border-t-4 border-ink pt-8 font-serif text-4xl leading-none tracking-tighter sm:text-5xl">
                 {t.dishesFound(menu.dishes.length)}
               </h2>
-              <ul className="mt-4 space-y-3">
+              <ul className="mt-6 space-y-4">
                 {menu.dishes.map((dish, index) => {
                   const flagged = dish.allergens.filter((allergen) => avoid.includes(allergen));
                   return (
                     <li
                       key={index}
-                      className={`rounded-xl border bg-card p-4 sm:p-5 ${
-                        flagged.length > 0 ? "border-2 border-tomato" : "border-line"
+                      // Unconfirmed dishes sit pressed into the page, never raised like confirmed ones.
+                      className={`rounded-panel p-6 shadow-pressed ${
+                        flagged.length > 0 ? "border-2 border-tomato" : ""
                       }`}
                     >
-                      <p className="font-serif text-xl">{dish.name || dish.original}</p>
+                      <p className="font-serif text-2xl leading-tight tracking-tight">
+                        {dish.name || dish.original}
+                      </p>
                       {dish.original && dish.original !== dish.name && (
                         <p className="mt-0.5 text-sm text-muted">{dish.original}</p>
                       )}
@@ -165,7 +168,7 @@ export function ScanMenu({ language, initialPrefs }: ScanMenuProps) {
                       <div className="mt-2 flex flex-wrap items-center gap-2 text-xs">
                         {dish.allergens.length > 0 ? (
                           <>
-                            <span className="text-muted">{t.mayContain}</span>
+                            <span className="eyebrow text-muted">{t.mayContain}</span>
                             {dish.allergens.map((allergen) => (
                               <Chip key={allergen} label={d.allergens[allergen]} tone="allergen" />
                             ))}
