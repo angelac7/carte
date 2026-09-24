@@ -16,7 +16,7 @@ export const metadata: Metadata = { title: "Link your map listing | Carte" };
 
 type Params = Record<string, string | string[] | undefined>;
 const one = (value: Params[string]) => (Array.isArray(value) ? value[0] : value) ?? "";
-const panelClass = "mt-6 rounded-2xl border border-line bg-card p-5 shadow-sm sm:p-6";
+const panelClass = "mt-8 rounded-panel bg-paper p-6 shadow-raised sm:p-8";
 
 const ERRORS: Record<string, string> = {
   taken: "Another Carte restaurant has already claimed this listing. Contact Carte if it's yours.",
@@ -60,7 +60,7 @@ export default async function ClaimPage({ searchParams }: { searchParams: Promis
         <div className={panelClass}>
           <p
             className={cn(
-              "inline-block rounded-full px-3 py-1 text-xs font-medium",
+              "eyebrow inline-block rounded-full px-3 py-1.5",
               claim.verified ? "bg-basil-soft text-basil" : "bg-saffron-soft text-saffron-ink",
             )}
           >
@@ -83,7 +83,7 @@ export default async function ClaimPage({ searchParams }: { searchParams: Promis
       {place && (
         <form action={claimPlaceAction} className={panelClass}>
           <input type="hidden" name="place" value={place.id} />
-          <p className="font-serif text-2xl">{place.name}</p>
+          <p className="font-serif text-3xl tracking-tight">{place.name}</p>
           <p className="mt-1 text-sm text-muted">
             {[place.address, place.city, place.cuisine.join(", ")].filter(Boolean).join(", ")}
           </p>
@@ -109,7 +109,7 @@ export default async function ClaimPage({ searchParams }: { searchParams: Promis
       )}
 
       {(place || claim.placeId) && (
-        <p className="mt-8 border-t border-line pt-5 text-xs leading-relaxed text-muted">
+        <p className="mt-10 border-t border-ink/15 pt-5 text-xs leading-relaxed text-muted">
           {PLACES_STRINGS.en.sourceNote}{" "}
           <a
             href="https://www.openstreetmap.org/copyright"
