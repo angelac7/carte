@@ -6,13 +6,10 @@ import { ProgressBar } from "@/components/ProgressBar";
 import { ToggleChip } from "@/components/ToggleChip";
 import { ALLERGENS, DIETARY_TAGS, type Allergen, type DietaryTag } from "@/lib/allergens";
 import { deleteDish, fetchDishes, updateDish } from "@/lib/api-client";
+import { toggleValue } from "@/lib/toggle-value";
 import type { MenuItem } from "@/types/menu";
 
 type Filter = "all" | "review" | "confirmed";
-
-function toggleValue<T>(list: T[], value: T): T[] {
-  return list.includes(value) ? list.filter((v) => v !== value) : [...list, value];
-}
 
 export default function ReviewPage() {
   const [dishes, setDishes] = useState<MenuItem[]>([]);

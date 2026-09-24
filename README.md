@@ -35,3 +35,12 @@ Owners upload a menu, AI suggests allergens, and owners confirm every dish befor
 ## Safety rule
 
 AI output is only a suggestion. Diners must only ever see dishes an owner has confirmed.
+
+## Pages
+
+| Page      | Who   | What it does                                          |
+| --------- | ----- | ----------------------------------------------------- |
+| `/`       | Owner | Upload a menu photo and save dishes                   |
+| `/review` | Owner | Confirm allergens and tags for each dish              |
+| `/qr`     | Owner | Print a table QR code linking to the diner menu       |
+| `/menu`   | Diner | Confirmed dishes only, with allergen and diet filters |
