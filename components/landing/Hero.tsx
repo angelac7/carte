@@ -32,10 +32,7 @@ export function Hero() {
               Every menu, <em className="text-accent">understood.</em>
             </h1>
           </BlurFade>
-          <div aria-hidden="true" className="mt-8 flex items-center gap-3">
-            <span className="h-1 w-24 bg-ink" />
-            <span className="h-3 w-3 border-2 border-ink" />
-          </div>
+          <div aria-hidden="true" className="mt-8 h-1 w-24 bg-ink" />
           <BlurFade delay={0.16}>
             <p className="mt-8 max-w-lg text-lg leading-relaxed text-muted">
               Allergens confirmed by the kitchen. Every dish explained. The whole menu,{" "}

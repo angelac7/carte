@@ -44,10 +44,7 @@ export function PageHero({ title, intro, image, lang, narrow = false, children }
             {title}
           </h1>
         </BlurFade>
-        <div aria-hidden="true" className="mt-7 flex items-center gap-3">
-          <span className="h-1 w-20 bg-white" />
-          <span className="h-3 w-3 border-2 border-white" />
-        </div>
+        <div aria-hidden="true" className="mt-7 h-1 w-20 bg-white" />
         {intro && (
           <BlurFade delay={0.1}>
             <p className="mt-7 max-w-xl text-lg leading-relaxed text-white/75">{intro}</p>

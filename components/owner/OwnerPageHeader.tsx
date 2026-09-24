@@ -25,10 +25,7 @@ export function OwnerPageHeader({ title, intro, eyebrow, children }: OwnerPageHe
         >
           {title}
         </h1>
-        <div aria-hidden="true" className="mt-6 flex items-center gap-3">
-          <span className="h-1 w-16 bg-ink" />
-          <span className="h-2.5 w-2.5 border-2 border-ink" />
-        </div>
+        <div aria-hidden="true" className="mt-6 h-1 w-16 bg-ink" />
         {intro && <p className="mt-6 max-w-2xl leading-relaxed text-muted">{intro}</p>}
         {children && <div className="mt-8 flex flex-wrap gap-4">{children}</div>}
       </header>

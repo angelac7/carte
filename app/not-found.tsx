@@ -14,10 +14,7 @@ export default function NotFound() {
         <p className="font-serif text-[clamp(7rem,30vw,14rem)] leading-none tracking-tighter text-accent italic">
           404
         </p>
-        <div aria-hidden="true" className="mt-10 flex items-center justify-center gap-3">
-          <span className="h-1 w-16 bg-ink" />
-          <span className="h-2.5 w-2.5 border-2 border-ink" />
-        </div>
+        <div aria-hidden="true" className="mx-auto mt-10 h-1 w-16 bg-ink" />
         <h1 className="mt-8 font-serif text-4xl leading-tight tracking-tight sm:text-5xl">
           This page isn’t on the menu
         </h1>
