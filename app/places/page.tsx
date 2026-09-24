@@ -11,7 +11,7 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { buttonClass } from "@/components/ui/button";
 import { cn } from "@/lib/cn";
 import { EmptyState } from "@/components/ui/empty-state";
-import { fieldClass, labelClass } from "@/components/ui/field";
+import { fieldClass } from "@/components/ui/field";
 import { Notice } from "@/components/ui/notice";
 import { carteLinksForPlaces } from "@/lib/db/places";
 import { DINER_STRINGS } from "@/lib/i18n/diner-strings";
@@ -86,7 +86,7 @@ export default async function PlacesPage({ searchParams }: { searchParams: Promi
     }
   }
 
-  const inputClass = fieldClass("mt-2 bg-paper px-4 py-3 text-base");
+  const inputClass = fieldClass("mt-2 px-5 py-4");
 
   return (
     <>
@@ -106,11 +106,11 @@ export default async function PlacesPage({ searchParams }: { searchParams: Promi
         <form
           action="/places"
           method="get"
-          className="rounded-2xl border border-line bg-card p-5 shadow-xl sm:p-6"
+          className="rounded-panel bg-paper p-5 shadow-raised-lg sm:p-7"
         >
           <div className="grid gap-4 sm:grid-cols-2">
             <label className="block">
-              <span className={labelClass}>{t.near}</span>
+              <span className="eyebrow text-muted">{t.near}</span>
               <input
                 name="near"
                 defaultValue={near}
@@ -120,7 +120,7 @@ export default async function PlacesPage({ searchParams }: { searchParams: Promi
               />
             </label>
             <label className="block">
-              <span className={labelClass}>{t.queryLabel}</span>
+              <span className="eyebrow text-muted">{t.queryLabel}</span>
               <input
                 name="q"
                 defaultValue={query}
@@ -163,7 +163,7 @@ export default async function PlacesPage({ searchParams }: { searchParams: Promi
         )}
 
         {results.length > 0 && (
-          <ul className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <ul className="mt-12 grid gap-6 border-t-4 border-ink pt-10 sm:grid-cols-2 lg:grid-cols-3">
             {results.map((place, index) => {
               const carteSlug = carteLinks.get(place.id);
               const href = carteSlug ? `/r/${carteSlug}` : `/place/${place.id}`;
@@ -189,8 +189,8 @@ export default async function PlacesPage({ searchParams }: { searchParams: Promi
                           )}
                         </CardImage>
                       </Link>
-                      <div className="flex flex-1 flex-col p-5">
-                        <h2 className="font-serif text-xl leading-snug">
+                      <div className="flex flex-1 flex-col px-6 pt-3 pb-6">
+                        <h2 className="font-serif text-2xl leading-tight tracking-tight">
                           <Link href={href} className="hover:underline">
                             {place.name}
                           </Link>
@@ -209,7 +209,7 @@ export default async function PlacesPage({ searchParams }: { searchParams: Promi
                         )}
                         <Link
                           href={href}
-                          className="mt-auto self-start pt-4 text-sm font-medium underline underline-offset-4 hover:text-muted"
+                          className="mt-auto self-start pt-5 text-sm font-semibold text-accent underline-offset-4 hover:underline"
                         >
                           {carteSlug ? t.viewMenu : t.details}
                         </Link>
@@ -222,7 +222,7 @@ export default async function PlacesPage({ searchParams }: { searchParams: Promi
           </ul>
         )}
 
-        <p className="mt-12 border-t border-line pt-5 text-xs leading-relaxed text-muted">
+        <p className="mt-16 border-t border-ink/15 pt-5 text-xs leading-relaxed text-muted">
           {t.sourceNote}{" "}
           <a
             href="https://www.openstreetmap.org/copyright"

@@ -105,7 +105,7 @@ export default async function PlacePage({ params }: { params: Promise<{ id: stri
             lang={htmlLang(language)}
             className="relative z-10 mx-auto -mt-10 max-w-3xl px-5 pb-20"
           >
-            <section className="rounded-2xl border border-line bg-card p-6 shadow-xl sm:p-8">
+            <section className="rounded-panel bg-paper p-6 shadow-raised-lg sm:p-8">
               {carteSlug ? (
                 <Link
                   href={`/r/${carteSlug}`}
@@ -115,14 +115,14 @@ export default async function PlacePage({ params }: { params: Promise<{ id: stri
                 </Link>
               ) : (
                 <>
-                  <p className="text-lg leading-relaxed">{t.noMenu}</p>
+                  <p className="font-serif text-2xl leading-snug tracking-tight">{t.noMenu}</p>
                   <Link
                     href="/scan"
                     className={cn(buttonClass({ size: "lg", shine: true }), "mt-5")}
                   >
                     {t.scanMenu}
                   </Link>
-                  <p className="mt-6 border-t border-line pt-5 text-sm">
+                  <p className="mt-6 border-t border-ink/10 pt-5 text-sm">
                     {t.ownerPrompt}{" "}
                     <Link
                       href={`/dashboard/claim?place=${place.id}`}
@@ -136,16 +136,16 @@ export default async function PlacePage({ params }: { params: Promise<{ id: stri
             </section>
 
             {(place.openingHours || place.diets.length > 0) && (
-              <div className="mt-6 grid gap-5 sm:grid-cols-2">
+              <div className="mt-8 grid gap-6 sm:grid-cols-2">
                 {place.openingHours && (
-                  <section className="rounded-2xl border border-line bg-card p-5">
-                    <h2 className="text-sm font-medium">{t.hours}</h2>
+                  <section className="rounded-panel p-6 shadow-pressed">
+                    <h2 className="eyebrow text-muted">{t.hours}</h2>
                     <p className="mt-2 text-sm leading-relaxed text-muted">{place.openingHours}</p>
                   </section>
                 )}
                 {place.diets.length > 0 && (
-                  <section className="rounded-2xl border border-line bg-card p-5">
-                    <h2 className="text-sm font-medium">{t.dietOptions}</h2>
+                  <section className="rounded-panel p-6 shadow-pressed">
+                    <h2 className="eyebrow text-muted">{t.dietOptions}</h2>
                     <div className="mt-3 flex flex-wrap gap-2">
                       {place.diets.map((diet) => (
                         <Chip key={diet} label={d.tags[diet]} tone="allergen" />
@@ -157,7 +157,7 @@ export default async function PlacePage({ params }: { params: Promise<{ id: stri
             )}
 
             <Notice className="mt-8">{d.safetyNotice}</Notice>
-            <p className="mt-8 border-t border-line pt-5 text-xs leading-relaxed text-muted">
+            <p className="mt-10 border-t border-ink/15 pt-5 text-xs leading-relaxed text-muted">
               {t.sourceNote}{" "}
               <a
                 href="https://www.openstreetmap.org/copyright"
