@@ -1,14 +1,17 @@
 "use client";
 import { AnimatePresence, motion } from "motion/react";
-import Link from "next/link";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { DishHeader } from "@/components/DishHeader";
 import { DishPhotoEditor } from "@/components/owner/DishPhotoEditor";
+import { OwnerPageHeader } from "@/components/owner/OwnerPageHeader";
 import { ProgressBar } from "@/components/ProgressBar";
 import { Sheet } from "@/components/Sheet";
 import { ToggleChip } from "@/components/ToggleChip";
-import { Button, buttonClass } from "@/components/ui/button";
+import { Button, ButtonLink } from "@/components/ui/button";
+import { EmptyState } from "@/components/ui/empty-state";
+import { fieldClass, labelClass } from "@/components/ui/field";
+import { Notice } from "@/components/ui/notice";
 import { ALLERGENS, DIETARY_TAGS, type Allergen, type DietaryTag } from "@/lib/allergens";
 import { deleteAllDishes, deleteDish, fetchDishes, saveDishes, updateDish } from "@/lib/api-client";
 import { cn } from "@/lib/cn";
@@ -18,8 +21,7 @@ import type { MenuItem } from "@/types/menu";
 type Filter = "all" | "review" | "confirmed";
 type DishDetails = { name: string; description: string; price: string };
 
-const inputClass =
-  "mt-1 w-full rounded-lg border border-line bg-paper px-3 py-2 text-sm focus:border-ink focus:outline-none";
+const inputClass = fieldClass("mt-1");
 
 function DishDetailsForm({
   initial,
@@ -46,7 +48,7 @@ function DishDetailsForm({
       className="space-y-3"
     >
       <label className="block">
-        <span className="text-sm font-medium">Dish name</span>
+        <span className={labelClass}>Dish name</span>
         <input
           required
           maxLength={120}
@@ -56,7 +58,7 @@ function DishDetailsForm({
         />
       </label>
       <label className="block">
-        <span className="text-sm font-medium">Description</span>
+        <span className={labelClass}>Description</span>
         <textarea
           rows={3}
           maxLength={500}
@@ -66,7 +68,7 @@ function DishDetailsForm({
         />
       </label>
       <label className="block">
-        <span className="text-sm font-medium">Price</span>
+        <span className={labelClass}>Price</span>
         <input
           maxLength={20}
           value={price}
@@ -187,76 +189,81 @@ export default function ReviewDishes() {
   return (
     <main className="mx-auto max-w-3xl px-5 pb-20">
       <div className="pt-12">
-        <h1 className="font-serif text-5xl leading-tight">Review dishes</h1>
-        <p className="mt-3 max-w-xl leading-relaxed text-muted">
-          Check each dish’s details and allergens, then confirm it. Diners only see dishes you’ve
-          confirmed.
-        </p>
-        <div className="mt-6 flex flex-wrap gap-3">
+        <OwnerPageHeader
+          title="Review dishes"
+          intro="Check each dish’s details and allergens, then confirm it. Diners only see dishes you’ve confirmed."
+        >
           <Button onClick={() => setAdding(true)} shine>
             Add a dish
           </Button>
-          <Link href="/dashboard/upload" className={buttonClass({ variant: "secondary" })}>
+          <ButtonLink href="/dashboard/upload" variant="secondary">
             Upload a menu photo
-          </Link>
-        </div>
+          </ButtonLink>
+        </OwnerPageHeader>
       </div>
 
       {problem && (
-        <p role="alert" className="mt-6 rounded-xl bg-tomato/10 px-4 py-3 text-sm text-tomato">
+        <Notice tone="warning" role="alert" className="mt-6">
           {problem}
-        </p>
+        </Notice>
       )}
 
       {loaded && total === 0 && !problem && (
-        <div className="mt-10 rounded-2xl border border-dashed border-line bg-card px-6 py-12 text-center">
-          <h2 className="font-serif text-3xl">No dishes yet</h2>
-          <p className="mx-auto mt-2 max-w-sm text-muted">
+        <EmptyState className="mt-10 bg-card py-12">
+          <h2 className="font-serif text-3xl text-ink">No dishes yet</h2>
+          <p className="mx-auto mt-2 max-w-sm">
             Upload a photo of your menu and Carte lists every dish here, or add dishes one at a
             time.
           </p>
-        </div>
+        </EmptyState>
       )}
 
       {total > 0 && (
         <>
           <div className="sticky top-14 z-10 -mx-5 mt-8 border-b border-line bg-paper/95 px-5 py-4 backdrop-blur">
             <ProgressBar done={done} total={total} />
-            <div className="mt-4 flex flex-wrap items-center gap-2">
-              {filters.map((f) => (
-                <button
-                  key={f.key}
-                  aria-pressed={filter === f.key}
-                  onClick={() => setFilter(f.key)}
-                  className={cn(
-                    "rounded-md px-3 py-1.5 text-sm transition-colors",
-                    filter === f.key
-                      ? "bg-ink text-white"
-                      : "text-muted hover:bg-card hover:text-ink",
-                  )}
-                >
-                  {f.label} <span className="tabular-nums opacity-70">{f.count}</span>
-                </button>
-              ))}
+            <div className="mt-4 flex flex-wrap items-center gap-3">
+              <div className="flex gap-1 rounded-xl border border-line bg-card p-1">
+                {filters.map((f) => (
+                  <button
+                    key={f.key}
+                    aria-pressed={filter === f.key}
+                    onClick={() => setFilter(f.key)}
+                    className={cn(
+                      "relative isolate rounded-lg px-3 py-1.5 text-sm whitespace-nowrap transition-colors",
+                      filter === f.key ? "text-white" : "text-muted hover:text-ink",
+                    )}
+                  >
+                    {filter === f.key && (
+                      <motion.span
+                        layoutId="review-filter"
+                        className="absolute inset-0 -z-10 rounded-lg bg-ink"
+                        transition={{ type: "spring", bounce: 0.2, duration: 0.4 }}
+                      />
+                    )}
+                    {f.label} <span className="tabular-nums opacity-70">{f.count}</span>
+                  </button>
+                ))}
+              </div>
               <input
                 type="search"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search dishes"
                 aria-label="Search dishes"
-                className="ml-auto w-full rounded-md border border-line bg-card px-3 py-1.5 text-sm focus:border-ink focus:outline-none sm:w-48"
+                className={fieldClass("py-1.5 sm:ml-auto sm:w-48")}
               />
             </div>
           </div>
 
           {shown.length === 0 && (
-            <p className="mt-10 text-muted">
+            <EmptyState className="mt-8">
               {needle
                 ? "No dishes match that search."
                 : filter === "review"
                   ? "Every dish is confirmed."
                   : "No dishes confirmed yet."}
-            </p>
+            </EmptyState>
           )}
 
           <div className="mt-6 space-y-5">
@@ -340,7 +347,7 @@ export default function ReviewDishes() {
                   </fieldset>
 
                   <label className="mt-4 block">
-                    <span className="text-sm font-medium">Kitchen notes</span>
+                    <span className={labelClass}>Kitchen notes</span>
                     <textarea
                       rows={2}
                       maxLength={2000}

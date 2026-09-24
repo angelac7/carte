@@ -36,16 +36,16 @@ export function DishPhotoEditor({ dish, onChange }: DishPhotoEditorProps) {
   return (
     <div className="mt-4 flex items-center gap-4">
       {dish.photo_url ? (
-        <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-lg">
+        <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-xl">
           <Image src={dish.photo_url} alt="" fill sizes="80px" className="object-cover" />
         </div>
       ) : (
-        <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-lg border border-dashed border-line text-xs text-muted">
+        <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-xl border border-dashed border-line text-xs text-muted">
           No photo
         </div>
       )}
       <div className="flex flex-col items-start gap-1">
-        <label className="cursor-pointer text-sm font-medium underline underline-offset-4 hover:text-muted has-focus-visible:outline-2 has-focus-visible:outline-ink">
+        <label className="cursor-pointer text-sm font-medium underline underline-offset-4 hover:text-muted has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-ink">
           <input
             type="file"
             accept="image/*"
