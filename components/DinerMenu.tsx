@@ -18,6 +18,7 @@ import { PhotoLookup } from "@/components/PhotoLookup";
 import { QuantityStepper } from "@/components/QuantityStepper";
 import { ToggleChip } from "@/components/ToggleChip";
 import { Button } from "@/components/ui/button";
+import { Notice } from "@/components/ui/notice";
 import { ALLERGENS, DIETARY_TAGS, type Allergen, type DietaryTag } from "@/lib/allergens";
 import { fetchTranslations, trackDishView } from "@/lib/api-client";
 import { writePrefsCookie, type DinerPrefs } from "@/lib/diner-prefs";
@@ -240,12 +241,7 @@ export function DinerMenu({
       />
 
       <main className="mx-auto max-w-3xl px-5 pb-36">
-        <p
-          role="note"
-          className="mt-6 rounded-xl border border-saffron/40 bg-saffron-soft px-4 py-3 text-sm leading-relaxed text-saffron-ink"
-        >
-          {t.safetyNotice}
-        </p>
+        <Notice className="mt-6">{t.safetyNotice}</Notice>
         {translating && (
           <p role="status" className="mt-3 text-sm text-muted">
             {t.translating}

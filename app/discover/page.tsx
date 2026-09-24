@@ -8,6 +8,8 @@ import { PageHero } from "@/components/PageHero";
 import { PublicHeader } from "@/components/PublicHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { buttonClass } from "@/components/ui/button";
+import { fieldClass } from "@/components/ui/field";
+import { Notice } from "@/components/ui/notice";
 import { cravingToTerms } from "@/lib/ai/craving";
 import { ALLERGENS, DIETARY_TAGS, isAllergen, isDietaryTag } from "@/lib/allergens";
 import { cn } from "@/lib/cn";
@@ -53,10 +55,11 @@ type Place = { city: string; occasions: Occasion[]; hours: WeeklyHours; timezone
 const many = (value: Params[string]) => (Array.isArray(value) ? value : value ? [value] : []);
 const one = (value: Params[string]) => (Array.isArray(value) ? value[0] : value) ?? "";
 
+// Matches ToggleChip, as a checkbox label so the filters work without JavaScript.
 const chipClass =
-  "cursor-pointer rounded-full border border-line bg-card px-3 py-1 text-sm text-muted transition-colors hover:border-muted has-checked:border-ink has-checked:bg-ink has-checked:text-white has-focus-visible:outline-2 has-focus-visible:outline-ink";
-const selectClass =
-  "w-full rounded-lg border border-line bg-card px-3 py-2 text-sm focus:border-ink focus:outline-none";
+  "cursor-pointer rounded-full border border-line bg-card px-3.5 py-1.5 text-sm text-muted transition-colors hover:border-muted hover:text-ink has-checked:border-ink has-checked:bg-ink has-checked:text-white has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-ink";
+const selectClass = fieldClass();
+const emptyClass = "rounded-2xl border border-dashed border-line p-8 text-center text-muted";
 const stagger = (index: number) => Math.min(index, 8) * 0.05;
 
 function DishGrid({
@@ -295,7 +298,7 @@ export default async function DiscoverPage({ searchParams }: DiscoverProps) {
               maxLength={100}
               aria-label={t.searchLabel}
               placeholder={t.placeholder}
-              className="flex-1 rounded-xl border border-line bg-paper px-4 py-3 text-lg focus:border-ink focus:outline-none"
+              className={fieldClass("flex-1 bg-paper px-4 py-3 text-base sm:text-lg")}
             />
             <button type="submit" className={buttonClass({ size: "lg", shine: true })}>
               {t.search}
@@ -319,15 +322,23 @@ export default async function DiscoverPage({ searchParams }: DiscoverProps) {
 
           <details
             open={activeFilters > 0}
-            className="mt-5 rounded-xl border border-line bg-paper/60"
+            className="group mt-5 rounded-xl border border-line bg-paper/60"
           >
-            <summary className="flex cursor-pointer list-none items-center justify-between px-4 py-3 text-sm font-medium [&::-webkit-details-marker]:hidden">
-              {t.filters}
-              {activeFilters > 0 && (
-                <span className="rounded-full bg-ink px-2 py-0.5 text-xs text-white tabular-nums">
-                  {activeFilters}
-                </span>
-              )}
+            <summary className="flex cursor-pointer list-none items-center justify-between gap-3 rounded-xl px-4 py-3 text-sm font-medium [&::-webkit-details-marker]:hidden">
+              <span className="flex items-center gap-2">
+                {t.filters}
+                {activeFilters > 0 && (
+                  <span className="rounded-full bg-ink px-2 py-0.5 text-xs text-white tabular-nums">
+                    {activeFilters}
+                  </span>
+                )}
+              </span>
+              <span
+                aria-hidden="true"
+                className="text-lg leading-none text-muted transition-transform group-open:rotate-45"
+              >
+                +
+              </span>
             </summary>
             <div className="space-y-5 border-t border-line px-4 py-4">
               <fieldset>
@@ -366,7 +377,13 @@ export default async function DiscoverPage({ searchParams }: DiscoverProps) {
               </fieldset>
               <div className="grid items-center gap-4 sm:grid-cols-3">
                 <label className="flex items-center gap-2 text-sm">
-                  <input type="checkbox" name="open" value="1" defaultChecked={openOnly} />
+                  <input
+                    type="checkbox"
+                    name="open"
+                    value="1"
+                    defaultChecked={openOnly}
+                    className="h-4 w-4 accent-ink"
+                  />
                   {t.openNow}
                 </label>
                 <label className="text-sm">
@@ -398,12 +415,12 @@ export default async function DiscoverPage({ searchParams }: DiscoverProps) {
           </details>
         </form>
 
-        <p className="mt-6 text-sm leading-relaxed text-muted">{d.safetyNotice}</p>
+        <Notice className="mt-6">{d.safetyNotice}</Notice>
 
         {tab === "dishes" && !query && trending.length > 0 && (
           <section className="mt-12">
             <BlurFade>
-              <h2 className="font-serif text-4xl">{t.trending}</h2>
+              <h2 className="font-serif text-3xl tracking-tight sm:text-4xl">{t.trending}</h2>
             </BlurFade>
             <DishGrid dishes={trending} d={d} t={t} />
           </section>
@@ -411,9 +428,9 @@ export default async function DiscoverPage({ searchParams }: DiscoverProps) {
 
         {tab === "dishes" && query && (
           <section className="mt-12">
-            {cravingUsed && <p className="text-sm text-muted">{t.cravingNote(query)}</p>}
+            {cravingUsed && <p className="mb-2 text-sm text-muted">{t.cravingNote(query)}</p>}
             {dishes.length === 0 ? (
-              <p className="text-muted">{t.noResults}</p>
+              <p className={emptyClass}>{t.noResults}</p>
             ) : (
               <DishGrid dishes={dishes} d={d} t={t} />
             )}
@@ -423,7 +440,7 @@ export default async function DiscoverPage({ searchParams }: DiscoverProps) {
         {tab === "restaurants" && (
           <section className="mt-12">
             {restaurants.length === 0 ? (
-              <p className="text-muted">{t.noResults}</p>
+              <p className={emptyClass}>{t.noResults}</p>
             ) : (
               <RestaurantGrid restaurants={restaurants} t={t} />
             )}
