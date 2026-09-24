@@ -2,6 +2,7 @@
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { Chip } from "@/components/Chip";
+import { Sheet } from "@/components/Sheet";
 import { fetchInsight } from "@/lib/api-client";
 import { DINER_STRINGS } from "@/lib/i18n/diner-strings";
 import { DISH_STRINGS } from "@/lib/i18n/dish-strings";
@@ -74,13 +75,8 @@ export function DishSheet({ dish, text, language, restaurantSlug, onClose }: Dis
     Object.fromEntries(insightCache),
   );
   const requested = useRef(new Set<string>());
-  const closeRef = useRef<HTMLButtonElement>(null);
   const result = results[key];
   const insight = result && result !== "failed" ? result : undefined;
-
-  useEffect(() => {
-    closeRef.current?.focus();
-  }, []);
 
   useEffect(() => {
     if (results[key] !== undefined || requested.current.has(key)) return;
@@ -94,145 +90,124 @@ export function DishSheet({ dish, text, language, restaurantSlug, onClose }: Dis
   }, [key, results, restaurantSlug, dish.id, language]);
 
   return (
-    <div
-      className="fixed inset-0 z-30 flex items-end justify-center bg-ink/40 sm:items-center print:hidden"
-      onClick={onClose}
+    <Sheet
+      title={text.name}
+      closeLabel={t.close}
+      onClose={onClose}
+      media={
+        dish.photo_url && (
+          <Image
+            src={dish.photo_url}
+            alt={text.name}
+            fill
+            sizes="(min-width: 640px) 32rem, 100vw"
+            className="object-cover"
+          />
+        )
+      }
+      subtitle={
+        <>
+          {text.name !== dish.name && (
+            <p lang="en" className="mt-0.5 text-sm text-muted">
+              {dish.name}
+            </p>
+          )}
+          {insight?.nativeName && insight.nativeName !== dish.name && (
+            <p lang={insight.nativeLang || undefined} className="mt-0.5 text-sm text-muted">
+              {insight.nativeName}
+            </p>
+          )}
+          {insight?.phonetic && (
+            <p className="mt-0.5 text-sm text-muted italic">{insight.phonetic}</p>
+          )}
+        </>
+      }
     >
-      <section
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="dish-sheet-title"
-        onClick={(e) => e.stopPropagation()}
-        onKeyDown={(e) => e.key === "Escape" && onClose()}
-        className="max-h-[90vh] w-full overflow-y-auto rounded-t-2xl bg-card p-5 shadow-2xl sm:max-w-lg sm:rounded-2xl sm:p-6"
-      >
-        {dish.photo_url && (
-          <div className="relative -mx-5 -mt-5 mb-5 aspect-[16/10] overflow-hidden sm:-mx-6 sm:-mt-6">
-            <Image
-              src={dish.photo_url}
-              alt={text.name}
-              fill
-              sizes="(min-width: 640px) 32rem, 100vw"
-              className="object-cover"
-            />
-          </div>
-        )}
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <h2 id="dish-sheet-title" className="font-serif text-2xl leading-tight">
-              {text.name}
-            </h2>
-            {text.name !== dish.name && (
-              <p lang="en" className="mt-0.5 text-sm text-muted">
-                {dish.name}
-              </p>
-            )}
-            {insight?.nativeName && insight.nativeName !== dish.name && (
-              <p lang={insight.nativeLang || undefined} className="mt-0.5 text-sm text-muted">
-                {insight.nativeName}
-              </p>
-            )}
-            {insight?.phonetic && (
-              <p className="mt-0.5 text-sm text-muted italic">{insight.phonetic}</p>
-            )}
-          </div>
+      <div className="mt-3 flex flex-wrap items-center gap-3">
+        <span className="tabular-nums">{dish.price}</span>
+        {canSpeak() && (
           <button
-            ref={closeRef}
-            onClick={onClose}
-            className="shrink-0 text-sm text-muted hover:text-ink"
+            onClick={() => speak(insight?.nativeName || dish.name, insight?.nativeLang || "en-US")}
+            className="rounded-full border border-line px-3 py-1.5 text-sm transition-colors hover:border-muted"
           >
-            {t.close}
+            {t.listen}
           </button>
-        </div>
-
-        <div className="mt-3 flex flex-wrap items-center gap-3">
-          <span className="tabular-nums">{dish.price}</span>
-          {canSpeak() && (
-            <button
-              onClick={() =>
-                speak(insight?.nativeName || dish.name, insight?.nativeLang || "en-US")
-              }
-              className="rounded-full border border-line px-3 py-1 text-sm hover:border-muted"
-            >
-              {t.listen}
-            </button>
-          )}
-        </div>
-
-        {text.description && (
-          <p className="mt-4 text-sm leading-relaxed text-muted">{text.description}</p>
         )}
+      </div>
 
-        <div className="mt-4 flex flex-wrap items-center gap-2 text-xs">
-          {dish.allergens.length > 0 ? (
-            <>
-              <span className="text-muted">{d.contains}</span>
-              {dish.allergens.map((allergen) => (
-                <Chip key={allergen} label={d.allergens[allergen]} tone="allergen" />
-              ))}
-            </>
-          ) : (
-            <span className="text-muted">{d.noMajorAllergens}</span>
-          )}
-          {dish.dietary_tags.map((tag) => (
-            <Chip key={tag} label={d.tags[tag]} tone="tag" />
-          ))}
-        </div>
-        {text.notes && (
-          <p className="mt-2 text-sm leading-relaxed">
-            <span className="font-medium">{d.kitchenNote}</span> {text.notes}
+      {text.description && (
+        <p className="mt-4 text-sm leading-relaxed text-muted">{text.description}</p>
+      )}
+
+      <div className="mt-4 flex flex-wrap items-center gap-2 text-xs">
+        {dish.allergens.length > 0 ? (
+          <>
+            <span className="text-muted">{d.contains}</span>
+            {dish.allergens.map((allergen) => (
+              <Chip key={allergen} label={d.allergens[allergen]} tone="allergen" />
+            ))}
+          </>
+        ) : (
+          <span className="text-muted">{d.noMajorAllergens}</span>
+        )}
+        {dish.dietary_tags.map((tag) => (
+          <Chip key={tag} label={d.tags[tag]} tone="tag" />
+        ))}
+      </div>
+      {text.notes && (
+        <p className="mt-2 text-sm leading-relaxed">
+          <span className="font-medium">{d.kitchenNote}</span> {text.notes}
+        </p>
+      )}
+
+      <div className="mt-6 border-t border-line pt-5">
+        {result === undefined && (
+          <p role="status" className="text-sm text-muted">
+            {t.loading}
           </p>
         )}
-
-        <div className="mt-6 border-t border-line pt-5">
-          {result === undefined && (
-            <p role="status" className="text-sm text-muted">
-              {t.loading}
-            </p>
-          )}
-          {result === "failed" && (
-            <p role="alert" className="text-sm text-tomato">
-              {t.failed}
-            </p>
-          )}
-          {insight && (
-            <div className="space-y-5">
-              <Section title={t.whatItIs} body={insight.summary} />
-              <Section title={t.taste} body={insight.taste} />
-              <div className="grid grid-cols-2 gap-4">
-                <Meter label={t.spice} level={insight.spice} words={t.spiceLevels} />
-                <Meter label={t.richness} level={insight.richness} words={t.richnessLevels} />
-              </div>
-              <div>
-                <h3 className="text-sm font-medium">{t.portion}</h3>
-                <p className="mt-1 text-sm">{t.portionLabels[insight.portion]}</p>
-                {insight.portionNote && (
-                  <p className="mt-1 text-sm leading-relaxed text-muted">{insight.portionNote}</p>
-                )}
-              </div>
-              <Section title={t.background} body={insight.background} />
-              {insight.glossary.length > 0 && (
-                <div>
-                  <h3 className="text-sm font-medium">{t.glossary}</h3>
-                  <dl className="mt-1 space-y-1 text-sm leading-relaxed">
-                    {insight.glossary.map((entry) => (
-                      <div key={entry.term}>
-                        <dt className="inline font-medium">{entry.term}: </dt>
-                        <dd className="inline text-muted">{entry.meaning}</dd>
-                      </div>
-                    ))}
-                  </dl>
-                </div>
-              )}
-              {insight.pairings.length > 0 && <List title={t.pairings} items={insight.pairings} />}
-              {insight.askKitchen.length > 0 && (
-                <List title={t.askKitchen} items={insight.askKitchen} />
-              )}
-              <p className="text-xs leading-relaxed text-muted">{t.disclaimer}</p>
+        {result === "failed" && (
+          <p role="alert" className="text-sm text-tomato">
+            {t.failed}
+          </p>
+        )}
+        {insight && (
+          <div className="space-y-5">
+            <Section title={t.whatItIs} body={insight.summary} />
+            <Section title={t.taste} body={insight.taste} />
+            <div className="grid grid-cols-2 gap-4">
+              <Meter label={t.spice} level={insight.spice} words={t.spiceLevels} />
+              <Meter label={t.richness} level={insight.richness} words={t.richnessLevels} />
             </div>
-          )}
-        </div>
-      </section>
-    </div>
+            <div>
+              <h3 className="text-sm font-medium">{t.portion}</h3>
+              <p className="mt-1 text-sm">{t.portionLabels[insight.portion]}</p>
+              {insight.portionNote && (
+                <p className="mt-1 text-sm leading-relaxed text-muted">{insight.portionNote}</p>
+              )}
+            </div>
+            <Section title={t.background} body={insight.background} />
+            {insight.glossary.length > 0 && (
+              <div>
+                <h3 className="text-sm font-medium">{t.glossary}</h3>
+                <dl className="mt-1 space-y-1 text-sm leading-relaxed">
+                  {insight.glossary.map((entry) => (
+                    <div key={entry.term}>
+                      <dt className="inline font-medium">{entry.term}: </dt>
+                      <dd className="inline text-muted">{entry.meaning}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </div>
+            )}
+            {insight.pairings.length > 0 && <List title={t.pairings} items={insight.pairings} />}
+            {insight.askKitchen.length > 0 && (
+              <List title={t.askKitchen} items={insight.askKitchen} />
+            )}
+            <p className="text-xs leading-relaxed text-muted">{t.disclaimer}</p>
+          </div>
+        )}
+      </div>
+    </Sheet>
   );
 }

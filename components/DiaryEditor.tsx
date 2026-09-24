@@ -1,6 +1,8 @@
 "use client";
 import { useState } from "react";
 import { Sheet } from "@/components/Sheet";
+import { Button } from "@/components/ui/button";
+import { fieldClass } from "@/components/ui/field";
 import { MY_CARTE_STRINGS } from "@/lib/i18n/my-carte-strings";
 import { TABLE_STRINGS } from "@/lib/i18n/table-strings";
 import type { LanguageCode } from "@/lib/languages";
@@ -58,21 +60,17 @@ export function DiaryEditor({ dish, entry, language, onClose }: DiaryEditorProps
           value={note}
           onChange={(e) => setNote(e.target.value)}
           placeholder={t.notePlaceholder}
-          className="mt-2 w-full rounded-md border border-line bg-paper px-3 py-2 text-sm focus:border-ink focus:outline-none"
+          className={fieldClass("mt-2")}
         />
       </label>
       <div className="mt-5 flex items-center gap-4">
-        <button
-          onClick={save}
-          disabled={rating < 1}
-          className="rounded-md bg-ink px-4 py-2 text-sm font-medium text-white hover:bg-ink/90 disabled:opacity-50"
-        >
+        <Button onClick={save} disabled={rating < 1}>
           {t.saveEntry}
-        </button>
+        </Button>
         {entry && (
-          <button onClick={remove} className="text-sm text-muted hover:text-tomato">
+          <Button onClick={remove} variant="danger" size="sm">
             {t.removeEntry}
-          </button>
+          </Button>
         )}
       </div>
     </Sheet>

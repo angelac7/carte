@@ -1,6 +1,8 @@
 "use client";
 import { useState } from "react";
 import { Sheet } from "@/components/Sheet";
+import { buttonClass } from "@/components/ui/button";
+import { cn } from "@/lib/cn";
 import { askPhotoMatch, PhotoLimitError } from "@/lib/api-client";
 import { CAMERA_STRINGS } from "@/lib/i18n/camera-strings";
 import { DISH_STRINGS } from "@/lib/i18n/dish-strings";
@@ -62,7 +64,12 @@ export function PhotoLookup({
     <Sheet title={t.photoButton} closeLabel={TABLE_STRINGS[language].close} onClose={onClose}>
       <p className="mt-2 text-sm leading-relaxed text-muted">{t.photoIntro}</p>
 
-      <label className="mt-4 inline-block cursor-pointer rounded-md bg-ink px-4 py-2 text-sm font-medium text-white hover:bg-ink/90 has-focus-visible:outline-2 has-focus-visible:outline-ink">
+      <label
+        className={cn(
+          buttonClass(),
+          "mt-4 cursor-pointer has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-ink has-disabled:pointer-events-none has-disabled:opacity-50",
+        )}
+      >
         <input
           type="file"
           accept="image/*"
@@ -81,7 +88,7 @@ export function PhotoLookup({
       {preview && (
         // A local preview of the diner's own photo, so Next's image optimizer isn't needed.
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={preview} alt="" className="mt-4 max-h-48 rounded-md object-cover" />
+        <img src={preview} alt="" className="mt-4 max-h-48 rounded-xl object-cover" />
       )}
 
       {status === "loading" && (

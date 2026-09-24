@@ -59,7 +59,7 @@ export function AllergyCard({
       {avoid.length === 0 ? (
         <p className="mt-6 text-sm text-muted">{t.noAllergies}</p>
       ) : (
-        <div className="mt-6 rounded-lg border-2 border-tomato bg-paper p-5">
+        <div className="mt-6 rounded-xl border-2 border-tomato bg-paper p-5">
           <p className="text-sm text-muted">{t.cardIntro}</p>
           <div className="mt-3">
             <CardText language={language} avoid={avoid} />

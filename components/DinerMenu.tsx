@@ -99,7 +99,7 @@ function MenuHero({
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: "easeOut" }}
-            className="font-serif text-5xl leading-tight sm:text-6xl"
+            className="font-serif text-4xl leading-tight tracking-tight text-balance break-words sm:text-6xl"
           >
             {name}
           </motion.h1>
@@ -224,7 +224,7 @@ export function DinerMenu({
           picker={languagePicker}
         />
         <main className="mx-auto max-w-3xl px-5 py-12">
-          <p className="text-muted">{t.notReady}</p>
+          <p className="rounded-2xl border border-line bg-card p-6 text-muted">{t.notReady}</p>
         </main>
       </div>
     );
@@ -324,7 +324,7 @@ export function DinerMenu({
                   </p>
                   <button
                     onClick={() => updateFilters([], [])}
-                    className="text-muted underline hover:text-ink"
+                    className="text-muted underline underline-offset-4 hover:text-ink"
                   >
                     {t.clearFilters}
                   </button>
@@ -335,7 +335,9 @@ export function DinerMenu({
         </section>
 
         {shown.length === 0 ? (
-          <p className="mt-10 text-muted">{t.noMatch}</p>
+          <p className="mt-6 rounded-2xl border border-dashed border-line p-6 text-center text-muted">
+            {t.noMatch}
+          </p>
         ) : (
           <ul className="mt-6 space-y-4">
             <AnimatePresence initial={false} mode="popLayout">

@@ -1,6 +1,8 @@
 "use client";
 import { motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { fieldClass } from "@/components/ui/field";
 import { askMenu, ChatLimitError } from "@/lib/api-client";
 import { CHAT_STRINGS } from "@/lib/i18n/chat-strings";
 import { HELP_STRINGS } from "@/lib/i18n/help-strings";
@@ -66,13 +68,13 @@ export function MenuChat({ language, restaurantSlug, open, onClose }: MenuChatPr
       animate={{ y: 0, opacity: 1 }}
       transition={{ type: "spring", bounce: 0.15, duration: 0.45 }}
       onKeyDown={(e) => e.key === "Escape" && onClose()}
-      className="fixed inset-x-0 bottom-0 z-30 flex max-h-[80vh] flex-col rounded-t-2xl border border-line bg-card shadow-2xl sm:inset-x-auto sm:right-5 sm:bottom-5 sm:w-96 sm:rounded-2xl print:hidden"
+      className="fixed inset-x-0 bottom-0 z-30 flex max-h-[80svh] flex-col rounded-t-2xl border border-line bg-card shadow-2xl sm:inset-x-auto sm:right-5 sm:bottom-5 sm:w-96 sm:rounded-2xl print:hidden"
     >
       <header className="flex items-center justify-between border-b border-line px-4 py-3">
         <h2 className="font-serif text-lg">{t.title}</h2>
-        <button onClick={onClose} className="text-sm text-muted hover:text-ink">
+        <Button onClick={onClose} variant="ghost" size="sm" className="-mr-2">
           {t.close}
-        </button>
+        </Button>
       </header>
 
       <div className="flex-1 space-y-3 overflow-y-auto px-4 py-4" aria-live="polite">
@@ -151,7 +153,7 @@ export function MenuChat({ language, restaurantSlug, open, onClose }: MenuChatPr
               ask(draft);
             }
           }}
-          className="flex-1 resize-none rounded-md border border-line bg-paper px-3 py-2 text-sm focus:border-ink focus:outline-none"
+          className={fieldClass("flex-1 resize-none")}
         />
         {speechInputSupported() && (
           <button
@@ -159,20 +161,16 @@ export function MenuChat({ language, restaurantSlug, open, onClose }: MenuChatPr
             aria-label={help.voice}
             aria-pressed={voice.listening}
             onClick={voice.listening ? voice.stop : voice.start}
-            className={`rounded-md border px-3 py-2 text-sm ${
+            className={`rounded-md border px-3 py-2 text-sm transition-colors ${
               voice.listening ? "border-tomato text-tomato" : "border-line hover:border-muted"
             }`}
           >
             {voice.listening ? "■" : "🎤"}
           </button>
         )}
-        <button
-          type="submit"
-          disabled={sending || !draft.trim()}
-          className="rounded-md bg-ink px-4 py-2 text-sm font-medium text-white hover:bg-ink/90 active:scale-[0.97] disabled:opacity-50"
-        >
+        <Button type="submit" disabled={sending || !draft.trim()}>
           {t.send}
-        </button>
+        </Button>
       </form>
     </motion.section>
   );

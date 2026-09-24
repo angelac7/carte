@@ -15,7 +15,7 @@ type DishActionsProps = {
 };
 
 const pill = (active: boolean) =>
-  `rounded-full border px-3 py-1 text-xs transition-colors ${
+  `rounded-full border px-3 py-1.5 text-xs transition-colors ${
     active
       ? "border-ink bg-ink text-white"
       : "border-line text-muted hover:border-muted hover:text-ink"

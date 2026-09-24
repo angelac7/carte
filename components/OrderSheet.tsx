@@ -2,6 +2,8 @@
 import { useState } from "react";
 import { QuantityStepper } from "@/components/QuantityStepper";
 import { Sheet } from "@/components/Sheet";
+import { Button } from "@/components/ui/button";
+import { fieldClass } from "@/components/ui/field";
 import type { Allergen } from "@/lib/allergens";
 import { splitBill, type BillLine } from "@/lib/bill";
 import { formatList } from "@/lib/format-list";
@@ -93,7 +95,7 @@ export function OrderSheet({
           ))}
         </ul>
         {avoid.length > 0 && (
-          <div lang="en" className="mt-6 rounded-lg border-2 border-tomato p-4">
+          <div lang="en" className="mt-6 rounded-xl border-2 border-tomato p-4">
             <p className="font-medium">{TABLE_STRINGS.en.statement}</p>
             <p className="mt-1 text-xl">
               {formatList(
@@ -115,8 +117,6 @@ export function OrderSheet({
       person: assignees[dish.id] || null,
     }));
     const bill = splitBill(billLines, people, taxPercent / 100, tipPercent / 100);
-    const inputClass =
-      "rounded-md border border-line bg-paper px-3 py-2 text-sm focus:border-ink focus:outline-none";
 
     return (
       <Sheet title={t.splitBill} closeLabel={t.back} onClose={() => setMode("list")}>
@@ -154,14 +154,11 @@ export function OrderSheet({
               maxLength={30}
               placeholder={t.personPlaceholder}
               aria-label={t.personPlaceholder}
-              className={`flex-1 ${inputClass}`}
+              className={fieldClass("flex-1")}
             />
-            <button
-              type="submit"
-              className="rounded-md border border-line px-3 py-2 text-sm hover:border-muted"
-            >
+            <Button type="submit" variant="secondary">
               {t.addPerson}
-            </button>
+            </Button>
           </form>
         </fieldset>
 
@@ -179,7 +176,7 @@ export function OrderSheet({
                     onChange={(e) =>
                       setAssignees((prev) => ({ ...prev, [dish.id]: e.target.value }))
                     }
-                    className="rounded-md border border-line bg-card px-2 py-1"
+                    className={fieldClass("w-auto py-1.5")}
                   >
                     <option value="">{t.shared}</option>
                     {people.map((person) => (
@@ -205,7 +202,7 @@ export function OrderSheet({
               step={0.1}
               value={taxPercent}
               onChange={(e) => setTaxPercent(clampPercent(e.target.value))}
-              className={`mt-1 w-full ${inputClass}`}
+              className={fieldClass("mt-1")}
             />
           </label>
           <fieldset className="text-sm">
@@ -217,8 +214,10 @@ export function OrderSheet({
                   type="button"
                   aria-pressed={tipPercent === percent}
                   onClick={() => setTipPercent(percent)}
-                  className={`rounded-md px-2 py-2 ${
-                    tipPercent === percent ? "bg-ink text-white" : "border border-line"
+                  className={`rounded-md border px-2.5 py-2 transition-colors ${
+                    tipPercent === percent
+                      ? "border-ink bg-ink text-white"
+                      : "border-line hover:border-muted"
                   }`}
                 >
                   {percent}%
@@ -274,21 +273,13 @@ export function OrderSheet({
             ))}
           </ul>
           <div className="mt-5 flex flex-wrap items-center gap-3">
-            <button
-              onClick={() => setMode("server")}
-              className="rounded-md bg-ink px-4 py-2 text-sm font-medium text-white hover:bg-ink/90"
-            >
-              {t.showServer}
-            </button>
-            <button
-              onClick={() => setMode("split")}
-              className="rounded-md border border-line px-4 py-2 text-sm hover:border-muted"
-            >
+            <Button onClick={() => setMode("server")}>{t.showServer}</Button>
+            <Button onClick={() => setMode("split")} variant="secondary">
               {t.splitBill}
-            </button>
-            <button onClick={onClear} className="ml-auto text-sm text-muted hover:text-tomato">
+            </Button>
+            <Button onClick={onClear} variant="danger" size="sm" className="ml-auto">
               {t.clearOrder}
-            </button>
+            </Button>
           </div>
         </>
       )}

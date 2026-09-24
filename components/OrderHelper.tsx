@@ -2,6 +2,9 @@
 import { useState } from "react";
 import { QuantityStepper } from "@/components/QuantityStepper";
 import { Sheet } from "@/components/Sheet";
+import { ToggleChip } from "@/components/ToggleChip";
+import { Button } from "@/components/ui/button";
+import { fieldClass } from "@/components/ui/field";
 import type { Allergen, DietaryTag } from "@/lib/allergens";
 import { askForPicks } from "@/lib/api-client";
 import { HELP_STRINGS } from "@/lib/i18n/help-strings";
@@ -41,19 +44,13 @@ function Segmented<T extends string | number>({
       <legend className="text-sm font-medium">{legend}</legend>
       <div className="mt-2 flex flex-wrap gap-2">
         {options.map(([option, label]) => (
-          <button
+          <ToggleChip
             key={String(option)}
-            type="button"
-            aria-pressed={value === option}
-            onClick={() => onChange(option)}
-            className={`rounded-full border px-3 py-1 text-sm transition-colors ${
-              value === option
-                ? "border-ink bg-ink text-white"
-                : "border-line text-muted hover:border-muted hover:text-ink"
-            }`}
-          >
-            {label}
-          </button>
+            label={label}
+            tone="ink"
+            pressed={value === option}
+            onToggle={() => onChange(option)}
+          />
         ))}
       </div>
     </fieldset>
@@ -81,8 +78,7 @@ export function OrderHelper({
   const [status, setStatus] = useState<Status>("idle");
   const [result, setResult] = useState<Recommendation | null>(null);
   const currency = detectCurrency(dishes.map((dish) => dish.price));
-  const inputClass =
-    "mt-1 w-full rounded-md border border-line bg-paper px-3 py-2 text-sm focus:border-ink focus:outline-none";
+  const inputClass = fieldClass("mt-1");
 
   async function getPicks() {
     setStatus("loading");
@@ -166,13 +162,9 @@ export function OrderHelper({
         {(avoid.length > 0 || onlyTags.length > 0) && (
           <p className="text-xs text-muted">{t.usesFilters}</p>
         )}
-        <button
-          type="submit"
-          disabled={status === "loading"}
-          className="rounded-md bg-ink px-4 py-2 text-sm font-medium text-white hover:bg-ink/90 disabled:opacity-60"
-        >
+        <Button type="submit" disabled={status === "loading"}>
           {status === "loading" ? t.thinking : t.getPicks}
-        </button>
+        </Button>
       </form>
 
       {status === "failed" && (
