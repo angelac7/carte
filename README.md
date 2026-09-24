@@ -95,3 +95,10 @@ hunger, spice tolerance, party size, and budget. Owners can label dishes halal, 
 pregnancy-friendly, or kid-friendly; the AI never suggests these. The menu chat accepts voice
 questions and reads answers aloud, and diners can turn on larger text and high contrast, saved
 on their device.
+
+## Discover
+
+`/discover` lets anyone search confirmed dishes and listed restaurants, filtered by saved allergy
+and diet filters, open now, occasion, and city. If a phrase finds no dishes, AI turns the craving
+into dish words and searches again. Trending counts anonymous dish views from the last 7 days.
+Owners fill in their profile and opt in to listing at `/dashboard/profile`.

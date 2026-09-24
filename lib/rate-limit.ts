@@ -28,3 +28,8 @@ export function checkRateLimit(
 export function clientKey(req: Request): string {
   return req.headers.get("x-forwarded-for")?.split(",")[0].trim() || "local";
 }
+
+/** Same as clientKey, for server pages that have headers but no Request. */
+export function clientKeyFromHeaders(headers: Pick<Headers, "get">): string {
+  return headers.get("x-forwarded-for")?.split(",")[0].trim() || "local";
+}

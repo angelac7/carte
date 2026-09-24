@@ -12,6 +12,7 @@ export function OwnerHeader({ restaurant }: OwnerHeaderProps) {
         { href: "/dashboard", label: "Upload menu" },
         { href: "/dashboard/review", label: "Review dishes" },
         { href: "/dashboard/qr", label: "QR code" },
+        { href: "/dashboard/profile", label: "Profile" },
         { href: `/r/${restaurant.slug}`, label: "Diner menu" },
       ]
     : [];

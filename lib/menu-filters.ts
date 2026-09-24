@@ -9,7 +9,10 @@ export function confirmedOnly(dishes: MenuItem[]): MenuItem[] {
 }
 
 /** Hides dishes with any avoided allergen, and keeps only dishes with every selected tag. */
-export function filterDishes(dishes: MenuItem[], { avoid, onlyTags }: DinerFilters): MenuItem[] {
+export function filterDishes<T extends Pick<MenuItem, "allergens" | "dietary_tags">>(
+  dishes: T[],
+  { avoid, onlyTags }: DinerFilters,
+): T[] {
   return dishes.filter(
     (dish) =>
       !dish.allergens.some((allergen) => avoid.includes(allergen)) &&

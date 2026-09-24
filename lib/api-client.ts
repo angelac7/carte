@@ -106,3 +106,13 @@ export async function askForPicks(request: RecommendRequest): Promise<Recommenda
   if (!res.ok || !data.recommendation) throw new Error("Suggestions failed");
   return data.recommendation as Recommendation;
 }
+
+/** Counts a dish view for trending. Never blocks the diner or shows errors. */
+export function trackDishView(dishId: string): void {
+  fetch("/api/track", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ dish: dishId }),
+    keepalive: true,
+  }).catch(() => {});
+}

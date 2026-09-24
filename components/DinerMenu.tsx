@@ -11,7 +11,7 @@ import { OrderSheet } from "@/components/OrderSheet";
 import { QuantityStepper } from "@/components/QuantityStepper";
 import { ToggleChip } from "@/components/ToggleChip";
 import { ALLERGENS, DIETARY_TAGS, type Allergen, type DietaryTag } from "@/lib/allergens";
-import { fetchTranslations } from "@/lib/api-client";
+import { fetchTranslations, trackDishView } from "@/lib/api-client";
 import { writePrefsCookie, type DinerPrefs } from "@/lib/diner-prefs";
 import {
   applyDisplay,
@@ -107,6 +107,11 @@ export function DinerMenu({
     setAvoid(nextAvoid);
     setOnlyTags(nextOnlyTags);
     writePrefsCookie({ avoid: nextAvoid, onlyTags: nextOnlyTags });
+  }
+
+  function openDetails(dishId: string) {
+    setOpenDishId(dishId);
+    trackDishView(dishId);
   }
 
   function setQuantity(dishId: string, quantity: number) {
@@ -293,7 +298,7 @@ export function DinerMenu({
                 )}
                 <div className="mt-3 flex items-center justify-between gap-4">
                   <button
-                    onClick={() => setOpenDishId(dish.id)}
+                    onClick={() => openDetails(dish.id)}
                     className="text-sm font-medium underline underline-offset-4 hover:text-muted"
                   >
                     {DISH_STRINGS[language].details}

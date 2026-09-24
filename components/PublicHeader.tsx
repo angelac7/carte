@@ -8,6 +8,9 @@ export function PublicHeader() {
           Carte
         </Link>
         <div className="flex gap-5 text-sm">
+          <Link href="/discover" className="text-muted hover:text-ink">
+            Discover
+          </Link>
           <Link href="/login" className="text-muted hover:text-ink">
             Log in
           </Link>

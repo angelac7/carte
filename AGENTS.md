@@ -34,3 +34,5 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - The AI may only suggest tags in `AI_SUGGESTED_TAGS`. Tags in `OWNER_ONLY_TAGS` are set by owners only.
 - Filter dishes with the diner's filters before sending them to any AI feature, so suggestions can't break them.
 - Colors are CSS variables in `app/globals.css`; high contrast overrides them there, never in components.
+- Discover only shows restaurants with `listed = true` and confirmed dishes; the database search functions enforce this.
+- View tracking stores anonymous counts only. Never add personal data to `dish_stats`.

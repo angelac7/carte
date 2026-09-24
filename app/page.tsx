@@ -24,10 +24,10 @@ export default async function LandingPage() {
             Create your menu
           </Link>
           <Link
-            href="/login"
+            href="/discover"
             className="rounded-md border border-line px-5 py-2.5 text-sm hover:border-muted"
           >
-            Log in
+            Find somewhere to eat
           </Link>
         </div>
       </main>
