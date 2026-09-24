@@ -10,6 +10,7 @@ import { cn } from "@/lib/cn";
 import { getClaim } from "@/lib/db/places";
 import { PLACES_STRINGS } from "@/lib/i18n/places-strings";
 import { isValidPlaceId, type OsmPlace } from "@/lib/places/normalize";
+import { checkRateLimit } from "@/lib/rate-limit";
 import { getPlace } from "@/lib/places/osm";
 
 export const metadata: Metadata = { title: "Link your map listing | Carte" };
@@ -19,6 +20,7 @@ const one = (value: Params[string]) => (Array.isArray(value) ? value[0] : value)
 const panelClass = "mt-8 rounded-panel bg-paper p-6 shadow-raised sm:p-8";
 
 const ERRORS: Record<string, string> = {
+  limited: "Too many map lookups. Please try again later.",
   taken: "Another Carte restaurant has already claimed this listing. Contact Carte if it's yours.",
   missing: "That map listing couldn't be found. Try finding your restaurant again.",
   failed: "The claim couldn't be saved. Try again.",
@@ -36,7 +38,8 @@ export default async function ClaimPage({ searchParams }: { searchParams: Promis
   const claim = await getClaim(supabase, restaurant.id);
   let place: OsmPlace | null = null;
   if (isValidPlaceId(placeId) && placeId !== claim.placeId) {
-    place = await getPlace(placeId).catch(() => null);
+    if (await checkRateLimit(`claim:${restaurant.id}`, 30, 10 * 60 * 1000))
+      place = await getPlace(placeId).catch(() => null);
   }
 
   return (

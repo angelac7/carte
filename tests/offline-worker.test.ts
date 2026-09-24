@@ -13,7 +13,11 @@ it("caches the initial menu and its assets, then serves it without a connection"
   };
   const fetch = vi
     .fn()
-    .mockResolvedValue(new Response('<script src="/_next/static/menu.js"></script>'));
+    .mockResolvedValue(
+      new Response(
+        '<html><head><script src="/_next/static/menu.js"></script></head><body>Menu</body></html>',
+      ),
+    );
   runInNewContext(readFileSync("public/sw.js", "utf8"), {
     self: {
       addEventListener: (type: string, callback: (typeof handlers)[string]) => {
@@ -27,6 +31,8 @@ it("caches the initial menu and its assets, then serves it without a connection"
     },
     fetch,
     URL,
+    Headers,
+    Response,
   });
   let pending!: Promise<void>;
   const url = "https://carte.test/r/cafe";
@@ -47,5 +53,7 @@ it("caches the initial menu and its assets, then serves it without a connection"
       response = promise;
     },
   });
-  expect(await (await response).text()).toContain("menu.js");
+  const html = await (await response).text();
+  expect(html).toContain("menu.js");
+  expect(html).toContain("window.__carteOffline=true");
 });

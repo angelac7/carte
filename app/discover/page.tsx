@@ -247,11 +247,10 @@ export default async function DiscoverPage({ searchParams }: DiscoverProps) {
     dishes = await searchDishes(supabase, query, filters);
     // No direct matches for a phrase: let AI turn the craving into dish words, then search again.
     const isPhrase = query.split(/\s+/).length >= 2;
-    const allowed = await checkRateLimit(
-      `craving:${clientKeyFromHeaders(headerStore)}`,
-      20,
-      10 * 60 * 1000,
-    );
+    const allowed =
+      dishes.length === 0 &&
+      isPhrase &&
+      (await checkRateLimit(`craving:${clientKeyFromHeaders(headerStore)}`, 20, 10 * 60 * 1000));
     if (dishes.length === 0 && isPhrase && allowed) {
       const terms = await cravingToTerms(query).catch(() => [] as string[]);
       if (terms.length > 0) {

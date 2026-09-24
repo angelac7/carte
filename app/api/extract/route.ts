@@ -4,7 +4,7 @@ import { getOwnerContext } from "@/lib/auth";
 import { ndjsonResponse } from "@/lib/ndjson-response";
 import { checkRateLimit } from "@/lib/rate-limit";
 import type { SupportedImageType } from "@/lib/upload-rules";
-import { isSupportedImage, MAX_UPLOAD_BYTES } from "@/lib/upload-rules";
+import { readImageUpload } from "@/lib/read-image-upload";
 import type { MenuStreamEvent } from "@/types/menu-stream";
 
 function fail(message: string, status: number) {
@@ -19,15 +19,9 @@ export async function POST(req: Request) {
   }
 
   const form = await req.formData().catch(() => null);
-  const file = form?.get("menu");
-  if (!(file instanceof File)) return fail("No menu image was uploaded.", 400);
-  const mediaType = file.type;
-  if (!isSupportedImage(mediaType)) return fail("Use a JPG, PNG, or WebP image of your menu.", 400);
-  if (file.size > MAX_UPLOAD_BYTES)
-    return fail("That image is over 10 MB. Use a smaller photo.", 413);
-
-  const imageBase64 = Buffer.from(await file.arrayBuffer()).toString("base64");
-  return ndjsonResponse(readMenu(imageBase64, mediaType, req.signal));
+  const image = await readImageUpload(form?.get("menu"));
+  if (!image.ok) return fail(image.message, image.status);
+  return ndjsonResponse(readMenu(image.base64, image.mediaType, req.signal));
 }
 
 const UNREADABLE =

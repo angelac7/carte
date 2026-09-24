@@ -18,6 +18,16 @@ export type OsmPlace = {
   diets: DietaryTag[];
 };
 
+export const FOOD_AMENITIES = [
+  "restaurant",
+  "cafe",
+  "fast_food",
+  "food_court",
+  "ice_cream",
+  "bar",
+  "pub",
+] as const;
+
 const PLACE_ID = /^(node|way|relation)-\d{1,15}$/;
 
 export function isValidPlaceId(id: string): boolean {
@@ -74,12 +84,26 @@ type OsmElement = {
 export function normalizeElement(raw: unknown): OsmPlace | null {
   const element = raw as OsmElement | null;
   if (!element || !["node", "way", "relation"].includes(element.type ?? "")) return null;
-  if (typeof element.id !== "number") return null;
+  if (typeof element.id !== "number" || !Number.isSafeInteger(element.id) || element.id < 1)
+    return null;
   const tags = element.tags ?? {};
-  if (!tags.name) return null;
+  if (
+    typeof tags.name !== "string" ||
+    !tags.name.trim() ||
+    !(FOOD_AMENITIES as readonly string[]).includes(tags.amenity)
+  )
+    return null;
   const lat = element.lat ?? element.center?.lat;
   const lon = element.lon ?? element.center?.lon;
-  if (typeof lat !== "number" || typeof lon !== "number") return null;
+  if (
+    typeof lat !== "number" ||
+    typeof lon !== "number" ||
+    !Number.isFinite(lat) ||
+    !Number.isFinite(lon) ||
+    Math.abs(lat) > 90 ||
+    Math.abs(lon) > 180
+  )
+    return null;
 
   return {
     id: `${element.type}-${element.id}`,

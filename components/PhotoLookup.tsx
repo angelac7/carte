@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Sheet } from "@/components/Sheet";
 import { buttonClass, fileButtonClass } from "@/components/ui/button";
 import { cn } from "@/lib/cn";
@@ -12,7 +12,9 @@ import type { LanguageCode } from "@/lib/languages";
 import type { PhotoMatch } from "@/types/camera";
 import type { DishText, MenuItem } from "@/types/menu";
 
-type PhotoLookupProps = {
+import type { DinerFilters } from "@/lib/menu-filters";
+
+type PhotoLookupProps = DinerFilters & {
   restaurantSlug: string;
   language: LanguageCode;
   dishes: MenuItem[];
@@ -28,6 +30,8 @@ type Status = "idle" | "loading" | "done" | "failed" | "limit";
 export function PhotoLookup({
   restaurantSlug,
   language,
+  avoid,
+  onlyTags,
   dishes,
   visibleIds,
   textFor,
@@ -37,18 +41,30 @@ export function PhotoLookup({
   const t = CAMERA_STRINGS[language];
   const [status, setStatus] = useState<Status>("idle");
   const [matches, setMatches] = useState<PhotoMatch[]>([]);
+  const active = useRef(true);
+  useEffect(() => {
+    active.current = true;
+    return () => {
+      active.current = false;
+    };
+  }, []);
   const [preview, setPreview] = useState<string | null>(null);
+
+  useEffect(
+    () => () => {
+      if (preview) URL.revokeObjectURL(preview);
+    },
+    [preview],
+  );
 
   async function search(file: File) {
     setStatus("loading");
     setMatches([]);
     try {
       const image = await shrinkImage(file);
-      setPreview((old) => {
-        if (old) URL.revokeObjectURL(old);
-        return URL.createObjectURL(image);
-      });
-      setMatches(await askPhotoMatch(restaurantSlug, language, image));
+      if (!active.current) return;
+      setPreview(URL.createObjectURL(image));
+      setMatches(await askPhotoMatch(restaurantSlug, language, image, { avoid, onlyTags }));
       setStatus("done");
     } catch (err) {
       setStatus(err instanceof PhotoLimitError ? "limit" : "failed");

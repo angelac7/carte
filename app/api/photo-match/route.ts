@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
 import { matchDishPhoto } from "@/lib/ai/photo-match";
 import { getConfirmedDishes, getRestaurantBySlug } from "@/lib/db";
-import { isLanguageCode, languageName } from "@/lib/languages";
+import { languageName } from "@/lib/languages";
 import { checkRateLimit, clientKey } from "@/lib/rate-limit";
 import { readImageUpload } from "@/lib/read-image-upload";
-import { isValidSlug } from "@/lib/slug";
+import { filterDishes } from "@/lib/menu-filters";
+import { PhotoMatchRequestSchema } from "@/types/camera";
 import { createClient } from "@/lib/supabase/server";
 
 /** Finds which of a restaurant's confirmed dishes a photo shows. */
@@ -14,11 +15,14 @@ export async function POST(req: Request) {
   }
 
   const form = await req.formData().catch(() => null);
-  const slug = String(form?.get("restaurant") ?? "");
-  const language = String(form?.get("lang") ?? "");
-  if (!isValidSlug(slug) || !isLanguageCode(language)) {
-    return NextResponse.json({ error: "invalid" }, { status: 400 });
-  }
+  const parsed = PhotoMatchRequestSchema.safeParse({
+    restaurant: form?.get("restaurant"),
+    language: form?.get("lang"),
+    avoid: form?.getAll("avoid") ?? [],
+    onlyTags: form?.getAll("onlyTags") ?? [],
+  });
+  if (!parsed.success) return NextResponse.json({ error: "invalid" }, { status: 400 });
+  const { restaurant: slug, language } = parsed.data;
   const image = await readImageUpload(form?.get("image"));
   if (!image.ok) return NextResponse.json({ error: image.message }, { status: image.status });
 
@@ -26,7 +30,7 @@ export async function POST(req: Request) {
     const supabase = await createClient();
     const restaurant = await getRestaurantBySlug(supabase, slug);
     if (!restaurant) return NextResponse.json({ error: "not found" }, { status: 404 });
-    const dishes = await getConfirmedDishes(supabase, restaurant.id);
+    const dishes = filterDishes(await getConfirmedDishes(supabase, restaurant.id), parsed.data);
     if (dishes.length === 0) return NextResponse.json({ matches: [] });
 
     const matches = await matchDishPhoto(

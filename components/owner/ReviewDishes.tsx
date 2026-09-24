@@ -97,6 +97,8 @@ export default function ReviewDishes() {
   const [problem, setProblem] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [adding, setAdding] = useState(false);
+  const mutationPending = useRef(false);
+  const [mutating, setMutating] = useState(false);
   const persisted = useRef(new Map<string, MenuItem>());
   const pending = useRef(new Set<string>());
   const [busy, setBusy] = useState(new Set<string>());
@@ -124,7 +126,7 @@ export default function ReviewDishes() {
   }
 
   async function save(updated: MenuItem): Promise<MenuItem | null> {
-    if (pending.current.has(updated.id)) return null;
+    if (mutationPending.current || pending.current.has(updated.id)) return null;
     setPending(updated.id, true);
     try {
       const saved = await updateDish(updated);
@@ -162,6 +164,9 @@ export default function ReviewDishes() {
   }
 
   async function addDish(details: DishDetails) {
+    if (mutationPending.current) return;
+    mutationPending.current = true;
+    setMutating(true);
     try {
       const added = await saveDishes([{ ...details, likely_allergens: [], dietary_tags: [] }]);
       for (const dish of added) persisted.current.set(dish.id, dish);
@@ -171,11 +176,14 @@ export default function ReviewDishes() {
       toast(`${details.name} added. Choose its allergens, then confirm it.`);
     } catch {
       setProblem("That dish wasn't added. Check that Carte is running, then try again.");
+    } finally {
+      mutationPending.current = false;
+      setMutating(false);
     }
   }
 
   async function removeDish(dish: MenuItem) {
-    if (pending.current.has(dish.id)) return;
+    if (mutationPending.current || pending.current.has(dish.id)) return;
     if (!window.confirm(`Delete ${dish.name} from your menu?`)) return;
     setPending(dish.id, true);
     try {
@@ -191,16 +199,23 @@ export default function ReviewDishes() {
   }
 
   async function clearMenu() {
+    if (mutationPending.current || pending.current.size > 0) return;
     if (
       !window.confirm(`Delete all ${dishes.length} dishes and their photos? This can’t be undone.`)
     )
       return;
+    mutationPending.current = true;
+    setMutating(true);
     try {
       await deleteAllDishes();
+      persisted.current.clear();
       setDishes([]);
       toast("All dishes deleted");
     } catch {
       setProblem("Your dishes weren't deleted. Check that Carte is running, then try again.");
+    } finally {
+      mutationPending.current = false;
+      setMutating(false);
     }
   }
 
@@ -225,7 +240,7 @@ export default function ReviewDishes() {
           title="Review dishes"
           intro="Check each dish’s details and allergens, then confirm it. Diners only see dishes you’ve confirmed."
         >
-          <Button onClick={() => setAdding(true)} shine>
+          <Button disabled={mutating} onClick={() => setAdding(true)} shine>
             Add a dish
           </Button>
           <ButtonLink href="/dashboard/upload" variant="secondary">
@@ -311,7 +326,7 @@ export default function ReviewDishes() {
                   className="relative overflow-hidden rounded-panel bg-paper p-6 shadow-raised sm:p-8"
                 >
                   <fieldset
-                    disabled={busy.has(dish.id)}
+                    disabled={mutating || busy.has(dish.id)}
                     className="min-w-0"
                     aria-busy={busy.has(dish.id)}
                   >
@@ -437,7 +452,7 @@ export default function ReviewDishes() {
             <Button
               variant="secondary"
               size="sm"
-              disabled={busy.size > 0}
+              disabled={mutating || busy.size > 0}
               onClick={clearMenu}
               className="mt-3 text-tomato hover:border-tomato"
             >
@@ -449,14 +464,14 @@ export default function ReviewDishes() {
 
       {adding && (
         <Sheet title="Add a dish" closeLabel="Close" onClose={() => setAdding(false)}>
-          <div className="mt-4">
+          <fieldset disabled={mutating} className="mt-4">
             <DishDetailsForm
               initial={{ name: "", description: "", price: "" }}
               submitLabel="Add dish"
               onSave={addDish}
               onCancel={() => setAdding(false)}
             />
-          </div>
+          </fieldset>
           <p className="mt-4 text-xs text-muted">
             New dishes start unconfirmed. Choose their allergens, then confirm them.
           </p>

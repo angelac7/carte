@@ -67,3 +67,20 @@ describe("distanceMeters", () => {
     expect(Math.round(meters / 1000)).toBe(111);
   });
 });
+
+it("rejects non-food map listings and invalid coordinates", () => {
+  const element = {
+    type: "node",
+    id: 123,
+    lat: 42,
+    lon: -76,
+    tags: { name: "Named place", amenity: "school" },
+  };
+  expect(normalizeElement(element)).toBeNull();
+  expect(
+    normalizeElement({ ...element, lat: Infinity, tags: { ...element.tags, amenity: "cafe" } }),
+  ).toBeNull();
+  expect(normalizeElement({ ...element, tags: { ...element.tags, amenity: "cafe" } })?.id).toBe(
+    "node-123",
+  );
+});

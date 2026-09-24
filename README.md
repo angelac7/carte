@@ -27,7 +27,7 @@ Owners upload a menu, AI suggests allergens, and owners confirm every dish befor
 | `app/`             | Pages and API routes                          |
 | `components/`      | Reusable UI pieces                            |
 | `lib/ai/`          | AI prompts and calls                          |
-| `lib/db/`          | Data storage (a JSON file for now)            |
+| `lib/db/`          | Supabase queries and server data access       |
 | `lib/allergens.ts` | The single list of allergens and dietary tags |
 | `types/`           | Shared types and validation schemas           |
 | `tests/`           | Unit tests                                    |
@@ -36,20 +36,16 @@ Owners upload a menu, AI suggests allergens, and owners confirm every dish befor
 
 AI output is only a suggestion. Diners must only ever see dishes an owner has confirmed.
 
-## Pages
+## Functionality and current limits
 
-| Page      | Who   | What it does                                          |
-| --------- | ----- | ----------------------------------------------------- |
-| `/`       | Owner | Upload a menu photo and save dishes                   |
-| `/review` | Owner | Confirm allergens and tags for each dish              |
-| `/qr`     | Owner | Print a table QR code linking to the diner menu       |
-| `/menu`   | Diner | Confirmed dishes only, with allergen and diet filters |
+See [the complete functionality inventory](docs/FEATURES.md) for public browsing, diner tools,
+owner workflows, supporting behavior, and current product limits.
 
 ## Languages
 
 The diner menu supports English, Spanish, Chinese, Korean, Japanese, French, and Vietnamese.
 Page text and allergen names use fixed translations in `lib/i18n/diner-strings.ts`.
-Dish text is translated by AI once per language and saved in `data/translations.json`;
+Dish text is translated by AI once per language and saved in Supabase’s `translations` table;
 editing a dish triggers a fresh translation of that dish only.
 
 ## Menu chat
@@ -72,7 +68,7 @@ rules live in `supabase/migrations/`. Owners sign up, create one restaurant, and
 | `/`                 | Everyone | Landing page                                       |
 | `/login`, `/signup` | Owners   | Log in or create an account                        |
 | `/dashboard/setup`  | Owners   | Name the restaurant and choose its menu link       |
-| `/dashboard`        | Owners   | Upload a menu photo                                |
+| `/dashboard`        | Owners   | Statistics and setup checklist                     |
 | `/dashboard/review` | Owners   | Confirm allergens and tags                         |
 | `/dashboard/qr`     | Owners   | Print the table QR code                            |
 | `/r/<menu-link>`    | Diners   | Confirmed dishes with filters, languages, and chat |

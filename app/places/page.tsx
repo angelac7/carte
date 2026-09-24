@@ -52,7 +52,11 @@ export default async function PlacesPage({ searchParams }: { searchParams: Promi
   const lat = Number(one(params.lat));
   const lon = Number(one(params.lon));
   const hasCoordinates =
-    one(params.lat) !== "" && Math.abs(lat) <= 90 && Math.abs(lon) <= 180 && Number.isFinite(lon);
+    one(params.lat) !== "" &&
+    one(params.lon) !== "" &&
+    Math.abs(lat) <= 90 &&
+    Math.abs(lon) <= 180 &&
+    Number.isFinite(lon);
 
   let status: Status = "idle";
   let results: (OsmPlace & { distance: number })[] = [];

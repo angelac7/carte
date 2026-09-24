@@ -36,8 +36,11 @@ export function MenuChat({
   const [problem, setProblem] = useState("");
   const endRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
-  const voice = useSpeechInput(SPEECH_LANG[language], (spoken) =>
-    setDraft((prev) => (prev ? `${prev} ${spoken}` : spoken).slice(0, MAX_QUESTION_LENGTH)),
+  const voice = useSpeechInput(
+    SPEECH_LANG[language],
+    (spoken) =>
+      setDraft((prev) => (prev ? `${prev} ${spoken}` : spoken).slice(0, MAX_QUESTION_LENGTH)),
+    open,
   );
 
   useEffect(() => {

@@ -38,8 +38,18 @@ export async function translateDishes(
     output_config: jsonReply(TRANSLATION_SCHEMA, "high"),
     messages: [{ role: "user", content: buildPrompt(languageName, dishes) }],
   });
-  const knownIds = new Set(dishes.map((dish) => dish.id));
-  return TranslationReplySchema.parse(parseJsonReply(reply)).dishes.filter((dish) =>
-    knownIds.has(dish.id),
-  );
+  const translations = TranslationReplySchema.parse(parseJsonReply(reply)).dishes;
+  const byId = new Map(translations.map((dish) => [dish.id, dish]));
+  return dishes.map((dish) => {
+    const translated = byId.get(dish.id);
+    if (
+      !translated ||
+      ["name", "description", "notes"].some((field) => {
+        const key = field as "name" | "description" | "notes";
+        return dish[key].trim() && !translated[key].trim();
+      })
+    )
+      throw new Error("The translation is incomplete. Please retry.");
+    return translated;
+  });
 }

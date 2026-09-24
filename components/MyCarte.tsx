@@ -42,6 +42,7 @@ export function MyCarte({ language, initialPrefs }: MyCarteProps) {
   const [tasteStatus, setTasteStatus] = useState<TasteStatus>("idle");
   const [taste, setTaste] = useState<TasteProfile | null>(null);
   const [copied, setCopied] = useState(false);
+  const [shareFailed, setShareFailed] = useState(false);
   const [cardOpen, setCardOpen] = useState(false);
   const [prefs, setPrefs] = useDinerPrefs(initialPrefs);
   const { avoid, onlyTags } = prefs;
@@ -56,6 +57,8 @@ export function MyCarte({ language, initialPrefs }: MyCarteProps) {
 
   async function createTaste() {
     setTasteStatus("loading");
+    setCopied(false);
+    setShareFailed(false);
     try {
       const profile = await requestTasteProfile({
         language,
@@ -83,12 +86,18 @@ export function MyCarte({ language, initialPrefs }: MyCarteProps) {
     ]
       .filter(Boolean)
       .join("\n");
-    if (navigator.share) {
-      await navigator.share({ title: t.tabTaste, text }).catch(() => {});
-      return;
+    setShareFailed(false);
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: t.tabTaste, text });
+        return;
+      }
+      if (!navigator.clipboard) throw new Error("Clipboard unavailable");
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+    } catch (error) {
+      if (!(error instanceof DOMException && error.name === "AbortError")) setShareFailed(true);
     }
-    await navigator.clipboard?.writeText(text);
-    setCopied(true);
   }
 
   function toggleAllergy(allergen: Allergen) {
@@ -97,7 +106,13 @@ export function MyCarte({ language, initialPrefs }: MyCarteProps) {
   }
 
   function clearAll() {
-    if (window.confirm(t.clearConfirm)) saveOnDevice(() => EMPTY_MY_CARTE);
+    if (window.confirm(t.clearConfirm) && saveOnDevice(() => EMPTY_MY_CARTE)) {
+      setTaste(null);
+      setTasteStatus("idle");
+      setCopied(false);
+      setShareFailed(false);
+      setEditing(null);
+    }
   }
 
   const challenges = computeChallenges(state, new Date());
@@ -271,6 +286,11 @@ export function MyCarte({ language, initialPrefs }: MyCarteProps) {
                 <Button onClick={() => shareTaste(taste)} variant="secondary" className="mt-4">
                   {copied ? t.copied : t.share}
                 </Button>
+                {shareFailed && (
+                  <Notice tone="warning" role="alert" className="mt-3">
+                    {t.shareFailed}
+                  </Notice>
+                )}
               </div>
             )}
           </div>

@@ -1,5 +1,5 @@
 "use client";
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { saveProfileAction, type ProfileState } from "@/app/dashboard/profile/actions";
 import { Button } from "@/components/ui/button";
 import { fieldClass, labelClass } from "@/components/ui/field";
@@ -30,6 +30,7 @@ const chipClass =
   "cursor-pointer rounded-full bg-paper px-4 py-2.5 text-sm font-medium text-muted shadow-raised-sm transition-[box-shadow,background-color,color] duration-200 hover:text-ink has-checked:bg-basil has-checked:text-white has-checked:shadow-pressed-color has-focus-visible:outline-2 has-focus-visible:outline-offset-3 has-focus-visible:outline-accent";
 
 export function ProfileForm({ profile }: { profile: RestaurantProfile }) {
+  const [draft, setDraft] = useState(profile);
   const [state, formAction, pending] = useActionState<ProfileState, FormData>(
     saveProfileAction,
     {},
@@ -41,7 +42,8 @@ export function ProfileForm({ profile }: { profile: RestaurantProfile }) {
         <input
           type="checkbox"
           name="listed"
-          defaultChecked={profile.listed}
+          checked={draft.listed}
+          onChange={(event) => setDraft({ ...draft, listed: event.target.checked })}
           className={`mt-1 ${checkboxClass}`}
         />
         <span>
@@ -58,7 +60,13 @@ export function ProfileForm({ profile }: { profile: RestaurantProfile }) {
           name="description"
           rows={3}
           maxLength={500}
-          defaultValue={profile.description}
+          value={draft.description}
+          onChange={(event) =>
+            setDraft({
+              ...draft,
+              description: event.target.value as RestaurantProfile["description"],
+            })
+          }
           placeholder="For example: Modern Korean noodles and small plates in a cozy room."
           className={inputClass}
         />
@@ -70,7 +78,10 @@ export function ProfileForm({ profile }: { profile: RestaurantProfile }) {
           <input
             name="cuisine"
             maxLength={60}
-            defaultValue={profile.cuisine}
+            value={draft.cuisine}
+            onChange={(event) =>
+              setDraft({ ...draft, cuisine: event.target.value as RestaurantProfile["cuisine"] })
+            }
             placeholder="Korean"
             className={inputClass}
           />
@@ -80,7 +91,10 @@ export function ProfileForm({ profile }: { profile: RestaurantProfile }) {
           <input
             name="city"
             maxLength={80}
-            defaultValue={profile.city}
+            value={draft.city}
+            onChange={(event) =>
+              setDraft({ ...draft, city: event.target.value as RestaurantProfile["city"] })
+            }
             placeholder="Ithaca"
             className={inputClass}
           />
@@ -92,7 +106,10 @@ export function ProfileForm({ profile }: { profile: RestaurantProfile }) {
         <input
           name="address"
           maxLength={200}
-          defaultValue={profile.address}
+          value={draft.address}
+          onChange={(event) =>
+            setDraft({ ...draft, address: event.target.value as RestaurantProfile["address"] })
+          }
           placeholder="123 Main Street"
           className={inputClass}
         />
@@ -100,7 +117,14 @@ export function ProfileForm({ profile }: { profile: RestaurantProfile }) {
 
       <label className="block">
         <span className={labelClass}>Time zone</span>
-        <select name="timezone" defaultValue={profile.timezone} className={inputClass}>
+        <select
+          name="timezone"
+          value={draft.timezone}
+          onChange={(event) =>
+            setDraft({ ...draft, timezone: event.target.value as RestaurantProfile["timezone"] })
+          }
+          className={inputClass}
+        >
           {TIMEZONES.map((zone) => (
             <option key={zone} value={zone}>
               {zone.replace(/_/g, " ")}
@@ -116,14 +140,20 @@ export function ProfileForm({ profile }: { profile: RestaurantProfile }) {
         </p>
         <div className="mt-3 divide-y divide-ink/10 rounded-panel bg-paper px-5 shadow-raised sm:px-6">
           {WEEKDAYS.map((day) => {
-            const hours = profile.hours[day];
+            const hours = draft.hours[day];
+            const setHours = (value: RestaurantProfile["hours"][typeof day]) =>
+              setDraft((current) => ({ ...current, hours: { ...current.hours, [day]: value } }));
             return (
               <div key={day} className="flex flex-wrap items-center gap-3 py-3">
                 <span className="w-24 text-sm font-medium">{DAY_LABELS[day]}</span>
                 <input
                   type="time"
                   name={`${day}-open`}
-                  defaultValue={hours?.open ?? "11:00"}
+                  value={hours?.open ?? "11:00"}
+                  disabled={hours === null}
+                  onChange={(event) =>
+                    setHours({ open: event.target.value, close: hours?.close ?? "21:00" })
+                  }
                   aria-label={`${DAY_LABELS[day]} opening time`}
                   className={timeClass}
                 />
@@ -131,7 +161,11 @@ export function ProfileForm({ profile }: { profile: RestaurantProfile }) {
                 <input
                   type="time"
                   name={`${day}-close`}
-                  defaultValue={hours?.close ?? "21:00"}
+                  value={hours?.close ?? "21:00"}
+                  disabled={hours === null}
+                  onChange={(event) =>
+                    setHours({ open: hours?.open ?? "11:00", close: event.target.value })
+                  }
                   aria-label={`${DAY_LABELS[day]} closing time`}
                   className={timeClass}
                 />
@@ -139,7 +173,10 @@ export function ProfileForm({ profile }: { profile: RestaurantProfile }) {
                   <input
                     type="checkbox"
                     name={`${day}-closed`}
-                    defaultChecked={hours === null}
+                    checked={hours === null}
+                    onChange={(event) =>
+                      setHours(event.target.checked ? null : { open: "11:00", close: "21:00" })
+                    }
                     className={checkboxClass}
                   />
                   Closed
@@ -159,7 +196,15 @@ export function ProfileForm({ profile }: { profile: RestaurantProfile }) {
                 type="checkbox"
                 name="occasion"
                 value={occasion}
-                defaultChecked={profile.occasions.includes(occasion)}
+                checked={draft.occasions.includes(occasion)}
+                onChange={(event) =>
+                  setDraft({
+                    ...draft,
+                    occasions: event.target.checked
+                      ? [...draft.occasions, occasion]
+                      : draft.occasions.filter((value) => value !== occasion),
+                  })
+                }
                 className="sr-only"
               />
               {DISCOVER_STRINGS.en.occasions[occasion]}

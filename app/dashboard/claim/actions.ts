@@ -1,4 +1,5 @@
 "use server";
+import { checkRateLimit } from "@/lib/rate-limit";
 import { redirect } from "next/navigation";
 import { requireRestaurant } from "@/lib/auth";
 import { claimPlace } from "@/lib/db/places";
@@ -10,6 +11,8 @@ export async function claimPlaceAction(formData: FormData) {
   const placeId = String(formData.get("place") ?? "");
   if (!isValidPlaceId(placeId)) redirect("/dashboard/claim?error=missing");
 
+  if (!(await checkRateLimit(`claim:${restaurant.id}`, 30, 10 * 60 * 1000)))
+    redirect(`/dashboard/claim?place=${placeId}&error=limited`);
   const place = await getPlace(placeId).catch(() => null);
   if (!place) redirect(`/dashboard/claim?place=${placeId}&error=missing`);
 

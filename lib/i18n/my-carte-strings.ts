@@ -5,6 +5,7 @@ import type { ChallengeId } from "@/lib/my-carte";
 
 export type MyCarteStrings = {
   myCarte: string;
+  shareFailed: string;
   storageFailed: string;
   intro: string;
   offlineNote: string;
@@ -52,6 +53,7 @@ export type MyCarteStrings = {
 
 export const MY_CARTE_STRINGS: Record<LanguageCode, MyCarteStrings> = {
   en: {
+    shareFailed: "Could not share or copy. Try again or copy the text manually.",
     storageFailed:
       "Could not save on this device. Free up storage or allow site storage, then try again.",
     myCarte: "My Carte",
@@ -114,6 +116,7 @@ export const MY_CARTE_STRINGS: Record<LanguageCode, MyCarteStrings> = {
     openCard: "Open allergy card",
   },
   es: {
+    shareFailed: "No se pudo compartir ni copiar. Inténtalo de nuevo o copia el texto manualmente.",
     storageFailed:
       "No se pudo guardar en este dispositivo. Libere espacio o permita el almacenamiento del sitio e inténtelo de nuevo.",
     myCarte: "Mi Carte",
@@ -179,6 +182,7 @@ export const MY_CARTE_STRINGS: Record<LanguageCode, MyCarteStrings> = {
     openCard: "Abrir tarjeta de alergias",
   },
   zh: {
+    shareFailed: "无法分享或复制。请重试或手动复制文字。",
     storageFailed: "无法在此设备上保存。请释放存储空间或允许网站存储，然后重试。",
     myCarte: "我的 Carte",
     intro: "您收藏的菜品、美食日记和口味档案，都保存在这部手机上，无需注册。",
@@ -239,6 +243,7 @@ export const MY_CARTE_STRINGS: Record<LanguageCode, MyCarteStrings> = {
     openCard: "打开过敏卡",
   },
   ko: {
+    shareFailed: "공유하거나 복사하지 못했습니다. 다시 시도하거나 텍스트를 직접 복사하세요.",
     storageFailed:
       "이 기기에 저장하지 못했습니다. 저장 공간을 확보하거나 사이트 저장을 허용한 후 다시 시도하세요.",
     myCarte: "마이 Carte",
@@ -300,6 +305,8 @@ export const MY_CARTE_STRINGS: Record<LanguageCode, MyCarteStrings> = {
     openCard: "알레르기 카드 열기",
   },
   ja: {
+    shareFailed:
+      "共有またはコピーできませんでした。再試行するか、テキストを手動でコピーしてください。",
     storageFailed:
       "この端末に保存できませんでした。空き容量を増やすかサイトの保存を許可して、再試行してください。",
     myCarte: "マイ Carte",
@@ -362,6 +369,7 @@ export const MY_CARTE_STRINGS: Record<LanguageCode, MyCarteStrings> = {
     openCard: "アレルギーカードを開く",
   },
   fr: {
+    shareFailed: "Impossible de partager ou de copier. Réessayez ou copiez le texte manuellement.",
     storageFailed:
       "Impossible d’enregistrer sur cet appareil. Libérez de l’espace ou autorisez le stockage du site, puis réessayez.",
     myCarte: "Mon Carte",
@@ -426,6 +434,7 @@ export const MY_CARTE_STRINGS: Record<LanguageCode, MyCarteStrings> = {
     openCard: "Ouvrir la carte d'allergies",
   },
   vi: {
+    shareFailed: "Không thể chia sẻ hoặc sao chép. Hãy thử lại hoặc sao chép văn bản thủ công.",
     storageFailed:
       "Không thể lưu trên thiết bị này. Hãy giải phóng dung lượng hoặc cho phép trang web lưu dữ liệu rồi thử lại.",
     myCarte: "Carte của tôi",

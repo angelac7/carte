@@ -23,6 +23,7 @@ import { Notice } from "@/components/ui/notice";
 import { panelClass } from "@/components/ui/panel";
 import { ALLERGENS, DIETARY_TAGS, type Allergen, type DietaryTag } from "@/lib/allergens";
 import { fetchTranslations, trackDishView } from "@/lib/api-client";
+import { useOffline } from "@/lib/use-offline";
 import { useDinerPrefs } from "@/lib/use-diner-prefs";
 import { type DinerPrefs } from "@/lib/diner-prefs";
 import {
@@ -116,6 +117,7 @@ export function DinerMenu({
   initialPrefs,
   initialDisplay,
 }: DinerMenuProps) {
+  const offline = useOffline();
   const [language, setLanguage] = useState<LanguageCode>(initialLanguage);
   const [byLanguage, setByLanguage] = useState<TranslationState>({});
   const [prefs, setPrefs] = useDinerPrefs(initialPrefs);
@@ -189,8 +191,13 @@ export function DinerMenu({
   const shown = filterDishes(dishes, { avoid, onlyTags });
   const hiddenCount = dishes.length - shown.length;
   const filtering = avoid.length > 0 || onlyTags.length > 0;
-  const openDish = dishes.find((dish) => dish.id === openDishId);
-  const orderCount = Object.values(order).reduce((sum, quantity) => sum + quantity, 0);
+  const shownIds = new Set(shown.map((dish) => dish.id));
+  const filteredOrder = Object.fromEntries(
+    Object.entries(order).filter(([id]) => shownIds.has(id)),
+  );
+  const excludedOrder = Object.keys(order).some((id) => !shownIds.has(id));
+  const openDish = shown.find((dish) => dish.id === openDishId);
+  const orderCount = Object.values(filteredOrder).reduce((sum, quantity) => sum + quantity, 0);
   const cover = dishes.find((dish) => dish.photo_url)?.photo_url ?? null;
 
   const languagePicker = (
@@ -237,6 +244,16 @@ export function DinerMenu({
 
       <main id="main" className="mx-auto max-w-3xl px-5 pb-36">
         <Notice className="mt-6">{t.safetyNotice}</Notice>
+        {offline && (
+          <Notice tone="warning" role="alert" className="mt-3">
+            {t.offlineMenu}
+          </Notice>
+        )}
+        {excludedOrder && (
+          <Notice tone="warning" role="status" className="mt-3">
+            {t.orderFiltered}
+          </Notice>
+        )}
         {translating && (
           <p role="status" className="mt-3 text-sm text-muted">
             {t.translating}
@@ -468,8 +485,8 @@ export function DinerMenu({
       )}
       {panel === "order" && (
         <OrderSheet
-          dishes={dishes}
-          order={order}
+          dishes={shown}
+          order={filteredOrder}
           textFor={textFor}
           language={language}
           avoid={avoid}
@@ -488,12 +505,13 @@ export function DinerMenu({
       )}
       {panel === "helper" && (
         <OrderHelper
+          key={JSON.stringify([language, avoid, onlyTags])}
           restaurantSlug={restaurant.slug}
           language={language}
-          dishes={dishes}
+          dishes={shown}
           avoid={avoid}
           onlyTags={onlyTags}
-          order={order}
+          order={filteredOrder}
           textFor={textFor}
           onQuantity={setQuantity}
           onClose={() => setPanel(null)}
@@ -512,6 +530,9 @@ export function DinerMenu({
       )}
       {panel === "photo" && (
         <PhotoLookup
+          key={JSON.stringify([language, avoid, onlyTags])}
+          avoid={avoid}
+          onlyTags={onlyTags}
           restaurantSlug={restaurant.slug}
           language={language}
           dishes={dishes}

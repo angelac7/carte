@@ -13,6 +13,7 @@ export async function readImageUpload(
   if (!isSupportedImage(mediaType)) {
     return { ok: false, message: "Use a JPG, PNG, or WebP image.", status: 400 };
   }
+  if (file.size === 0) return { ok: false, message: "The image is empty.", status: 400 };
   if (file.size > MAX_UPLOAD_BYTES) {
     return { ok: false, message: "That image is over 10 MB.", status: 413 };
   }

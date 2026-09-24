@@ -19,6 +19,7 @@ import {
   languageFromAcceptHeader,
 } from "@/lib/languages";
 import { coordinatesUrl, isValidPlaceId, type OsmPlace } from "@/lib/places/normalize";
+import { checkRateLimit, clientKeyFromHeaders } from "@/lib/rate-limit";
 import { getPlace } from "@/lib/places/osm";
 import { createClient } from "@/lib/supabase/server";
 
@@ -43,6 +44,11 @@ export default async function PlacePage({ params }: { params: Promise<{ id: stri
   let place: OsmPlace | null = null;
   let failed = false;
   try {
+    if (
+      !(await checkRateLimit(`place:${clientKeyFromHeaders(await headers())}`, 30, 10 * 60 * 1000))
+    ) {
+      throw new Error("Too many map lookups.");
+    }
     place = await getPlace(id);
   } catch (err) {
     console.error("Place lookup failed:", err);

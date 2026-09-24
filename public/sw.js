@@ -1,6 +1,6 @@
 // Carte's service worker: keeps opened menus and My Carte available offline.
 // Menus are fetched fresh whenever there's a connection; the saved copy is only a fallback.
-const CACHE = "carte-v2";
+const CACHE = "carte-v3";
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
@@ -70,7 +70,19 @@ self.addEventListener("fetch", (event) => {
           }
           return response;
         })
-        .catch(() => caches.match(request).then((cached) => cached || caches.match("/my"))),
+        .catch(async () => {
+          const cached = (await caches.match(request)) || (await caches.match("/my"));
+          if (!cached) return Response.error();
+          const headers = new Headers(cached.headers);
+          headers.delete("content-length");
+          headers.delete("content-encoding");
+          headers.set("cache-control", "no-store");
+          const html = (await cached.text()).replace(
+            "</head>",
+            "<script>window.__carteOffline=true</script></head>",
+          );
+          return new Response(html, { status: cached.status, headers });
+        }),
     );
   }
 });

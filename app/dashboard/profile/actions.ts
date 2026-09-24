@@ -1,4 +1,5 @@
 "use server";
+import { revalidatePath } from "next/cache";
 import { requireRestaurant } from "@/lib/auth";
 import { updateRestaurantProfile } from "@/lib/db/profile";
 import { ProfileSchema, WEEKDAYS } from "@/lib/restaurant-profile";
@@ -41,6 +42,12 @@ export async function saveProfileAction(
         "Check your hours: each open day needs an opening and closing time, or mark it closed.",
     };
   }
-  await updateRestaurantProfile(supabase, restaurant.id, parsed.data);
+  try {
+    await updateRestaurantProfile(supabase, restaurant.id, parsed.data);
+  } catch {
+    return { error: "Your profile could not be saved. Please try again." };
+  }
+  revalidatePath("/dashboard", "layout");
+  revalidatePath("/discover");
   return { saved: true };
 }

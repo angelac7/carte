@@ -1,6 +1,12 @@
 import "server-only";
+import { checkRateLimit } from "@/lib/rate-limit";
 import { readPlaceCache, writePlaceCache } from "@/lib/db/place-cache";
-import { isValidPlaceId, normalizeElement, type OsmPlace } from "@/lib/places/normalize";
+import {
+  FOOD_AMENITIES,
+  isValidPlaceId,
+  normalizeElement,
+  type OsmPlace,
+} from "@/lib/places/normalize";
 
 // All map lookups live in this file, so switching to a paid provider later only changes it.
 // OpenStreetMap's free servers ask for at most one request per second and a contact email:
@@ -10,7 +16,7 @@ const NOMINATIM = "https://nominatim.openstreetmap.org";
 const OVERPASS = "https://overpass-api.de/api/interpreter";
 const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
 const MONTH_MS = 30 * 24 * 60 * 60 * 1000;
-const FOOD_PLACES = "restaurant|cafe|fast_food|food_court|ice_cream|bar|pub";
+const FOOD_PLACES = FOOD_AMENITIES.join("|");
 
 function userAgent(): string {
   const contact = process.env.OSM_CONTACT_EMAIL;
@@ -18,14 +24,13 @@ function userAgent(): string {
   return `Carte/0.1 (${contact})`;
 }
 
-let nextSlot = 0;
-
-/** Waits so requests leave at most once every 1.1 seconds. */
+/** Share the upstream allowance across server instances; never build an unbounded queue. */
 async function throttle(): Promise<void> {
-  const now = Date.now();
-  const start = Math.max(now, nextSlot);
-  nextSlot = start + 1100;
-  if (start > now) await new Promise((resolve) => setTimeout(resolve, start - now));
+  for (let attempt = 0; attempt < 3; attempt++) {
+    if (await checkRateLimit("osm:upstream", 1, 1100)) return;
+    if (attempt < 2) await new Promise((resolve) => setTimeout(resolve, 1100));
+  }
+  throw new Error("Map lookups are busy. Please try again shortly.");
 }
 
 async function fetchJson(url: string, init: RequestInit = {}): Promise<unknown> {

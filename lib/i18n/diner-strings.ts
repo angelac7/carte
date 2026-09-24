@@ -19,6 +19,8 @@ export type DinerStrings = {
   kitchenNote: string;
   translating: string;
   translationFailed: string;
+  offlineMenu: string;
+  orderFiltered: string;
   retryTranslation: string;
   translatedNote: string;
   allergens: Record<Allergen, string>;
@@ -27,6 +29,9 @@ export type DinerStrings = {
 
 export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
   en: {
+    offlineMenu:
+      "Offline menu copy: dishes and allergen information may have changed. Confirm the current menu and allergens with staff.",
+    orderFiltered: "Items excluded by your current filters are omitted from your order.",
     retryTranslation: "Retry translation",
     menuTitle: "Menu",
     safetyNotice:
@@ -71,6 +76,9 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     },
   },
   es: {
+    offlineMenu:
+      "Copia del menú sin conexión: los platos y alérgenos pueden haber cambiado. Confirma el menú actual y los alérgenos con el personal.",
+    orderFiltered: "Los platos excluidos por tus filtros actuales no se incluyen en tu pedido.",
     retryTranslation: "Reintentar traducción",
     menuTitle: "Menú",
     safetyNotice:
@@ -115,6 +123,8 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     },
   },
   zh: {
+    offlineMenu: "离线菜单副本：菜品及过敏原信息可能已更改。请向工作人员确认当前菜单及过敏原。",
+    orderFiltered: "当前筛选条件排除的菜品不会计入您的订单。",
     retryTranslation: "重试翻译",
     menuTitle: "菜单",
     safetyNotice:
@@ -155,6 +165,9 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     },
   },
   ko: {
+    offlineMenu:
+      "오프라인 메뉴 사본입니다. 요리와 알레르기 정보가 변경되었을 수 있습니다. 현재 메뉴와 알레르기 정보를 직원에게 확인하세요.",
+    orderFiltered: "현재 필터에서 제외된 요리는 주문에 포함되지 않습니다.",
     retryTranslation: "번역 다시 시도",
     menuTitle: "메뉴",
     safetyNotice:
@@ -197,6 +210,9 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     },
   },
   ja: {
+    offlineMenu:
+      "オフラインのメニューです。料理やアレルゲン情報が変更されている可能性があります。最新の情報をスタッフに確認してください。",
+    orderFiltered: "現在の絞り込み条件で除外された料理は注文に含まれません。",
     retryTranslation: "翻訳を再試行",
     menuTitle: "メニュー",
     safetyNotice:
@@ -239,6 +255,10 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     },
   },
   fr: {
+    offlineMenu:
+      "Copie hors ligne du menu : les plats et les allergènes peuvent avoir changé. Confirmez les informations actuelles avec le personnel.",
+    orderFiltered:
+      "Les plats exclus par vos filtres actuels ne sont pas inclus dans votre commande.",
     retryTranslation: "Réessayer la traduction",
     menuTitle: "Menu",
     safetyNotice:
@@ -283,6 +303,9 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     },
   },
   vi: {
+    offlineMenu:
+      "Bản sao thực đơn ngoại tuyến: món ăn và thông tin dị ứng có thể đã thay đổi. Hãy xác nhận thực đơn và chất gây dị ứng hiện tại với nhân viên.",
+    orderFiltered: "Các món bị bộ lọc hiện tại loại trừ sẽ không được tính vào đơn gọi món.",
     retryTranslation: "Thử dịch lại",
     menuTitle: "Thực đơn",
     safetyNotice:
