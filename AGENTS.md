@@ -39,3 +39,5 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - Diner data (saved dishes, diary, challenges) lives in localStorage through `lib/my-carte-store.ts`. Never send it to the server except for an explicit diner request like the taste profile.
 - Keep My Carte logic pure in `lib/my-carte.ts`, with tests.
 - If you change `public/sw.js`, bump its `CACHE` name so phones pick up the new version.
+- Scanned paper menus are unconfirmed. Never show a "safe" or green state for them; always show the warning and point diners to staff.
+- Image uploads go through `readImageUpload` on the server and `shrinkImage` in the browser.

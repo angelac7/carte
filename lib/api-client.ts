@@ -2,6 +2,7 @@ import type { LanguageCode } from "@/lib/languages";
 import { MAX_HISTORY, type ChatMessage } from "@/types/chat";
 import type { ExtractedDish, MenuItem } from "@/types/menu";
 import type { MenuTranslations } from "@/types/translation";
+import type { PhotoMatch, ScannedMenu } from "@/types/camera";
 import type { TasteProfile, TasteRequest } from "@/types/taste";
 import type { Recommendation, RecommendRequest } from "@/types/recommend";
 import type { DishInsight } from "@/types/insight";
@@ -128,4 +129,36 @@ export async function requestTasteProfile(request: TasteRequest): Promise<TasteP
   const data = await res.json().catch(() => ({}));
   if (!res.ok || !data.profile) throw new Error("Taste profile failed");
   return data.profile as TasteProfile;
+}
+
+/** Thrown when a visitor has used a photo feature too many times recently. */
+export class PhotoLimitError extends Error {}
+
+/** Finds which dish on a restaurant's menu a photo shows. */
+export async function askPhotoMatch(
+  restaurantSlug: string,
+  language: LanguageCode,
+  image: File,
+): Promise<PhotoMatch[]> {
+  const form = new FormData();
+  form.append("restaurant", restaurantSlug);
+  form.append("lang", language);
+  form.append("image", image);
+  const res = await fetch("/api/photo-match", { method: "POST", body: form });
+  if (res.status === 429) throw new PhotoLimitError();
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok || !Array.isArray(data.matches)) throw new Error("Photo match failed");
+  return data.matches as PhotoMatch[];
+}
+
+/** Reads and translates a paper menu photo. */
+export async function scanMenu(language: LanguageCode, image: File): Promise<ScannedMenu> {
+  const form = new FormData();
+  form.append("lang", language);
+  form.append("image", image);
+  const res = await fetch("/api/scan", { method: "POST", body: form });
+  if (res.status === 429) throw new PhotoLimitError();
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok || !data.menu) throw new Error("Scan failed");
+  return data.menu as ScannedMenu;
 }

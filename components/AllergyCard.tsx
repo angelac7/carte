@@ -12,6 +12,8 @@ type AllergyCardProps = {
   avoid: Allergen[];
   onToggle: (allergen: Allergen) => void;
   onClose: () => void;
+  /** The language staff read. Carte menus are in English; scanned menus may differ. */
+  staffLanguage?: LanguageCode;
 };
 
 function CardText({ language, avoid }: { language: LanguageCode; avoid: Allergen[] }) {
@@ -26,8 +28,14 @@ function CardText({ language, avoid }: { language: LanguageCode; avoid: Allergen
   );
 }
 
-/** A card diners show staff, in their language with the restaurant's language underneath. */
-export function AllergyCard({ language, avoid, onToggle, onClose }: AllergyCardProps) {
+/** A card diners show staff, in their language with the staff's language underneath. */
+export function AllergyCard({
+  language,
+  avoid,
+  onToggle,
+  onClose,
+  staffLanguage = ORIGINAL_LANGUAGE,
+}: AllergyCardProps) {
   const t = TABLE_STRINGS[language];
   const d = DINER_STRINGS[language];
 
@@ -56,13 +64,13 @@ export function AllergyCard({ language, avoid, onToggle, onClose }: AllergyCardP
           <div className="mt-3">
             <CardText language={language} avoid={avoid} />
           </div>
-          {language !== ORIGINAL_LANGUAGE && (
+          {language !== staffLanguage && (
             <div className="mt-5 border-t border-line pt-4">
-              <p lang="en" className="text-sm text-muted">
-                {TABLE_STRINGS[ORIGINAL_LANGUAGE].forStaff}
+              <p lang={htmlLang(staffLanguage)} className="text-sm text-muted">
+                {TABLE_STRINGS[staffLanguage].forStaff}
               </p>
               <div className="mt-2">
-                <CardText language={ORIGINAL_LANGUAGE} avoid={avoid} />
+                <CardText language={staffLanguage} avoid={avoid} />
               </div>
             </div>
           )}

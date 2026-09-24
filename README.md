@@ -110,3 +110,10 @@ and create an AI taste profile at `/my`. All of it is stored on the diner's devi
 the taste profile request sends only the diner's own ratings and stores nothing. In production, a
 service worker keeps opened menus, My Carte, and the allergy card available offline, and Carte can
 be added to the home screen.
+
+## Camera
+
+On any Carte menu, diners can find a dish by photo; matches come only from confirmed dishes. At
+`/scan`, diners can photograph a paper menu from a restaurant not on Carte to translate it and flag
+possible allergens against their own list. Scanned results are always labeled as unconfirmed AI
+guesses, and nothing is stored. Photo features are limited per visitor per hour.

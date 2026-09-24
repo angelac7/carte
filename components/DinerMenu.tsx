@@ -190,6 +190,7 @@ export function DinerMenu({
         <MenuExtras
           restaurant={restaurant}
           language={language}
+          allDishes={dishes}
           menuSize={dishes.length}
           candidates={shown}
           textFor={textFor}
