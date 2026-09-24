@@ -71,10 +71,7 @@ export function ScanMenu({ language, initialPrefs }: ScanMenuProps) {
   );
 
   return (
-    <main lang={htmlLang(language)} className="mx-auto max-w-3xl px-5 py-12">
-      <h1 className="font-serif text-4xl leading-tight">{t.scanTitle}</h1>
-      <p className="mt-3 max-w-xl leading-relaxed text-muted">{t.scanIntro}</p>
-
+    <main lang={htmlLang(language)} className="mx-auto max-w-3xl px-5 pt-4 pb-20">
       <div className="mt-8 flex flex-wrap gap-3">
         {uploadButton}
         <button

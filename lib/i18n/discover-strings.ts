@@ -9,6 +9,7 @@ export type DiscoverStrings = {
   searchLabel: string;
   placeholder: string;
   search: string;
+  filters: string;
   dishesTab: string;
   restaurantsTab: string;
   openNow: string;
@@ -34,6 +35,7 @@ export const DISCOVER_STRINGS: Record<LanguageCode, DiscoverStrings> = {
     searchLabel: "Search dishes, restaurants, or a craving",
     placeholder: "Try “ramen”, “noodles”, or “something warm and cozy”",
     search: "Search",
+    filters: "Filters",
     dishesTab: "Dishes",
     restaurantsTab: "Restaurants",
     openNow: "Open now",
@@ -64,6 +66,7 @@ export const DISCOVER_STRINGS: Record<LanguageCode, DiscoverStrings> = {
     searchLabel: "Busque platos, restaurantes o un antojo",
     placeholder: "Pruebe «ramen», «fideos» o «algo caliente y reconfortante»",
     search: "Buscar",
+    filters: "Filtros",
     dishesTab: "Platos",
     restaurantsTab: "Restaurantes",
     openNow: "Abierto ahora",
@@ -94,6 +97,7 @@ export const DISCOVER_STRINGS: Record<LanguageCode, DiscoverStrings> = {
     searchLabel: "搜索菜品、餐厅或想吃的",
     placeholder: "试试「拉面」「面条」或「想吃点暖和的」",
     search: "搜索",
+    filters: "筛选",
     dishesTab: "菜品",
     restaurantsTab: "餐厅",
     openNow: "正在营业",
@@ -124,6 +128,7 @@ export const DISCOVER_STRINGS: Record<LanguageCode, DiscoverStrings> = {
     searchLabel: "요리, 레스토랑 또는 먹고 싶은 것을 검색",
     placeholder: "'라멘', '면', '따뜻하고 든든한 것'을 검색해 보세요",
     search: "검색",
+    filters: "필터",
     dishesTab: "요리",
     restaurantsTab: "레스토랑",
     openNow: "영업 중",
@@ -154,6 +159,7 @@ export const DISCOVER_STRINGS: Record<LanguageCode, DiscoverStrings> = {
     searchLabel: "料理、レストラン、食べたいものを検索",
     placeholder: "「ラーメン」「麺」「温まるもの」などで検索",
     search: "検索",
+    filters: "絞り込み",
     dishesTab: "料理",
     restaurantsTab: "レストラン",
     openNow: "営業中",
@@ -185,6 +191,7 @@ export const DISCOVER_STRINGS: Record<LanguageCode, DiscoverStrings> = {
     searchLabel: "Rechercher un plat, un restaurant ou une envie",
     placeholder: "Essayez « ramen », « nouilles » ou « quelque chose de chaud et réconfortant »",
     search: "Rechercher",
+    filters: "Filtres",
     dishesTab: "Plats",
     restaurantsTab: "Restaurants",
     openNow: "Ouvert maintenant",
@@ -215,6 +222,7 @@ export const DISCOVER_STRINGS: Record<LanguageCode, DiscoverStrings> = {
     searchLabel: "Tìm món, nhà hàng hoặc món bạn thèm",
     placeholder: "Thử “ramen”, “mì” hoặc “món gì đó ấm áp”",
     search: "Tìm",
+    filters: "Bộ lọc",
     dishesTab: "Món ăn",
     restaurantsTab: "Nhà hàng",
     openNow: "Đang mở cửa",

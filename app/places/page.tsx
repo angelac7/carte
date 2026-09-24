@@ -1,9 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { cookies, headers } from "next/headers";
+import { Badge, CardImage, cardClass } from "@/components/cards";
 import { Chip } from "@/components/Chip";
 import { LocateButton } from "@/components/LocateButton";
+import { BlurFade } from "@/components/motion/BlurFade";
+import { PageHero } from "@/components/PageHero";
 import { PublicHeader } from "@/components/PublicHeader";
+import { SiteFooter } from "@/components/SiteFooter";
+import { buttonClass } from "@/components/ui/button";
 import { carteLinksForPlaces } from "@/lib/db/places";
 import { DINER_STRINGS } from "@/lib/i18n/diner-strings";
 import { PLACES_STRINGS } from "@/lib/i18n/places-strings";
@@ -15,6 +20,7 @@ import {
 } from "@/lib/languages";
 import { distanceMeters, formatDistance, type OsmPlace } from "@/lib/places/normalize";
 import { geocode, searchPlaces } from "@/lib/places/osm";
+import { publicAsset } from "@/lib/public-asset";
 import { checkRateLimit, clientKeyFromHeaders } from "@/lib/rate-limit";
 import { createClient } from "@/lib/supabase/server";
 
@@ -77,30 +83,46 @@ export default async function PlacesPage({ searchParams }: { searchParams: Promi
   }
 
   const inputClass =
-    "mt-2 w-full rounded-md border border-line bg-paper px-3 py-2 focus:border-ink focus:outline-none";
+    "mt-2 w-full rounded-xl border border-line bg-paper px-4 py-3 focus:border-ink focus:outline-none";
 
   return (
     <>
       <PublicHeader />
-      <main lang={htmlLang(language)} className="mx-auto max-w-3xl px-5 py-12">
-        <h1 className="font-serif text-4xl leading-tight">{t.title}</h1>
-        <p className="mt-3 max-w-xl leading-relaxed text-muted">{t.intro}</p>
+      <PageHero
+        title={t.title}
+        intro={t.intro}
+        image={publicAsset("images/places.jpg")}
+        lang={htmlLang(language)}
+      />
 
+      <main lang={htmlLang(language)} className="relative z-10 mx-auto -mt-10 max-w-5xl px-5 pb-20">
         <form
           action="/places"
           method="get"
-          className="mt-8 space-y-4 rounded-lg border border-line bg-card p-5 sm:p-6"
+          className="rounded-2xl border border-line bg-card p-5 shadow-xl sm:p-6"
         >
-          <label className="block">
-            <span className="text-sm font-medium">{t.near}</span>
-            <input
-              name="near"
-              defaultValue={near}
-              maxLength={100}
-              placeholder={t.nearPlaceholder}
-              className={inputClass}
-            />
-          </label>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <label className="block">
+              <span className="text-sm font-medium">{t.near}</span>
+              <input
+                name="near"
+                defaultValue={near}
+                maxLength={100}
+                placeholder={t.nearPlaceholder}
+                className={inputClass}
+              />
+            </label>
+            <label className="block">
+              <span className="text-sm font-medium">{t.queryLabel}</span>
+              <input
+                name="q"
+                defaultValue={query}
+                maxLength={60}
+                placeholder={t.queryPlaceholder}
+                className={inputClass}
+              />
+            </label>
+          </div>
           <input
             type="hidden"
             name="lat"
@@ -111,21 +133,8 @@ export default async function PlacesPage({ searchParams }: { searchParams: Promi
             name="lon"
             defaultValue={hasCoordinates && !near ? String(lon) : ""}
           />
-          <label className="block">
-            <span className="text-sm font-medium">{t.queryLabel}</span>
-            <input
-              name="q"
-              defaultValue={query}
-              maxLength={60}
-              placeholder={t.queryPlaceholder}
-              className={inputClass}
-            />
-          </label>
-          <div className="flex flex-wrap items-center gap-3">
-            <button
-              type="submit"
-              className="rounded-md bg-ink px-5 py-2 text-sm font-medium text-white hover:bg-ink/90"
-            >
+          <div className="mt-5 flex flex-wrap items-center gap-3">
+            <button type="submit" className={buttonClass({ size: "lg", shine: true })}>
               {t.search}
             </button>
             <LocateButton
@@ -136,58 +145,77 @@ export default async function PlacesPage({ searchParams }: { searchParams: Promi
           </div>
         </form>
 
-        {status === "notFound" && <p className="mt-8 text-muted">{t.notFoundLocation}</p>}
+        {status === "notFound" && <p className="mt-10 text-muted">{t.notFoundLocation}</p>}
         {status === "failed" && (
-          <p role="alert" className="mt-8 text-tomato">
+          <p role="alert" className="mt-10 text-tomato">
             {t.lookupFailed}
           </p>
         )}
         {status === "done" && results.length === 0 && (
-          <p className="mt-8 text-muted">{t.noResults}</p>
+          <p className="mt-10 text-muted">{t.noResults}</p>
         )}
 
         {results.length > 0 && (
-          <ul className="mt-8 divide-y divide-line rounded-lg border border-line bg-card px-5 sm:px-6">
-            {results.map((place) => {
+          <ul className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {results.map((place, index) => {
               const carteSlug = carteLinks.get(place.id);
+              const href = carteSlug ? `/r/${carteSlug}` : `/place/${place.id}`;
               return (
-                <li key={place.id} className="py-5">
-                  <div className="flex flex-wrap items-baseline justify-between gap-2">
-                    <h2 className="font-serif text-xl">
-                      <Link href={`/place/${place.id}`} className="hover:underline">
-                        {place.name}
+                <li key={place.id}>
+                  <BlurFade delay={Math.min(index, 8) * 0.05}>
+                    <article className={cardClass}>
+                      <Link href={href} className="block" tabIndex={-1} aria-hidden="true">
+                        <CardImage
+                          src={null}
+                          alt=""
+                          index={index}
+                          monogram={place.name.charAt(0)}
+                          className="aspect-[16/9]"
+                        >
+                          <Badge className="tabular-nums">
+                            {formatDistance(place.distance, language)}
+                          </Badge>
+                          {carteSlug && (
+                            <Badge tone="basil" className="right-3 left-auto">
+                              {t.onCarte}
+                            </Badge>
+                          )}
+                        </CardImage>
                       </Link>
-                    </h2>
-                    <span className="text-sm text-muted tabular-nums">
-                      {formatDistance(place.distance, language)}
-                    </span>
-                  </div>
-                  {(place.cuisine.length > 0 || place.address) && (
-                    <p className="text-sm text-muted">
-                      {[place.cuisine.join(", "), place.address].filter(Boolean).join(", ")}
-                    </p>
-                  )}
-                  <div className="mt-3 flex flex-wrap items-center gap-2">
-                    {carteSlug && <Chip label={t.onCarte} tone="tag" />}
-                    {place.diets.map((diet) => (
-                      <Chip key={diet} label={d.tags[diet]} tone="allergen" />
-                    ))}
-                  </div>
-                  <div className="mt-3 flex gap-4 text-sm">
-                    <Link
-                      href={carteSlug ? `/r/${carteSlug}` : `/place/${place.id}`}
-                      className="font-medium underline underline-offset-4 hover:text-muted"
-                    >
-                      {carteSlug ? t.viewMenu : t.details}
-                    </Link>
-                  </div>
+                      <div className="p-5">
+                        <h2 className="font-serif text-xl leading-snug">
+                          <Link href={href} className="hover:underline">
+                            {place.name}
+                          </Link>
+                        </h2>
+                        {(place.cuisine.length > 0 || place.address) && (
+                          <p className="mt-1 text-sm text-muted">
+                            {[place.cuisine.join(", "), place.address].filter(Boolean).join(", ")}
+                          </p>
+                        )}
+                        {place.diets.length > 0 && (
+                          <div className="mt-3 flex flex-wrap gap-2">
+                            {place.diets.map((diet) => (
+                              <Chip key={diet} label={d.tags[diet]} tone="allergen" />
+                            ))}
+                          </div>
+                        )}
+                        <Link
+                          href={href}
+                          className="mt-4 inline-block text-sm font-medium underline underline-offset-4 hover:text-muted"
+                        >
+                          {carteSlug ? t.viewMenu : t.details}
+                        </Link>
+                      </div>
+                    </article>
+                  </BlurFade>
                 </li>
               );
             })}
           </ul>
         )}
 
-        <p className="mt-8 text-xs text-muted">
+        <p className="mt-12 text-xs text-muted">
           {t.sourceNote}{" "}
           <a
             href="https://www.openstreetmap.org/copyright"
@@ -199,6 +227,7 @@ export default async function PlacesPage({ searchParams }: { searchParams: Promi
           </a>
         </p>
       </main>
+      <SiteFooter />
     </>
   );
 }

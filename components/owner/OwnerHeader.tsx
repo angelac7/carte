@@ -8,7 +8,8 @@ type OwnerHeaderProps = { restaurant: { name: string; slug: string } | null };
 export function OwnerHeader({ restaurant }: OwnerHeaderProps) {
   const links = restaurant
     ? [
-        { href: "/dashboard", label: "Upload menu" },
+        { href: "/dashboard", label: "Home" },
+        { href: "/dashboard/upload", label: "Upload" },
         { href: "/dashboard/review", label: "Review dishes" },
         { href: "/dashboard/qr", label: "QR code" },
         { href: "/dashboard/profile", label: "Profile" },

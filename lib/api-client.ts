@@ -184,3 +184,6 @@ export async function removeDishPhoto(dishId: string): Promise<void> {
   checkSignedIn(res);
   if (!res.ok) throw new Error("Removing the photo failed");
 }
+
+/** Deletes every dish on the owner's menu, for example before uploading a new one. */
+export const deleteAllDishes = () => sendToItems<{ ok: boolean }>("DELETE", { all: true });

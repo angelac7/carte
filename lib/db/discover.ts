@@ -15,6 +15,7 @@ export type DishResult = {
   timezone: string;
   hours: WeeklyHours;
   occasions: Occasion[];
+  photo_url: string | null;
 };
 
 export type RestaurantResult = {
@@ -28,6 +29,7 @@ export type RestaurantResult = {
   timezone: string;
   hours: WeeklyHours;
   occasions: Occasion[];
+  cover_url: string | null;
 };
 
 export type TrendingDish = {
@@ -40,6 +42,7 @@ export type TrendingDish = {
   restaurant_slug: string;
   city: string;
   views: number;
+  photo_url: string | null;
 };
 
 export async function searchDishes(

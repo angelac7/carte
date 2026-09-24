@@ -125,3 +125,11 @@ guesses, and nothing is stored. Photo features are limited per visitor per hour.
 listing at `/dashboard/claim`; claims stay hidden from diners until Carte sets `osm_verified` to true
 in the `restaurants` table. Map requests are throttled to one per second, identify Carte with
 `OSM_CONTACT_EMAIL`, and are cached for a week in `place_cache`.
+
+## Owner dashboard
+
+`/dashboard` shows stats, diner views over the last 14 days, the most-viewed dishes, and a setup
+checklist. Menu upload lives at `/dashboard/upload`. On `/dashboard/review`, owners can edit a dish's
+name, description, and price (which unconfirms it), add dishes by hand, and delete every dish to replace
+a menu. Deleting dishes also deletes their photos. View statistics come from `my_dish_views` and
+`my_daily_views`, which only return the signed-in owner's own numbers.

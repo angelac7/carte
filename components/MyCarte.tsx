@@ -95,11 +95,7 @@ export function MyCarte({ language, initialPrefs }: MyCarteProps) {
   const challenges = computeChallenges(state, new Date());
 
   return (
-    <main lang={htmlLang(language)} className="mx-auto max-w-3xl px-5 py-12">
-      <h1 className="font-serif text-4xl leading-tight">{t.myCarte}</h1>
-      <p className="mt-3 max-w-xl leading-relaxed text-muted">{t.intro}</p>
-      <p className="mt-2 max-w-xl text-sm text-muted">{t.offlineNote}</p>
-
+    <main lang={htmlLang(language)} className="mx-auto max-w-3xl px-5 pt-4 pb-20">
       <div className="mt-8 flex flex-wrap gap-2" role="tablist">
         {tabs.map(([key, label]) => (
           <button

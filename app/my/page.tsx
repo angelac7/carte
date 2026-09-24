@@ -1,9 +1,18 @@
 import type { Metadata } from "next";
 import { cookies, headers } from "next/headers";
 import { MyCarte } from "@/components/MyCarte";
+import { PageHero } from "@/components/PageHero";
 import { PublicHeader } from "@/components/PublicHeader";
+import { SiteFooter } from "@/components/SiteFooter";
 import { parsePrefs, PREFS_COOKIE } from "@/lib/diner-prefs";
-import { isLanguageCode, LANGUAGE_COOKIE, languageFromAcceptHeader } from "@/lib/languages";
+import { MY_CARTE_STRINGS } from "@/lib/i18n/my-carte-strings";
+import {
+  htmlLang,
+  isLanguageCode,
+  LANGUAGE_COOKIE,
+  languageFromAcceptHeader,
+} from "@/lib/languages";
+import { publicAsset } from "@/lib/public-asset";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "My Carte | Carte" };
@@ -15,14 +24,24 @@ export default async function MyCartePage() {
     saved && isLanguageCode(saved)
       ? saved
       : languageFromAcceptHeader((await headers()).get("accept-language") ?? "");
+  const t = MY_CARTE_STRINGS[language];
 
   return (
     <>
       <PublicHeader />
+      <PageHero
+        title={t.myCarte}
+        intro={t.intro}
+        image={publicAsset("images/my.jpg")}
+        lang={htmlLang(language)}
+      >
+        <p className="text-sm text-white/70">{t.offlineNote}</p>
+      </PageHero>
       <MyCarte
         language={language}
         initialPrefs={parsePrefs(cookieStore.get(PREFS_COOKIE)?.value)}
       />
+      <SiteFooter />
     </>
   );
 }

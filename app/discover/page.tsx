@@ -1,11 +1,16 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { cookies, headers } from "next/headers";
+import { Badge, CardImage, cardClass } from "@/components/cards";
 import { Chip } from "@/components/Chip";
-import { DishHeader } from "@/components/DishHeader";
+import { BlurFade } from "@/components/motion/BlurFade";
+import { PageHero } from "@/components/PageHero";
 import { PublicHeader } from "@/components/PublicHeader";
+import { SiteFooter } from "@/components/SiteFooter";
+import { buttonClass } from "@/components/ui/button";
 import { cravingToTerms } from "@/lib/ai/craving";
 import { ALLERGENS, DIETARY_TAGS, isAllergen, isDietaryTag } from "@/lib/allergens";
+import { cn } from "@/lib/cn";
 import {
   listCities,
   searchDishes,
@@ -26,6 +31,7 @@ import {
   languageFromAcceptHeader,
 } from "@/lib/languages";
 import { filterDishes } from "@/lib/menu-filters";
+import { publicAsset } from "@/lib/public-asset";
 import { checkRateLimit, clientKeyFromHeaders } from "@/lib/rate-limit";
 import {
   directionsUrl,
@@ -48,11 +54,12 @@ const many = (value: Params[string]) => (Array.isArray(value) ? value : value ? 
 const one = (value: Params[string]) => (Array.isArray(value) ? value[0] : value) ?? "";
 
 const chipClass =
-  "cursor-pointer rounded-full border border-line px-3 py-1 text-sm text-muted transition-colors hover:border-muted has-checked:border-ink has-checked:bg-ink has-checked:text-white has-focus-visible:outline-2 has-focus-visible:outline-ink";
+  "cursor-pointer rounded-full border border-line bg-card px-3 py-1 text-sm text-muted transition-colors hover:border-muted has-checked:border-ink has-checked:bg-ink has-checked:text-white has-focus-visible:outline-2 has-focus-visible:outline-ink";
 const selectClass =
-  "w-full rounded-md border border-line bg-paper px-3 py-2 text-sm focus:border-ink focus:outline-none";
+  "w-full rounded-lg border border-line bg-card px-3 py-2 text-sm focus:border-ink focus:outline-none";
+const stagger = (index: number) => Math.min(index, 8) * 0.05;
 
-function DishList({
+function DishGrid({
   dishes,
   d,
   t,
@@ -62,54 +69,55 @@ function DishList({
   t: DiscoverStrings;
 }) {
   return (
-    <ul className="mt-4 divide-y divide-line rounded-lg border border-line bg-card px-5 sm:px-6">
-      {dishes.map((dish) => (
-        <li key={dish.dish_id} className="py-5">
-          <DishHeader name={dish.dish_name} price={dish.price} as="h3" />
-          <p className="mt-0.5 text-sm text-muted">
-            <Link href={`/r/${dish.restaurant_slug}`} className="hover:underline">
-              {dish.restaurant_name}
+    <ul className="mt-6 grid gap-5 sm:grid-cols-2">
+      {dishes.map((dish, index) => (
+        <li key={dish.dish_id}>
+          <BlurFade delay={stagger(index)}>
+            <Link href={`/r/${dish.restaurant_slug}`} className={cn(cardClass, "block")}>
+              <CardImage
+                src={dish.photo_url}
+                alt={dish.dish_name}
+                index={index}
+                monogram={dish.dish_name.charAt(0)}
+              >
+                {dish.price && (
+                  <Badge className="right-3 left-auto tabular-nums">{dish.price}</Badge>
+                )}
+              </CardImage>
+              <div className="p-5">
+                <h3 className="font-serif text-xl leading-snug">{dish.dish_name}</h3>
+                <p className="mt-1 text-sm text-muted">
+                  {dish.restaurant_name}
+                  {dish.city && `, ${dish.city}`}
+                </p>
+                <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">
+                  {dish.allergens.length > 0 ? (
+                    <>
+                      <span className="text-muted">{d.contains}</span>
+                      {dish.allergens.map((allergen) => (
+                        <Chip key={allergen} label={d.allergens[allergen]} tone="allergen" />
+                      ))}
+                    </>
+                  ) : (
+                    <span className="text-muted">{d.noMajorAllergens}</span>
+                  )}
+                  {dish.dietary_tags.map((tag) => (
+                    <Chip key={tag} label={d.tags[tag]} tone="tag" />
+                  ))}
+                </div>
+                <p className="mt-4 text-sm font-medium underline underline-offset-4">
+                  {t.viewMenu}
+                </p>
+              </div>
             </Link>
-            {dish.city && <span>, {dish.city}</span>}
-          </p>
-          <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">
-            {dish.allergens.length > 0 ? (
-              <>
-                <span className="text-muted">{d.contains}</span>
-                {dish.allergens.map((allergen) => (
-                  <Chip key={allergen} label={d.allergens[allergen]} tone="allergen" />
-                ))}
-              </>
-            ) : (
-              <span className="text-muted">{d.noMajorAllergens}</span>
-            )}
-            {dish.dietary_tags.map((tag) => (
-              <Chip key={tag} label={d.tags[tag]} tone="tag" />
-            ))}
-          </div>
-          <Link
-            href={`/r/${dish.restaurant_slug}`}
-            className="mt-3 inline-block text-sm font-medium underline underline-offset-4 hover:text-muted"
-          >
-            {t.viewMenu}
-          </Link>
+          </BlurFade>
         </li>
       ))}
     </ul>
   );
 }
 
-function OpenStatus({ place, t }: { place: Place; t: DiscoverStrings }) {
-  const open = isOpenNow(place.hours, place.timezone);
-  if (open === null) return <span className="text-sm text-muted">{t.hoursUnknown}</span>;
-  return open ? (
-    <span className="text-sm font-medium text-basil">{t.openStatus}</span>
-  ) : (
-    <span className="text-sm text-muted">{t.closedStatus}</span>
-  );
-}
-
-function RestaurantList({
+function RestaurantGrid({
   restaurants,
   t,
 }: {
@@ -117,52 +125,77 @@ function RestaurantList({
   t: DiscoverStrings;
 }) {
   return (
-    <ul className="mt-4 divide-y divide-line rounded-lg border border-line bg-card px-5 sm:px-6">
-      {restaurants.map((restaurant) => (
-        <li key={restaurant.id} className="py-5">
-          <div className="flex flex-wrap items-baseline justify-between gap-2">
-            <h3 className="font-serif text-xl">
-              <Link href={`/r/${restaurant.slug}`} className="hover:underline">
-                {restaurant.name}
-              </Link>
-            </h3>
-            <OpenStatus place={restaurant} t={t} />
-          </div>
-          {(restaurant.cuisine || restaurant.city) && (
-            <p className="text-sm text-muted">
-              {[restaurant.cuisine, restaurant.city].filter(Boolean).join(", ")}
-            </p>
-          )}
-          {restaurant.description && (
-            <p className="mt-1 max-w-prose text-sm leading-relaxed">{restaurant.description}</p>
-          )}
-          {restaurant.occasions.length > 0 && (
-            <div className="mt-3 flex flex-wrap gap-2">
-              {restaurant.occasions.map((occasion) => (
-                <Chip key={occasion} label={t.occasions[occasion]} tone="tag" />
-              ))}
-            </div>
-          )}
-          <div className="mt-3 flex gap-4 text-sm">
-            <Link
-              href={`/r/${restaurant.slug}`}
-              className="font-medium underline underline-offset-4 hover:text-muted"
-            >
-              {t.viewMenu}
-            </Link>
-            {restaurant.address && (
-              <a
-                href={directionsUrl(restaurant.name, restaurant.address)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-muted underline underline-offset-4 hover:text-ink"
-              >
-                {t.directions}
-              </a>
-            )}
-          </div>
-        </li>
-      ))}
+    <ul className="mt-6 grid gap-5 sm:grid-cols-2">
+      {restaurants.map((restaurant, index) => {
+        const open = isOpenNow(restaurant.hours, restaurant.timezone);
+        return (
+          <li key={restaurant.id}>
+            <BlurFade delay={stagger(index)}>
+              <article className={cardClass}>
+                <Link
+                  href={`/r/${restaurant.slug}`}
+                  className="block"
+                  tabIndex={-1}
+                  aria-hidden="true"
+                >
+                  <CardImage
+                    src={restaurant.cover_url}
+                    alt=""
+                    index={index}
+                    monogram={restaurant.name.charAt(0)}
+                  >
+                    <Badge tone={open ? "basil" : "dark"}>
+                      {open === null ? t.hoursUnknown : open ? t.openStatus : t.closedStatus}
+                    </Badge>
+                  </CardImage>
+                </Link>
+                <div className="p-5">
+                  <h3 className="font-serif text-2xl leading-snug">
+                    <Link href={`/r/${restaurant.slug}`} className="hover:underline">
+                      {restaurant.name}
+                    </Link>
+                  </h3>
+                  {(restaurant.cuisine || restaurant.city) && (
+                    <p className="mt-1 text-sm text-muted">
+                      {[restaurant.cuisine, restaurant.city].filter(Boolean).join(", ")}
+                    </p>
+                  )}
+                  {restaurant.description && (
+                    <p className="mt-2 line-clamp-2 text-sm leading-relaxed">
+                      {restaurant.description}
+                    </p>
+                  )}
+                  {restaurant.occasions.length > 0 && (
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {restaurant.occasions.map((occasion) => (
+                        <Chip key={occasion} label={t.occasions[occasion]} tone="tag" />
+                      ))}
+                    </div>
+                  )}
+                  <div className="mt-4 flex gap-4 text-sm">
+                    <Link
+                      href={`/r/${restaurant.slug}`}
+                      className="font-medium underline underline-offset-4 hover:text-muted"
+                    >
+                      {t.viewMenu}
+                    </Link>
+                    {restaurant.address && (
+                      <a
+                        href={directionsUrl(restaurant.name, restaurant.address)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-muted underline underline-offset-4 hover:text-ink"
+                      >
+                        {t.directions}
+                      </a>
+                    )}
+                  </div>
+                </div>
+              </article>
+            </BlurFade>
+          </li>
+        );
+      })}
     </ul>
   );
 }
@@ -192,6 +225,8 @@ export default async function DiscoverPage({ searchParams }: DiscoverProps) {
   const occasion = isOccasion(occasionParam) ? occasionParam : "";
   const openOnly = one(params.open) === "1";
   const city = one(params.city).slice(0, 80);
+  const activeFilters =
+    avoid.length + onlyTags.length + (openOnly ? 1 : 0) + (occasion ? 1 : 0) + (city ? 1 : 0);
 
   const supabase = await createClient();
   const cities = await listCities(supabase);
@@ -232,32 +267,40 @@ export default async function DiscoverPage({ searchParams }: DiscoverProps) {
   return (
     <>
       <PublicHeader />
-      <main lang={htmlLang(language)} className="mx-auto max-w-3xl px-5 py-12">
-        <h1 className="font-serif text-4xl leading-tight">{t.title}</h1>
-        <p className="mt-3 max-w-xl leading-relaxed text-muted">{t.intro}</p>
+      <PageHero
+        title={t.title}
+        intro={t.intro}
+        image={publicAsset("images/discover.jpg")}
+        lang={htmlLang(language)}
+      >
         <Link
           href="/places"
-          className="mt-2 inline-block text-sm underline underline-offset-4 hover:text-muted"
+          className="text-sm text-white/80 underline underline-offset-4 hover:text-white"
         >
           {PLACES_STRINGS[language].placesLink}
         </Link>
+      </PageHero>
 
+      <main lang={htmlLang(language)} className="relative z-10 mx-auto -mt-10 max-w-5xl px-5 pb-20">
         <form
           action="/discover"
           method="get"
-          className="mt-8 rounded-lg border border-line bg-card p-5 sm:p-6"
+          className="rounded-2xl border border-line bg-card p-5 shadow-xl sm:p-6"
         >
           <input type="hidden" name="filters" value="1" />
-          <label className="block">
-            <span className="text-sm font-medium">{t.searchLabel}</span>
+          <div className="flex flex-col gap-3 sm:flex-row">
             <input
               name="q"
               defaultValue={query}
               maxLength={100}
+              aria-label={t.searchLabel}
               placeholder={t.placeholder}
-              className="mt-2 w-full rounded-md border border-line bg-paper px-3 py-2 focus:border-ink focus:outline-none"
+              className="flex-1 rounded-xl border border-line bg-paper px-4 py-3 text-lg focus:border-ink focus:outline-none"
             />
-          </label>
+            <button type="submit" className={buttonClass({ size: "lg", shine: true })}>
+              {t.search}
+            </button>
+          </div>
 
           <div className="mt-4 flex gap-2">
             {(["dishes", "restaurants"] as const).map((option) => (
@@ -274,111 +317,120 @@ export default async function DiscoverPage({ searchParams }: DiscoverProps) {
             ))}
           </div>
 
-          <fieldset className="mt-5">
-            <legend className="text-sm font-medium">{d.hideContaining}</legend>
-            <div className="mt-2 flex flex-wrap gap-2">
-              {ALLERGENS.map((allergen) => (
-                <label key={allergen} className={chipClass}>
-                  <input
-                    type="checkbox"
-                    name="avoid"
-                    value={allergen}
-                    defaultChecked={avoid.includes(allergen)}
-                    className="sr-only"
-                  />
-                  {d.allergens[allergen]}
-                </label>
-              ))}
-            </div>
-          </fieldset>
-
-          <fieldset className="mt-4">
-            <legend className="text-sm font-medium">{d.showOnly}</legend>
-            <div className="mt-2 flex flex-wrap gap-2">
-              {DIETARY_TAGS.map((tag) => (
-                <label key={tag} className={chipClass}>
-                  <input
-                    type="checkbox"
-                    name="tag"
-                    value={tag}
-                    defaultChecked={onlyTags.includes(tag)}
-                    className="sr-only"
-                  />
-                  {d.tags[tag]}
-                </label>
-              ))}
-            </div>
-          </fieldset>
-
-          <div className="mt-5 grid items-center gap-4 sm:grid-cols-3">
-            <label className="flex items-center gap-2 text-sm">
-              <input type="checkbox" name="open" value="1" defaultChecked={openOnly} />
-              {t.openNow}
-            </label>
-            <label className="text-sm">
-              <span className="sr-only">{t.occasion}</span>
-              <select name="occasion" defaultValue={occasion} className={selectClass}>
-                <option value="">{t.anyOccasion}</option>
-                {OCCASIONS.map((option) => (
-                  <option key={option} value={option}>
-                    {t.occasions[option]}
-                  </option>
-                ))}
-              </select>
-            </label>
-            {cities.length > 0 && (
-              <label className="text-sm">
-                <span className="sr-only">{t.city}</span>
-                <select name="city" defaultValue={city} className={selectClass}>
-                  <option value="">{t.anyCity}</option>
-                  {cities.map((option) => (
-                    <option key={option} value={option}>
-                      {option}
-                    </option>
-                  ))}
-                </select>
-              </label>
-            )}
-          </div>
-
-          <button
-            type="submit"
-            className="mt-5 rounded-md bg-ink px-5 py-2 text-sm font-medium text-white hover:bg-ink/90"
+          <details
+            open={activeFilters > 0}
+            className="mt-5 rounded-xl border border-line bg-paper/60"
           >
-            {t.search}
-          </button>
+            <summary className="flex cursor-pointer list-none items-center justify-between px-4 py-3 text-sm font-medium [&::-webkit-details-marker]:hidden">
+              {t.filters}
+              {activeFilters > 0 && (
+                <span className="rounded-full bg-ink px-2 py-0.5 text-xs text-white tabular-nums">
+                  {activeFilters}
+                </span>
+              )}
+            </summary>
+            <div className="space-y-5 border-t border-line px-4 py-4">
+              <fieldset>
+                <legend className="text-sm font-medium">{d.hideContaining}</legend>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {ALLERGENS.map((allergen) => (
+                    <label key={allergen} className={chipClass}>
+                      <input
+                        type="checkbox"
+                        name="avoid"
+                        value={allergen}
+                        defaultChecked={avoid.includes(allergen)}
+                        className="sr-only"
+                      />
+                      {d.allergens[allergen]}
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+              <fieldset>
+                <legend className="text-sm font-medium">{d.showOnly}</legend>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {DIETARY_TAGS.map((tag) => (
+                    <label key={tag} className={chipClass}>
+                      <input
+                        type="checkbox"
+                        name="tag"
+                        value={tag}
+                        defaultChecked={onlyTags.includes(tag)}
+                        className="sr-only"
+                      />
+                      {d.tags[tag]}
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+              <div className="grid items-center gap-4 sm:grid-cols-3">
+                <label className="flex items-center gap-2 text-sm">
+                  <input type="checkbox" name="open" value="1" defaultChecked={openOnly} />
+                  {t.openNow}
+                </label>
+                <label className="text-sm">
+                  <span className="sr-only">{t.occasion}</span>
+                  <select name="occasion" defaultValue={occasion} className={selectClass}>
+                    <option value="">{t.anyOccasion}</option>
+                    {OCCASIONS.map((option) => (
+                      <option key={option} value={option}>
+                        {t.occasions[option]}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                {cities.length > 0 && (
+                  <label className="text-sm">
+                    <span className="sr-only">{t.city}</span>
+                    <select name="city" defaultValue={city} className={selectClass}>
+                      <option value="">{t.anyCity}</option>
+                      {cities.map((option) => (
+                        <option key={option} value={option}>
+                          {option}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                )}
+              </div>
+            </div>
+          </details>
         </form>
 
         <p className="mt-6 text-sm leading-relaxed text-muted">{d.safetyNotice}</p>
 
         {tab === "dishes" && !query && trending.length > 0 && (
-          <section className="mt-8">
-            <h2 className="font-serif text-2xl">{t.trending}</h2>
-            <DishList dishes={trending} d={d} t={t} />
+          <section className="mt-12">
+            <BlurFade>
+              <h2 className="font-serif text-4xl">{t.trending}</h2>
+            </BlurFade>
+            <DishGrid dishes={trending} d={d} t={t} />
           </section>
         )}
 
         {tab === "dishes" && query && (
-          <section className="mt-8">
+          <section className="mt-12">
             {cravingUsed && <p className="text-sm text-muted">{t.cravingNote(query)}</p>}
             {dishes.length === 0 ? (
               <p className="text-muted">{t.noResults}</p>
             ) : (
-              <DishList dishes={dishes} d={d} t={t} />
+              <DishGrid dishes={dishes} d={d} t={t} />
             )}
           </section>
         )}
 
         {tab === "restaurants" && (
-          <section className="mt-8">
+          <section className="mt-12">
             {restaurants.length === 0 ? (
               <p className="text-muted">{t.noResults}</p>
             ) : (
-              <RestaurantList restaurants={restaurants} t={t} />
+              <RestaurantGrid restaurants={restaurants} t={t} />
             )}
           </section>
         )}
       </main>
+      <SiteFooter />
     </>
   );
 }

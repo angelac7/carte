@@ -148,3 +148,19 @@ export async function getConfirmedDish(
   if (error) throw error;
   return data as unknown as MenuItem | null;
 }
+
+/** Deletes every dish for a restaurant and returns their photo addresses, so the files can be removed too. */
+export async function deleteAllDishes(
+  supabase: SupabaseClient,
+  restaurantId: string,
+): Promise<string[]> {
+  const { data, error } = await supabase
+    .from("menu_items")
+    .delete()
+    .eq("restaurant_id", restaurantId)
+    .select("photo_url");
+  if (error) throw error;
+  return ((data ?? []) as { photo_url: string | null }[]).flatMap((row) =>
+    row.photo_url ? [row.photo_url] : [],
+  );
+}

@@ -3,7 +3,10 @@ import Link from "next/link";
 import { cookies, headers } from "next/headers";
 import { notFound } from "next/navigation";
 import { Chip } from "@/components/Chip";
+import { PageHero } from "@/components/PageHero";
 import { PublicHeader } from "@/components/PublicHeader";
+import { SiteFooter } from "@/components/SiteFooter";
+import { buttonClass } from "@/components/ui/button";
 import { carteLinksForPlaces } from "@/lib/db/places";
 import { DINER_STRINGS } from "@/lib/i18n/diner-strings";
 import { PLACES_STRINGS } from "@/lib/i18n/places-strings";
@@ -19,6 +22,9 @@ import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "Restaurant | Carte" };
+
+const pillClass =
+  "rounded-full border border-white/25 bg-white/10 px-4 py-2 text-sm text-white backdrop-blur transition-colors hover:bg-white/20";
 
 export default async function PlacePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -46,32 +52,31 @@ export default async function PlacePage({ params }: { params: Promise<{ id: stri
   const carteSlug = place
     ? (await carteLinksForPlaces(await createClient(), [place.id])).get(place.id)
     : undefined;
-  const linkClass = "underline underline-offset-4 hover:text-muted";
+  const address = place ? [place.address, place.city].filter(Boolean).join(", ") : "";
 
   return (
     <>
       <PublicHeader />
-      <main lang={htmlLang(language)} className="mx-auto max-w-3xl px-5 py-12">
-        {!place ? (
+      {!place ? (
+        <main className="mx-auto max-w-3xl px-5 py-16">
           <p role="alert" className="text-tomato">
             {t.lookupFailed}
           </p>
-        ) : (
-          <>
-            <h1 className="font-serif text-4xl leading-tight">{place.name}</h1>
-            {place.cuisine.length > 0 && (
-              <p className="mt-2 text-muted">{place.cuisine.join(", ")}</p>
-            )}
-            {(place.address || place.city) && (
-              <p className="mt-1">{[place.address, place.city].filter(Boolean).join(", ")}</p>
-            )}
-
-            <div className="mt-4 flex flex-wrap gap-4 text-sm">
+        </main>
+      ) : (
+        <>
+          <PageHero
+            title={place.name}
+            intro={place.cuisine.join(", ") || undefined}
+            lang={htmlLang(language)}
+          >
+            {address && <p className="text-white/80">{address}</p>}
+            <div className="mt-5 flex flex-wrap gap-3">
               <a
                 href={coordinatesUrl(place)}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={linkClass}
+                className={pillClass}
               >
                 {t.directions}
               </a>
@@ -80,56 +85,43 @@ export default async function PlacePage({ params }: { params: Promise<{ id: stri
                   href={place.website}
                   target="_blank"
                   rel="noopener noreferrer nofollow"
-                  className={linkClass}
+                  className={pillClass}
                 >
                   {t.website}
                 </a>
               )}
               {place.phone && (
-                <a href={`tel:${place.phone.replace(/[^\d+]/g, "")}`} className={linkClass}>
+                <a href={`tel:${place.phone.replace(/[^\d+]/g, "")}`} className={pillClass}>
                   {t.call}
                 </a>
               )}
             </div>
+          </PageHero>
 
-            {place.openingHours && (
-              <div className="mt-6">
-                <h2 className="text-sm font-medium">{t.hours}</h2>
-                <p className="mt-1 text-sm text-muted">{place.openingHours}</p>
-              </div>
-            )}
-
-            {place.diets.length > 0 && (
-              <div className="mt-6">
-                <h2 className="text-sm font-medium">{t.dietOptions}</h2>
-                <div className="mt-2 flex flex-wrap gap-2">
-                  {place.diets.map((diet) => (
-                    <Chip key={diet} label={d.tags[diet]} tone="allergen" />
-                  ))}
-                </div>
-              </div>
-            )}
-
-            <section className="mt-8 rounded-lg border border-line bg-card p-5">
+          <main
+            lang={htmlLang(language)}
+            className="relative z-10 mx-auto -mt-10 max-w-3xl px-5 pb-20"
+          >
+            <section className="rounded-2xl border border-line bg-card p-6 shadow-xl sm:p-8">
               {carteSlug ? (
                 <Link
                   href={`/r/${carteSlug}`}
-                  className="inline-block rounded-md bg-basil px-4 py-2 text-sm font-medium text-white hover:bg-basil/90"
+                  className={buttonClass({ variant: "basil", size: "lg", shine: true })}
                 >
                   {t.viewMenu}
                 </Link>
               ) : (
                 <>
-                  <p className="text-muted">{t.noMenu}</p>
-                  <Link
-                    href="/scan"
-                    className="mt-4 inline-block rounded-md bg-ink px-4 py-2 text-sm font-medium text-white hover:bg-ink/90"
-                  >
+                  <p className="text-lg leading-relaxed">{t.noMenu}</p>
+                  <Link href="/scan" className={`${buttonClass({ size: "lg", shine: true })} mt-5`}>
                     {t.scanMenu}
                   </Link>
-                  <p className="mt-5 border-t border-line pt-4 text-sm">
+                  <p className="mt-6 border-t border-line pt-5 text-sm">
                     {t.ownerPrompt}{" "}
-                    <Link href={`/dashboard/claim?place=${place.id}`} className={linkClass}>
+                    <Link
+                      href={`/dashboard/claim?place=${place.id}`}
+                      className="underline underline-offset-4 hover:text-muted"
+                    >
                       {t.ownerLink}
                     </Link>
                   </p>
@@ -137,22 +129,43 @@ export default async function PlacePage({ params }: { params: Promise<{ id: stri
               )}
             </section>
 
-            <p className="mt-8 text-sm leading-relaxed text-muted">{d.safetyNotice}</p>
-          </>
-        )}
+            {(place.openingHours || place.diets.length > 0) && (
+              <div className="mt-6 grid gap-5 sm:grid-cols-2">
+                {place.openingHours && (
+                  <section className="rounded-2xl border border-line bg-card p-5">
+                    <h2 className="text-sm font-medium">{t.hours}</h2>
+                    <p className="mt-2 text-sm leading-relaxed text-muted">{place.openingHours}</p>
+                  </section>
+                )}
+                {place.diets.length > 0 && (
+                  <section className="rounded-2xl border border-line bg-card p-5">
+                    <h2 className="text-sm font-medium">{t.dietOptions}</h2>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {place.diets.map((diet) => (
+                        <Chip key={diet} label={d.tags[diet]} tone="allergen" />
+                      ))}
+                    </div>
+                  </section>
+                )}
+              </div>
+            )}
 
-        <p className="mt-6 text-xs text-muted">
-          {t.sourceNote}{" "}
-          <a
-            href="https://www.openstreetmap.org/copyright"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="underline"
-          >
-            {t.credit}
-          </a>
-        </p>
-      </main>
+            <p className="mt-8 text-sm leading-relaxed text-muted">{d.safetyNotice}</p>
+            <p className="mt-4 text-xs text-muted">
+              {t.sourceNote}{" "}
+              <a
+                href="https://www.openstreetmap.org/copyright"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline"
+              >
+                {t.credit}
+              </a>
+            </p>
+          </main>
+        </>
+      )}
+      <SiteFooter />
     </>
   );
 }
