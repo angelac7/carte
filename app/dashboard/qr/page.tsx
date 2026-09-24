@@ -39,17 +39,17 @@ export default async function QrPage() {
         </Notice>
       )}
 
-      <div className="mt-8 flex flex-col items-center rounded-2xl border border-line bg-card px-6 py-10 text-center shadow-sm print:border-0 print:shadow-none">
-        <p className="font-serif text-3xl">{restaurant.name}</p>
-        <p className="mt-2 text-sm text-muted">Scan for our menu, with allergen and diet filters</p>
+      <div className="mt-10 flex flex-col items-center rounded-panel bg-paper px-6 py-12 text-center shadow-raised print:bg-white print:shadow-none">
+        <p className="font-serif text-4xl tracking-tight">{restaurant.name}</p>
+        <p className="eyebrow mt-3 text-muted">Scan for our menu, with allergen and diet filters</p>
         {/* A data URL, so Next's image optimizer isn't needed */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={qrSrc}
           alt={`QR code linking to ${menuUrl}`}
-          className="mt-6 aspect-square w-full max-w-64"
+          className="mt-8 aspect-square w-full max-w-64 rounded-[1.25rem] bg-white p-3 shadow-pressed print:shadow-none"
         />
-        <p className="mt-4 text-xs break-all text-muted">{menuUrl}</p>
+        <p className="mt-5 font-mono text-xs break-all text-muted">{menuUrl}</p>
       </div>
 
       <div className="mt-6 flex flex-wrap gap-3 print:hidden">
