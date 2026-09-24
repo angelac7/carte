@@ -7,6 +7,8 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { Notice } from "@/components/ui/notice";
 import { requireRestaurant } from "@/lib/auth";
 import { cn } from "@/lib/cn";
+import { listPlaceClaims } from "@/lib/db/claims";
+import { fieldClass } from "@/components/ui/field";
 import { getClaim } from "@/lib/db/places";
 import { PLACES_STRINGS } from "@/lib/i18n/places-strings";
 import { isValidPlaceId, type OsmPlace } from "@/lib/places/normalize";
@@ -20,6 +22,7 @@ const one = (value: Params[string]) => (Array.isArray(value) ? value[0] : value)
 const panelClass = "mt-8 rounded-panel bg-paper p-6 shadow-raised sm:p-8";
 
 const ERRORS: Record<string, string> = {
+  evidence: "Describe how Carte can verify your ownership (20–2000 characters).",
   limited: "Too many map lookups. Please try again later.",
   taken: "Another Carte restaurant has already claimed this listing. Contact Carte if it's yours.",
   missing: "That map listing couldn't be found. Try finding your restaurant again.",
@@ -36,8 +39,10 @@ export default async function ClaimPage({ searchParams }: { searchParams: Promis
   const justClaimed = one(params.claimed) === "1";
 
   const claim = await getClaim(supabase, restaurant.id);
+  const requests = await listPlaceClaims(supabase, restaurant.id);
+  const latest = requests[0];
   let place: OsmPlace | null = null;
-  if (isValidPlaceId(placeId) && placeId !== claim.placeId) {
+  if (isValidPlaceId(placeId)) {
     if (await checkRateLimit(`claim:${restaurant.id}`, 30, 10 * 60 * 1000))
       place = await getPlace(placeId).catch(() => null);
   }
@@ -61,6 +66,23 @@ export default async function ClaimPage({ searchParams }: { searchParams: Promis
         </Notice>
       )}
 
+      {latest && (
+        <Notice tone={latest.status === "approved" ? "success" : "warning"} className="mt-6">
+          <p>
+            Latest claim: {latest.status} · {latest.place_id}
+          </p>
+          {latest.review_note && <p className="mt-2 whitespace-pre-wrap">{latest.review_note}</p>}
+          {(latest.status === "rejected" || latest.status === "transferred") && (
+            <Link
+              href={`/dashboard/claim?place=${latest.place_id}`}
+              className="mt-3 inline-block underline"
+            >
+              Submit new ownership evidence
+            </Link>
+          )}
+        </Notice>
+      )}
+
       {claim.placeId && (
         <div className={panelClass}>
           <p
@@ -69,12 +91,16 @@ export default async function ClaimPage({ searchParams }: { searchParams: Promis
               claim.verified ? "bg-basil-soft text-basil" : "bg-saffron-soft text-saffron-ink",
             )}
           >
-            {claim.verified ? "Verified" : "Waiting for verification"}
+            {claim.verified
+              ? "Verified"
+              : latest?.status === "pending"
+                ? "Waiting for verification"
+                : "Not verified"}
           </p>
           <p className="mt-3 text-sm leading-relaxed text-muted">
             {claim.verified
               ? "Diners who find your restaurant on the map can open your Carte menu."
-              : "Carte will confirm you own this restaurant before linking it for diners. This usually means a quick call to the restaurant."}
+              : "Carte will confirm you own this restaurant before linking it for diners. Check this page for the decision and any follow-up request."}
           </p>
           <Link
             href={`/place/${claim.placeId}`}
@@ -92,11 +118,43 @@ export default async function ClaimPage({ searchParams }: { searchParams: Promis
           <p className="mt-1 text-sm text-muted">
             {[place.address, place.city, place.cuisine.join(", ")].filter(Boolean).join(", ")}
           </p>
+          {latest && (
+            <Notice tone={latest.status === "approved" ? "success" : "warning"} className="mt-6">
+              <p>
+                Latest claim: {latest.status} · {latest.place_id}
+              </p>
+              {latest.review_note && (
+                <p className="mt-2 whitespace-pre-wrap">{latest.review_note}</p>
+              )}
+              {(latest.status === "rejected" || latest.status === "transferred") && (
+                <Link
+                  href={`/dashboard/claim?place=${latest.place_id}`}
+                  className="mt-3 inline-block underline"
+                >
+                  Submit new ownership evidence
+                </Link>
+              )}
+            </Notice>
+          )}
+
           {claim.placeId && (
             <p className="mt-3 text-sm text-tomato">
-              This replaces your current listing link and needs verification again.
+              Changing your listing needs verification again. Claims to an existing listing are
+              reviewed as disputes.
             </p>
           )}
+          <label className="mt-5 block text-sm font-medium">
+            Ownership evidence
+            <textarea
+              name="evidence"
+              required
+              minLength={20}
+              maxLength={2000}
+              rows={4}
+              className={fieldClass("mt-2")}
+              placeholder="Your role, a business website, and how Carte can independently verify ownership. Do not include passwords or identity documents."
+            />
+          </label>
           <Button type="submit" shine className="mt-5">
             This is my restaurant
           </Button>

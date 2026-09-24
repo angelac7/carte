@@ -1,0 +1,124 @@
+-- Administrative access is provisioned separately by a database administrator.
+create table public.carte_admins (
+  user_id uuid primary key references auth.users(id) on delete cascade
+);
+alter table public.carte_admins enable row level security;
+create policy "Read own admin membership" on public.carte_admins for select to authenticated
+  using (user_id = (select auth.uid()));
+grant select on public.carte_admins to authenticated;
+revoke insert, update, delete on public.carte_admins from anon, authenticated;
+
+create function public.is_carte_admin() returns boolean language sql stable security definer set search_path = '' as $$
+  select exists(select 1 from public.carte_admins where user_id = auth.uid());
+$$;
+revoke all on function public.is_carte_admin() from public, anon;
+grant execute on function public.is_carte_admin() to authenticated;
+
+create table public.place_claims (
+  id uuid primary key default gen_random_uuid(),
+  restaurant_id uuid not null references public.restaurants(id) on delete cascade,
+  place_id text not null check (place_id ~ '^(node|way|relation)-[0-9]+$'),
+  previous_place_id text,
+  evidence text not null check (length(evidence) between 20 and 2000),
+  status text not null default 'pending' check (status in ('pending','approved','rejected','superseded','transferred')),
+  review_note text not null default '' check (length(review_note) <= 2000),
+  revision integer not null default 1,
+  created_at timestamptz not null default now(),
+  reviewed_at timestamptz
+);
+create unique index one_pending_place_claim on public.place_claims(restaurant_id) where status = 'pending';
+alter table public.place_claims enable row level security;
+create policy "Owners and admins read claims" on public.place_claims for select to authenticated using (
+  public.is_carte_admin() or exists(select 1 from public.restaurants r where r.id = restaurant_id and r.owner_id = auth.uid())
+);
+grant select on public.place_claims to authenticated;
+revoke insert, update, delete on public.place_claims from anon, authenticated;
+
+create table public.claim_events (
+  id bigint generated always as identity primary key,
+  claim_id uuid not null references public.place_claims(id) on delete cascade,
+  actor_id uuid references auth.users(id) on delete set null,
+  action text not null,
+  note text not null,
+  created_at timestamptz not null default now()
+);
+alter table public.claim_events enable row level security;
+create policy "Admins read claim audit" on public.claim_events for select to authenticated using(public.is_carte_admin());
+grant select on public.claim_events to authenticated;
+revoke insert, update, delete on public.claim_events from anon, authenticated;
+
+-- Bring existing claims into the queue without changing current approvals.
+insert into public.place_claims(restaurant_id, place_id, previous_place_id, evidence, status)
+select id, osm_id, osm_id, 'Legacy claim: independently verify ownership before approving.',
+  case when osm_verified then 'approved' else 'pending' end
+from public.restaurants where osm_id is not null;
+
+create function public.submit_place_claim(restaurant uuid, place text, ownership_evidence text, defaults jsonb default '{}')
+returns uuid language plpgsql security definer set search_path = '' as $$
+declare target public.restaurants; claim_id uuid;
+begin
+  if auth.uid() is null then raise exception 'Not authorized' using errcode = '42501'; end if;
+  if length(trim(ownership_evidence)) not between 20 and 2000 or place !~ '^(node|way|relation)-[0-9]+$' then
+    raise exception 'Invalid claim' using errcode = '22023';
+  end if;
+  perform pg_advisory_xact_lock(73190421);
+  select * into target from public.restaurants where id = restaurant and owner_id = auth.uid() for update;
+  if not found then raise exception 'Not authorized' using errcode = '42501'; end if;
+  update public.place_claims set status = 'superseded', revision = revision + 1 where restaurant_id = restaurant and status = 'pending';
+  -- A duplicate claim becomes a dispute in the queue. It never takes another owner's link.
+  if not exists(select 1 from public.restaurants where osm_id = place and id <> restaurant) then
+    update public.restaurants set osm_id = place,
+      address = case when address = '' then left(coalesce(defaults->>'address', ''), 200) else address end,
+      city = case when city = '' then left(coalesce(defaults->>'city', ''), 80) else city end,
+      cuisine = case when cuisine = '' then left(coalesce(defaults->>'cuisine', ''), 60) else cuisine end,
+      hours = case when hours = '{}'::jsonb and jsonb_typeof(defaults->'hours') = 'object' then defaults->'hours' else hours end
+    where id = restaurant;
+  end if;
+  insert into public.place_claims(restaurant_id,place_id,previous_place_id,evidence)
+    select restaurant, place, osm_id, trim(ownership_evidence) from public.restaurants where id = restaurant returning id into claim_id;
+  insert into public.claim_events(claim_id,actor_id,action,note) values(claim_id,auth.uid(),'submitted','Ownership review requested');
+  return claim_id;
+end;
+$$;
+revoke all on function public.submit_place_claim(uuid,text,text,jsonb) from public, anon;
+grant execute on function public.submit_place_claim(uuid,text,text,jsonb) to authenticated;
+
+create function public.review_place_claim(claim uuid, expected_revision integer, decision text, review_note text, allow_transfer boolean default false)
+returns void language plpgsql security definer set search_path = '' as $$
+declare request public.place_claims; target public.restaurants; previous_owner uuid;
+begin
+  if not public.is_carte_admin() then raise exception 'Not authorized' using errcode = '42501'; end if;
+  if decision not in ('approved','rejected') or length(trim(review_note)) not between 20 and 2000 then
+    raise exception 'A verification note is required' using errcode = '22023';
+  end if;
+  perform pg_advisory_xact_lock(73190421);
+  select * into request from public.place_claims where id = claim for update;
+  if not found or expected_revision is null or request.status <> 'pending' or request.revision <> expected_revision then
+    raise exception 'Claim changed. Reload the queue.' using errcode = '40001';
+  end if;
+  select * into target from public.restaurants where id = request.restaurant_id for update;
+  if target.owner_id = auth.uid() then raise exception 'Another administrator must review your own restaurant.' using errcode = '42501'; end if;
+  if target.osm_id is distinct from request.previous_place_id then raise exception 'Restaurant changed its listing. Request a new claim.' using errcode = '40001'; end if;
+  if decision = 'approved' then
+    select id into previous_owner from public.restaurants where osm_id = request.place_id and id <> request.restaurant_id for update;
+    if previous_owner is not null then
+      if not allow_transfer then raise exception 'Listing already claimed. Explicit transfer approval required.' using errcode = '23505'; end if;
+      update public.restaurants set osm_id = null, osm_verified = false where id = previous_owner;
+      with moved as (
+        update public.place_claims set status = 'transferred', review_note = 'Listing transferred after administrator review.', revision = revision + 1, reviewed_at = now()
+        where restaurant_id = previous_owner and place_id = request.place_id and status in ('approved','pending') returning id
+      ) insert into public.claim_events(claim_id, actor_id, action, note) select id, auth.uid(), 'transferred', review_place_claim.review_note from moved;
+    end if;
+    -- The existing reset trigger requires setting the link first and approving separately.
+    update public.restaurants set osm_id = request.place_id where id = request.restaurant_id;
+    update public.restaurants set osm_verified = true where id = request.restaurant_id;
+  else
+    -- Rejection also revokes an existing link to this particular listing.
+    update public.restaurants set osm_verified = false where id = request.restaurant_id and osm_id = request.place_id;
+  end if;
+  update public.place_claims set status = decision, review_note = review_place_claim.review_note, revision = revision + 1, reviewed_at = now() where id = claim;
+  insert into public.claim_events(claim_id,actor_id,action,note) values(claim,auth.uid(),decision,review_note);
+end;
+$$;
+revoke all on function public.review_place_claim(uuid,integer,text,text,boolean) from public, anon;
+grant execute on function public.review_place_claim(uuid,integer,text,text,boolean) to authenticated;

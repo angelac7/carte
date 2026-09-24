@@ -204,3 +204,121 @@ it("rejects stale dish updates and stale whole-menu deletion snapshots", async (
     );
   }
 });
+
+it("requires independent admin review, detects stale decisions, and explicitly handles disputed claims", async () => {
+  const { rows: owners } = await db.query<{ id: string; owner_id: string }>(
+    "select id, owner_id from restaurants where slug in ('restaurant-42','restaurant-43') order by slug",
+  );
+  const [first, second] = owners;
+  const {
+    rows: [admin],
+  } = await db.query<{ id: string }>(
+    "insert into auth.users values (gen_random_uuid()) returning id",
+  );
+  await db.query("insert into carte_admins(user_id) values ($1)", [admin.id]);
+  const login = (id: string) =>
+    db.exec(
+      `create or replace function auth.uid() returns uuid language sql as 'select ''${id}''::uuid'`,
+    );
+  try {
+    await login(first.owner_id);
+    const {
+      rows: [submitted],
+    } = await db.query<{ id: string }>(
+      "select submit_place_claim($1, 'node-987654', 'I operate this restaurant; verify using its published business telephone.') as id",
+      [first.id],
+    );
+    await expect(
+      db.query(
+        "select review_place_claim($1, 1, 'approved', 'I called the independently listed restaurant telephone.', false)",
+        [submitted.id],
+      ),
+    ).rejects.toThrow(/Not authorized/);
+    await db.query("insert into carte_admins(user_id) values ($1)", [first.owner_id]);
+    await expect(
+      db.query(
+        "select review_place_claim($1, 1, 'approved', 'I called the independently listed restaurant telephone.', false)",
+        [submitted.id],
+      ),
+    ).rejects.toThrow(/Another administrator/);
+    await login(admin.id);
+    await db.query(
+      "select review_place_claim($1, 1, 'approved', 'I called the independently listed restaurant telephone.', false)",
+      [submitted.id],
+    );
+    await expect(
+      db.query(
+        "select review_place_claim($1, 1, 'rejected', 'Old tab must not override a completed approval.', false)",
+        [submitted.id],
+      ),
+    ).rejects.toThrow(/Claim changed/);
+    await login(second.owner_id);
+    const {
+      rows: [dispute],
+    } = await db.query<{ id: string }>(
+      "select submit_place_claim($1, 'node-987654', 'This listing is ours; please independently investigate ownership.') as id",
+      [second.id],
+    );
+    expect(
+      (
+        await db.query<{ osm_verified: boolean }>(
+          "select osm_verified from restaurants where id = $1",
+          [first.id],
+        )
+      ).rows[0].osm_verified,
+    ).toBe(true);
+    await login(admin.id);
+    await expect(
+      db.query(
+        "select review_place_claim($1, 1, 'approved', 'Verified a change of ownership through independent contact.', false)",
+        [dispute.id],
+      ),
+    ).rejects.toThrow(/Explicit transfer/);
+    await db.query(
+      "select review_place_claim($1, 1, 'approved', 'Verified a change of ownership through independent contact.', true)",
+      [dispute.id],
+    );
+    expect(
+      (
+        await db.query<{ osm_id: string | null }>("select osm_id from restaurants where id = $1", [
+          first.id,
+        ])
+      ).rows[0].osm_id,
+    ).toBeNull();
+    expect(
+      (
+        await db.query<{ osm_verified: boolean }>(
+          "select osm_verified from restaurants where id = $1",
+          [second.id],
+        )
+      ).rows[0].osm_verified,
+    ).toBe(true);
+    expect(
+      (await db.query("select id from claim_events where action = 'transferred'")).rows,
+    ).toHaveLength(1);
+    const {
+      rows: [permissions],
+    } = await db.query<{ edit_admin: boolean; verify: boolean; edit_claim: boolean }>(
+      "select has_table_privilege('authenticated','carte_admins','INSERT') as edit_admin, has_column_privilege('authenticated','restaurants','osm_verified','UPDATE') as verify, has_table_privilege('authenticated','place_claims','UPDATE') as edit_claim",
+    );
+    expect(permissions).toEqual({ edit_admin: false, verify: false, edit_claim: false });
+  } finally {
+    await db.exec(
+      "create or replace function auth.uid() returns uuid language sql as 'select null::uuid'",
+    );
+  }
+});
+
+it("requires review when a source language is corrected", async () => {
+  const {
+    rows: [dish],
+  } = await db.query<{ id: string }>("select id from menu_items limit 1");
+  await db.query("update menu_items set confirmed = true where id = $1", [dish.id]);
+  const {
+    rows: [changed],
+  } = await db.query<{ confirmed: boolean; revision: number }>(
+    "update menu_items set source_language = 'ja', confirmed = true where id = $1 returning confirmed, revision",
+    [dish.id],
+  );
+  expect(changed.confirmed).toBe(false);
+});

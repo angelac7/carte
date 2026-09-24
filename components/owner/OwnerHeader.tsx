@@ -3,9 +3,9 @@ import { logOut } from "@/app/auth/actions";
 import { NavBar } from "@/components/NavBar";
 import { Button } from "@/components/ui/button";
 
-type OwnerHeaderProps = { restaurant: { name: string; slug: string } | null };
+type OwnerHeaderProps = { admin?: boolean; restaurant: { name: string; slug: string } | null };
 
-export function OwnerHeader({ restaurant }: OwnerHeaderProps) {
+export function OwnerHeader({ restaurant, admin }: OwnerHeaderProps) {
   const links = restaurant
     ? [
         { href: "/dashboard", label: "Home" },
@@ -17,6 +17,8 @@ export function OwnerHeader({ restaurant }: OwnerHeaderProps) {
         { href: `/r/${restaurant.slug}`, label: "Diner menu" },
       ]
     : [];
+
+  if (admin) links.push({ href: "/admin/claims", label: "Review claims" });
 
   return (
     <NavBar

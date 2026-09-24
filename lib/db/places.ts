@@ -41,24 +41,18 @@ export async function claimPlace(
   supabase: SupabaseClient,
   restaurantId: string,
   place: OsmPlace,
-): Promise<{ ok: true } | { ok: false; reason: "taken" | "failed" }> {
-  const { data, error: readError } = await supabase
-    .from("restaurants")
-    .select("address, city, cuisine, hours")
-    .eq("id", restaurantId)
-    .single();
-  if (readError) return { ok: false, reason: "failed" };
-  const current = data as { address: string; city: string; cuisine: string; hours: object };
-
-  const update: Record<string, unknown> = { osm_id: place.id };
-  if (!current.address && place.address) update.address = place.address.slice(0, 200);
-  if (!current.city && place.city) update.city = place.city.slice(0, 80);
-  if (!current.cuisine && place.cuisine.length)
-    update.cuisine = place.cuisine.join(", ").slice(0, 60);
-  const hours = parseOpeningHours(place.openingHours);
-  if (hours && Object.keys(current.hours ?? {}).length === 0) update.hours = hours;
-
-  const { error } = await supabase.from("restaurants").update(update).eq("id", restaurantId);
-  if (!error) return { ok: true };
-  return { ok: false, reason: error.code === "23505" ? "taken" : "failed" };
+  evidence: string,
+): Promise<{ ok: true } | { ok: false; reason: "failed" }> {
+  const { error } = await supabase.rpc("submit_place_claim", {
+    restaurant: restaurantId,
+    place: place.id,
+    ownership_evidence: evidence,
+    defaults: {
+      address: place.address,
+      city: place.city,
+      cuisine: place.cuisine.join(", "),
+      hours: parseOpeningHours(place.openingHours),
+    },
+  });
+  return error ? { ok: false, reason: "failed" } : { ok: true };
 }
