@@ -2,6 +2,7 @@ import type { LanguageCode } from "@/lib/languages";
 import { MAX_HISTORY, type ChatMessage } from "@/types/chat";
 import type { ExtractedDish, MenuItem } from "@/types/menu";
 import type { MenuTranslations } from "@/types/translation";
+import type { Recommendation, RecommendRequest } from "@/types/recommend";
 import type { DishInsight } from "@/types/insight";
 
 /** Sends owners to the login page if their session has expired. */
@@ -92,4 +93,16 @@ export async function fetchInsight(
   const data = await res.json().catch(() => ({}));
   if (!res.ok || !data.insight) throw new Error(data.error ?? "Dish details failed.");
   return data.insight as DishInsight;
+}
+
+/** Asks for dish suggestions that respect the diner's filters. */
+export async function askForPicks(request: RecommendRequest): Promise<Recommendation> {
+  const res = await fetch("/api/recommend", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(request),
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok || !data.recommendation) throw new Error("Suggestions failed");
+  return data.recommendation as Recommendation;
 }

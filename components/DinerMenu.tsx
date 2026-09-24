@@ -4,15 +4,24 @@ import { AllergyCard } from "@/components/AllergyCard";
 import { Chip } from "@/components/Chip";
 import { DishHeader } from "@/components/DishHeader";
 import { DishSheet } from "@/components/DishSheet";
+import { DisplaySettings } from "@/components/DisplaySettings";
 import { MenuChat } from "@/components/MenuChat";
+import { OrderHelper } from "@/components/OrderHelper";
 import { OrderSheet } from "@/components/OrderSheet";
 import { QuantityStepper } from "@/components/QuantityStepper";
 import { ToggleChip } from "@/components/ToggleChip";
 import { ALLERGENS, DIETARY_TAGS, type Allergen, type DietaryTag } from "@/lib/allergens";
 import { fetchTranslations } from "@/lib/api-client";
 import { writePrefsCookie, type DinerPrefs } from "@/lib/diner-prefs";
+import {
+  applyDisplay,
+  DEFAULT_DISPLAY,
+  writeDisplayCookie,
+  type DisplayPrefs,
+} from "@/lib/display-prefs";
 import { DINER_STRINGS } from "@/lib/i18n/diner-strings";
 import { DISH_STRINGS } from "@/lib/i18n/dish-strings";
+import { HELP_STRINGS } from "@/lib/i18n/help-strings";
 import { TABLE_STRINGS } from "@/lib/i18n/table-strings";
 import {
   htmlLang,
@@ -28,17 +37,24 @@ import type { DishText, MenuItem } from "@/types/menu";
 import type { MenuTranslations } from "@/types/translation";
 
 type TranslationState = Partial<Record<LanguageCode, MenuTranslations | "failed">>;
-type Panel = "order" | "allergy-card" | null;
+type Panel = "order" | "allergy-card" | "helper" | "display" | null;
 
 type DinerMenuProps = {
   restaurant: { name: string; slug: string };
   dishes: MenuItem[];
   initialLanguage: LanguageCode;
   initialPrefs: DinerPrefs;
+  initialDisplay: DisplayPrefs;
 };
 
 /** The public menu diners see. Receives confirmed dishes only. */
-export function DinerMenu({ restaurant, dishes, initialLanguage, initialPrefs }: DinerMenuProps) {
+export function DinerMenu({
+  restaurant,
+  dishes,
+  initialLanguage,
+  initialPrefs,
+  initialDisplay,
+}: DinerMenuProps) {
   const [language, setLanguage] = useState<LanguageCode>(initialLanguage);
   const [byLanguage, setByLanguage] = useState<TranslationState>({});
   const [avoid, setAvoid] = useState<Allergen[]>(initialPrefs.avoid);
@@ -46,6 +62,7 @@ export function DinerMenu({ restaurant, dishes, initialLanguage, initialPrefs }:
   const [order, setOrder] = useState<Record<string, number>>({});
   const [openDishId, setOpenDishId] = useState<string | null>(null);
   const [panel, setPanel] = useState<Panel>(null);
+  const [display, setDisplay] = useState<DisplayPrefs>(initialDisplay);
   const requested = useRef(new Set<LanguageCode>());
 
   // Fetch each language's translations once, the first time a diner picks it.
@@ -57,8 +74,15 @@ export function DinerMenu({ restaurant, dishes, initialLanguage, initialPrefs }:
       .catch(() => setByLanguage((prev) => ({ ...prev, [language]: "failed" })));
   }, [language, restaurant.slug]);
 
+  // Larger text and high contrast apply to the whole page while this menu is open.
+  useEffect(() => {
+    applyDisplay(display);
+    return () => applyDisplay(DEFAULT_DISPLAY);
+  }, [display]);
+
   const t = DINER_STRINGS[language];
   const tableText = TABLE_STRINGS[language];
+  const helpText = HELP_STRINGS[language];
   const status = language === ORIGINAL_LANGUAGE ? undefined : byLanguage[language];
   const translations = status && status !== "failed" ? status : undefined;
   const translating = language !== ORIGINAL_LANGUAGE && status === undefined;
@@ -142,6 +166,20 @@ export function DinerMenu({ restaurant, dishes, initialLanguage, initialPrefs }:
         >
           {t.safetyNotice}
         </p>
+        <div className="mt-4 flex flex-wrap gap-3">
+          <button
+            onClick={() => setPanel("helper")}
+            className="rounded-md bg-ink px-4 py-2 text-sm font-medium text-white hover:bg-ink/90"
+          >
+            {helpText.helperButton}
+          </button>
+          <button
+            onClick={() => setPanel("display")}
+            className="rounded-md border border-line px-4 py-2 text-sm hover:border-muted"
+          >
+            {helpText.display}
+          </button>
+        </div>
         {translating && (
           <p role="status" className="mt-3 text-sm text-muted">
             {t.translating}
@@ -308,6 +346,30 @@ export function DinerMenu({ restaurant, dishes, initialLanguage, initialPrefs }:
           language={language}
           avoid={avoid}
           onToggle={(allergen) => updateFilters(toggleValue(avoid, allergen), onlyTags)}
+          onClose={() => setPanel(null)}
+        />
+      )}
+      {panel === "helper" && (
+        <OrderHelper
+          restaurantSlug={restaurant.slug}
+          language={language}
+          dishes={dishes}
+          avoid={avoid}
+          onlyTags={onlyTags}
+          order={order}
+          textFor={textFor}
+          onQuantity={setQuantity}
+          onClose={() => setPanel(null)}
+        />
+      )}
+      {panel === "display" && (
+        <DisplaySettings
+          language={language}
+          display={display}
+          onChange={(next) => {
+            setDisplay(next);
+            writeDisplayCookie(next);
+          }}
           onClose={() => setPanel(null)}
         />
       )}

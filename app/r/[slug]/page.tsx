@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { DinerMenu } from "@/components/DinerMenu";
 import { getConfirmedDishes, getRestaurantBySlug } from "@/lib/db";
 import { parsePrefs, PREFS_COOKIE } from "@/lib/diner-prefs";
+import { DISPLAY_COOKIE, parseDisplay } from "@/lib/display-prefs";
 import { isLanguageCode, LANGUAGE_COOKIE, languageFromAcceptHeader } from "@/lib/languages";
 import { confirmedOnly } from "@/lib/menu-filters";
 import { isValidSlug } from "@/lib/slug";
@@ -34,6 +35,7 @@ export default async function RestaurantMenuPage({ params }: RestaurantMenuProps
       ? savedLanguage
       : languageFromAcceptHeader(acceptLanguage);
   const initialPrefs = parsePrefs(cookieStore.get(PREFS_COOKIE)?.value);
+  const initialDisplay = parseDisplay(cookieStore.get(DISPLAY_COOKIE)?.value);
 
   return (
     <DinerMenu
@@ -41,6 +43,7 @@ export default async function RestaurantMenuPage({ params }: RestaurantMenuProps
       dishes={dishes}
       initialLanguage={initialLanguage}
       initialPrefs={initialPrefs}
+      initialDisplay={initialDisplay}
     />
   );
 }

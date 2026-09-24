@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
-@theme inline {
+/* Colors are CSS variables so display settings like high contrast can override them. */
+@theme {
   --color-paper: #f6f7f4;
   --color-card: #ffffff;
   --color-ink: #1c2a39;
@@ -12,12 +13,27 @@
   --color-saffron-soft: #fbf1da;
   --color-saffron-ink: #7a5000;
   --color-tomato: #b3261e;
+}
+
+@theme inline {
   --font-sans: var(--font-public-sans), system-ui, sans-serif;
   --font-serif: var(--font-caslon), Georgia, serif;
 }
 
 html {
   color-scheme: light;
+}
+
+html.large-text {
+  font-size: 118.75%;
+}
+
+html.high-contrast {
+  --color-paper: #ffffff;
+  --color-muted: #2a3542;
+  --color-line: #7a8794;
+  --color-saffron-soft: #fff6df;
+  --color-saffron-ink: #4d3200;
 }
 
 body {

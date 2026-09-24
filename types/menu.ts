@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { ALLERGENS, DIETARY_TAGS, isAllergen, isDietaryTag } from "@/lib/allergens";
+import { ALLERGENS, DIETARY_TAGS, isAiSuggestedTag, isAllergen } from "@/lib/allergens";
 
 // AI output can have numbers, nulls, or unknown allergens, so these helpers clean it up.
 const text = z
@@ -15,7 +15,7 @@ const allergenList = z
 const tagList = z
   .array(z.string())
   .nullish()
-  .transform((list) => (list ?? []).filter(isDietaryTag));
+  .transform((list) => (list ?? []).filter(isAiSuggestedTag));
 
 /** A dish as the AI read it from a menu photo. Allergens are suggestions, not confirmed. */
 export const ExtractedDishSchema = z.object({

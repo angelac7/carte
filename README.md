@@ -87,3 +87,11 @@ regenerated when the owner edits the dish. They never include allergens.
 Diners can build an order, show it to staff in English with their allergies, split the bill
 with tax and tip, and show a translated allergy card. Allergy and diet filters are saved on the
 diner's device in the `carte-prefs` cookie and applied at every Carte menu. No diner account is needed.
+
+## Help me choose
+
+"What should I order?" suggests 2 to 5 dishes from those that pass the diner's filters, based on
+hunger, spice tolerance, party size, and budget. Owners can label dishes halal, kosher,
+pregnancy-friendly, or kid-friendly; the AI never suggests these. The menu chat accepts voice
+questions and reads answers aloud, and diners can turn on larger text and high contrast, saved
+on their device.

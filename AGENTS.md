@@ -31,3 +31,6 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - Allergy card and staff-facing text come from `lib/i18n/table-strings.ts` and are never AI-generated.
 - Money math lives in `lib/bill.ts` and `lib/prices.ts`, with tests; keep it out of components.
 - Use the shared `Sheet` component for new diner panels.
+- The AI may only suggest tags in `AI_SUGGESTED_TAGS`. Tags in `OWNER_ONLY_TAGS` are set by owners only.
+- Filter dishes with the diner's filters before sending them to any AI feature, so suggestions can't break them.
+- Colors are CSS variables in `app/globals.css`; high contrast overrides them there, never in components.

@@ -2,18 +2,18 @@
 import { useEffect, useRef, useState } from "react";
 import { askMenu, ChatLimitError } from "@/lib/api-client";
 import { CHAT_STRINGS } from "@/lib/i18n/chat-strings";
+import { HELP_STRINGS } from "@/lib/i18n/help-strings";
 import type { LanguageCode } from "@/lib/languages";
+import { canSpeak, speak, SPEECH_LANG } from "@/lib/speak";
+import { speechInputSupported, useSpeechInput } from "@/lib/use-speech-input";
 import { MAX_QUESTION_LENGTH, type ChatMessage } from "@/types/chat";
 
-/** A chat panel where diners ask questions answered from the confirmed menu. */
-export function MenuChat({
-  language,
-  restaurantSlug,
-}: {
-  language: LanguageCode;
-  restaurantSlug: string;
-}) {
+type MenuChatProps = { language: LanguageCode; restaurantSlug: string };
+
+/** A chat panel where diners ask questions, by typing or speaking, answered from the confirmed menu. */
+export function MenuChat({ language, restaurantSlug }: MenuChatProps) {
   const t = CHAT_STRINGS[language];
+  const help = HELP_STRINGS[language];
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [draft, setDraft] = useState("");
@@ -21,6 +21,9 @@ export function MenuChat({
   const [problem, setProblem] = useState("");
   const endRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const voice = useSpeechInput(SPEECH_LANG[language], (spoken) =>
+    setDraft((prev) => (prev ? `${prev} ${spoken}` : spoken).slice(0, MAX_QUESTION_LENGTH)),
+  );
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ block: "end" });
@@ -91,14 +94,23 @@ export function MenuChat({
         )}
 
         {messages.map((message, index) => (
-          <p
-            key={index}
-            className={`max-w-[85%] rounded-lg px-3 py-2 text-sm leading-relaxed whitespace-pre-line ${
-              message.role === "user" ? "ml-auto bg-ink text-white" : "bg-paper"
-            }`}
-          >
-            {message.content}
-          </p>
+          <div key={index} className={message.role === "user" ? "flex justify-end" : ""}>
+            <p
+              className={`max-w-[85%] rounded-lg px-3 py-2 text-sm leading-relaxed whitespace-pre-line ${
+                message.role === "user" ? "bg-ink text-white" : "bg-paper"
+              }`}
+            >
+              {message.content}
+            </p>
+            {message.role === "assistant" && canSpeak() && (
+              <button
+                onClick={() => speak(message.content, SPEECH_LANG[language])}
+                className="mt-1 text-xs text-muted underline hover:text-ink"
+              >
+                {help.listen}
+              </button>
+            )}
+          </div>
         ))}
 
         {sending && <p className="text-sm text-muted">{t.thinking}</p>}
@@ -126,7 +138,7 @@ export function MenuChat({
           rows={1}
           value={draft}
           maxLength={MAX_QUESTION_LENGTH}
-          placeholder={t.placeholder}
+          placeholder={voice.listening ? help.listening : t.placeholder}
           onChange={(e) => setDraft(e.target.value)}
           onKeyDown={(e) => {
             // Enter sends; Shift+Enter adds a line. Skip while typing Chinese, Japanese, or Korean.
@@ -137,6 +149,19 @@ export function MenuChat({
           }}
           className="flex-1 resize-none rounded-md border border-line bg-paper px-3 py-2 text-sm focus:border-ink focus:outline-none"
         />
+        {speechInputSupported() && (
+          <button
+            type="button"
+            aria-label={help.voice}
+            aria-pressed={voice.listening}
+            onClick={voice.listening ? voice.stop : voice.start}
+            className={`rounded-md border px-3 py-2 text-sm ${
+              voice.listening ? "border-tomato text-tomato" : "border-line hover:border-muted"
+            }`}
+          >
+            {voice.listening ? "■" : "🎤"}
+          </button>
+        )}
         <button
           type="submit"
           disabled={sending || !draft.trim()}

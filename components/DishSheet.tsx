@@ -4,6 +4,7 @@ import { Chip } from "@/components/Chip";
 import { fetchInsight } from "@/lib/api-client";
 import { DINER_STRINGS } from "@/lib/i18n/diner-strings";
 import { DISH_STRINGS } from "@/lib/i18n/dish-strings";
+import { canSpeak, speak } from "@/lib/speak";
 import type { LanguageCode } from "@/lib/languages";
 import type { DishInsight } from "@/types/insight";
 import type { MenuItem } from "@/types/menu";
@@ -20,19 +21,6 @@ type DishSheetProps = {
 
 // Remembers explanations during this visit, so reopening a dish is instant.
 const insightCache = new Map<string, DishInsight>();
-
-function canSpeak(): boolean {
-  return typeof window !== "undefined" && "speechSynthesis" in window;
-}
-
-/** Reads a dish name aloud with the phone's built-in voice, slowed down slightly. */
-function speak(text: string, lang: string) {
-  const utterance = new SpeechSynthesisUtterance(text);
-  utterance.lang = lang || "en-US";
-  utterance.rate = 0.85;
-  window.speechSynthesis.cancel();
-  window.speechSynthesis.speak(utterance);
-}
 
 function Meter({ label, level, words }: { label: string; level: number; words: string[] }) {
   return (
