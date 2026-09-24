@@ -29,7 +29,7 @@ type TasteStatus = "idle" | "loading" | "done" | "failed";
 type MyCarteProps = { language: LanguageCode; initialPrefs: DinerPrefs };
 
 const linkClass = "underline underline-offset-4 hover:text-muted";
-const panelClass = "divide-y divide-line rounded-2xl border border-line bg-card px-5";
+const panelClass = "divide-y divide-ink/10 rounded-panel bg-paper px-6 shadow-raised";
 
 export function MyCarte({ language, initialPrefs }: MyCarteProps) {
   const t = MY_CARTE_STRINGS[language];
@@ -105,7 +105,7 @@ export function MyCarte({ language, initialPrefs }: MyCarteProps) {
       <div className="-mx-5 mt-8 overflow-x-auto px-5 pb-1">
         <div
           role="tablist"
-          className="flex w-max gap-1 rounded-xl border border-line bg-card p-1 shadow-sm"
+          className="flex w-max gap-1 rounded-full bg-paper p-1.5 shadow-raised-sm"
         >
           {tabs.map(([key, label]) => (
             <button
@@ -115,14 +115,14 @@ export function MyCarte({ language, initialPrefs }: MyCarteProps) {
               aria-selected={tab === key}
               aria-controls="my-tab-panel"
               onClick={() => setTab(key)}
-              className={`relative isolate rounded-lg px-3.5 py-2 text-sm whitespace-nowrap transition-colors ${
+              className={`relative isolate rounded-full px-4 py-2.5 text-sm font-medium whitespace-nowrap transition-colors ${
                 tab === key ? "text-white" : "text-muted hover:text-ink"
               }`}
             >
               {tab === key && (
                 <motion.span
                   layoutId="my-carte-tab"
-                  className="absolute inset-0 -z-10 rounded-lg bg-ink"
+                  className="absolute inset-0 -z-10 rounded-full bg-ink shadow-pressed-color"
                   transition={{ type: "spring", bounce: 0.2, duration: 0.4 }}
                 />
               )}
@@ -140,7 +140,7 @@ export function MyCarte({ language, initialPrefs }: MyCarteProps) {
             <div className="space-y-8">
               {state.restaurants.length > 0 && (
                 <div>
-                  <h2 className="font-serif text-2xl">{t.savedRestaurants}</h2>
+                  <h2 className="font-serif text-3xl tracking-tight">{t.savedRestaurants}</h2>
                   <ul className={`mt-3 ${panelClass}`}>
                     {state.restaurants.map((restaurant) => (
                       <li
@@ -173,7 +173,7 @@ export function MyCarte({ language, initialPrefs }: MyCarteProps) {
               )}
               {state.dishes.length > 0 && (
                 <div>
-                  <h2 className="font-serif text-2xl">{t.savedDishes}</h2>
+                  <h2 className="font-serif text-3xl tracking-tight">{t.savedDishes}</h2>
                   <ul className={`mt-3 ${panelClass}`}>
                     {state.dishes.map((dish) => (
                       <li
@@ -253,7 +253,7 @@ export function MyCarte({ language, initialPrefs }: MyCarteProps) {
               </Notice>
             )}
             {taste && tasteStatus === "done" && (
-              <div className="mt-6 rounded-2xl border border-line bg-card p-5 sm:p-6">
+              <div className="mt-6 rounded-panel bg-paper p-6 shadow-raised sm:p-8">
                 <p className="leading-relaxed">{taste.summary}</p>
                 {taste.loves.length > 0 && (
                   <p className="mt-4 text-sm">
@@ -274,26 +274,31 @@ export function MyCarte({ language, initialPrefs }: MyCarteProps) {
         )}
 
         {tab === "challenges" && (
-          <ul className="grid gap-4 sm:grid-cols-2">
+          <ul className="grid gap-6 sm:grid-cols-2">
             {challenges.map((challenge) => (
               <li
                 key={challenge.id}
-                className={`rounded-2xl border bg-card p-5 ${challenge.done ? "border-basil" : "border-line"}`}
+                className={`rounded-panel bg-paper p-6 ${challenge.done ? "shadow-raised outline-2 outline-offset-2 outline-basil" : "shadow-raised"}`}
               >
                 <div className="flex items-baseline justify-between gap-2">
-                  <h2 className="font-serif text-lg">{t.challengeNames[challenge.id]}</h2>
+                  <h2 className="font-serif text-2xl tracking-tight">
+                    {t.challengeNames[challenge.id]}
+                  </h2>
                   {challenge.done ? (
                     <span className="text-sm font-medium text-basil">✓ {t.completed}</span>
                   ) : (
-                    <span className="text-sm text-muted tabular-nums">
+                    <span className="font-mono text-sm text-muted tabular-nums">
                       {challenge.progress}/{challenge.goal}
                     </span>
                   )}
                 </div>
                 <p className="mt-1 text-sm text-muted">{t.challengeGoals[challenge.id]}</p>
-                <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-line" aria-hidden="true">
+                <div
+                  className="mt-4 h-2.5 overflow-hidden rounded-full shadow-pressed-sm"
+                  aria-hidden="true"
+                >
                   <div
-                    className="h-full rounded-full bg-basil"
+                    className="h-full rounded-full bg-accent"
                     style={{
                       width: `${Math.min(100, (challenge.progress / challenge.goal) * 100)}%`,
                     }}
@@ -314,7 +319,7 @@ export function MyCarte({ language, initialPrefs }: MyCarteProps) {
         )}
       </section>
 
-      <div className="mt-12 border-t border-line pt-5">
+      <div className="mt-16 border-t border-ink/15 pt-5">
         <Button onClick={clearAll} variant="danger" size="sm" className="-ml-3">
           {t.clearAll}
         </Button>
