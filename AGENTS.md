@@ -41,3 +41,6 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - If you change `public/sw.js`, bump its `CACHE` name so phones pick up the new version.
 - Scanned paper menus are unconfirmed. Never show a "safe" or green state for them; always show the warning and point diners to staff.
 - Image uploads go through `readImageUpload` on the server and `shrinkImage` in the browser.
+- All map lookups go through `lib/places/osm.ts` (throttled and cached). Never call OpenStreetMap from anywhere else.
+- Owners can never set `osm_verified`; only Carte approves claims. Keep the column privileges in the places migration.
+- Map data is unconfirmed. Show the OpenStreetMap credit and source note wherever it appears.

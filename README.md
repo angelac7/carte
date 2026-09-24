@@ -117,3 +117,11 @@ On any Carte menu, diners can find a dish by photo; matches come only from confi
 `/scan`, diners can photograph a paper menu from a restaurant not on Carte to translate it and flag
 possible allergens against their own list. Scanned results are always labeled as unconfirmed AI
 guesses, and nothing is stored. Photo features are limited per visitor per hour.
+
+## Real restaurants
+
+`/places` searches real restaurants from OpenStreetMap by city or the diner's location, and
+`/place/<id>` shows any restaurant, linking to its Carte menu when one exists. Owners can claim their
+listing at `/dashboard/claim`; claims stay hidden from diners until Carte sets `osm_verified` to true
+in the `restaurants` table. Map requests are throttled to one per second, identify Carte with
+`OSM_CONTACT_EMAIL`, and are cached for a week in `place_cache`.

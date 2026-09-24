@@ -11,6 +11,9 @@ export function PublicHeader() {
           <Link href="/discover" className="text-muted hover:text-ink">
             Discover
           </Link>
+          <Link href="/places" className="text-muted hover:text-ink">
+            Nearby
+          </Link>
           <Link href="/scan" className="text-muted hover:text-ink">
             Scan a menu
           </Link>

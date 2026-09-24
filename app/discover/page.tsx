@@ -18,6 +18,7 @@ import {
 import { parsePrefs, PREFS_COOKIE } from "@/lib/diner-prefs";
 import { DINER_STRINGS, type DinerStrings } from "@/lib/i18n/diner-strings";
 import { DISCOVER_STRINGS, type DiscoverStrings } from "@/lib/i18n/discover-strings";
+import { PLACES_STRINGS } from "@/lib/i18n/places-strings";
 import {
   htmlLang,
   isLanguageCode,
@@ -234,6 +235,12 @@ export default async function DiscoverPage({ searchParams }: DiscoverProps) {
       <main lang={htmlLang(language)} className="mx-auto max-w-3xl px-5 py-12">
         <h1 className="font-serif text-4xl leading-tight">{t.title}</h1>
         <p className="mt-3 max-w-xl leading-relaxed text-muted">{t.intro}</p>
+        <Link
+          href="/places"
+          className="mt-2 inline-block text-sm underline underline-offset-4 hover:text-muted"
+        >
+          {PLACES_STRINGS[language].placesLink}
+        </Link>
 
         <form
           action="/discover"
