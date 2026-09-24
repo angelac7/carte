@@ -14,7 +14,7 @@ function fail(message: string, status: number) {
 export async function POST(req: Request) {
   const owner = await getOwnerContext();
   if (!owner) return fail("Log in to upload a menu.", 401);
-  if (!checkRateLimit(`extract:${owner.user.id}`, 30, 60 * 60 * 1000)) {
+  if (!(await checkRateLimit(`extract:${owner.user.id}`, 30, 60 * 60 * 1000))) {
     return fail("Too many menu uploads in the last hour. Try again later.", 429);
   }
 

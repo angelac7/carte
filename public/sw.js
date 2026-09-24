@@ -1,12 +1,20 @@
 // Carte's service worker: keeps opened menus and My Carte available offline.
 // Menus are fetched fresh whenever there's a connection; the saved copy is only a fallback.
-const CACHE = "carte-v1";
+const CACHE = "carte-v2";
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches
       .open(CACHE)
-      .then((cache) => cache.add("/my"))
+      .then(async (cache) => {
+        const response = await fetch("/my");
+        if (!response.ok) return;
+        await cache.put("/my", response.clone());
+        // Preload the offline shell's scripts, styles, and fonts even before /my is visited.
+        const html = await response.text();
+        const assets = [...new Set(html.match(/\/_next\/static\/[^"'\\\s<>]+/g) || [])];
+        await Promise.all(assets.map((asset) => cache.add(asset).catch(() => {})));
+      })
       .catch(() => {})
       .then(() => self.skipWaiting()),
   );
@@ -17,7 +25,11 @@ self.addEventListener("activate", (event) => {
     caches
       .keys()
       .then((keys) =>
-        Promise.all(keys.filter((key) => key !== CACHE).map((key) => caches.delete(key))),
+        Promise.all(
+          keys
+            .filter((key) => key.startsWith("carte-") && key !== CACHE)
+            .map((key) => caches.delete(key)),
+        ),
       )
       .then(() => self.clients.claim()),
   );
@@ -37,7 +49,7 @@ self.addEventListener("fetch", (event) => {
           cached ||
           fetch(request).then((response) => {
             const copy = response.clone();
-            caches.open(CACHE).then((cache) => cache.put(request, copy));
+            event.waitUntil(caches.open(CACHE).then((cache) => cache.put(request, copy)));
             return response;
           }),
       ),
@@ -54,11 +66,39 @@ self.addEventListener("fetch", (event) => {
         .then((response) => {
           if (response.ok) {
             const copy = response.clone();
-            caches.open(CACHE).then((cache) => cache.put(request, copy));
+            event.waitUntil(caches.open(CACHE).then((cache) => cache.put(request, copy)));
           }
           return response;
         })
         .catch(() => caches.match(request).then((cached) => cached || caches.match("/my"))),
     );
   }
+});
+
+// The first visit may finish before the worker takes control. Save that document too.
+self.addEventListener("message", (event) => {
+  if (event.data?.type !== "cache-page") return;
+  let url;
+  try {
+    url = new URL(event.data.url);
+  } catch {
+    return;
+  }
+  if (
+    url.origin !== self.location.origin ||
+    !(url.pathname.startsWith("/r/") || url.pathname === "/my")
+  )
+    return;
+  event.waitUntil(
+    (async () => {
+      const response = await fetch(url.href);
+      if (!response.ok) return;
+      const cache = await caches.open(CACHE);
+      await cache.put(url.href, response.clone());
+      const assets = [
+        ...new Set((await response.text()).match(/\/_next\/static\/[^"'\\\s<>]+/g) || []),
+      ];
+      await Promise.all(assets.map((asset) => cache.add(asset).catch(() => {})));
+    })().catch(() => {}),
+  );
 });

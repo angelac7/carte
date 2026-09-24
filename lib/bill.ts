@@ -9,45 +9,45 @@ export type BillSplit = {
   unpricedCount: number;
 };
 
-const round = (amount: number) => Math.round(amount * 100) / 100;
-
-/**
- * Splits a bill. A dish assigned to a person goes to them; unassigned dishes are shared evenly.
- * Tax and tip are added in proportion to what each person ordered.
- */
+/** Split integer cents, assigning leftover cents by largest remainder. */
 export function splitBill(
   lines: BillLine[],
   people: string[],
   taxRate: number,
   tipRate: number,
 ): BillSplit {
-  const owed = new Map(people.map((person) => [person, 0]));
-  let subtotal = 0;
+  const names = [...new Set(people)];
+  const owed = new Map(names.map((name) => [name, 0]));
+  let subtotalCents = 0;
   let unpricedCount = 0;
-
   for (const line of lines) {
     if (line.price === null) {
-      unpricedCount += 1;
+      unpricedCount++;
       continue;
     }
-    const amount = line.price * line.quantity;
-    subtotal += amount;
-    if (line.person && owed.has(line.person)) {
-      owed.set(line.person, owed.get(line.person)! + amount);
-    } else if (people.length > 0) {
-      for (const person of people) owed.set(person, owed.get(person)! + amount / people.length);
-    }
+    const cents = Math.round(line.price * 100) * line.quantity;
+    subtotalCents += cents;
+    if (line.person && owed.has(line.person)) owed.set(line.person, owed.get(line.person)! + cents);
+    else for (const name of names) owed.set(name, owed.get(name)! + cents / names.length);
   }
-
-  const multiplier = 1 + taxRate + tipRate;
+  const taxCents = Math.round(subtotalCents * taxRate);
+  const tipCents = Math.round(subtotalCents * tipRate);
+  const totalCents = subtotalCents + taxCents + tipCents;
+  const shares = names.map((name) => {
+    const exact = subtotalCents ? (owed.get(name)! / subtotalCents) * totalCents : 0;
+    const cents = Math.floor(exact);
+    return { name, cents, remainder: exact - cents };
+  });
+  let remaining = totalCents - shares.reduce((sum, share) => sum + share.cents, 0);
+  for (const share of [...shares].sort((a, b) => b.remainder - a.remainder)) {
+    if (remaining-- > 0) share.cents++;
+  }
   return {
-    subtotal: round(subtotal),
-    tax: round(subtotal * taxRate),
-    tip: round(subtotal * tipRate),
-    total: round(subtotal * multiplier),
-    perPerson: Object.fromEntries(
-      [...owed].map(([person, amount]) => [person, round(amount * multiplier)]),
-    ),
+    subtotal: subtotalCents / 100,
+    tax: taxCents / 100,
+    tip: tipCents / 100,
+    total: totalCents / 100,
+    perPerson: Object.fromEntries(shares.map(({ name, cents }) => [name, cents / 100])),
     unpricedCount,
   };
 }

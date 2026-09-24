@@ -7,7 +7,7 @@ let db: PGlite;
 beforeAll(async () => {
   db = new PGlite();
   await db.exec(`
-    create role anon; create role authenticated;
+    create role anon; create role authenticated; create role service_role;
     create schema auth;
     create table auth.users (id uuid primary key);
     create function auth.uid() returns uuid language sql as 'select null::uuid';
@@ -89,7 +89,7 @@ it("unconfirms every content edit even when the writer supplies confirmed=true",
     "allergens = array['milk']",
     "dietary_tags = array['vegetarian']",
     "notes = 'Shared fryer'",
-    "photo_url = 'https://test.supabase.co/storage/v1/object/public/dish-photos/test.jpg'",
+    "photo_url = 'https://test.supabase.co/storage/v1/object/public/dish-photos/' || restaurant_id::text || '/' || id::text || '-1.jpg'",
   ]) {
     await db.query("update public.menu_items set confirmed = true where id = $1", [id]);
     const updated = await db.query<{ confirmed: boolean }>(
@@ -123,4 +123,35 @@ it("keeps SQL opening-hours filtering consistent with diner badges", async () =>
       expect(rows[0].open).toBe(isOpenNow(hours, zone, new Date(rows[0].now)) === true);
     }
   }
+});
+
+it("atomically enforces shared limits and resets expired windows", async () => {
+  const key = "a".repeat(64);
+  const attempts = await Promise.all(
+    Array.from({ length: 8 }, () =>
+      db.query<{ allowed: boolean }>("select public.consume_rate_limit($1, 3, 60000) as allowed", [
+        key,
+      ]),
+    ),
+  );
+  expect(attempts.filter((result) => result.rows[0].allowed)).toHaveLength(3);
+  await db.query(
+    "update public.rate_limits set expires_at = now() - interval '1 second' where key_hash = $1",
+    [key],
+  );
+  expect(
+    (
+      await db.query<{ allowed: boolean }>(
+        "select public.consume_rate_limit($1, 3, 60000) as allowed",
+        [key],
+      )
+    ).rows[0].allowed,
+  ).toBe(true);
+});
+it("rejects cross-restaurant photo references at the database boundary", async () => {
+  await expect(
+    db.exec(
+      "update public.menu_items set photo_url = 'https://test.supabase.co/storage/v1/object/public/dish-photos/other/dish-1.jpg' where id = (select id from public.menu_items limit 1)",
+    ),
+  ).rejects.toThrow();
 });

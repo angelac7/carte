@@ -16,7 +16,7 @@ function fail(message: string, status: number) {
 export async function POST(req: Request) {
   const owner = await getOwnerContext();
   if (!owner) return fail("Log in to manage your menu.", 401);
-  if (!checkRateLimit(`photo-upload:${owner.user.id}`, 60, 60 * 60 * 1000)) {
+  if (!(await checkRateLimit(`photo-upload:${owner.user.id}`, 60, 60 * 60 * 1000))) {
     return fail("Too many uploads in the last hour. Try again later.", 429);
   }
 
@@ -37,7 +37,7 @@ export async function POST(req: Request) {
       image.mediaType,
     );
     await setDishPhoto(owner.supabase, owner.restaurant.id, dishId, photoUrl);
-    await deleteStoredPhoto(current.photoUrl).catch(() => {});
+    await deleteStoredPhoto(current.photoUrl, owner.restaurant.id).catch(() => {});
     return NextResponse.json({ photoUrl });
   } catch (err) {
     console.error("Dish photo upload failed:", err);
@@ -56,6 +56,6 @@ export async function DELETE(req: Request) {
   const current = await getDishPhoto(owner.supabase, owner.restaurant.id, parsed.data);
   if (!current.exists) return fail("That dish no longer exists.", 404);
   await setDishPhoto(owner.supabase, owner.restaurant.id, parsed.data, null);
-  await deleteStoredPhoto(current.photoUrl).catch(() => {});
+  await deleteStoredPhoto(current.photoUrl, owner.restaurant.id).catch(() => {});
   return NextResponse.json({ ok: true });
 }

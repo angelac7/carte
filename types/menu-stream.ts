@@ -16,6 +16,7 @@ export const MenuStreamEventSchema = z.discriminatedUnion("type", [
 
 /** Events from /api/scan while a diner's paper-menu photo is read and translated. */
 export const ScanStreamEventSchema = z.discriminatedUnion("type", [
+  z.object({ type: z.literal("partial") }),
   z.object({ type: z.literal("language"), menuLanguage: z.string() }),
   z.object({ type: z.literal("dish"), dish: ScannedDishSchema }),
   done,

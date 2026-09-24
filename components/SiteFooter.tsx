@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/components/OfflineLink";
 
 const DINER_LINKS = [
   { href: "/discover", label: "Discover" },

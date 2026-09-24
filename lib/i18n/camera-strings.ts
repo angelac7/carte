@@ -19,6 +19,7 @@ export type CameraStrings = {
   reading: string;
   readingHint: string;
   scanFailed: string;
+  scanPartial: string;
   warning: string;
   checking: string;
   noAllergiesSet: string;
@@ -31,6 +32,8 @@ export type CameraStrings = {
 
 export const CAMERA_STRINGS: Record<LanguageCode, CameraStrings> = {
   en: {
+    scanPartial:
+      "Only the first 60 dishes were read. Photograph the remaining section separately. Always confirm allergens with staff.",
     photoButton: "Find a dish by photo",
     photoIntro: "Take a photo of a dish, like one at another table, to find it on this menu.",
     takePhoto: "Take or choose a photo",
@@ -60,6 +63,8 @@ export const CAMERA_STRINGS: Record<LanguageCode, CameraStrings> = {
     dishesFound: (count) => `${count} dishes found`,
   },
   es: {
+    scanPartial:
+      "Solo se leyeron los primeros 60 platos. Fotografíe el resto por separado. Confirme siempre los alérgenos con el personal.",
     photoButton: "Buscar un plato por foto",
     photoIntro:
       "Tome una foto de un plato, por ejemplo en otra mesa, para encontrarlo en este menú.",
@@ -94,6 +99,7 @@ export const CAMERA_STRINGS: Record<LanguageCode, CameraStrings> = {
     dishesFound: (count) => `${count} platos encontrados`,
   },
   zh: {
+    scanPartial: "只读取了前60道菜。请单独拍摄剩余部分。务必向工作人员确认过敏原。",
     photoButton: "拍照找菜",
     photoIntro: "拍下一道菜（比如邻桌的菜），在这份菜单上找到它。",
     takePhoto: "拍照或选择照片",
@@ -121,6 +127,8 @@ export const CAMERA_STRINGS: Record<LanguageCode, CameraStrings> = {
     dishesFound: (count) => `找到 ${count} 道菜`,
   },
   ko: {
+    scanPartial:
+      "처음 60개 메뉴만 읽었습니다. 나머지 부분을 따로 촬영하세요. 알레르기 유발 성분은 반드시 직원에게 확인하세요.",
     photoButton: "사진으로 요리 찾기",
     photoIntro: "옆 테이블의 요리처럼 요리 사진을 찍어 이 메뉴에서 찾아보세요.",
     takePhoto: "사진 찍기 또는 선택",
@@ -152,6 +160,8 @@ export const CAMERA_STRINGS: Record<LanguageCode, CameraStrings> = {
     dishesFound: (count) => `요리 ${count}개를 찾았습니다`,
   },
   ja: {
+    scanPartial:
+      "最初の60品のみ読み取りました。残りの部分を別に撮影してください。アレルゲンは必ずスタッフに確認してください。",
     photoButton: "写真で料理を探す",
     photoIntro: "隣のテーブルの料理などを撮影して、このメニューから探せます。",
     takePhoto: "写真を撮る・選ぶ",
@@ -183,6 +193,8 @@ export const CAMERA_STRINGS: Record<LanguageCode, CameraStrings> = {
     dishesFound: (count) => `${count}品見つかりました`,
   },
   fr: {
+    scanPartial:
+      "Seuls les 60 premiers plats ont été lus. Photographiez le reste séparément. Confirmez toujours les allergènes avec le personnel.",
     photoButton: "Trouver un plat en photo",
     photoIntro:
       "Prenez un plat en photo, par exemple à une autre table, pour le trouver sur ce menu.",
@@ -216,6 +228,8 @@ export const CAMERA_STRINGS: Record<LanguageCode, CameraStrings> = {
     dishesFound: (count) => `${count} plats trouvés`,
   },
   vi: {
+    scanPartial:
+      "Chỉ đọc được 60 món đầu tiên. Hãy chụp riêng phần còn lại. Luôn xác nhận chất gây dị ứng với nhân viên.",
     photoButton: "Tìm món bằng ảnh",
     photoIntro: "Chụp ảnh một món, ví dụ ở bàn bên cạnh, để tìm món đó trong thực đơn này.",
     takePhoto: "Chụp hoặc chọn ảnh",

@@ -1,5 +1,5 @@
 "use client";
-import Link from "next/link";
+import Link from "@/components/OfflineLink";
 import { useActionState } from "react";
 import { logIn, signUp, type AuthState } from "@/app/auth/actions";
 import { BlurFade } from "@/components/motion/BlurFade";
@@ -26,7 +26,13 @@ const COPY = {
 
 const inputClass = fieldClass("mt-2");
 
-export function AuthForm({ mode }: { mode: "login" | "signup" }) {
+export function AuthForm({
+  mode,
+  next = "/dashboard",
+}: {
+  mode: "login" | "signup";
+  next?: string;
+}) {
   const [state, formAction, pending] = useActionState<AuthState, FormData>(
     mode === "login" ? logIn : signUp,
     {},
@@ -44,6 +50,7 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
         action={formAction}
         className="mt-10 space-y-5 rounded-panel bg-paper p-6 shadow-raised-lg sm:p-8"
       >
+        <input type="hidden" name="next" value={next} />
         <label className="block">
           <span className="eyebrow text-muted">Email</span>
           <input name="email" type="email" required autoComplete="email" className={inputClass} />
@@ -78,10 +85,15 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
           {pending ? "One moment…" : copy.submit}
         </Button>
       </form>
+      {mode === "login" && (
+        <Link href="/forgot-password" className="mt-4 inline-block text-sm underline">
+          Forgot your password?
+        </Link>
+      )}
       <p className="mt-6 text-sm text-muted">
         {copy.switchText}{" "}
         <Link
-          href={copy.switchHref}
+          href={`${copy.switchHref}?next=${encodeURIComponent(next)}`}
           className="text-ink underline underline-offset-4 hover:text-muted"
         >
           {copy.switchLabel}

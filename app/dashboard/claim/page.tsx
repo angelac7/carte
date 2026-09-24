@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import Link from "@/components/OfflineLink";
 import { claimPlaceAction } from "@/app/dashboard/claim/actions";
 import { OwnerPageHeader } from "@/components/owner/OwnerPageHeader";
 import { Button } from "@/components/ui/button";
@@ -25,8 +25,10 @@ const ERRORS: Record<string, string> = {
 };
 
 export default async function ClaimPage({ searchParams }: { searchParams: Promise<Params> }) {
-  const { supabase, restaurant } = await requireRestaurant();
   const params = await searchParams;
+  const { supabase, restaurant } = await requireRestaurant(
+    `/dashboard/claim?place=${encodeURIComponent(one(params.place))}`,
+  );
   const placeId = one(params.place);
   const error = ERRORS[one(params.error)];
   const justClaimed = one(params.claimed) === "1";

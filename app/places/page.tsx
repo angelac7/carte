@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import Link from "@/components/OfflineLink";
 import { cookies, headers } from "next/headers";
 import { Badge, CardImage, cardClass } from "@/components/cards";
 import { Chip } from "@/components/Chip";
@@ -59,7 +59,7 @@ export default async function PlacesPage({ searchParams }: { searchParams: Promi
   let carteLinks = new Map<string, string>();
 
   if (near || hasCoordinates) {
-    const allowed = checkRateLimit(
+    const allowed = await checkRateLimit(
       `places:${clientKeyFromHeaders(headerStore)}`,
       30,
       10 * 60 * 1000,

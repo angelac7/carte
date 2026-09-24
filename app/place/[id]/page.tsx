@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import Link from "@/components/OfflineLink";
 import { cookies, headers } from "next/headers";
 import { notFound } from "next/navigation";
 import { Chip } from "@/components/Chip";

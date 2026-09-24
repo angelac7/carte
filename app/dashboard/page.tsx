@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import Link from "@/components/OfflineLink";
 import { BlurFade } from "@/components/motion/BlurFade";
 import { NumberTicker } from "@/components/motion/NumberTicker";
 import { OwnerPageHeader } from "@/components/owner/OwnerPageHeader";

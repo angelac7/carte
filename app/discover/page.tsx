@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import Link from "@/components/OfflineLink";
 import { cookies, headers } from "next/headers";
 import { Badge, CardImage, cardClass } from "@/components/cards";
 import { Chip } from "@/components/Chip";
@@ -247,7 +247,7 @@ export default async function DiscoverPage({ searchParams }: DiscoverProps) {
     dishes = await searchDishes(supabase, query, filters);
     // No direct matches for a phrase: let AI turn the craving into dish words, then search again.
     const isPhrase = query.split(/\s+/).length >= 2;
-    const allowed = checkRateLimit(
+    const allowed = await checkRateLimit(
       `craving:${clientKeyFromHeaders(headerStore)}`,
       20,
       10 * 60 * 1000,
@@ -286,7 +286,7 @@ export default async function DiscoverPage({ searchParams }: DiscoverProps) {
         className="relative z-10 mx-auto -mt-10 max-w-5xl px-5 pb-20"
       >
         <form
-          action="/discover"
+          action="/discover/filters"
           method="get"
           className="rounded-panel bg-paper p-5 shadow-raised-lg sm:p-7"
         >

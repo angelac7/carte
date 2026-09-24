@@ -21,7 +21,7 @@ export async function GET(req: Request) {
   const params = Object.fromEntries(new URL(req.url).searchParams);
   const parsed = Query.safeParse(params);
   if (!parsed.success) return NextResponse.json({ error: "Invalid request." }, { status: 400 });
-  if (!checkRateLimit(`insight:${clientKey(req)}`, 60, 10 * 60 * 1000)) {
+  if (!(await checkRateLimit(`insight:${clientKey(req)}`, 60, 10 * 60 * 1000))) {
     return NextResponse.json({ error: "Too many requests. Try again soon." }, { status: 429 });
   }
 

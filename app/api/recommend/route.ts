@@ -9,7 +9,7 @@ import { RecommendRequestSchema } from "@/types/recommend";
 
 /** Suggests dishes from a restaurant's confirmed menu, after applying the diner's filters. */
 export async function POST(req: Request) {
-  if (!checkRateLimit(`recommend:${clientKey(req)}`, 20, 10 * 60 * 1000)) {
+  if (!(await checkRateLimit(`recommend:${clientKey(req)}`, 20, 10 * 60 * 1000))) {
     return NextResponse.json({ error: "limit" }, { status: 429 });
   }
   const parsed = RecommendRequestSchema.safeParse(await req.json().catch(() => null));

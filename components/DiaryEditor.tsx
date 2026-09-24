@@ -7,7 +7,7 @@ import { MY_CARTE_STRINGS } from "@/lib/i18n/my-carte-strings";
 import { TABLE_STRINGS } from "@/lib/i18n/table-strings";
 import type { LanguageCode } from "@/lib/languages";
 import { removeDiaryEntry, saveDiaryEntry, type DiaryEntry, type DishRef } from "@/lib/my-carte";
-import { updateMyCarte } from "@/lib/my-carte-store";
+import { useMyCarteWriter } from "@/lib/use-my-carte-writer";
 
 type DiaryEditorProps = {
   dish: DishRef;
@@ -19,18 +19,17 @@ type DiaryEditorProps = {
 /** Rate a dish from 1 to 5 stars and add a note, saved in the diner's food diary. */
 export function DiaryEditor({ dish, entry, language, onClose }: DiaryEditorProps) {
   const t = MY_CARTE_STRINGS[language];
+  const saveOnDevice = useMyCarteWriter(language);
   const [rating, setRating] = useState(entry?.rating ?? 0);
   const [note, setNote] = useState(entry?.note ?? "");
 
   function save() {
     if (rating < 1) return;
-    updateMyCarte((state) => saveDiaryEntry(state, dish, rating, note, Date.now()));
-    onClose();
+    if (saveOnDevice((state) => saveDiaryEntry(state, dish, rating, note, Date.now()))) onClose();
   }
 
   function remove() {
-    updateMyCarte((state) => removeDiaryEntry(state, dish.dishId));
-    onClose();
+    if (saveOnDevice((state) => removeDiaryEntry(state, dish.dishId))) onClose();
   }
 
   return (

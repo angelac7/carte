@@ -10,7 +10,7 @@ import {
   type ScannedDish,
 } from "@/types/camera";
 
-export type ScanUpdate = { menuLanguage: string } | { dish: ScannedDish };
+export type ScanUpdate = { menuLanguage: string } | { dish: ScannedDish } | { partial: true };
 
 function promptFor(languageName: string) {
   return `You are reading a photo of a restaurant menu for a diner who reads ${languageName}.
@@ -95,7 +95,10 @@ export async function* streamPaperMenu(
       const dish = toDish(item);
       if (!dish) continue;
       // Stopping here also stops the AI call, so a huge menu doesn't run on.
-      if (++dishes > MAX_SCANNED_DISHES) return;
+      if (++dishes > MAX_SCANNED_DISHES) {
+        yield { partial: true };
+        return;
+      }
       yield { dish };
     }
   }

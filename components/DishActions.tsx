@@ -5,7 +5,8 @@ import { DiaryEditor } from "@/components/DiaryEditor";
 import { MY_CARTE_STRINGS } from "@/lib/i18n/my-carte-strings";
 import type { LanguageCode } from "@/lib/languages";
 import { findDiaryEntry, isDishSaved, toggleSavedDish, type DishRef } from "@/lib/my-carte";
-import { updateMyCarte, useMyCarte } from "@/lib/my-carte-store";
+import { useMyCarteWriter } from "@/lib/use-my-carte-writer";
+import { useMyCarte } from "@/lib/my-carte-store";
 import type { MenuItem } from "@/types/menu";
 
 type DishActionsProps = {
@@ -24,6 +25,7 @@ const pill = (active: boolean) =>
 /** Save a dish or mark it tried, stored in My Carte on this device. */
 export function DishActions({ dish, restaurant, language }: DishActionsProps) {
   const t = MY_CARTE_STRINGS[language];
+  const saveOnDevice = useMyCarteWriter(language);
   const state = useMyCarte();
   const [editing, setEditing] = useState(false);
 
@@ -44,8 +46,8 @@ export function DishActions({ dish, restaurant, language }: DishActionsProps) {
       <button
         aria-pressed={saved}
         onClick={() => {
-          updateMyCarte((current) => toggleSavedDish(current, ref, Date.now()));
-          if (!saved) toast(`♥ ${t.saved}`);
+          const written = saveOnDevice((current) => toggleSavedDish(current, ref, Date.now()));
+          if (written && !saved) toast(`♥ ${t.saved}`);
         }}
         className={pill(saved)}
       >

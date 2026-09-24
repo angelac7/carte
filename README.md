@@ -57,7 +57,9 @@ editing a dish triggers a fresh translation of that dish only.
 Diners can ask questions on the menu page. Answers use only confirmed dishes, reply in the
 diner's language, and send preparation or cross-contamination questions to staff.
 Limits: 20 questions per 10 minutes per visitor, 30 menu uploads per hour, 500 characters per question.
-Rate limits are in memory for now and must move to a shared store before launch.
+Rate limits use atomic Supabase counters shared across server instances. Apply all migrations, including `20261002000000_photo_ownership_and_rate_limits.sql`, before deploying this version. Missing counter storage fails closed for rate-limited requests. Counters contain keyed hashes, never raw IP addresses.
+
+Set `NEXT_PUBLIC_SITE_URL` to your production origin (for example `https://carte.example`). In Supabase Authentication URL Configuration, set the Site URL and allow that origin's `/auth/callback` redirect, including query parameters. Password recovery starts at `/forgot-password`; open the email in the same browser to complete the PKCE flow. Claim destinations are retained through login, signup, and restaurant setup.
 
 ## Accounts and database
 

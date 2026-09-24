@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/components/OfflineLink";
 import { FeatureShowcase, type Feature } from "@/components/landing/FeatureShowcase";
 import { Hero } from "@/components/landing/Hero";
 import { BlurFade } from "@/components/motion/BlurFade";

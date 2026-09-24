@@ -1,5 +1,5 @@
 "use client";
-import Link from "next/link";
+import Link from "@/components/OfflineLink";
 import { useEffect } from "react";
 import { MY_CARTE_STRINGS } from "@/lib/i18n/my-carte-strings";
 import type { LanguageCode } from "@/lib/languages";
@@ -9,6 +9,7 @@ import {
   similarDishes,
   toggleSavedRestaurant,
 } from "@/lib/my-carte";
+import { useMyCarteWriter } from "@/lib/use-my-carte-writer";
 import { updateMyCarte, useMyCarte } from "@/lib/my-carte-store";
 import type { DishText, MenuItem } from "@/types/menu";
 
@@ -31,6 +32,7 @@ export function MenuExtras({
   onOpenDish,
 }: MenuExtrasProps) {
   const t = MY_CARTE_STRINGS[language];
+  const saveOnDevice = useMyCarteWriter(language);
   const state = useMyCarte();
 
   // Remember the menu's size for the Menu master challenge.
@@ -53,7 +55,7 @@ export function MenuExtras({
         <button
           aria-pressed={saved}
           onClick={() =>
-            updateMyCarte((current) => toggleSavedRestaurant(current, restaurant, Date.now()))
+            saveOnDevice((current) => toggleSavedRestaurant(current, restaurant, Date.now()))
           }
           className={linkClass}
         >

@@ -50,12 +50,14 @@ export async function DELETE(req: Request) {
 
   if ("all" in parsed.data) {
     const photos = await deleteAllDishes(owner.supabase, owner.restaurant.id);
-    await Promise.all(photos.map((photo) => deleteStoredPhoto(photo).catch(() => {})));
+    await Promise.all(
+      photos.map((photo) => deleteStoredPhoto(photo, owner.restaurant.id).catch(() => {})),
+    );
     return NextResponse.json({ ok: true });
   }
 
   const { photoUrl } = await getDishPhoto(owner.supabase, owner.restaurant.id, parsed.data.id);
   await deleteDish(owner.supabase, owner.restaurant.id, parsed.data.id);
-  await deleteStoredPhoto(photoUrl).catch(() => {});
+  await deleteStoredPhoto(photoUrl, owner.restaurant.id).catch(() => {});
   return NextResponse.json({ ok: true });
 }

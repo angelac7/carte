@@ -44,14 +44,15 @@ export function useMyCarte(): MyCarte {
 }
 
 /** Saves a change on this device and updates every part of the page that shows it. */
-export function updateMyCarte(change: (current: MyCarte) => MyCarte): void {
+export function updateMyCarte(change: (current: MyCarte) => MyCarte): boolean {
   const current = getSnapshot();
   const next = change(current);
-  if (next === current) return;
+  if (next === current) return true;
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
   } catch {
-    return;
+    return false;
   }
   window.dispatchEvent(new Event(CHANGE_EVENT));
+  return true;
 }

@@ -1,6 +1,6 @@
 "use client";
 import { motion } from "motion/react";
-import Link from "next/link";
+import Link from "@/components/OfflineLink";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 import { CompassIcon, HeartIcon, PinIcon, ScanIcon } from "@/components/icons";

@@ -9,7 +9,7 @@ import type { ScanStreamEvent } from "@/types/menu-stream";
 
 /** Reads and translates a paper menu from a restaurant that isn't on Carte. Nothing is stored. */
 export async function POST(req: Request) {
-  if (!checkRateLimit(`scan:${clientKey(req)}`, 10, 60 * 60 * 1000)) {
+  if (!(await checkRateLimit(`scan:${clientKey(req)}`, 10, 60 * 60 * 1000))) {
     return NextResponse.json({ error: "limit" }, { status: 429 });
   }
 
@@ -33,9 +33,11 @@ async function* scanMenu(
 ): AsyncGenerator<ScanStreamEvent> {
   try {
     for await (const update of streamPaperMenu(imageBase64, mediaType, language, signal)) {
-      yield "dish" in update
-        ? { type: "dish", dish: update.dish }
-        : { type: "language", menuLanguage: update.menuLanguage };
+      yield "partial" in update
+        ? { type: "partial" }
+        : "dish" in update
+          ? { type: "dish", dish: update.dish }
+          : { type: "language", menuLanguage: update.menuLanguage };
     }
     yield { type: "done" };
   } catch (err) {

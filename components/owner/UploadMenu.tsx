@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Chip } from "@/components/Chip";
 import { DishHeader } from "@/components/DishHeader";
 import { OwnerPageHeader } from "@/components/owner/OwnerPageHeader";
@@ -19,13 +19,16 @@ export default function UploadPage() {
   const [error, setError] = useState("");
   const [fileName, setFileName] = useState("");
   const [dragging, setDragging] = useState(false);
+  const pending = useRef(false);
 
   async function readMenu(file: File) {
+    if (pending.current) return;
     if (!isSupportedImage(file.type)) {
       setStatus("error");
       setError("Use a JPG, PNG, or WebP image of your menu.");
       return;
     }
+    pending.current = true;
     setFileName(file.name);
     setStatus("reading");
     setError("");
@@ -40,10 +43,14 @@ export default function UploadPage() {
       // Keep any dishes already read; the message says whether the menu was cut short.
       setStatus("error");
       setError(err instanceof Error ? err.message : "Carte couldn't read that menu. Try again.");
+    } finally {
+      pending.current = false;
     }
   }
 
   async function saveAll() {
+    if (pending.current) return;
+    pending.current = true;
     setStatus("saving");
     try {
       await saveDishes(dishes);
@@ -51,10 +58,13 @@ export default function UploadPage() {
     } catch {
       setStatus("error");
       setError("Your dishes weren't saved. Check that Carte is still running, then try again.");
+    } finally {
+      pending.current = false;
     }
   }
 
   const reading = status === "reading";
+  const busy = reading || status === "saving";
 
   return (
     <main id="main" className="mx-auto max-w-3xl px-5 py-12 sm:py-16">
@@ -79,13 +89,13 @@ export default function UploadPage() {
           dragging
             ? "shadow-well outline-2 outline-offset-4 outline-accent"
             : "shadow-pressed hover:shadow-well"
-        } ${reading ? "pointer-events-none" : ""}`}
+        } ${busy ? "pointer-events-none" : ""}`}
       >
         <input
           type="file"
           accept="image/jpeg,image/png,image/webp"
           className="sr-only"
-          disabled={reading}
+          disabled={busy}
           onChange={(e) => {
             const file = e.target.files?.[0];
             if (file) readMenu(file);

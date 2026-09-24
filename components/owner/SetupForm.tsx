@@ -6,7 +6,7 @@ import { fieldClass, labelClass } from "@/components/ui/field";
 import { Notice } from "@/components/ui/notice";
 import { slugify } from "@/lib/slug";
 
-export function SetupForm() {
+export function SetupForm({ next = "/dashboard" }: { next?: string }) {
   const [state, formAction, pending] = useActionState<SetupState, FormData>(
     createRestaurantAction,
     {},
@@ -20,6 +20,7 @@ export function SetupForm() {
       action={formAction}
       className="mt-10 space-y-6 rounded-panel bg-paper p-6 shadow-raised sm:p-8"
     >
+      <input type="hidden" name="next" value={next} />
       <label className="block">
         <span className={labelClass}>Restaurant name</span>
         <input

@@ -18,7 +18,7 @@ const ChatBody = ChatRequestSchema.extend({ restaurant: z.string().refine(isVali
 
 /** Answers a diner's menu question from that restaurant's confirmed dishes only. */
 export async function POST(req: Request) {
-  if (!checkRateLimit(`chat:${clientKey(req)}`, QUESTIONS_PER_WINDOW, WINDOW_MS)) {
+  if (!(await checkRateLimit(`chat:${clientKey(req)}`, QUESTIONS_PER_WINDOW, WINDOW_MS))) {
     return NextResponse.json({ error: "limit" }, { status: 429 });
   }
 

@@ -1,27 +1,21 @@
-type Bucket = { count: number; resetAt: number };
+import { createHmac } from "node:crypto";
+import { consumeRateLimit } from "@/lib/db/rate-limits";
 
-// In-memory limits for local development. At launch, move to a shared store such as Redis
-// so limits hold across servers and restarts.
-const buckets = new Map<string, Bucket>();
-
-/** Returns true if this request is allowed, false once the key hits its limit for the window. */
-export function checkRateLimit(
+/** Atomic limits shared by every server. Fail closed if the counter store is unavailable. */
+export async function checkRateLimit(
   key: string,
   limit: number,
   windowMs: number,
-  now = Date.now(),
-): boolean {
-  if (buckets.size > 5000) {
-    for (const [k, bucket] of buckets) if (now >= bucket.resetAt) buckets.delete(k);
+): Promise<boolean> {
+  try {
+    const secret = process.env.SUPABASE_SECRET_KEY;
+    if (!secret) throw new Error("Rate limit storage is not configured");
+    const hash = createHmac("sha256", secret).update(key).digest("hex");
+    return await consumeRateLimit(hash, limit, windowMs);
+  } catch (error) {
+    console.error("Rate limit check unavailable:", error);
+    return false;
   }
-  const bucket = buckets.get(key);
-  if (!bucket || now >= bucket.resetAt) {
-    buckets.set(key, { count: 1, resetAt: now + windowMs });
-    return true;
-  }
-  if (bucket.count >= limit) return false;
-  bucket.count += 1;
-  return true;
 }
 
 /** Identifies a visitor by IP address for rate limiting. */

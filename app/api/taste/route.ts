@@ -6,7 +6,7 @@ import { TasteRequestSchema } from "@/types/taste";
 
 /** Creates a taste profile from data the diner sends from their own device. Nothing is stored. */
 export async function POST(req: Request) {
-  if (!checkRateLimit(`taste:${clientKey(req)}`, 10, 10 * 60 * 1000)) {
+  if (!(await checkRateLimit(`taste:${clientKey(req)}`, 10, 10 * 60 * 1000))) {
     return NextResponse.json({ error: "limit" }, { status: 429 });
   }
   const parsed = TasteRequestSchema.safeParse(await req.json().catch(() => null));

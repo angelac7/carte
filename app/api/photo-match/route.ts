@@ -9,7 +9,7 @@ import { createClient } from "@/lib/supabase/server";
 
 /** Finds which of a restaurant's confirmed dishes a photo shows. */
 export async function POST(req: Request) {
-  if (!checkRateLimit(`photo:${clientKey(req)}`, 20, 60 * 60 * 1000)) {
+  if (!(await checkRateLimit(`photo:${clientKey(req)}`, 20, 60 * 60 * 1000))) {
     return NextResponse.json({ error: "limit" }, { status: 429 });
   }
 

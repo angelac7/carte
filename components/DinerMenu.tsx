@@ -23,7 +23,8 @@ import { Notice } from "@/components/ui/notice";
 import { panelClass } from "@/components/ui/panel";
 import { ALLERGENS, DIETARY_TAGS, type Allergen, type DietaryTag } from "@/lib/allergens";
 import { fetchTranslations, trackDishView } from "@/lib/api-client";
-import { writePrefsCookie, type DinerPrefs } from "@/lib/diner-prefs";
+import { useDinerPrefs } from "@/lib/use-diner-prefs";
+import { type DinerPrefs } from "@/lib/diner-prefs";
 import {
   applyDisplay,
   DEFAULT_DISPLAY,
@@ -117,13 +118,14 @@ export function DinerMenu({
 }: DinerMenuProps) {
   const [language, setLanguage] = useState<LanguageCode>(initialLanguage);
   const [byLanguage, setByLanguage] = useState<TranslationState>({});
-  const [avoid, setAvoid] = useState<Allergen[]>(initialPrefs.avoid);
-  const [onlyTags, setOnlyTags] = useState<DietaryTag[]>(initialPrefs.onlyTags);
+  const [prefs, setPrefs] = useDinerPrefs(initialPrefs);
+  const { avoid, onlyTags } = prefs;
   const [order, setOrder] = useState<Record<string, number>>({});
   const [openDishId, setOpenDishId] = useState<string | null>(null);
   const [panel, setPanel] = useState<Panel>(null);
   const [display, setDisplay] = useState<DisplayPrefs>(initialDisplay);
   const requested = useRef(new Set<LanguageCode>());
+  const [translationAttempt, setTranslationAttempt] = useState(0);
 
   // Fetch each language's translations once, the first time a diner picks it.
   useEffect(() => {
@@ -132,7 +134,7 @@ export function DinerMenu({
     fetchTranslations(restaurant.slug, language)
       .then((result) => setByLanguage((prev) => ({ ...prev, [language]: result })))
       .catch(() => setByLanguage((prev) => ({ ...prev, [language]: "failed" })));
-  }, [language, restaurant.slug]);
+  }, [language, restaurant.slug, translationAttempt]);
 
   // Larger text and high contrast apply to the whole page while this menu is open.
   useEffect(() => {
@@ -166,9 +168,7 @@ export function DinerMenu({
 
   // Filters are remembered on this device and applied at every Carte menu.
   function updateFilters(nextAvoid: Allergen[], nextOnlyTags: DietaryTag[]) {
-    setAvoid(nextAvoid);
-    setOnlyTags(nextOnlyTags);
-    writePrefsCookie({ avoid: nextAvoid, onlyTags: nextOnlyTags });
+    setPrefs({ avoid: nextAvoid, onlyTags: nextOnlyTags });
   }
 
   function openDetails(dishId: string) {
@@ -244,7 +244,22 @@ export function DinerMenu({
         )}
         {status === "failed" && (
           <p role="alert" className="mt-3 text-sm text-tomato">
-            {t.translationFailed}
+            {t.translationFailed}{" "}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                requested.current.delete(language);
+                setByLanguage((previous) => {
+                  const next = { ...previous };
+                  delete next[language];
+                  return next;
+                });
+                setTranslationAttempt((attempt) => attempt + 1);
+              }}
+            >
+              {t.retryTranslation}
+            </Button>
           </p>
         )}
         {translations && <p className="mt-3 text-sm text-muted">{t.translatedNote}</p>}

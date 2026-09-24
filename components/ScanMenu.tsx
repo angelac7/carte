@@ -9,7 +9,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/cn";
 import type { Allergen } from "@/lib/allergens";
 import { PhotoLimitError, streamScan } from "@/lib/api-client";
-import { writePrefsCookie, type DinerPrefs } from "@/lib/diner-prefs";
+import { useDinerPrefs } from "@/lib/use-diner-prefs";
+import { type DinerPrefs } from "@/lib/diner-prefs";
 import { formatList } from "@/lib/format-list";
 import { CAMERA_STRINGS } from "@/lib/i18n/camera-strings";
 import { DINER_STRINGS } from "@/lib/i18n/diner-strings";
@@ -23,7 +24,7 @@ import {
 import { toggleValue } from "@/lib/toggle-value";
 import type { ScannedMenu } from "@/types/camera";
 
-type Status = "idle" | "loading" | "done" | "failed" | "limit";
+type Status = "idle" | "loading" | "done" | "failed" | "limit" | "partial";
 type ScanMenuProps = { language: LanguageCode; initialPrefs: DinerPrefs };
 
 /** Translate a paper menu from a restaurant that isn't on Carte, flagging possible allergens. */
@@ -32,7 +33,8 @@ export function ScanMenu({ language, initialPrefs }: ScanMenuProps) {
   const d = DINER_STRINGS[language];
   const [status, setStatus] = useState<Status>("idle");
   const [menu, setMenu] = useState<ScannedMenu | null>(null);
-  const [avoid, setAvoid] = useState<Allergen[]>(initialPrefs.avoid);
+  const [prefs, setPrefs] = useDinerPrefs(initialPrefs);
+  const { avoid, onlyTags } = prefs;
   const [cardOpen, setCardOpen] = useState(false);
 
   async function scan(file: File) {
@@ -40,12 +42,12 @@ export function ScanMenu({ language, initialPrefs }: ScanMenuProps) {
     setMenu({ menuLanguage: "", dishes: [] });
     try {
       // Dishes appear as soon as they're read.
-      await streamScan(language, await shrinkImage(file, MENU_PHOTO_SIDE), {
+      const partial = await streamScan(language, await shrinkImage(file, MENU_PHOTO_SIDE), {
         onLanguage: (menuLanguage) => setMenu((current) => current && { ...current, menuLanguage }),
         onDish: (dish) =>
           setMenu((current) => current && { ...current, dishes: [...current.dishes, dish] }),
       });
-      setStatus("done");
+      setStatus(partial ? "partial" : "done");
     } catch (err) {
       // Keep any dishes already read, with the warning still showing above them.
       setStatus(err instanceof PhotoLimitError ? "limit" : "failed");
@@ -54,8 +56,7 @@ export function ScanMenu({ language, initialPrefs }: ScanMenuProps) {
 
   function toggleAllergy(allergen: Allergen) {
     const next = toggleValue(avoid, allergen);
-    setAvoid(next);
-    writePrefsCookie({ avoid: next, onlyTags: initialPrefs.onlyTags });
+    setPrefs({ avoid: next, onlyTags });
   }
 
   const hasDishes = Boolean(menu && menu.dishes.length > 0);
@@ -79,7 +80,7 @@ export function ScanMenu({ language, initialPrefs }: ScanMenuProps) {
           e.target.value = "";
         }}
       />
-      {status === "done" ? t.scanAnother : t.takePhoto}
+      {status === "done" || status === "partial" ? t.scanAnother : t.takePhoto}
     </label>
   );
 
@@ -123,6 +124,11 @@ export function ScanMenu({ language, initialPrefs }: ScanMenuProps) {
             ))}
           </div>
         </div>
+      )}
+      {status === "partial" && (
+        <Notice tone="warning" role="alert" className="mt-6">
+          {t.scanPartial}
+        </Notice>
       )}
       {status === "failed" && (
         <Notice tone="warning" role="alert" className="mt-6">

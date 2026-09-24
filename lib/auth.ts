@@ -1,23 +1,24 @@
 import "server-only";
+import { safeNextPath } from "@/lib/safe-redirect";
 import { redirect } from "next/navigation";
 import { getOwnerRestaurant } from "@/lib/db";
 import { createClient } from "@/lib/supabase/server";
 
 /** For owner pages: sends signed-out visitors to the login page. */
-export async function requireUser() {
+export async function requireUser(next = "/dashboard") {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
+  if (!user) redirect(`/login?next=${encodeURIComponent(safeNextPath(next))}`);
   return { supabase, user };
 }
 
 /** For owner pages that need a restaurant: sends new owners to setup first. */
-export async function requireRestaurant() {
-  const { supabase, user } = await requireUser();
+export async function requireRestaurant(next = "/dashboard") {
+  const { supabase, user } = await requireUser(next);
   const restaurant = await getOwnerRestaurant(supabase, user.id);
-  if (!restaurant) redirect("/dashboard/setup");
+  if (!restaurant) redirect(`/dashboard/setup?next=${encodeURIComponent(safeNextPath(next))}`);
   return { supabase, user, restaurant };
 }
 
@@ -34,10 +35,10 @@ export async function getOwnerContext() {
 }
 
 /** For the landing, login, and signup pages: signed-in owners go straight to the dashboard. */
-export async function redirectIfSignedIn() {
+export async function redirectIfSignedIn(next = "/dashboard") {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (user) redirect("/dashboard");
+  if (user) redirect(safeNextPath(next));
 }

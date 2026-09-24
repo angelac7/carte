@@ -12,8 +12,8 @@ export async function POST(req: Request) {
 
   const visitor = clientKey(req);
   const allowed =
-    checkRateLimit(`track:${visitor}`, 60, 10 * 60 * 1000) &&
-    checkRateLimit(`track:${visitor}:${parsed.data.dish}`, 1, 60 * 60 * 1000);
+    (await checkRateLimit(`track:${visitor}`, 60, 10 * 60 * 1000)) &&
+    (await checkRateLimit(`track:${visitor}:${parsed.data.dish}`, 1, 60 * 60 * 1000));
   if (!allowed) return NextResponse.json({ ok: true });
 
   try {

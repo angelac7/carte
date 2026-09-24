@@ -17,7 +17,7 @@ export async function GET(req: Request) {
   if (!isValidSlug(slug) || !isLanguageCode(language) || language === ORIGINAL_LANGUAGE) {
     return NextResponse.json({ error: "Choose a supported language." }, { status: 400 });
   }
-  if (!checkRateLimit(`translate:${clientKey(req)}`, 60, 10 * 60 * 1000)) {
+  if (!(await checkRateLimit(`translate:${clientKey(req)}`, 60, 10 * 60 * 1000))) {
     return NextResponse.json({ error: "Too many requests. Try again soon." }, { status: 429 });
   }
 

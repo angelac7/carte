@@ -1,7 +1,8 @@
+import { prepareChatHistory } from "@/lib/chat-history";
 import type { DinerFilters } from "@/lib/menu-filters";
 import { createLineReader, parseJsonLine } from "@/lib/json-lines";
 import type { LanguageCode } from "@/lib/languages";
-import { ChatStreamEventSchema, MAX_HISTORY, type ChatMessage } from "@/types/chat";
+import { ChatStreamEventSchema, type ChatMessage } from "@/types/chat";
 import type { ExtractedDish, MenuItem } from "@/types/menu";
 import type { MenuTranslations } from "@/types/translation";
 import type { PhotoMatch, ScannedDish } from "@/types/camera";
@@ -121,7 +122,7 @@ export async function streamMenuAnswer(
     body: JSON.stringify({
       restaurant: restaurantSlug,
       language,
-      messages: messages.slice(-MAX_HISTORY),
+      messages: prepareChatHistory(messages),
       ...filters,
     }),
   });
@@ -217,7 +218,7 @@ export async function streamScan(
   language: LanguageCode,
   image: File,
   { onLanguage, onDish }: ScanHandlers,
-): Promise<void> {
+): Promise<boolean> {
   const form = new FormData();
   form.append("lang", language);
   form.append("image", image);
@@ -225,15 +226,18 @@ export async function streamScan(
   if (res.status === 429) throw new PhotoLimitError();
   if (!res.ok) throw new Error("Scan failed");
   let finished = false;
+  let partial = false;
   await readJsonLines(res, (value) => {
     const event = ScanStreamEventSchema.safeParse(value);
     if (!event.success) return;
     if (event.data.type === "language") onLanguage(event.data.menuLanguage);
     else if (event.data.type === "dish") onDish(event.data.dish);
+    else if (event.data.type === "partial") partial = true;
     else if (event.data.type === "error") throw new Error("Scan failed");
     else finished = true;
   });
   if (!finished) throw new Error("Scan failed");
+  return partial;
 }
 
 /** Uploads a photo for one of the owner's dishes and returns its address. */

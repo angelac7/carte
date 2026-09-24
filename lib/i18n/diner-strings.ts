@@ -19,6 +19,7 @@ export type DinerStrings = {
   kitchenNote: string;
   translating: string;
   translationFailed: string;
+  retryTranslation: string;
   translatedNote: string;
   allergens: Record<Allergen, string>;
   tags: Record<DietaryTag, string>;
@@ -26,6 +27,7 @@ export type DinerStrings = {
 
 export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
   en: {
+    retryTranslation: "Retry translation",
     menuTitle: "Menu",
     safetyNotice:
       "Allergen information comes from the restaurant. Kitchens share equipment and recipes change, so always tell your server about allergies before ordering.",
@@ -69,6 +71,7 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     },
   },
   es: {
+    retryTranslation: "Reintentar traducción",
     menuTitle: "Menú",
     safetyNotice:
       "La información sobre alérgenos proviene del restaurante. Las cocinas comparten equipos y las recetas cambian, así que informe siempre a su mesero sobre sus alergias antes de pedir.",
@@ -112,6 +115,7 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     },
   },
   zh: {
+    retryTranslation: "重试翻译",
     menuTitle: "菜单",
     safetyNotice:
       "过敏原信息由餐厅提供。厨房共用设备，菜谱也可能变化，点餐前请务必告知服务员您的过敏情况。",
@@ -151,6 +155,7 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     },
   },
   ko: {
+    retryTranslation: "번역 다시 시도",
     menuTitle: "메뉴",
     safetyNotice:
       "알레르기 정보는 레스토랑에서 제공합니다. 주방은 조리 기구를 함께 사용하고 레시피가 바뀔 수 있으므로, 주문 전에 반드시 직원에게 알레르기를 알려 주세요.",
@@ -192,6 +197,7 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     },
   },
   ja: {
+    retryTranslation: "翻訳を再試行",
     menuTitle: "メニュー",
     safetyNotice:
       "アレルゲン情報はレストランが提供しています。厨房では調理器具を共用しており、レシピが変わることもあるため、ご注文前に必ずスタッフにアレルギーをお伝えください。",
@@ -233,6 +239,7 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     },
   },
   fr: {
+    retryTranslation: "Réessayer la traduction",
     menuTitle: "Menu",
     safetyNotice:
       "Les informations sur les allergènes sont fournies par le restaurant. Les cuisines partagent du matériel et les recettes changent : signalez toujours vos allergies au serveur avant de commander.",
@@ -276,6 +283,7 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     },
   },
   vi: {
+    retryTranslation: "Thử dịch lại",
     menuTitle: "Thực đơn",
     safetyNotice:
       "Thông tin về chất gây dị ứng do nhà hàng cung cấp. Bếp dùng chung dụng cụ và công thức có thể thay đổi, vì vậy hãy luôn báo cho nhân viên phục vụ về dị ứng của bạn trước khi gọi món.",

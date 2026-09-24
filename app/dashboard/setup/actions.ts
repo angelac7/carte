@@ -1,4 +1,5 @@
 "use server";
+import { safeNextPath } from "@/lib/safe-redirect";
 import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth";
 import { createRestaurant } from "@/lib/db";
@@ -31,5 +32,5 @@ export async function createRestaurantAction(
           : "Your restaurant couldn't be saved. Try again.",
     };
   }
-  redirect("/dashboard");
+  redirect(safeNextPath(String(formData.get("next") ?? "")));
 }

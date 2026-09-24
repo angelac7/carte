@@ -5,6 +5,7 @@ import type { ChallengeId } from "@/lib/my-carte";
 
 export type MyCarteStrings = {
   myCarte: string;
+  storageFailed: string;
   intro: string;
   offlineNote: string;
   tabSaved: string;
@@ -51,6 +52,8 @@ export type MyCarteStrings = {
 
 export const MY_CARTE_STRINGS: Record<LanguageCode, MyCarteStrings> = {
   en: {
+    storageFailed:
+      "Could not save on this device. Free up storage or allow site storage, then try again.",
     myCarte: "My Carte",
     intro:
       "Your saved dishes, food diary, and taste profile, stored on this phone. No account needed.",
@@ -111,6 +114,8 @@ export const MY_CARTE_STRINGS: Record<LanguageCode, MyCarteStrings> = {
     openCard: "Open allergy card",
   },
   es: {
+    storageFailed:
+      "No se pudo guardar en este dispositivo. Libere espacio o permita el almacenamiento del sitio e inténtelo de nuevo.",
     myCarte: "Mi Carte",
     intro:
       "Sus platos guardados, su diario de comidas y su perfil de sabores, guardados en este teléfono. No necesita cuenta.",
@@ -174,6 +179,7 @@ export const MY_CARTE_STRINGS: Record<LanguageCode, MyCarteStrings> = {
     openCard: "Abrir tarjeta de alergias",
   },
   zh: {
+    storageFailed: "无法在此设备上保存。请释放存储空间或允许网站存储，然后重试。",
     myCarte: "我的 Carte",
     intro: "您收藏的菜品、美食日记和口味档案，都保存在这部手机上，无需注册。",
     offlineNote: "您打开过的菜单和过敏卡在这部手机上也可离线使用。",
@@ -233,6 +239,8 @@ export const MY_CARTE_STRINGS: Record<LanguageCode, MyCarteStrings> = {
     openCard: "打开过敏卡",
   },
   ko: {
+    storageFailed:
+      "이 기기에 저장하지 못했습니다. 저장 공간을 확보하거나 사이트 저장을 허용한 후 다시 시도하세요.",
     myCarte: "마이 Carte",
     intro: "저장한 요리, 음식 일기, 입맛 프로필이 이 휴대폰에 저장됩니다. 계정이 필요 없습니다.",
     offlineNote: "열어 본 메뉴와 알레르기 카드는 이 휴대폰에서 오프라인으로도 사용할 수 있습니다.",
@@ -292,6 +300,8 @@ export const MY_CARTE_STRINGS: Record<LanguageCode, MyCarteStrings> = {
     openCard: "알레르기 카드 열기",
   },
   ja: {
+    storageFailed:
+      "この端末に保存できませんでした。空き容量を増やすかサイトの保存を許可して、再試行してください。",
     myCarte: "マイ Carte",
     intro:
       "保存した料理、食事日記、味の好みプロフィールはこのスマートフォンに保存されます。アカウントは不要です。",
@@ -352,6 +362,8 @@ export const MY_CARTE_STRINGS: Record<LanguageCode, MyCarteStrings> = {
     openCard: "アレルギーカードを開く",
   },
   fr: {
+    storageFailed:
+      "Impossible d’enregistrer sur cet appareil. Libérez de l’espace ou autorisez le stockage du site, puis réessayez.",
     myCarte: "Mon Carte",
     intro:
       "Vos plats enregistrés, votre journal culinaire et votre profil de goûts, stockés sur ce téléphone. Aucun compte nécessaire.",
@@ -414,6 +426,8 @@ export const MY_CARTE_STRINGS: Record<LanguageCode, MyCarteStrings> = {
     openCard: "Ouvrir la carte d'allergies",
   },
   vi: {
+    storageFailed:
+      "Không thể lưu trên thiết bị này. Hãy giải phóng dung lượng hoặc cho phép trang web lưu dữ liệu rồi thử lại.",
     myCarte: "Carte của tôi",
     intro:
       "Món đã lưu, nhật ký ăn uống và hồ sơ khẩu vị được lưu trên điện thoại này. Không cần tài khoản.",

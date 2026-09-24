@@ -29,6 +29,7 @@ export async function proxy(request: NextRequest) {
     const loginUrl = request.nextUrl.clone();
     loginUrl.pathname = "/login";
     loginUrl.search = "";
+    loginUrl.searchParams.set("next", request.nextUrl.pathname + request.nextUrl.search);
     return NextResponse.redirect(loginUrl);
   }
 
@@ -37,5 +38,15 @@ export async function proxy(request: NextRequest) {
 
 // Only pages that read the owner's session need this; diner menus stay fast.
 export const config = {
-  matcher: ["/", "/login", "/signup", "/dashboard/:path*", "/api/items", "/api/extract"],
+  matcher: [
+    "/",
+    "/login",
+    "/signup",
+    "/dashboard/:path*",
+    "/api/items",
+    "/api/extract",
+    "/api/dish-photo",
+    "/reset-password",
+    "/forgot-password",
+  ],
 };

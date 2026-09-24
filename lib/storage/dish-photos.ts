@@ -1,4 +1,5 @@
 import "server-only";
+import { supabaseUrl } from "@/lib/supabase/config";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { SupportedImageType } from "@/lib/upload-rules";
 
@@ -27,9 +28,24 @@ export async function storeDishPhoto(
   return storage.getPublicUrl(path).data.publicUrl;
 }
 
-/** Deletes a stored photo by its public address. Quietly ignores anything that isn't ours. */
-export async function deleteStoredPhoto(url: string | null | undefined): Promise<void> {
-  const path = url?.split(`/${BUCKET}/`)[1];
-  if (!path) return;
-  await createAdminClient().storage.from(BUCKET).remove([path]);
+/** Delete only a file in this restaurant's directory in our own bucket. */
+export async function deleteStoredPhoto(
+  url: string | null | undefined,
+  restaurantId: string,
+): Promise<void> {
+  if (!url) return;
+  let path: string;
+  try {
+    const photo = new URL(url);
+    const project = new URL(supabaseUrl());
+    const prefix = `/storage/v1/object/public/${BUCKET}/${restaurantId}/`;
+    if (photo.origin !== project.origin || !photo.pathname.startsWith(prefix)) return;
+    const name = photo.pathname.slice(prefix.length);
+    if (!/^[a-zA-Z0-9-]+\.(jpg|png|webp)$/.test(name)) return;
+    path = `${restaurantId}/${name}`;
+  } catch {
+    return;
+  }
+  const { error } = await createAdminClient().storage.from(BUCKET).remove([path]);
+  if (error) throw error;
 }

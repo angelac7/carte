@@ -1,6 +1,6 @@
 "use client";
 import { motion } from "motion/react";
-import Link from "next/link";
+import Link from "@/components/OfflineLink";
 import { useState } from "react";
 import { AllergyCard } from "@/components/AllergyCard";
 import { DiaryEditor } from "@/components/DiaryEditor";
@@ -9,7 +9,8 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { Notice } from "@/components/ui/notice";
 import type { Allergen } from "@/lib/allergens";
 import { requestTasteProfile } from "@/lib/api-client";
-import { writePrefsCookie, type DinerPrefs } from "@/lib/diner-prefs";
+import { useDinerPrefs } from "@/lib/use-diner-prefs";
+import { type DinerPrefs } from "@/lib/diner-prefs";
 import { MY_CARTE_STRINGS } from "@/lib/i18n/my-carte-strings";
 import { htmlLang, type LanguageCode } from "@/lib/languages";
 import {
@@ -19,7 +20,8 @@ import {
   removeSavedRestaurant,
   type DiaryEntry,
 } from "@/lib/my-carte";
-import { updateMyCarte, useMyCarte } from "@/lib/my-carte-store";
+import { useMyCarteWriter } from "@/lib/use-my-carte-writer";
+import { useMyCarte } from "@/lib/my-carte-store";
 import { toggleValue } from "@/lib/toggle-value";
 import type { TasteProfile } from "@/types/taste";
 
@@ -33,6 +35,7 @@ const panelClass = "divide-y divide-ink/10 rounded-panel bg-paper px-6 shadow-ra
 
 export function MyCarte({ language, initialPrefs }: MyCarteProps) {
   const t = MY_CARTE_STRINGS[language];
+  const saveOnDevice = useMyCarteWriter(language);
   const state = useMyCarte();
   const [tab, setTab] = useState<Tab>("saved");
   const [editing, setEditing] = useState<DiaryEntry | null>(null);
@@ -40,7 +43,8 @@ export function MyCarte({ language, initialPrefs }: MyCarteProps) {
   const [taste, setTaste] = useState<TasteProfile | null>(null);
   const [copied, setCopied] = useState(false);
   const [cardOpen, setCardOpen] = useState(false);
-  const [avoid, setAvoid] = useState<Allergen[]>(initialPrefs.avoid);
+  const [prefs, setPrefs] = useDinerPrefs(initialPrefs);
+  const { avoid, onlyTags } = prefs;
 
   const tabs: [Tab, string][] = [
     ["saved", t.tabSaved],
@@ -89,12 +93,11 @@ export function MyCarte({ language, initialPrefs }: MyCarteProps) {
 
   function toggleAllergy(allergen: Allergen) {
     const next = toggleValue(avoid, allergen);
-    setAvoid(next);
-    writePrefsCookie({ avoid: next, onlyTags: initialPrefs.onlyTags });
+    setPrefs({ avoid: next, onlyTags });
   }
 
   function clearAll() {
-    if (window.confirm(t.clearConfirm)) updateMyCarte(() => EMPTY_MY_CARTE);
+    if (window.confirm(t.clearConfirm)) saveOnDevice(() => EMPTY_MY_CARTE);
   }
 
   const challenges = computeChallenges(state, new Date());
@@ -159,7 +162,7 @@ export function MyCarte({ language, initialPrefs }: MyCarteProps) {
                           </Link>
                           <button
                             onClick={() =>
-                              updateMyCarte((s) => removeSavedRestaurant(s, restaurant.slug))
+                              saveOnDevice((s) => removeSavedRestaurant(s, restaurant.slug))
                             }
                             className="text-muted hover:text-tomato"
                           >
@@ -192,7 +195,7 @@ export function MyCarte({ language, initialPrefs }: MyCarteProps) {
                             {t.viewMenu}
                           </Link>
                           <button
-                            onClick={() => updateMyCarte((s) => removeSavedDish(s, dish.dishId))}
+                            onClick={() => saveOnDevice((s) => removeSavedDish(s, dish.dishId))}
                             className="text-muted hover:text-tomato"
                           >
                             {t.remove}

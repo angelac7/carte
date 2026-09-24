@@ -31,4 +31,10 @@ export function serializePrefs(prefs: DinerPrefs): string {
 /** Browser only: saves filters on this device for a year. */
 export function writePrefsCookie(prefs: DinerPrefs): void {
   document.cookie = `${PREFS_COOKIE}=${serializePrefs(prefs)}; path=/; max-age=31536000; samesite=lax`;
+  window.dispatchEvent(new Event("carte-prefs-change"));
+  try {
+    localStorage.setItem("carte-prefs-change", String(Date.now()));
+  } catch {
+    /* Cookies remain available without localStorage. */
+  }
 }
