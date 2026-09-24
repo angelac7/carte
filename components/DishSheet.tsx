@@ -128,7 +128,7 @@ export function DishSheet({ dish, text, language, restaurantSlug, onClose }: Dis
         {canSpeak() && (
           <button
             onClick={() => speak(insight?.nativeName || dish.name, insight?.nativeLang || "en-US")}
-            className="rounded-full bg-paper px-4 py-2 text-sm font-medium shadow-raised-sm transition-[box-shadow,color] duration-200 hover:text-accent active:shadow-pressed-sm"
+            className="rounded-full bg-paper px-4 py-2.5 text-sm font-medium shadow-raised-sm transition-[box-shadow,color] duration-200 hover:text-accent active:shadow-pressed-sm"
           >
             {t.listen}
           </button>

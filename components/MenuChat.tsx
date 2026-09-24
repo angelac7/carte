@@ -86,7 +86,7 @@ export function MenuChat({ language, restaurantSlug, open, onClose }: MenuChatPr
               <button
                 key={suggestion}
                 onClick={() => ask(suggestion)}
-                className="rounded-full bg-paper px-4 py-2 text-left text-sm shadow-raised-sm transition-[box-shadow,color] duration-200 hover:text-accent active:shadow-pressed-sm"
+                className="rounded-full bg-paper px-4 py-2.5 text-left text-sm shadow-raised-sm transition-[box-shadow,color] duration-200 hover:text-accent active:shadow-pressed-sm"
               >
                 {suggestion}
               </button>
@@ -163,7 +163,7 @@ export function MenuChat({ language, restaurantSlug, open, onClose }: MenuChatPr
             aria-label={help.voice}
             aria-pressed={voice.listening}
             onClick={voice.listening ? voice.stop : voice.start}
-            className={`rounded-control px-3.5 py-2 text-sm transition-[box-shadow,color] duration-200 ${
+            className={`rounded-control px-4 py-3 text-sm transition-[box-shadow,color] duration-200 ${
               voice.listening
                 ? "text-tomato shadow-pressed-sm"
                 : "bg-paper shadow-raised-sm active:shadow-pressed-sm"

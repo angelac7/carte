@@ -15,7 +15,7 @@ type DishActionsProps = {
 };
 
 const pill = (active: boolean) =>
-  `rounded-full px-4 py-2 text-sm font-medium transition-[box-shadow,background-color,color] duration-200 ${
+  `rounded-full px-4 py-2.5 text-sm font-medium transition-[box-shadow,background-color,color] duration-200 ${
     active
       ? "bg-ink text-white shadow-pressed-color"
       : "bg-paper text-muted shadow-raised-sm hover:text-ink active:shadow-pressed-sm"

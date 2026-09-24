@@ -230,7 +230,7 @@ export default function ReviewDishes() {
                     aria-pressed={filter === f.key}
                     onClick={() => setFilter(f.key)}
                     className={cn(
-                      "relative isolate rounded-full px-4 py-2 text-sm font-medium whitespace-nowrap transition-colors",
+                      "relative isolate rounded-full px-4 py-2.5 text-sm font-medium whitespace-nowrap transition-colors",
                       filter === f.key ? "text-white" : "text-muted hover:text-ink",
                     )}
                   >

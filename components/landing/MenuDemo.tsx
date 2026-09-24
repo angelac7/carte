@@ -175,7 +175,7 @@ export function MenuDemo() {
               aria-pressed={avoid.includes(allergen)}
               onClick={() => setAvoid((current) => toggleValue(current, allergen))}
               className={cn(
-                "rounded-full px-3.5 py-1.5 text-sm font-medium transition-[box-shadow,background-color,color] duration-200",
+                "rounded-full px-4 py-2.5 text-sm font-medium transition-[box-shadow,background-color,color] duration-200",
                 avoid.includes(allergen)
                   ? "bg-ink text-white shadow-pressed-color"
                   : "bg-paper text-muted shadow-raised-sm hover:text-ink",

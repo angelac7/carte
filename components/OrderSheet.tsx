@@ -127,13 +127,13 @@ export function OrderSheet({
               {people.map((person) => (
                 <span
                   key={person}
-                  className="flex items-center gap-2 rounded-full px-4 py-1.5 text-sm shadow-pressed-sm"
+                  className="flex items-center gap-1 rounded-full py-1 pr-1 pl-4 text-sm shadow-pressed-sm"
                 >
                   {person}
                   <button
                     aria-label={`${t.remove} ${person}`}
                     onClick={() => removePerson(person)}
-                    className="text-muted hover:text-tomato"
+                    className="flex h-9 w-9 items-center justify-center rounded-full text-lg text-muted transition-colors hover:text-tomato"
                   >
                     ×
                   </button>
@@ -176,7 +176,7 @@ export function OrderSheet({
                     onChange={(e) =>
                       setAssignees((prev) => ({ ...prev, [dish.id]: e.target.value }))
                     }
-                    className={fieldClass("w-auto py-1.5")}
+                    className={fieldClass("w-auto py-2.5")}
                   >
                     <option value="">{t.shared}</option>
                     {people.map((person) => (
