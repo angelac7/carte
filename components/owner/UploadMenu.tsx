@@ -71,8 +71,10 @@ export default function UploadPage() {
           const file = e.dataTransfer.files[0];
           if (file) readMenu(file);
         }}
-        className={`mt-10 flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed px-6 py-14 text-center transition-colors has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-ink ${
-          dragging ? "border-ink bg-card" : "border-line bg-card/60 hover:border-muted"
+        className={`mt-10 flex cursor-pointer flex-col items-center justify-center rounded-panel px-6 py-16 text-center transition-[box-shadow,outline-color] duration-300 has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-3 has-[:focus-visible]:outline-accent ${
+          dragging
+            ? "shadow-well outline-2 outline-offset-4 outline-accent"
+            : "shadow-pressed hover:shadow-well"
         } ${reading ? "pointer-events-none" : ""}`}
       >
         <input
@@ -86,7 +88,7 @@ export default function UploadPage() {
             e.target.value = "";
           }}
         />
-        <span className="font-serif text-2xl">
+        <span className="font-serif text-3xl tracking-tight">
           {reading ? "Reading your menu…" : "Drop a menu photo here"}
         </span>
         <span className="mt-2 text-sm text-muted">
@@ -105,7 +107,7 @@ export default function UploadPage() {
       {reading && (
         <div className="mt-8 space-y-3" aria-hidden="true">
           {[0, 1, 2].map((row) => (
-            <div key={row} className="rounded-2xl border border-line bg-card p-5">
+            <div key={row} className="rounded-panel bg-paper p-6 shadow-raised">
               <Skeleton className="h-6 w-1/2" />
               <Skeleton className="mt-3 h-4 w-4/5" />
               <div className="mt-4 flex gap-2">
@@ -118,10 +120,12 @@ export default function UploadPage() {
       )}
 
       {dishes.length > 0 && (
-        <section className="mt-12">
+        <section className="mt-14 border-t-4 border-ink pt-8">
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div>
-              <h2 className="font-serif text-3xl tracking-tight">{dishes.length} dishes found</h2>
+              <h2 className="font-serif text-4xl leading-none tracking-tighter sm:text-5xl">
+                {dishes.length} dishes found
+              </h2>
               <p className="mt-1 text-sm text-muted">
                 Allergens are suggestions. You’ll confirm each dish on the next step.
               </p>
@@ -143,7 +147,7 @@ export default function UploadPage() {
             </Notice>
           )}
 
-          <ul className="mt-6 divide-y divide-line rounded-2xl border border-line bg-card px-5 sm:px-6">
+          <ul className="mt-8 divide-y divide-ink/10 rounded-panel bg-paper px-6 shadow-raised sm:px-8">
             {dishes.map((dish, index) => (
               <li key={index} className="py-5">
                 <DishHeader name={dish.name} price={dish.price} />
