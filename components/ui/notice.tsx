@@ -13,8 +13,8 @@ const TONES = {
 type NoticeProps = {
   children: ReactNode;
   tone?: keyof typeof TONES;
-  /** "alert" for errors that should be announced as soon as they appear. */
-  role?: "note" | "alert";
+  /** "alert" for errors and "status" for confirmations, so screen readers announce them. */
+  role?: "note" | "alert" | "status";
   className?: string;
 };
 
