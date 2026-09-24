@@ -6,6 +6,8 @@ const TONES = {
   caution: "border-saffron/40 bg-saffron-soft text-saffron-ink",
   /** Unconfirmed information, like a scanned paper menu. */
   warning: "border-tomato/40 bg-tomato/10 text-tomato",
+  /** Owner-facing confirmations, like "Saved to your menu". Never for diner allergy safety. */
+  success: "border-basil/30 bg-basil-soft text-basil",
 } as const;
 
 type NoticeProps = {
