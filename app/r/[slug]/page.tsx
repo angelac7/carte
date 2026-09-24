@@ -3,6 +3,7 @@ import { cookies, headers } from "next/headers";
 import { notFound } from "next/navigation";
 import { DinerMenu } from "@/components/DinerMenu";
 import { getConfirmedDishes, getRestaurantBySlug } from "@/lib/db";
+import { parsePrefs, PREFS_COOKIE } from "@/lib/diner-prefs";
 import { isLanguageCode, LANGUAGE_COOKIE, languageFromAcceptHeader } from "@/lib/languages";
 import { confirmedOnly } from "@/lib/menu-filters";
 import { isValidSlug } from "@/lib/slug";
@@ -24,16 +25,22 @@ export default async function RestaurantMenuPage({ params }: RestaurantMenuProps
   // Filtered to confirmed dishes in the database, then again here as a safety net.
   const dishes = confirmedOnly(await getConfirmedDishes(supabase, restaurant.id));
 
-  const saved = (await cookies()).get(LANGUAGE_COOKIE)?.value;
+  // The diner's saved language and filters, stored on their own device.
+  const cookieStore = await cookies();
+  const savedLanguage = cookieStore.get(LANGUAGE_COOKIE)?.value;
   const acceptLanguage = (await headers()).get("accept-language") ?? "";
   const initialLanguage =
-    saved && isLanguageCode(saved) ? saved : languageFromAcceptHeader(acceptLanguage);
+    savedLanguage && isLanguageCode(savedLanguage)
+      ? savedLanguage
+      : languageFromAcceptHeader(acceptLanguage);
+  const initialPrefs = parsePrefs(cookieStore.get(PREFS_COOKIE)?.value);
 
   return (
     <DinerMenu
       restaurant={{ name: restaurant.name, slug: restaurant.slug }}
       dishes={dishes}
       initialLanguage={initialLanguage}
+      initialPrefs={initialPrefs}
     />
   );
 }

@@ -28,3 +28,6 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - Database changes go in a new file in `supabase/migrations/`, never by editing an old one.
 - AI dish explanations must never mention allergens or call a dish safe; allergens always come from owner-confirmed data.
 - Diners never need an account. Diner preferences are stored on their device.
+- Allergy card and staff-facing text come from `lib/i18n/table-strings.ts` and are never AI-generated.
+- Money math lives in `lib/bill.ts` and `lib/prices.ts`, with tests; keep it out of components.
+- Use the shared `Sheet` component for new diner panels.

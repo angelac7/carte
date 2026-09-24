@@ -46,3 +46,6 @@ export const MenuItemSchema = z.object({
 
 export type ExtractedDish = z.infer<typeof ExtractedDishSchema>;
 export type MenuItem = z.infer<typeof MenuItemSchema>;
+
+/** A dish's text as shown to a diner, translated when available. */
+export type DishText = { name: string; description: string; notes: string };

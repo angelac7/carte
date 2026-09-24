@@ -1,14 +1,19 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import { AllergyCard } from "@/components/AllergyCard";
 import { Chip } from "@/components/Chip";
 import { DishHeader } from "@/components/DishHeader";
 import { DishSheet } from "@/components/DishSheet";
 import { MenuChat } from "@/components/MenuChat";
+import { OrderSheet } from "@/components/OrderSheet";
+import { QuantityStepper } from "@/components/QuantityStepper";
 import { ToggleChip } from "@/components/ToggleChip";
 import { ALLERGENS, DIETARY_TAGS, type Allergen, type DietaryTag } from "@/lib/allergens";
 import { fetchTranslations } from "@/lib/api-client";
+import { writePrefsCookie, type DinerPrefs } from "@/lib/diner-prefs";
 import { DINER_STRINGS } from "@/lib/i18n/diner-strings";
 import { DISH_STRINGS } from "@/lib/i18n/dish-strings";
+import { TABLE_STRINGS } from "@/lib/i18n/table-strings";
 import {
   htmlLang,
   isLanguageCode,
@@ -19,25 +24,29 @@ import {
 } from "@/lib/languages";
 import { filterDishes } from "@/lib/menu-filters";
 import { toggleValue } from "@/lib/toggle-value";
-import type { MenuItem } from "@/types/menu";
+import type { DishText, MenuItem } from "@/types/menu";
 import type { MenuTranslations } from "@/types/translation";
 
 type TranslationState = Partial<Record<LanguageCode, MenuTranslations | "failed">>;
+type Panel = "order" | "allergy-card" | null;
 
 type DinerMenuProps = {
   restaurant: { name: string; slug: string };
   dishes: MenuItem[];
   initialLanguage: LanguageCode;
+  initialPrefs: DinerPrefs;
 };
 
 /** The public menu diners see. Receives confirmed dishes only. */
-export function DinerMenu({ restaurant, dishes, initialLanguage }: DinerMenuProps) {
+export function DinerMenu({ restaurant, dishes, initialLanguage, initialPrefs }: DinerMenuProps) {
   const [language, setLanguage] = useState<LanguageCode>(initialLanguage);
   const [byLanguage, setByLanguage] = useState<TranslationState>({});
-  const [avoid, setAvoid] = useState<Allergen[]>([]);
-  const [onlyTags, setOnlyTags] = useState<DietaryTag[]>([]);
-  const requested = useRef(new Set<LanguageCode>());
+  const [avoid, setAvoid] = useState<Allergen[]>(initialPrefs.avoid);
+  const [onlyTags, setOnlyTags] = useState<DietaryTag[]>(initialPrefs.onlyTags);
+  const [order, setOrder] = useState<Record<string, number>>({});
   const [openDishId, setOpenDishId] = useState<string | null>(null);
+  const [panel, setPanel] = useState<Panel>(null);
+  const requested = useRef(new Set<LanguageCode>());
 
   // Fetch each language's translations once, the first time a diner picks it.
   useEffect(() => {
@@ -49,6 +58,7 @@ export function DinerMenu({ restaurant, dishes, initialLanguage }: DinerMenuProp
   }, [language, restaurant.slug]);
 
   const t = DINER_STRINGS[language];
+  const tableText = TABLE_STRINGS[language];
   const status = language === ORIGINAL_LANGUAGE ? undefined : byLanguage[language];
   const translations = status && status !== "failed" ? status : undefined;
   const translating = language !== ORIGINAL_LANGUAGE && status === undefined;
@@ -59,7 +69,7 @@ export function DinerMenu({ restaurant, dishes, initialLanguage }: DinerMenuProp
     document.cookie = `${LANGUAGE_COOKIE}=${value}; path=/; max-age=31536000; samesite=lax`;
   }
 
-  function textFor(dish: MenuItem) {
+  function textFor(dish: MenuItem): DishText {
     const translated = translations?.[dish.id];
     return {
       name: translated?.name || dish.name,
@@ -68,15 +78,27 @@ export function DinerMenu({ restaurant, dishes, initialLanguage }: DinerMenuProp
     };
   }
 
-  function clearFilters() {
-    setAvoid([]);
-    setOnlyTags([]);
+  // Filters are remembered on this device and applied at every Carte menu.
+  function updateFilters(nextAvoid: Allergen[], nextOnlyTags: DietaryTag[]) {
+    setAvoid(nextAvoid);
+    setOnlyTags(nextOnlyTags);
+    writePrefsCookie({ avoid: nextAvoid, onlyTags: nextOnlyTags });
   }
 
-  const openDish = dishes.find((dish) => dish.id === openDishId);
+  function setQuantity(dishId: string, quantity: number) {
+    setOrder((prev) => {
+      const next = { ...prev };
+      if (quantity > 0) next[dishId] = quantity;
+      else delete next[dishId];
+      return next;
+    });
+  }
+
   const shown = filterDishes(dishes, { avoid, onlyTags });
   const hiddenCount = dishes.length - shown.length;
   const filtering = avoid.length > 0 || onlyTags.length > 0;
+  const openDish = dishes.find((dish) => dish.id === openDishId);
+  const orderCount = Object.values(order).reduce((sum, quantity) => sum + quantity, 0);
 
   const languagePicker = (
     <label className="flex items-center gap-2 text-sm">
@@ -108,7 +130,7 @@ export function DinerMenu({ restaurant, dishes, initialLanguage }: DinerMenuProp
   }
 
   return (
-    <main lang={htmlLang(language)} className="mx-auto max-w-3xl px-5 pb-28">
+    <main lang={htmlLang(language)} className="mx-auto max-w-3xl px-5 pb-32">
       <div className="pt-12">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <h1 className="font-serif text-4xl leading-tight">{restaurant.name}</h1>
@@ -146,7 +168,7 @@ export function DinerMenu({ restaurant, dishes, initialLanguage }: DinerMenuProp
                 label={t.allergens[allergen]}
                 tone="ink"
                 pressed={avoid.includes(allergen)}
-                onToggle={() => setAvoid((prev) => toggleValue(prev, allergen))}
+                onToggle={() => updateFilters(toggleValue(avoid, allergen), onlyTags)}
               />
             ))}
           </div>
@@ -161,22 +183,37 @@ export function DinerMenu({ restaurant, dishes, initialLanguage }: DinerMenuProp
                 label={t.tags[tag]}
                 tone="basil"
                 pressed={onlyTags.includes(tag)}
-                onToggle={() => setOnlyTags((prev) => toggleValue(prev, tag))}
+                onToggle={() => updateFilters(avoid, toggleValue(onlyTags, tag))}
               />
             ))}
           </div>
         </fieldset>
 
-        {filtering && (
-          <div className="mt-4 flex items-center justify-between gap-4 border-t border-line pt-4 text-sm">
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-4 border-t border-line pt-4 text-sm">
+          {filtering ? (
             <p aria-live="polite" className="text-muted">
               {t.showing(shown.length, dishes.length, hiddenCount)}
             </p>
-            <button onClick={clearFilters} className="shrink-0 text-muted underline hover:text-ink">
-              {t.clearFilters}
+          ) : (
+            <span />
+          )}
+          <div className="flex gap-4">
+            {filtering && (
+              <button
+                onClick={() => updateFilters([], [])}
+                className="text-muted underline hover:text-ink"
+              >
+                {t.clearFilters}
+              </button>
+            )}
+            <button
+              onClick={() => setPanel("allergy-card")}
+              className="font-medium underline underline-offset-4 hover:text-muted"
+            >
+              {tableText.allergyCard}
             </button>
           </div>
-        )}
+        </div>
       </section>
 
       {shown.length === 0 ? (
@@ -216,17 +253,34 @@ export function DinerMenu({ restaurant, dishes, initialLanguage }: DinerMenuProp
                     <span className="font-medium">{t.kitchenNote}</span> {text.notes}
                   </p>
                 )}
-                <button
-                  onClick={() => setOpenDishId(dish.id)}
-                  className="mt-3 text-sm font-medium text-ink underline underline-offset-4 hover:text-muted"
-                >
-                  {DISH_STRINGS[language].details}
-                </button>
+                <div className="mt-3 flex items-center justify-between gap-4">
+                  <button
+                    onClick={() => setOpenDishId(dish.id)}
+                    className="text-sm font-medium underline underline-offset-4 hover:text-muted"
+                  >
+                    {DISH_STRINGS[language].details}
+                  </button>
+                  <QuantityStepper
+                    quantity={order[dish.id] ?? 0}
+                    onChange={(quantity) => setQuantity(dish.id, quantity)}
+                    labels={tableText}
+                  />
+                </div>
               </li>
             );
           })}
         </ul>
       )}
+
+      {orderCount > 0 && (
+        <button
+          onClick={() => setPanel("order")}
+          className="fixed bottom-5 left-5 z-20 rounded-full border border-ink bg-card px-5 py-3 text-sm font-medium shadow-lg hover:bg-paper print:hidden"
+        >
+          {tableText.yourOrder} ({orderCount})
+        </button>
+      )}
+
       {openDish && (
         <DishSheet
           key={openDish.id}
@@ -235,6 +289,26 @@ export function DinerMenu({ restaurant, dishes, initialLanguage }: DinerMenuProp
           language={language}
           restaurantSlug={restaurant.slug}
           onClose={() => setOpenDishId(null)}
+        />
+      )}
+      {panel === "order" && (
+        <OrderSheet
+          dishes={dishes}
+          order={order}
+          textFor={textFor}
+          language={language}
+          avoid={avoid}
+          onQuantity={setQuantity}
+          onClear={() => setOrder({})}
+          onClose={() => setPanel(null)}
+        />
+      )}
+      {panel === "allergy-card" && (
+        <AllergyCard
+          language={language}
+          avoid={avoid}
+          onToggle={(allergen) => updateFilters(toggleValue(avoid, allergen), onlyTags)}
+          onClose={() => setPanel(null)}
         />
       )}
       <MenuChat language={language} restaurantSlug={restaurant.slug} />

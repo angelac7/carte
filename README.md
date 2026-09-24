@@ -81,3 +81,9 @@ Diners tap "Details" on any dish for an AI explanation in their language: what i
 background, ingredients to know, spice and richness, portion, pairings, and questions for the
 kitchen. Explanations are generated once per dish and language, saved in `dish_insights`, and
 regenerated when the owner edits the dish. They never include allergens.
+
+## At the table
+
+Diners can build an order, show it to staff in English with their allergies, split the bill
+with tax and tip, and show a translated allergy card. Allergy and diet filters are saved on the
+diner's device in the `carte-prefs` cookie and applied at every Carte menu. No diner account is needed.

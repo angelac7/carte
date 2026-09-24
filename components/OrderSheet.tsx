@@ -1,0 +1,297 @@
+"use client";
+import { useState } from "react";
+import { QuantityStepper } from "@/components/QuantityStepper";
+import { Sheet } from "@/components/Sheet";
+import type { Allergen } from "@/lib/allergens";
+import { splitBill, type BillLine } from "@/lib/bill";
+import { formatList } from "@/lib/format-list";
+import { DINER_STRINGS } from "@/lib/i18n/diner-strings";
+import { TABLE_STRINGS } from "@/lib/i18n/table-strings";
+import type { LanguageCode } from "@/lib/languages";
+import { detectCurrency, formatMoney, parsePrice } from "@/lib/prices";
+import type { DishText, MenuItem } from "@/types/menu";
+
+type OrderSheetProps = {
+  dishes: MenuItem[];
+  order: Record<string, number>;
+  textFor: (dish: MenuItem) => DishText;
+  language: LanguageCode;
+  avoid: Allergen[];
+  onQuantity: (dishId: string, quantity: number) => void;
+  onClear: () => void;
+  onClose: () => void;
+};
+
+type Mode = "list" | "split" | "server";
+
+const TIP_OPTIONS = [0, 15, 18, 20];
+const MAX_PEOPLE = 12;
+const STAFF_TITLE = "Order";
+
+function clampPercent(value: string): number {
+  const number = Number(value);
+  return Number.isFinite(number) ? Math.max(0, Math.min(30, number)) : 0;
+}
+
+function Row({ label, value, strong = false }: { label: string; value: string; strong?: boolean }) {
+  return (
+    <div className="flex justify-between gap-4">
+      <dt className={strong ? "font-medium" : ""}>{label}</dt>
+      <dd className={`tabular-nums ${strong ? "font-medium" : ""}`}>{value}</dd>
+    </div>
+  );
+}
+
+/** The diner's order: adjust quantities, show it to staff, or split the bill. */
+export function OrderSheet({
+  dishes,
+  order,
+  textFor,
+  language,
+  avoid,
+  onQuantity,
+  onClear,
+  onClose,
+}: OrderSheetProps) {
+  const t = TABLE_STRINGS[language];
+  const [mode, setMode] = useState<Mode>("list");
+  const [people, setPeople] = useState<string[]>([]);
+  const [newPerson, setNewPerson] = useState("");
+  const [assignees, setAssignees] = useState<Record<string, string>>({});
+  const [taxPercent, setTaxPercent] = useState(8);
+  const [tipPercent, setTipPercent] = useState(18);
+
+  const lines = dishes
+    .filter((dish) => order[dish.id])
+    .map((dish) => ({ dish, quantity: order[dish.id] }));
+  const currency = detectCurrency(lines.map(({ dish }) => dish.price));
+  const money = (amount: number) => formatMoney(amount, currency);
+
+  function addPerson() {
+    const name = newPerson.trim();
+    if (!name || people.includes(name) || people.length >= MAX_PEOPLE) return;
+    setPeople([...people, name]);
+    setNewPerson("");
+  }
+
+  function removePerson(name: string) {
+    setPeople(people.filter((person) => person !== name));
+    setAssignees((prev) =>
+      Object.fromEntries(Object.entries(prev).filter(([, person]) => person !== name)),
+    );
+  }
+
+  if (mode === "server") {
+    return (
+      <Sheet title={STAFF_TITLE} closeLabel={t.back} onClose={() => setMode("list")}>
+        <ul lang="en" className="mt-4 space-y-3">
+          {lines.map(({ dish, quantity }) => (
+            <li key={dish.id} className="flex gap-3 text-xl">
+              <span className="font-medium tabular-nums">{quantity} ×</span>
+              <span>{dish.name}</span>
+            </li>
+          ))}
+        </ul>
+        {avoid.length > 0 && (
+          <div lang="en" className="mt-6 rounded-lg border-2 border-tomato p-4">
+            <p className="font-medium">{TABLE_STRINGS.en.statement}</p>
+            <p className="mt-1 text-xl">
+              {formatList(
+                avoid.map((allergen) => DINER_STRINGS.en.allergens[allergen]),
+                "en",
+              )}
+            </p>
+            <p className="mt-2 text-sm leading-relaxed">{TABLE_STRINGS.en.request}</p>
+          </div>
+        )}
+      </Sheet>
+    );
+  }
+
+  if (mode === "split") {
+    const billLines: BillLine[] = lines.map(({ dish, quantity }) => ({
+      price: parsePrice(dish.price),
+      quantity,
+      person: assignees[dish.id] || null,
+    }));
+    const bill = splitBill(billLines, people, taxPercent / 100, tipPercent / 100);
+    const inputClass =
+      "rounded-md border border-line bg-paper px-3 py-2 text-sm focus:border-ink focus:outline-none";
+
+    return (
+      <Sheet title={t.splitBill} closeLabel={t.back} onClose={() => setMode("list")}>
+        <fieldset className="mt-4">
+          <legend className="text-sm font-medium">{t.people}</legend>
+          {people.length > 0 && (
+            <div className="mt-2 flex flex-wrap gap-2">
+              {people.map((person) => (
+                <span
+                  key={person}
+                  className="flex items-center gap-2 rounded-full border border-line px-3 py-1 text-sm"
+                >
+                  {person}
+                  <button
+                    aria-label={`${t.remove} ${person}`}
+                    onClick={() => removePerson(person)}
+                    className="text-muted hover:text-tomato"
+                  >
+                    ×
+                  </button>
+                </span>
+              ))}
+            </div>
+          )}
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              addPerson();
+            }}
+            className="mt-2 flex gap-2"
+          >
+            <input
+              value={newPerson}
+              onChange={(e) => setNewPerson(e.target.value)}
+              maxLength={30}
+              placeholder={t.personPlaceholder}
+              aria-label={t.personPlaceholder}
+              className={`flex-1 ${inputClass}`}
+            />
+            <button
+              type="submit"
+              className="rounded-md border border-line px-3 py-2 text-sm hover:border-muted"
+            >
+              {t.addPerson}
+            </button>
+          </form>
+        </fieldset>
+
+        {people.length > 0 && (
+          <ul className="mt-5 divide-y divide-line">
+            {lines.map(({ dish, quantity }) => (
+              <li key={dish.id} className="flex items-center justify-between gap-3 py-2 text-sm">
+                <span className="min-w-0">
+                  {quantity} × {textFor(dish).name}
+                </span>
+                <label className="shrink-0">
+                  <span className="sr-only">{t.whoHad}</span>
+                  <select
+                    value={assignees[dish.id] ?? ""}
+                    onChange={(e) =>
+                      setAssignees((prev) => ({ ...prev, [dish.id]: e.target.value }))
+                    }
+                    className="rounded-md border border-line bg-card px-2 py-1"
+                  >
+                    <option value="">{t.shared}</option>
+                    {people.map((person) => (
+                      <option key={person} value={person}>
+                        {person}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              </li>
+            ))}
+          </ul>
+        )}
+
+        <div className="mt-5 grid grid-cols-2 gap-4">
+          <label className="block text-sm">
+            <span className="font-medium">{t.tax} (%)</span>
+            <input
+              type="number"
+              inputMode="decimal"
+              min={0}
+              max={30}
+              step={0.1}
+              value={taxPercent}
+              onChange={(e) => setTaxPercent(clampPercent(e.target.value))}
+              className={`mt-1 w-full ${inputClass}`}
+            />
+          </label>
+          <fieldset className="text-sm">
+            <legend className="font-medium">{t.tip}</legend>
+            <div className="mt-1 flex flex-wrap gap-1">
+              {TIP_OPTIONS.map((percent) => (
+                <button
+                  key={percent}
+                  type="button"
+                  aria-pressed={tipPercent === percent}
+                  onClick={() => setTipPercent(percent)}
+                  className={`rounded-md px-2 py-2 ${
+                    tipPercent === percent ? "bg-ink text-white" : "border border-line"
+                  }`}
+                >
+                  {percent}%
+                </button>
+              ))}
+            </div>
+          </fieldset>
+        </div>
+
+        <dl className="mt-5 space-y-1 text-sm">
+          <Row label={t.subtotal} value={money(bill.subtotal)} />
+          <Row label={`${t.tax} (${taxPercent}%)`} value={money(bill.tax)} />
+          <Row label={`${t.tip} (${tipPercent}%)`} value={money(bill.tip)} />
+          <Row label={t.total} value={money(bill.total)} strong />
+        </dl>
+
+        {people.length > 0 && (
+          <div className="mt-5 border-t border-line pt-4">
+            <h3 className="text-sm font-medium">{t.perPerson}</h3>
+            <dl className="mt-2 space-y-1 text-sm">
+              {people.map((person) => (
+                <Row key={person} label={person} value={money(bill.perPerson[person] ?? 0)} />
+              ))}
+            </dl>
+          </div>
+        )}
+
+        {bill.unpricedCount > 0 && <p className="mt-4 text-xs text-muted">{t.unpriced}</p>}
+        <p className="mt-2 text-xs text-muted">{t.estimate}</p>
+      </Sheet>
+    );
+  }
+
+  return (
+    <Sheet title={t.yourOrder} closeLabel={t.close} onClose={onClose}>
+      {lines.length === 0 ? (
+        <p className="mt-4 text-sm text-muted">{t.empty}</p>
+      ) : (
+        <>
+          <ul className="mt-4 divide-y divide-line">
+            {lines.map(({ dish, quantity }) => (
+              <li key={dish.id} className="flex items-center justify-between gap-4 py-3">
+                <div className="min-w-0">
+                  <p className="font-medium">{textFor(dish).name}</p>
+                  <p className="text-sm text-muted tabular-nums">{dish.price}</p>
+                </div>
+                <QuantityStepper
+                  quantity={quantity}
+                  onChange={(next) => onQuantity(dish.id, next)}
+                  labels={t}
+                />
+              </li>
+            ))}
+          </ul>
+          <div className="mt-5 flex flex-wrap items-center gap-3">
+            <button
+              onClick={() => setMode("server")}
+              className="rounded-md bg-ink px-4 py-2 text-sm font-medium text-white hover:bg-ink/90"
+            >
+              {t.showServer}
+            </button>
+            <button
+              onClick={() => setMode("split")}
+              className="rounded-md border border-line px-4 py-2 text-sm hover:border-muted"
+            >
+              {t.splitBill}
+            </button>
+            <button onClick={onClear} className="ml-auto text-sm text-muted hover:text-tomato">
+              {t.clearOrder}
+            </button>
+          </div>
+        </>
+      )}
+    </Sheet>
+  );
+}

@@ -1,0 +1,279 @@
+import type { LanguageCode } from "@/lib/languages";
+
+// The allergy statement and request are safety-critical and never AI-generated.
+// TODO: have a native speaker review each language before launch.
+
+export type TableStrings = {
+  add: string;
+  increase: string;
+  decrease: string;
+  remove: string;
+  yourOrder: string;
+  empty: string;
+  showServer: string;
+  splitBill: string;
+  clearOrder: string;
+  people: string;
+  addPerson: string;
+  personPlaceholder: string;
+  shared: string;
+  whoHad: string;
+  tax: string;
+  tip: string;
+  subtotal: string;
+  total: string;
+  perPerson: string;
+  unpriced: string;
+  estimate: string;
+  back: string;
+  close: string;
+  allergyCard: string;
+  cardTitle: string;
+  cardIntro: string;
+  chooseAllergies: string;
+  noAllergies: string;
+  statement: string;
+  request: string;
+  forStaff: string;
+};
+
+export const TABLE_STRINGS: Record<LanguageCode, TableStrings> = {
+  en: {
+    add: "Add",
+    increase: "Add one",
+    decrease: "Remove one",
+    remove: "Remove",
+    yourOrder: "Your order",
+    empty: "Your order is empty. Tap Add on any dish to start.",
+    showServer: "Show to server",
+    splitBill: "Split the bill",
+    clearOrder: "Clear order",
+    people: "Who's eating?",
+    addPerson: "Add person",
+    personPlaceholder: "Name",
+    shared: "Shared",
+    whoHad: "Who had this?",
+    tax: "Tax",
+    tip: "Tip",
+    subtotal: "Subtotal",
+    total: "Total",
+    perPerson: "Each person pays",
+    unpriced: "Dishes without a price aren't included in the totals.",
+    estimate: "This is an estimate. The restaurant's bill is final.",
+    back: "Back",
+    close: "Close",
+    allergyCard: "My allergy card",
+    cardTitle: "Allergy card",
+    cardIntro: "Show this card to your server.",
+    chooseAllergies: "Choose your allergies",
+    noAllergies: "No allergies selected yet.",
+    statement: "I have a food allergy to:",
+    request:
+      "Please make sure my food does not contain these, including in sauces, oils, and garnishes. Please tell me if a dish can't be made without them. Thank you.",
+    forStaff: "For restaurant staff",
+  },
+  es: {
+    add: "Agregar",
+    increase: "Agregar uno",
+    decrease: "Quitar uno",
+    remove: "Quitar",
+    yourOrder: "Su pedido",
+    empty: "Su pedido está vacío. Toque Agregar en cualquier plato para empezar.",
+    showServer: "Mostrar al mesero",
+    splitBill: "Dividir la cuenta",
+    clearOrder: "Vaciar pedido",
+    people: "¿Quiénes comen?",
+    addPerson: "Agregar persona",
+    personPlaceholder: "Nombre",
+    shared: "Compartido",
+    whoHad: "¿Quién lo pidió?",
+    tax: "Impuesto",
+    tip: "Propina",
+    subtotal: "Subtotal",
+    total: "Total",
+    perPerson: "Cada persona paga",
+    unpriced: "Los platos sin precio no se incluyen en los totales.",
+    estimate: "Es una estimación. La cuenta del restaurante es la definitiva.",
+    back: "Atrás",
+    close: "Cerrar",
+    allergyCard: "Mi tarjeta de alergias",
+    cardTitle: "Tarjeta de alergias",
+    cardIntro: "Muestre esta tarjeta a su mesero.",
+    chooseAllergies: "Elija sus alergias",
+    noAllergies: "Aún no ha elegido ninguna alergia.",
+    statement: "Tengo alergia alimentaria a:",
+    request:
+      "Por favor, asegúrese de que mi comida no contenga estos ingredientes, incluso en salsas, aceites y guarniciones. Avíseme si algún plato no se puede preparar sin ellos. Gracias.",
+    forStaff: "Para el personal del restaurante",
+  },
+  zh: {
+    add: "加入",
+    increase: "加一份",
+    decrease: "减一份",
+    remove: "移除",
+    yourOrder: "我的点单",
+    empty: "点单为空。点击任意菜品的「加入」开始点单。",
+    showServer: "给服务员看",
+    splitBill: "分账",
+    clearOrder: "清空点单",
+    people: "谁在用餐？",
+    addPerson: "添加人员",
+    personPlaceholder: "姓名",
+    shared: "共享",
+    whoHad: "这道菜是谁点的？",
+    tax: "税",
+    tip: "小费",
+    subtotal: "小计",
+    total: "合计",
+    perPerson: "每人应付",
+    unpriced: "没有价格的菜品未计入合计。",
+    estimate: "此为估算，以餐厅账单为准。",
+    back: "返回",
+    close: "关闭",
+    allergyCard: "我的过敏卡",
+    cardTitle: "过敏卡",
+    cardIntro: "请将此卡出示给服务员。",
+    chooseAllergies: "选择您的过敏原",
+    noAllergies: "尚未选择过敏原。",
+    statement: "我对以下食物过敏：",
+    request:
+      "请确保我的餐点不含这些成分，包括酱汁、油和配菜。如果某道菜无法去除这些成分，请告诉我。谢谢。",
+    forStaff: "给餐厅员工",
+  },
+  ko: {
+    add: "담기",
+    increase: "하나 추가",
+    decrease: "하나 빼기",
+    remove: "삭제",
+    yourOrder: "내 주문",
+    empty: "주문이 비어 있습니다. 요리의 '담기'를 눌러 시작하세요.",
+    showServer: "직원에게 보여주기",
+    splitBill: "계산 나누기",
+    clearOrder: "주문 비우기",
+    people: "누가 먹나요?",
+    addPerson: "사람 추가",
+    personPlaceholder: "이름",
+    shared: "같이 먹음",
+    whoHad: "누가 주문했나요?",
+    tax: "세금",
+    tip: "팁",
+    subtotal: "소계",
+    total: "합계",
+    perPerson: "1인당 금액",
+    unpriced: "가격이 없는 요리는 합계에 포함되지 않습니다.",
+    estimate: "예상 금액입니다. 레스토랑 계산서가 최종 금액입니다.",
+    back: "뒤로",
+    close: "닫기",
+    allergyCard: "내 알레르기 카드",
+    cardTitle: "알레르기 카드",
+    cardIntro: "이 카드를 직원에게 보여주세요.",
+    chooseAllergies: "알레르기를 선택하세요",
+    noAllergies: "아직 선택한 알레르기가 없습니다.",
+    statement: "저는 다음 식품에 알레르기가 있습니다:",
+    request:
+      "소스, 기름, 고명을 포함해 제 음식에 이 재료들이 들어가지 않도록 확인해 주세요. 이 재료 없이 만들 수 없는 요리가 있으면 알려 주세요. 감사합니다.",
+    forStaff: "레스토랑 직원용",
+  },
+  ja: {
+    add: "追加",
+    increase: "1つ増やす",
+    decrease: "1つ減らす",
+    remove: "削除",
+    yourOrder: "注文リスト",
+    empty: "注文リストは空です。料理の「追加」を押して始めましょう。",
+    showServer: "スタッフに見せる",
+    splitBill: "割り勘",
+    clearOrder: "注文をクリア",
+    people: "食べる人",
+    addPerson: "人を追加",
+    personPlaceholder: "名前",
+    shared: "シェア",
+    whoHad: "誰が注文しましたか？",
+    tax: "税",
+    tip: "チップ",
+    subtotal: "小計",
+    total: "合計",
+    perPerson: "1人あたり",
+    unpriced: "価格のない料理は合計に含まれません。",
+    estimate: "これは概算です。レストランの会計が最終金額です。",
+    back: "戻る",
+    close: "閉じる",
+    allergyCard: "アレルギーカード",
+    cardTitle: "アレルギーカード",
+    cardIntro: "このカードをスタッフにお見せください。",
+    chooseAllergies: "アレルギーを選択",
+    noAllergies: "アレルギーがまだ選択されていません。",
+    statement: "私は次の食品にアレルギーがあります：",
+    request:
+      "ソース、油、付け合わせを含め、料理にこれらが入らないようにしてください。除去できない料理があれば教えてください。よろしくお願いします。",
+    forStaff: "レストランスタッフ向け",
+  },
+  fr: {
+    add: "Ajouter",
+    increase: "Ajouter un",
+    decrease: "Retirer un",
+    remove: "Retirer",
+    yourOrder: "Ma commande",
+    empty: "Votre commande est vide. Touchez Ajouter sur un plat pour commencer.",
+    showServer: "Montrer au serveur",
+    splitBill: "Partager l'addition",
+    clearOrder: "Vider la commande",
+    people: "Qui mange ?",
+    addPerson: "Ajouter une personne",
+    personPlaceholder: "Nom",
+    shared: "Partagé",
+    whoHad: "Qui a pris ce plat ?",
+    tax: "Taxes",
+    tip: "Pourboire",
+    subtotal: "Sous-total",
+    total: "Total",
+    perPerson: "Chaque personne paie",
+    unpriced: "Les plats sans prix ne sont pas inclus dans les totaux.",
+    estimate: "Ceci est une estimation. L'addition du restaurant fait foi.",
+    back: "Retour",
+    close: "Fermer",
+    allergyCard: "Ma carte d'allergies",
+    cardTitle: "Carte d'allergies",
+    cardIntro: "Montrez cette carte à votre serveur.",
+    chooseAllergies: "Choisissez vos allergies",
+    noAllergies: "Aucune allergie sélectionnée pour l'instant.",
+    statement: "J'ai une allergie alimentaire à :",
+    request:
+      "Veuillez vous assurer que mon plat n'en contient pas, y compris dans les sauces, les huiles et les garnitures. Dites-moi si un plat ne peut pas être préparé sans. Merci.",
+    forStaff: "Pour le personnel du restaurant",
+  },
+  vi: {
+    add: "Thêm",
+    increase: "Thêm một",
+    decrease: "Bớt một",
+    remove: "Xóa",
+    yourOrder: "Món đã chọn",
+    empty: "Bạn chưa chọn món nào. Nhấn Thêm ở món bất kỳ để bắt đầu.",
+    showServer: "Cho nhân viên xem",
+    splitBill: "Chia hóa đơn",
+    clearOrder: "Xóa hết món",
+    people: "Ai cùng ăn?",
+    addPerson: "Thêm người",
+    personPlaceholder: "Tên",
+    shared: "Ăn chung",
+    whoHad: "Ai gọi món này?",
+    tax: "Thuế",
+    tip: "Tiền boa",
+    subtotal: "Tạm tính",
+    total: "Tổng cộng",
+    perPerson: "Mỗi người trả",
+    unpriced: "Các món không có giá không được tính vào tổng.",
+    estimate: "Đây là số tiền ước tính. Hóa đơn của nhà hàng là chính thức.",
+    back: "Quay lại",
+    close: "Đóng",
+    allergyCard: "Thẻ dị ứng của tôi",
+    cardTitle: "Thẻ dị ứng",
+    cardIntro: "Hãy đưa thẻ này cho nhân viên phục vụ.",
+    chooseAllergies: "Chọn chất bạn bị dị ứng",
+    noAllergies: "Chưa chọn chất gây dị ứng nào.",
+    statement: "Tôi bị dị ứng thực phẩm với:",
+    request:
+      "Vui lòng đảm bảo món ăn của tôi không chứa các thành phần này, kể cả trong nước sốt, dầu và đồ trang trí. Xin báo cho tôi nếu món nào không thể làm mà không có chúng. Cảm ơn.",
+    forStaff: "Dành cho nhân viên nhà hàng",
+  },
+};
