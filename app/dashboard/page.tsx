@@ -2,9 +2,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { BlurFade } from "@/components/motion/BlurFade";
 import { NumberTicker } from "@/components/motion/NumberTicker";
+import { OwnerPageHeader } from "@/components/owner/OwnerPageHeader";
 import { ProgressRing } from "@/components/owner/ProgressRing";
 import { ViewsChart } from "@/components/owner/ViewsChart";
-import { buttonClass } from "@/components/ui/button";
+import { ButtonLink } from "@/components/ui/button";
 import { requireRestaurant } from "@/lib/auth";
 import { cn } from "@/lib/cn";
 import { listDishes } from "@/lib/db";
@@ -16,7 +17,7 @@ import { buildChecklist } from "@/lib/owner-checklist";
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "Dashboard | Carte" };
 
-const cardClass = "rounded-2xl border border-line bg-card p-6 shadow-sm";
+const panelClass = "rounded-2xl border border-line bg-card p-6 shadow-sm";
 
 export default async function DashboardHome() {
   const { supabase, restaurant } = await requireRestaurant();
@@ -54,26 +55,29 @@ export default async function DashboardHome() {
 
   return (
     <main className="mx-auto max-w-5xl px-5 py-12">
-      <BlurFade>
-        <p className="text-sm text-muted">Welcome back</p>
-        <h1 className="mt-1 font-serif text-5xl leading-tight sm:text-6xl">{restaurant.name}</h1>
-      </BlurFade>
-      <BlurFade delay={0.1}>
-        <div className="mt-6 flex flex-wrap gap-3">
-          <Link href={`/r/${restaurant.slug}`} className={buttonClass({ shine: true })}>
-            View your diner menu
-          </Link>
-          <Link href="/dashboard/qr" className={buttonClass({ variant: "secondary" })}>
-            Print your QR code
-          </Link>
-        </div>
-      </BlurFade>
+      <OwnerPageHeader eyebrow="Welcome back" title={restaurant.name}>
+        <ButtonLink href={`/r/${restaurant.slug}`} shine>
+          View your diner menu
+        </ButtonLink>
+        <ButtonLink href="/dashboard/qr" variant="secondary">
+          Print your QR code
+        </ButtonLink>
+      </OwnerPageHeader>
 
-      <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mt-10 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         {stats.map((stat, index) => (
-          <BlurFade key={stat.label} delay={0.1 + index * 0.06}>
-            <div className={cn(cardClass, stat.alert && "border-saffron/50 bg-saffron-soft")}>
-              <NumberTicker value={stat.value} className="block font-serif text-5xl leading-none" />
+          <BlurFade key={stat.label} delay={0.1 + index * 0.06} className="h-full">
+            <div
+              className={cn(
+                panelClass,
+                "h-full p-5 sm:p-6",
+                stat.alert && "border-saffron/50 bg-saffron-soft",
+              )}
+            >
+              <NumberTicker
+                value={stat.value}
+                className="block font-serif text-4xl leading-none sm:text-5xl"
+              />
               <p className={cn("mt-3 text-sm", stat.alert ? "text-saffron-ink" : "text-muted")}>
                 {stat.label}
               </p>
@@ -93,7 +97,7 @@ export default async function DashboardHome() {
       <div className="mt-6 grid gap-6 lg:grid-cols-3">
         <div className="space-y-6 lg:col-span-2">
           <BlurFade>
-            <section className={cardClass}>
+            <section className={panelClass}>
               <h2 className="font-serif text-2xl">Diner views</h2>
               <p className="mt-1 text-sm text-muted">
                 How often diners opened your dishes’ details each day.
@@ -105,10 +109,10 @@ export default async function DashboardHome() {
           </BlurFade>
 
           <BlurFade>
-            <section className={cardClass}>
+            <section className={panelClass}>
               <h2 className="font-serif text-2xl">Most viewed this week</h2>
               {topDishes.length === 0 ? (
-                <p className="mt-3 text-sm leading-relaxed text-muted">
+                <p className="mt-4 rounded-xl border border-dashed border-line px-4 py-6 text-center text-sm leading-relaxed text-muted">
                   No views yet. Put your QR code on tables, and you’ll see which dishes diners open
                   most.
                 </p>
@@ -135,7 +139,7 @@ export default async function DashboardHome() {
         </div>
 
         <BlurFade delay={0.1}>
-          <section className={cardClass}>
+          <section className={panelClass}>
             <div className="flex items-center gap-5">
               <ProgressRing done={stepsDone} total={checklist.length} />
               <div>
