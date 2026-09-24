@@ -1,10 +1,7 @@
-import Anthropic from "@anthropic-ai/sdk";
 import { ALLERGENS, DIETARY_TAGS } from "@/lib/allergens";
+import { anthropic, MODEL, parseJsonReply } from "@/lib/ai/client";
 import type { SupportedImageType } from "@/lib/upload-rules";
 import { ExtractedMenuSchema, type ExtractedDish } from "@/types/menu";
-
-const MODEL = "claude-sonnet-5";
-const client = new Anthropic();
 
 // The caution rules come from testing real menus: early versions missed wheat in
 // soy sauce and noodles, and milk in French-style sauces.
@@ -24,7 +21,7 @@ export async function extractMenu(
   imageBase64: string,
   mediaType: SupportedImageType,
 ): Promise<ExtractedDish[]> {
-  const message = await client.messages.create({
+  const reply = await anthropic.messages.create({
     model: MODEL,
     max_tokens: 4000,
     messages: [
@@ -37,8 +34,5 @@ export async function extractMenu(
       },
     ],
   });
-
-  const reply = message.content.map((block) => (block.type === "text" ? block.text : "")).join("");
-  const json = reply.replace(/```json|```/g, "").trim();
-  return ExtractedMenuSchema.parse(JSON.parse(json)).items;
+  return ExtractedMenuSchema.parse(parseJsonReply(reply)).items;
 }

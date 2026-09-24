@@ -6,6 +6,7 @@ const OWNER_LINKS = [
   { href: "/", label: "Upload menu" },
   { href: "/review", label: "Review dishes" },
   { href: "/qr", label: "QR code" },
+  { href: "/menu", label: "Diner menu" },
 ];
 
 /** Owners see their tools; diners on the menu page see only the Carte name. */

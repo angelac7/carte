@@ -1,4 +1,6 @@
+import type { LanguageCode } from "@/lib/languages";
 import type { ExtractedDish, MenuItem } from "@/types/menu";
+import type { MenuTranslations } from "@/types/translation";
 
 async function sendToItems<T>(method: "POST" | "PUT" | "DELETE", body: unknown): Promise<T> {
   const res = await fetch("/api/items", {
@@ -28,4 +30,12 @@ export async function readMenuImage(image: File): Promise<ExtractedDish[]> {
   const data = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error(data.error ?? "Carte couldn't read that menu. Try again.");
   return data.items as ExtractedDish[];
+}
+
+/** Gets translated dish text for the diner menu. */
+export async function fetchTranslations(language: LanguageCode): Promise<MenuTranslations> {
+  const res = await fetch(`/api/translations?lang=${encodeURIComponent(language)}`);
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error ?? "Translation failed.");
+  return data.translations as MenuTranslations;
 }

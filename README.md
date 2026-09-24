@@ -44,3 +44,10 @@ AI output is only a suggestion. Diners must only ever see dishes an owner has co
 | `/review` | Owner | Confirm allergens and tags for each dish              |
 | `/qr`     | Owner | Print a table QR code linking to the diner menu       |
 | `/menu`   | Diner | Confirmed dishes only, with allergen and diet filters |
+
+## Languages
+
+The diner menu supports English, Spanish, Chinese, Korean, Japanese, French, and Vietnamese.
+Page text and allergen names use fixed translations in `lib/i18n/diner-strings.ts`.
+Dish text is translated by AI once per language and saved in `data/translations.json`;
+editing a dish triggers a fresh translation of that dish only.

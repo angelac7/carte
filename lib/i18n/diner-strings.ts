@@ -1,0 +1,263 @@
+import type { Allergen, DietaryTag } from "@/lib/allergens";
+import type { LanguageCode } from "@/lib/languages";
+
+// Allergen names are safety-critical and are never AI-generated.
+// TODO: have a native speaker review each language before launch.
+
+export type DinerStrings = {
+  menuTitle: string;
+  safetyNotice: string;
+  notReady: string;
+  language: string;
+  hideContaining: string;
+  showOnly: string;
+  showing: (shown: number, total: number, hidden: number) => string;
+  clearFilters: string;
+  noMatch: string;
+  contains: string;
+  noMajorAllergens: string;
+  kitchenNote: string;
+  translating: string;
+  translationFailed: string;
+  translatedNote: string;
+  allergens: Record<Allergen, string>;
+  tags: Record<DietaryTag, string>;
+};
+
+export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
+  en: {
+    menuTitle: "Menu",
+    safetyNotice:
+      "Allergen information comes from the restaurant. Kitchens share equipment and recipes change, so always tell your server about allergies before ordering.",
+    notReady:
+      "This menu isn't ready yet. Ask your server for today's menu and allergen information.",
+    language: "Language",
+    hideContaining: "Hide dishes that contain",
+    showOnly: "Show only dishes marked",
+    showing: (shown, total, hidden) =>
+      `Showing ${shown} of ${total} dishes.${hidden > 0 ? ` ${hidden} hidden by your filters.` : ""}`,
+    clearFilters: "Clear filters",
+    noMatch:
+      "No dishes match your filters. Try removing one, or ask your server what the kitchen can adjust.",
+    contains: "Contains",
+    noMajorAllergens: "None of the 9 major allergens listed",
+    kitchenNote: "Kitchen note:",
+    translating: "Translating menu…",
+    translationFailed:
+      "Translation isn't available right now, so the menu is shown in its original language.",
+    translatedNote:
+      "Dish descriptions were translated automatically. Ask your server if anything is unclear.",
+    allergens: {
+      milk: "milk",
+      eggs: "eggs",
+      fish: "fish",
+      shellfish: "shellfish",
+      "tree nuts": "tree nuts",
+      peanuts: "peanuts",
+      wheat: "wheat",
+      soy: "soy",
+      sesame: "sesame",
+    },
+    tags: { vegan: "vegan", vegetarian: "vegetarian", "gluten-free": "gluten-free" },
+  },
+  es: {
+    menuTitle: "Menú",
+    safetyNotice:
+      "La información sobre alérgenos proviene del restaurante. Las cocinas comparten equipos y las recetas cambian, así que informe siempre a su mesero sobre sus alergias antes de pedir.",
+    notReady:
+      "Este menú aún no está listo. Pregunte a su mesero por el menú de hoy y la información sobre alérgenos.",
+    language: "Idioma",
+    hideContaining: "Ocultar platos que contienen",
+    showOnly: "Mostrar solo platos marcados como",
+    showing: (shown, total, hidden) =>
+      `Mostrando ${shown} de ${total} platos.${hidden > 0 ? ` ${hidden} ocultos por sus filtros.` : ""}`,
+    clearFilters: "Borrar filtros",
+    noMatch:
+      "Ningún plato coincide con sus filtros. Quite alguno o pregunte a su mesero qué puede adaptar la cocina.",
+    contains: "Contiene",
+    noMajorAllergens: "No se indica ninguno de los 9 alérgenos principales",
+    kitchenNote: "Nota de cocina:",
+    translating: "Traduciendo el menú…",
+    translationFailed:
+      "La traducción no está disponible en este momento, así que el menú se muestra en su idioma original.",
+    translatedNote:
+      "Las descripciones se tradujeron automáticamente. Pregunte a su mesero si algo no está claro.",
+    allergens: {
+      milk: "leche",
+      eggs: "huevo",
+      fish: "pescado",
+      shellfish: "mariscos",
+      "tree nuts": "nueces de árbol",
+      peanuts: "cacahuate (maní)",
+      wheat: "trigo",
+      soy: "soya",
+      sesame: "sésamo",
+    },
+    tags: { vegan: "vegano", vegetarian: "vegetariano", "gluten-free": "sin gluten" },
+  },
+  zh: {
+    menuTitle: "菜单",
+    safetyNotice:
+      "过敏原信息由餐厅提供。厨房共用设备，菜谱也可能变化，点餐前请务必告知服务员您的过敏情况。",
+    notReady: "此菜单尚未准备好。请向服务员询问今日菜单和过敏原信息。",
+    language: "语言",
+    hideContaining: "隐藏含有以下成分的菜品",
+    showOnly: "仅显示标注为以下的菜品",
+    showing: (shown, total, hidden) =>
+      `显示 ${total} 道菜中的 ${shown} 道。${hidden > 0 ? `${hidden} 道已被筛选隐藏。` : ""}`,
+    clearFilters: "清除筛选",
+    noMatch: "没有符合筛选条件的菜品。请尝试移除筛选条件，或询问服务员厨房可以如何调整。",
+    contains: "含有",
+    noMajorAllergens: "未标注 9 种主要过敏原中的任何一种",
+    kitchenNote: "厨房备注：",
+    translating: "正在翻译菜单…",
+    translationFailed: "暂时无法翻译，菜单以原语言显示。",
+    translatedNote: "菜品描述为自动翻译。如有不清楚之处，请询问服务员。",
+    allergens: {
+      milk: "牛奶",
+      eggs: "鸡蛋",
+      fish: "鱼",
+      shellfish: "贝类海鲜",
+      "tree nuts": "坚果",
+      peanuts: "花生",
+      wheat: "小麦",
+      soy: "大豆",
+      sesame: "芝麻",
+    },
+    tags: { vegan: "纯素", vegetarian: "素食", "gluten-free": "无麸质" },
+  },
+  ko: {
+    menuTitle: "메뉴",
+    safetyNotice:
+      "알레르기 정보는 레스토랑에서 제공합니다. 주방은 조리 기구를 함께 사용하고 레시피가 바뀔 수 있으므로, 주문 전에 반드시 직원에게 알레르기를 알려 주세요.",
+    notReady:
+      "메뉴가 아직 준비되지 않았습니다. 오늘의 메뉴와 알레르기 정보는 직원에게 문의해 주세요.",
+    language: "언어",
+    hideContaining: "다음 성분이 들어간 요리 숨기기",
+    showOnly: "다음으로 표시된 요리만 보기",
+    showing: (shown, total, hidden) =>
+      `전체 ${total}개 중 ${shown}개 요리 표시 중.${hidden > 0 ? ` ${hidden}개는 필터로 숨겨졌습니다.` : ""}`,
+    clearFilters: "필터 지우기",
+    noMatch:
+      "필터에 맞는 요리가 없습니다. 필터를 하나 해제하거나, 주방에서 조정 가능한지 직원에게 문의해 주세요.",
+    contains: "포함",
+    noMajorAllergens: "9대 주요 알레르기 유발 성분 표시 없음",
+    kitchenNote: "주방 메모:",
+    translating: "메뉴 번역 중…",
+    translationFailed: "지금은 번역을 사용할 수 없어 원래 언어로 메뉴를 표시합니다.",
+    translatedNote: "요리 설명은 자동 번역되었습니다. 궁금한 점은 직원에게 문의해 주세요.",
+    allergens: {
+      milk: "우유",
+      eggs: "달걀",
+      fish: "생선",
+      shellfish: "갑각류·조개류",
+      "tree nuts": "견과류",
+      peanuts: "땅콩",
+      wheat: "밀",
+      soy: "대두",
+      sesame: "참깨",
+    },
+    tags: { vegan: "비건", vegetarian: "채식", "gluten-free": "글루텐 프리" },
+  },
+  ja: {
+    menuTitle: "メニュー",
+    safetyNotice:
+      "アレルゲン情報はレストランが提供しています。厨房では調理器具を共用しており、レシピが変わることもあるため、ご注文前に必ずスタッフにアレルギーをお伝えください。",
+    notReady:
+      "このメニューはまだ準備中です。本日のメニューとアレルゲン情報はスタッフにお尋ねください。",
+    language: "言語",
+    hideContaining: "次を含む料理を非表示",
+    showOnly: "次の表示がある料理のみ表示",
+    showing: (shown, total, hidden) =>
+      `${total}品中${shown}品を表示中。${hidden > 0 ? `${hidden}品はフィルターで非表示です。` : ""}`,
+    clearFilters: "フィルターをクリア",
+    noMatch:
+      "条件に合う料理がありません。フィルターを外すか、対応できるかスタッフにお尋ねください。",
+    contains: "含む",
+    noMajorAllergens: "主要アレルゲン9品目の表示なし",
+    kitchenNote: "厨房メモ：",
+    translating: "メニューを翻訳中…",
+    translationFailed: "現在翻訳を利用できないため、元の言語でメニューを表示しています。",
+    translatedNote: "料理の説明は自動翻訳です。不明な点はスタッフにお尋ねください。",
+    allergens: {
+      milk: "乳",
+      eggs: "卵",
+      fish: "魚",
+      shellfish: "甲殻類・貝類",
+      "tree nuts": "ナッツ類",
+      peanuts: "ピーナッツ",
+      wheat: "小麦",
+      soy: "大豆",
+      sesame: "ごま",
+    },
+    tags: { vegan: "ヴィーガン", vegetarian: "ベジタリアン", "gluten-free": "グルテンフリー" },
+  },
+  fr: {
+    menuTitle: "Menu",
+    safetyNotice:
+      "Les informations sur les allergènes sont fournies par le restaurant. Les cuisines partagent du matériel et les recettes changent : signalez toujours vos allergies au serveur avant de commander.",
+    notReady:
+      "Ce menu n'est pas encore prêt. Demandez au serveur le menu du jour et les informations sur les allergènes.",
+    language: "Langue",
+    hideContaining: "Masquer les plats contenant",
+    showOnly: "Afficher uniquement les plats",
+    showing: (shown, total, hidden) =>
+      `Plats affichés : ${shown} sur ${total}.${hidden > 0 ? ` Masqués par vos filtres : ${hidden}.` : ""}`,
+    clearFilters: "Effacer les filtres",
+    noMatch:
+      "Aucun plat ne correspond à vos filtres. Retirez-en un ou demandez au serveur ce que la cuisine peut adapter.",
+    contains: "Contient",
+    noMajorAllergens: "Aucun des 9 allergènes majeurs n'est indiqué",
+    kitchenNote: "Note de la cuisine :",
+    translating: "Traduction du menu…",
+    translationFailed:
+      "La traduction n'est pas disponible pour le moment ; le menu est affiché dans sa langue d'origine.",
+    translatedNote:
+      "Les descriptions ont été traduites automatiquement. Demandez au serveur si quelque chose n'est pas clair.",
+    allergens: {
+      milk: "lait",
+      eggs: "œufs",
+      fish: "poisson",
+      shellfish: "fruits de mer",
+      "tree nuts": "fruits à coque",
+      peanuts: "arachides",
+      wheat: "blé",
+      soy: "soja",
+      sesame: "sésame",
+    },
+    tags: { vegan: "végan", vegetarian: "végétarien", "gluten-free": "sans gluten" },
+  },
+  vi: {
+    menuTitle: "Thực đơn",
+    safetyNotice:
+      "Thông tin về chất gây dị ứng do nhà hàng cung cấp. Bếp dùng chung dụng cụ và công thức có thể thay đổi, vì vậy hãy luôn báo cho nhân viên phục vụ về dị ứng của bạn trước khi gọi món.",
+    notReady:
+      "Thực đơn này chưa sẵn sàng. Hãy hỏi nhân viên phục vụ về thực đơn hôm nay và thông tin dị ứng.",
+    language: "Ngôn ngữ",
+    hideContaining: "Ẩn món có chứa",
+    showOnly: "Chỉ hiện món được đánh dấu",
+    showing: (shown, total, hidden) =>
+      `Đang hiện ${shown} trên ${total} món.${hidden > 0 ? ` ${hidden} món bị ẩn theo bộ lọc.` : ""}`,
+    clearFilters: "Xóa bộ lọc",
+    noMatch:
+      "Không có món nào phù hợp với bộ lọc. Hãy bỏ bớt một bộ lọc, hoặc hỏi nhân viên phục vụ xem bếp có thể điều chỉnh gì.",
+    contains: "Chứa",
+    noMajorAllergens: "Không ghi nhận chất nào trong 9 chất gây dị ứng chính",
+    kitchenNote: "Ghi chú của bếp:",
+    translating: "Đang dịch thực đơn…",
+    translationFailed: "Hiện không thể dịch, nên thực đơn được hiển thị bằng ngôn ngữ gốc.",
+    translatedNote: "Mô tả món ăn được dịch tự động. Hãy hỏi nhân viên phục vụ nếu có gì chưa rõ.",
+    allergens: {
+      milk: "sữa",
+      eggs: "trứng",
+      fish: "cá",
+      shellfish: "động vật có vỏ",
+      "tree nuts": "hạt cây",
+      peanuts: "đậu phộng",
+      wheat: "lúa mì",
+      soy: "đậu nành",
+      sesame: "mè",
+    },
+    tags: { vegan: "thuần chay", vegetarian: "chay", "gluten-free": "không chứa gluten" },
+  },
+};
