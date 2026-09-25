@@ -1,4 +1,5 @@
 "use client";
+import { PhraseCards } from "@/components/PhraseCards";
 import { Sheet } from "@/components/Sheet";
 import { ToggleChip } from "@/components/ToggleChip";
 import { ALLERGENS, type Allergen } from "@/lib/allergens";
@@ -119,6 +120,8 @@ export function AllergyCard({
           )}
         </div>
       )}
+
+      <PhraseCards language={language} staffLanguage={staffLanguage} />
     </Sheet>
   );
 }
