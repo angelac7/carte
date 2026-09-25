@@ -4,7 +4,7 @@ const mocks = vi.hoisted(() => ({
   passwordMatches: vi.fn(),
   deleteAccount: vi.fn(),
   checkRateLimit: vi.fn(),
-  getOwnerRestaurant: vi.fn(),
+  listMyRestaurants: vi.fn(),
   storage: { list: vi.fn(), remove: vi.fn() },
 }));
 vi.mock("server-only", () => ({}));
@@ -25,7 +25,7 @@ vi.mock("@/lib/account", () => ({
   deleteAccount: mocks.deleteAccount,
 }));
 vi.mock("@/lib/rate-limit", () => ({ checkRateLimit: mocks.checkRateLimit }));
-vi.mock("@/lib/db", () => ({ getOwnerRestaurant: mocks.getOwnerRestaurant }));
+vi.mock("@/lib/db", () => ({ listMyRestaurants: mocks.listMyRestaurants }));
 vi.mock("@/lib/supabase/admin", () => ({
   createAdminClient: () => ({ storage: { from: () => mocks.storage } }),
 }));
@@ -49,7 +49,11 @@ beforeEach(() => {
   mocks.checkRateLimit.mockResolvedValue(true);
   mocks.auth.updateUser.mockResolvedValue({ error: null });
   mocks.auth.signOut.mockResolvedValue({ error: null });
-  mocks.getOwnerRestaurant.mockResolvedValue({ id: "restaurant" });
+  mocks.listMyRestaurants.mockResolvedValue([
+    { id: "restaurant", role: "owner" },
+    { id: "second-location", role: "owner" },
+    { id: "someone-elses", role: "editor" },
+  ]);
 });
 
 describe("account settings", () => {
@@ -95,13 +99,14 @@ describe("account settings", () => {
     expect(mocks.auth.updateUser).toHaveBeenCalledWith({ password: "abcdefgh" });
   });
 
-  it("deletes the account and its restaurant only after typing DELETE", async () => {
+  it("deletes the account and the restaurants it owns only after typing DELETE", async () => {
     expect((await deleteAccountAction({}, form({ confirm: "delete" }))).error).toMatch(/DELETE/);
     expect(mocks.passwordMatches).not.toHaveBeenCalled();
     await expect(
       deleteAccountAction({}, form({ confirm: "DELETE", currentPassword: "old" })),
     ).rejects.toThrow("redirect:/goodbye");
-    expect(mocks.deleteAccount).toHaveBeenCalledWith("owner", "restaurant");
+    // Places the owner only helps edit belong to someone else and aren't deleted.
+    expect(mocks.deleteAccount).toHaveBeenCalledWith("owner", ["restaurant", "second-location"]);
     expect(mocks.auth.signOut).toHaveBeenCalled();
   });
 

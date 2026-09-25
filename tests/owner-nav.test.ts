@@ -11,10 +11,18 @@ describe("site navigation", () => {
       "QR code",
       "Profile",
       "Map listing",
+      "Team",
       "Account",
       "Diner menu",
     ]);
     expect(ownerLinks({ slug: "maru" }, false).at(-1)?.href).toBe("/r/maru");
+  });
+
+  it("leaves the map listing and team to the owner", () => {
+    const labels = ownerLinks({ slug: "maru", role: "editor" }, false).map((link) => link.label);
+    expect(labels).not.toContain("Map listing");
+    expect(labels).not.toContain("Team");
+    expect(labels).toContain("Review dishes");
   });
 
   it("sends owners without a restaurant to setup, and adds claim review for admins", () => {

@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { deleteAccount, passwordMatches } from "@/lib/account";
 import { requireUser } from "@/lib/auth";
-import { getOwnerRestaurant } from "@/lib/db";
+import { listMyRestaurants } from "@/lib/db";
 import { checkRateLimit } from "@/lib/rate-limit";
 
 export type AccountState = { error?: string; message?: string };
@@ -78,8 +78,13 @@ export async function deleteAccountAction(
   if ("error" in owner) return { error: owner.error };
 
   try {
-    const restaurant = await getOwnerRestaurant(owner.supabase, owner.user.id);
-    await deleteAccount(owner.user.id, restaurant?.id ?? null);
+    const owned = (await listMyRestaurants(owner.supabase, owner.user.id)).filter(
+      (restaurant) => restaurant.role === "owner",
+    );
+    await deleteAccount(
+      owner.user.id,
+      owned.map((restaurant) => restaurant.id),
+    );
   } catch (err) {
     console.error("Account deletion failed:", err);
     return { error: "Your account couldn't be deleted. Please try again." };

@@ -12,7 +12,8 @@ export async function createTestDatabase(): Promise<PGlite> {
     alter default privileges in schema public grant all on tables to anon, authenticated, service_role;
     create schema auth;
     create table auth.users (id uuid primary key);
-    create function auth.uid() returns uuid language sql as 'select null::uuid';
+    -- Tests act as a signed-in person with: set test.uid = '<user id>'.
+    create function auth.uid() returns uuid language sql stable as $$ select nullif(current_setting('test.uid', true), '')::uuid $$;
     grant usage on schema auth to anon, authenticated;
     grant execute on function auth.uid() to anon, authenticated;
     create schema storage;

@@ -1,6 +1,9 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { ExtractedDish, MenuItem } from "@/types/menu";
 
+/** An owner runs the restaurant; an editor was invited to help keep its menu up to date. */
+export type RestaurantRole = "owner" | "editor";
+
 export type Restaurant = {
   id: string;
   name: string;
@@ -14,6 +17,8 @@ export type Restaurant = {
   price_range?: number;
   logo_url?: string | null;
   cover_url?: string | null;
+  /** The signed-in person's part in this restaurant, when looked up for them. */
+  role?: RestaurantRole;
 };
 
 const RESTAURANT_COLUMNS =
@@ -21,17 +26,39 @@ const RESTAURANT_COLUMNS =
 const DISH_COLUMNS =
   "id, name, description, price, allergens, dietary_tags, notes, confirmed, photo_url, revision, source_language, section, sort_order, sold_out_on, special, available_from, available_until, sizes, addons, allergen_list, removable, may_contain, spice";
 
-export async function getOwnerRestaurant(
+/** Every restaurant a person can work on: the ones they own first, then ones they help edit. */
+export async function listMyRestaurants(
   supabase: SupabaseClient,
-  ownerId: string,
-): Promise<Restaurant | null> {
+  userId: string,
+): Promise<Restaurant[]> {
+  const { data: memberships, error: membershipError } = await supabase
+    .from("restaurant_members")
+    .select("restaurant_id")
+    .eq("user_id", userId);
+  if (membershipError) throw membershipError;
+  const memberIds = (memberships ?? []).map(
+    (row) => (row as { restaurant_id: string }).restaurant_id,
+  );
+  const filter = [
+    `owner_id.eq.${userId}`,
+    ...(memberIds.length ? [`id.in.(${memberIds.join(",")})`] : []),
+  ];
   const { data, error } = await supabase
     .from("restaurants")
-    .select(RESTAURANT_COLUMNS)
-    .eq("owner_id", ownerId)
-    .maybeSingle();
+    .select(`${RESTAURANT_COLUMNS}, owner_id`)
+    .or(filter.join(","))
+    .order("created_at");
   if (error) throw error;
-  return data as unknown as Restaurant | null;
+  const restaurants = ((data ?? []) as unknown as (Restaurant & { owner_id: string })[]).map(
+    ({ owner_id, ...restaurant }) => ({
+      ...restaurant,
+      role: (owner_id === userId ? "owner" : "editor") as RestaurantRole,
+    }),
+  );
+  return [
+    ...restaurants.filter((r) => r.role === "owner"),
+    ...restaurants.filter((r) => r.role === "editor"),
+  ];
 }
 
 export async function getRestaurantBySlug(
@@ -66,9 +93,13 @@ export async function createRestaurant(
   ownerId: string,
   name: string,
   slug: string,
-): Promise<{ ok: true } | { ok: false; reason: "taken" | "failed" }> {
-  const { error } = await supabase.from("restaurants").insert({ owner_id: ownerId, name, slug });
-  if (!error) return { ok: true };
+): Promise<{ ok: true; id: string } | { ok: false; reason: "taken" | "failed" }> {
+  const { data, error } = await supabase
+    .from("restaurants")
+    .insert({ owner_id: ownerId, name, slug })
+    .select("id")
+    .single();
+  if (!error) return { ok: true, id: (data as { id: string }).id };
   return { ok: false, reason: error.code === "23505" ? "taken" : "failed" };
 }
 

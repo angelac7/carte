@@ -5,7 +5,7 @@ import { OwnerPageHeader } from "@/components/owner/OwnerPageHeader";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Notice } from "@/components/ui/notice";
-import { requireRestaurant } from "@/lib/auth";
+import { requireOwnedRestaurant } from "@/lib/auth";
 import { cn } from "@/lib/cn";
 import { listPlaceClaims } from "@/lib/db/claims";
 import { fieldClass } from "@/components/ui/field";
@@ -31,7 +31,7 @@ const ERRORS: Record<string, string> = {
 
 export default async function ClaimPage({ searchParams }: { searchParams: Promise<Params> }) {
   const params = await searchParams;
-  const { supabase, restaurant } = await requireRestaurant(
+  const { supabase, restaurant } = await requireOwnedRestaurant(
     `/dashboard/claim?place=${encodeURIComponent(one(params.place))}`,
   );
   const placeId = one(params.place);

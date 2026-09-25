@@ -29,8 +29,8 @@ export default async function DashboardHome() {
     listDishes(supabase, restaurant.id),
     getRestaurantProfile(supabase, restaurant.id),
     getClaim(supabase, restaurant.id),
-    getDishViews(supabase).catch(() => []),
-    getDailyViews(supabase).catch(() => []),
+    getDishViews(supabase, restaurant.id).catch(() => []),
+    getDailyViews(supabase, restaurant.id).catch(() => []),
     listOpenReports(supabase, restaurant.id).catch(() => []),
   ]);
 

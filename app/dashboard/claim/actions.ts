@@ -2,13 +2,13 @@
 import { z } from "zod";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { redirect } from "next/navigation";
-import { requireRestaurant } from "@/lib/auth";
+import { requireOwnedRestaurant } from "@/lib/auth";
 import { claimPlace } from "@/lib/db/places";
 import { isValidPlaceId } from "@/lib/places/normalize";
 import { getPlace } from "@/lib/places/osm";
 
 export async function claimPlaceAction(formData: FormData) {
-  const { supabase, restaurant } = await requireRestaurant();
+  const { supabase, restaurant } = await requireOwnedRestaurant();
   const placeId = String(formData.get("place") ?? "");
   const evidence = z.string().trim().min(20).max(2000).safeParse(formData.get("evidence"));
   if (!evidence.success)

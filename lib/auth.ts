@@ -2,8 +2,9 @@ import "server-only";
 import { safeNextPath } from "@/lib/safe-redirect";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { getOwnerRestaurant } from "@/lib/db";
+import { listMyRestaurants, type Restaurant } from "@/lib/db";
 import { createClient } from "@/lib/supabase/server";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 /** For owner pages: sends signed-out visitors to the login page. */
 export async function requireUser(next = "/dashboard") {
@@ -15,12 +16,35 @@ export async function requireUser(next = "/dashboard") {
   return { supabase, user };
 }
 
+/** Remembers which restaurant a person with several locations is working on. */
+export const RESTAURANT_COOKIE = "carte-restaurant";
+
+/**
+ * The restaurant a signed-in person is working on: the one they picked, or else their first.
+ * Also returns every restaurant they can work on, for switching.
+ */
+export async function currentRestaurant(
+  supabase: SupabaseClient,
+  userId: string,
+): Promise<{ restaurant: Restaurant | null; all: Restaurant[] }> {
+  const all = await listMyRestaurants(supabase, userId);
+  const chosen = (await cookies()).get(RESTAURANT_COOKIE)?.value;
+  return { restaurant: all.find((r) => r.id === chosen) ?? all[0] ?? null, all };
+}
+
 /** For owner pages that need a restaurant: sends new owners to setup first. */
 export async function requireRestaurant(next = "/dashboard") {
   const { supabase, user } = await requireUser(next);
-  const restaurant = await getOwnerRestaurant(supabase, user.id);
+  const { restaurant } = await currentRestaurant(supabase, user.id);
   if (!restaurant) redirect(`/dashboard/setup?next=${encodeURIComponent(safeNextPath(next))}`);
   return { supabase, user, restaurant };
+}
+
+/** For pages only the owner may use, like the team and the map listing. Editors go back home. */
+export async function requireOwnedRestaurant(next = "/dashboard") {
+  const context = await requireRestaurant(next);
+  if (context.restaurant.role !== "owner") redirect("/dashboard");
+  return context;
 }
 
 /** For API routes: returns null instead of redirecting, so the route can answer 401. */
@@ -30,7 +54,7 @@ export async function getOwnerContext() {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return null;
-  const restaurant = await getOwnerRestaurant(supabase, user.id);
+  const { restaurant } = await currentRestaurant(supabase, user.id);
   if (!restaurant) return null;
   return { supabase, user, restaurant };
 }

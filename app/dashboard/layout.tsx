@@ -1,22 +1,23 @@
 import { OwnerTabs } from "@/components/owner/OwnerTabs";
 import { PublicHeader } from "@/components/PublicHeader";
-import { requireUser } from "@/lib/auth";
+import { LocationSwitcher } from "@/components/owner/LocationSwitcher";
+import { currentRestaurant, requireUser } from "@/lib/auth";
 import { Notice } from "@/components/ui/notice";
 import { ButtonLink } from "@/components/ui/button";
 import { isCarteAdmin, listPlaceClaims } from "@/lib/db/claims";
-import { getOwnerRestaurant } from "@/lib/db";
 import { ownerLinks } from "@/lib/owner-nav";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { supabase, user } = await requireUser();
-  const [restaurant, admin] = await Promise.all([
-    getOwnerRestaurant(supabase, user.id),
+  const [{ restaurant, all }, admin] = await Promise.all([
+    currentRestaurant(supabase, user.id),
     isCarteAdmin(supabase),
   ]);
   const latestClaim = restaurant ? (await listPlaceClaims(supabase, restaurant.id))[0] : null;
   return (
     <>
       <PublicHeader signedIn />
+      {restaurant && <LocationSwitcher restaurants={all} currentId={restaurant.id} />}
       <OwnerTabs links={ownerLinks(restaurant, admin)} />
       {latestClaim && ["approved", "rejected", "transferred"].includes(latestClaim.status) && (
         <div className="mx-auto max-w-5xl px-5 pt-5">

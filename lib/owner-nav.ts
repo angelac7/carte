@@ -12,7 +12,12 @@ export const DINER_LINKS: NavLink[] = [
  * The extra pages a signed-in owner sees, in one place so the header menu and the dashboard
  * tabs always match. Owners without a restaurant yet get the setup page instead.
  */
-export function ownerLinks(restaurant: { slug: string } | null, admin: boolean): NavLink[] {
+export function ownerLinks(
+  restaurant: { slug: string; role?: "owner" | "editor" } | null,
+  admin: boolean,
+): NavLink[] {
+  // Editors help with the menu; the map listing and the team are the owner's.
+  const owner = restaurant?.role !== "editor";
   const links: NavLink[] = restaurant
     ? [
         { href: "/dashboard", label: "Dashboard" },
@@ -20,7 +25,12 @@ export function ownerLinks(restaurant: { slug: string } | null, admin: boolean):
         { href: "/dashboard/review", label: "Review dishes" },
         { href: "/dashboard/qr", label: "QR code" },
         { href: "/dashboard/profile", label: "Profile" },
-        { href: "/dashboard/claim", label: "Map listing" },
+        ...(owner
+          ? [
+              { href: "/dashboard/claim", label: "Map listing" },
+              { href: "/dashboard/team", label: "Team" },
+            ]
+          : []),
         { href: "/dashboard/account", label: "Account" },
         { href: `/r/${restaurant.slug}`, label: "Diner menu" },
       ]

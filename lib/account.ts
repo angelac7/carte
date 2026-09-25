@@ -18,11 +18,23 @@ export async function passwordMatches(email: string, password: string): Promise<
 }
 
 /**
- * Deletes an owner's account for good. The database removes their restaurant, dishes,
- * explanations, and reports along with the login; photos are stored separately, so they go first.
+ * Deletes an owner's account for good. The database removes the restaurants they own, with their
+ * dishes, explanations, and reports, and any places they help edit; photos are stored separately,
+ * so they go first.
  */
-export async function deleteAccount(userId: string, restaurantId: string | null): Promise<void> {
-  if (restaurantId) await deleteAllRestaurantPhotos(restaurantId);
+export async function deleteAccount(userId: string, ownedRestaurantIds: string[]): Promise<void> {
+  for (const restaurantId of ownedRestaurantIds) await deleteAllRestaurantPhotos(restaurantId);
   const { error } = await createAdminClient().auth.admin.deleteUser(userId);
   if (error) throw error;
+}
+
+/** Team members' emails, so an owner can see who helps with their menu. */
+export async function emailsFor(userIds: string[]): Promise<Map<string, string>> {
+  const admin = createAdminClient();
+  const found = await Promise.all(
+    userIds.map(
+      async (id) => [id, (await admin.auth.admin.getUserById(id)).data.user?.email ?? ""] as const,
+    ),
+  );
+  return new Map(found);
 }
