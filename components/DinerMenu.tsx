@@ -55,6 +55,7 @@ import {
 import { filterDishes } from "@/lib/menu-filters";
 import { matchesSearch } from "@/lib/menu-search";
 import { groupBySection, hasSections } from "@/lib/menu-sections";
+import { dishAvailability, restaurantClock, shortTime } from "@/lib/availability";
 import { toggleValue } from "@/lib/toggle-value";
 import type { DishText, MenuItem } from "@/types/menu";
 import type { MenuTranslations } from "@/types/translation";
@@ -63,8 +64,10 @@ type TranslationState = Partial<Record<LanguageCode, MenuTranslations | "failed"
 type Panel = "order" | "allergy-card" | "helper" | "display" | "chat" | "photo" | "filters" | null;
 
 type DinerMenuProps = {
-  restaurant: { name: string; slug: string; cuisine: string; city?: string };
+  restaurant: { name: string; slug: string; cuisine: string; city?: string; timezone?: string };
   dishes: MenuItem[];
+  /** When the page was made, so the server and browser agree on what's available at first. */
+  initialNow?: number;
   initialLanguage: LanguageCode;
   initialPrefs: DinerPrefs;
   initialDisplay: DisplayPrefs;
@@ -85,6 +88,7 @@ export function DinerMenu({
   initialPrefs,
   initialDisplay,
   initialSummaries = {},
+  initialNow,
   onPreferencesChange,
 }: DinerMenuProps) {
   const offline = useOffline();
@@ -104,6 +108,19 @@ export function DinerMenu({
     [initialLanguage]: initialSummaries,
   });
   const summariesRequested = useRef(new Set<LanguageCode>([initialLanguage]));
+  // Sold-out dishes and serving times follow the restaurant's clock, checked every minute.
+  const [now, setNow] = useState(() => (initialNow ? new Date(initialNow) : new Date()));
+  useEffect(() => {
+    // Catch up right away too: a saved offline copy of the menu may be hours old.
+    const tick = () => setNow(new Date());
+    const first = setTimeout(tick, 0);
+    const timer = setInterval(tick, 60_000);
+    return () => {
+      clearTimeout(first);
+      clearInterval(timer);
+    };
+  }, []);
+  const clock = restaurantClock(restaurant.timezone ?? "America/New_York", now);
   useEffect(() => {
     onPreferencesChange?.({
       initialLanguage: language,
@@ -216,12 +233,23 @@ export function DinerMenu({
     const text = textFor(dish);
     return matchesSearch([text.name, dish.name, text.description, text.notes], query);
   });
-  // Menu headings, in the owner's order; a search shows matches under their headings too.
-  const groups = groupBySection(listed);
-  const sectioned = hasSections(groups);
+  // Specials first, then menu headings in the owner's order. A search keeps the same grouping.
+  const specials = listed.filter((dish) => dish.special);
+  const groups = [
+    ...(specials.length > 0 ? [{ section: "", special: true, dishes: specials }] : []),
+    ...groupBySection(listed.filter((dish) => !dish.special)).map((group) => ({
+      ...group,
+      special: false,
+    })),
+  ];
+  const sectioned = specials.length > 0 || hasSections(groups);
   const sectionId = (index: number) => `menu-section-${index}`;
   const sectionTitle = (group: (typeof groups)[number]) =>
-    group.section ? textFor(group.dishes[0]).section || group.section : t.otherDishes;
+    group.special
+      ? t.specials
+      : group.section
+        ? textFor(group.dishes[0]).section || group.section
+        : t.otherDishes;
   const details = [
     ...new Set([restaurant.cuisine, restaurant.city ?? ""].map((d) => d.trim())),
   ].filter(Boolean);
@@ -430,7 +458,7 @@ export function DinerMenu({
             <div className="mt-8 space-y-14">
               {groups.map((group, index) => (
                 <section
-                  key={group.section || "other"}
+                  key={group.special ? "specials" : group.section || "other"}
                   id={sectionId(index)}
                   aria-label={sectioned ? sectionTitle(group) : undefined}
                   className="scroll-mt-48"
@@ -447,6 +475,15 @@ export function DinerMenu({
                         dish={dish}
                         text={textFor(dish)}
                         summary={summaries[language]?.[summaryKey(dish)]}
+                        availability={dishAvailability(dish, clock)}
+                        servingWindow={
+                          dish.available_from && dish.available_until
+                            ? t.servedBetween(
+                                shortTime(dish.available_from),
+                                shortTime(dish.available_until),
+                              )
+                            : ""
+                        }
                         t={t}
                         detailsLabel={dishText.details}
                         explainLabel={dishText.explainLink}

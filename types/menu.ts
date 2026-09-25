@@ -57,6 +57,9 @@ export const ExtractedMenuSchema = z.object({
     .transform((dishes) => dishes.filter((dish) => dish.name.trim() !== "")),
 });
 
+/** A daily serving time like "11:30", or "11:30:00" as the database returns it. */
+export const ServingTimeSchema = z.string().regex(/^([01]\d|2[0-3]):[0-5]\d(:[0-5]\d)?$/);
+
 /** A saved dish. Only confirmed dishes will be shown to diners. */
 export const MenuItemSchema = z.object({
   source_language: SourceLanguageSchema.optional(),
@@ -73,6 +76,13 @@ export const MenuItemSchema = z.object({
   section: z.string().trim().max(80).optional(),
   /** The owner's order for the menu, lowest first. Changed only by reordering. */
   sort_order: z.number().int().optional(),
+  /** The service day it sold out, like "2026-09-25". Set only by the sold-out switch. */
+  sold_out_on: z.string().nullable().optional(),
+  /** Shown with the specials at the top of the menu. */
+  special: z.boolean().optional(),
+  /** An optional daily serving window in the restaurant's time zone. */
+  available_from: ServingTimeSchema.nullable().optional(),
+  available_until: ServingTimeSchema.nullable().optional(),
   // Set only by the photo upload route, never by dish edits.
   photo_url: z.string().nullable().optional(),
 });

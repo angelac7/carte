@@ -55,6 +55,18 @@ export const updateDish = (dish: MenuItem) => sendToItems<MenuItem>("PUT", dish)
 /** Saves a new dish order; returns the dishes whose order changed, with their new versions. */
 export const reorderDishes = (order: string[]) =>
   sendToItems<{ id: string; revision: number; sort_order: number }[]>("PATCH", { order });
+/** Marks a dish sold out for today, or available again. Returns the updated dish. */
+export async function setDishSoldOut(id: string, soldOut: boolean): Promise<MenuItem> {
+  const res = await fetch("/api/items/sold-out", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ id, soldOut }),
+  });
+  checkSignedIn(res);
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(body.error ?? "That dish couldn't be updated.");
+  return body as MenuItem;
+}
 export const deleteDish = (id: string, revision?: number) =>
   sendToItems<{ ok: boolean }>("DELETE", { id, revision });
 

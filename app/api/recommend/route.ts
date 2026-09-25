@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { recommendDishes } from "@/lib/ai/recommend";
+import { dishAvailability, restaurantClock } from "@/lib/availability";
 import { getConfirmedDishes, getRestaurantBySlug } from "@/lib/db";
 import { languageName } from "@/lib/languages";
 import { filterDishes } from "@/lib/menu-filters";
@@ -20,12 +21,13 @@ export async function POST(req: Request) {
     const restaurant = await getRestaurantBySlug(supabase, parsed.data.restaurant);
     if (!restaurant) return NextResponse.json({ error: "not found" }, { status: 404 });
 
-    // Filter first, so the AI never sees dishes the diner has ruled out.
+    // Filter first, so the AI never sees dishes the diner has ruled out or can't order now.
     const { avoid, onlyTags, language } = parsed.data;
+    const clock = restaurantClock(restaurant.timezone ?? "America/New_York");
     const dishes = filterDishes(await getConfirmedDishes(supabase, restaurant.id), {
       avoid,
       onlyTags,
-    });
+    }).filter((dish) => dishAvailability(dish, clock) === "available");
     if (dishes.length === 0) {
       return NextResponse.json({ recommendation: { picks: [], note: "" } });
     }

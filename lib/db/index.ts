@@ -7,11 +7,12 @@ export type Restaurant = {
   slug: string;
   cuisine: string;
   city?: string | null;
+  timezone?: string;
 };
 
-const RESTAURANT_COLUMNS = "id, name, slug, cuisine, city";
+const RESTAURANT_COLUMNS = "id, name, slug, cuisine, city, timezone";
 const DISH_COLUMNS =
-  "id, name, description, price, allergens, dietary_tags, notes, confirmed, photo_url, revision, source_language, section, sort_order";
+  "id, name, description, price, allergens, dietary_tags, notes, confirmed, photo_url, revision, source_language, section, sort_order, sold_out_on, special, available_from, available_until";
 
 export async function getOwnerRestaurant(
   supabase: SupabaseClient,
@@ -145,12 +146,35 @@ export async function updateDish(
       allergens: dish.allergens,
       dietary_tags: dish.dietary_tags,
       notes: dish.notes,
-      // Left alone when the edit doesn't include it.
+      // Layout and availability are left alone when the edit doesn't include them.
       ...(dish.section !== undefined && { section: dish.section }),
+      ...(dish.special !== undefined && { special: dish.special }),
+      ...(dish.available_from !== undefined && {
+        available_from: dish.available_from,
+        available_until: dish.available_until ?? null,
+      }),
       confirmed: dish.confirmed,
     })
     .eq("id", dish.id)
     .eq("revision", dish.revision!)
+    .eq("restaurant_id", restaurantId)
+    .select(DISH_COLUMNS)
+    .maybeSingle();
+  if (error) throw error;
+  return data as unknown as MenuItem | null;
+}
+
+/** Marks a dish sold out for a service day, or available again with null. */
+export async function setSoldOut(
+  supabase: SupabaseClient,
+  restaurantId: string,
+  dishId: string,
+  serviceDay: string | null,
+): Promise<MenuItem | null> {
+  const { data, error } = await supabase
+    .from("menu_items")
+    .update({ sold_out_on: serviceDay })
+    .eq("id", dishId)
     .eq("restaurant_id", restaurantId)
     .select(DISH_COLUMNS)
     .maybeSingle();

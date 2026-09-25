@@ -4,6 +4,8 @@ import { Chip } from "@/components/Chip";
 import { DishActions } from "@/components/DishActions";
 import { SparkleIcon } from "@/components/icons";
 import { QuantityStepper } from "@/components/QuantityStepper";
+import type { Availability } from "@/lib/availability";
+import { cn } from "@/lib/cn";
 import type { DinerStrings } from "@/lib/i18n/diner-strings";
 import type { LanguageCode } from "@/lib/languages";
 import { showOriginalName } from "@/lib/menu-search";
@@ -14,6 +16,10 @@ type DishCardProps = {
   text: DishText;
   /** A one-line AI explanation of what the dish is, when one has been written. */
   summary?: string;
+  /** Whether the dish can be ordered right now. Unavailable dishes stay listed, with their allergens. */
+  availability?: Availability;
+  /** Its daily serving window, like "Served 11:00–15:00", if it has one. */
+  servingWindow?: string;
   t: DinerStrings;
   detailsLabel: string;
   explainLabel: string;
@@ -34,6 +40,8 @@ export function DishCard({
   dish,
   text,
   summary,
+  availability = "available",
+  servingWindow = "",
   t,
   detailsLabel,
   explainLabel,
@@ -75,6 +83,28 @@ export function DishCard({
             <span className="shrink-0 font-mono text-base tabular-nums">{dish.price}</span>
           )}
         </div>
+        {(dish.special || availability !== "available" || servingWindow) && (
+          <div className="mt-2 flex flex-wrap gap-2 text-xs font-semibold">
+            {dish.special && (
+              <span className="rounded-full bg-accent px-3 py-1 text-white">{t.special}</span>
+            )}
+            {availability === "sold-out" && (
+              <span className="rounded-full bg-tomato px-3 py-1 text-white">{t.soldOut}</span>
+            )}
+            {servingWindow && (
+              <span
+                className={cn(
+                  "rounded-full px-3 py-1",
+                  availability === "not-now" ? "bg-ink text-white" : "shadow-pressed-sm",
+                )}
+              >
+                {availability === "not-now"
+                  ? `${t.notServedNow} · ${servingWindow}`
+                  : servingWindow}
+              </span>
+            )}
+          </div>
+        )}
         {showOriginalName(text.name, dish.name) && (
           <p lang={dish.source_language || undefined} className="mt-1 text-sm text-muted">
             {dish.name}
@@ -128,7 +158,13 @@ export function DishCard({
         <div aria-hidden="true" className="min-h-5 flex-1" />
         <div className="relative z-10 flex flex-wrap items-center justify-between gap-3 border-t border-ink/10 pt-5">
           <DishActions dish={dish} restaurant={restaurant} language={language} />
-          <QuantityStepper quantity={quantity} onChange={onQuantity} labels={stepperLabels} />
+          {availability === "available" ? (
+            <QuantityStepper quantity={quantity} onChange={onQuantity} labels={stepperLabels} />
+          ) : (
+            <span className="text-sm font-medium text-muted">
+              {availability === "sold-out" ? t.soldOut : t.notServedNow}
+            </span>
+          )}
         </div>
       </div>
     </li>

@@ -69,3 +69,20 @@ it("keeps dishes confirmed when only their section or order changes", async () =
   );
   expect(edited.rows[0].confirmed).toBe(false);
 });
+
+it("keeps dishes confirmed when their availability changes", async () => {
+  await db.exec(`
+    update public.menu_items
+    set sold_out_on = current_date, special = true, available_from = '11:00', available_until = '15:00'
+    where id = '${ids.Soup}'`);
+  const soup = await db.query<{ confirmed: boolean }>(
+    `select confirmed from public.menu_items where id = '${ids.Soup}'`,
+  );
+  expect(soup.rows[0].confirmed).toBe(true);
+});
+
+it("needs both serving times, or neither", async () => {
+  await expect(
+    db.exec(`update public.menu_items set available_from = '11:00' where id = '${ids.Salad}'`),
+  ).rejects.toThrow(/menu_items_serving_window/);
+});

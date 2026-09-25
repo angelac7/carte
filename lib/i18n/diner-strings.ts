@@ -38,6 +38,11 @@ export type DinerStrings = {
   /** The heading for dishes the owner hasn't put in a section. */
   otherDishes: string;
   sectionsLabel: string;
+  soldOut: string;
+  special: string;
+  specials: string;
+  servedBetween: (from: string, until: string) => string;
+  notServedNow: string;
   allergens: Record<Allergen, string>;
   tags: Record<DietaryTag, string>;
 };
@@ -55,6 +60,11 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     removeFilter: (label) => `Remove ${label}`,
     otherDishes: "More dishes",
     sectionsLabel: "Jump to a section",
+    soldOut: "Sold out today",
+    special: "Special",
+    specials: "Specials",
+    servedBetween: (from, until) => `Served ${from}–${until}`,
+    notServedNow: "Not served right now",
     menuUpdated:
       "The restaurant updated this menu. Your order and assistant results were cleared; review the current dishes before ordering.",
     refreshFailed:
@@ -117,6 +127,11 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     removeFilter: (label) => `Quitar ${label}`,
     otherDishes: "Más platos",
     sectionsLabel: "Ir a una sección",
+    soldOut: "Agotado hoy",
+    special: "Especial",
+    specials: "Especiales",
+    servedBetween: (from, until) => `Se sirve de ${from} a ${until}`,
+    notServedNow: "No se sirve ahora",
     menuUpdated:
       "El restaurante actualizó el menú. Se borraron tu pedido y los resultados del asistente; revisa los platos antes de pedir.",
     refreshFailed:
@@ -179,6 +194,11 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     removeFilter: (label) => `移除${label}`,
     otherDishes: "更多菜品",
     sectionsLabel: "跳转到分类",
+    soldOut: "今日售罄",
+    special: "特色菜",
+    specials: "特色菜",
+    servedBetween: (from, until) => `供应时间 ${from}–${until}`,
+    notServedNow: "当前不供应",
     menuUpdated: "餐厅更新了菜单。你的点单和助手结果已清除；点餐前请查看最新菜品。",
     refreshFailed: "无法检查菜单更新。请向工作人员确认当前菜品和过敏原。",
     offlineMenu: "离线菜单副本：菜品及过敏原信息可能已更改。请向工作人员确认当前菜单及过敏原。",
@@ -234,6 +254,11 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     removeFilter: (label) => `${label} 해제`,
     otherDishes: "다른 요리",
     sectionsLabel: "섹션으로 이동",
+    soldOut: "오늘 품절",
+    special: "스페셜",
+    specials: "스페셜 메뉴",
+    servedBetween: (from, until) => `${from}–${until} 제공`,
+    notServedNow: "지금은 제공되지 않음",
     menuUpdated:
       "식당에서 메뉴를 업데이트했습니다. 주문과 도우미 결과가 초기화되었습니다. 주문 전에 현재 메뉴를 확인하세요.",
     refreshFailed:
@@ -294,6 +319,11 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     removeFilter: (label) => `${label}を解除`,
     otherDishes: "その他の料理",
     sectionsLabel: "セクションへ移動",
+    soldOut: "本日完売",
+    special: "おすすめ",
+    specials: "本日のおすすめ",
+    servedBetween: (from, until) => `${from}〜${until} 提供`,
+    notServedNow: "現在は提供していません",
     menuUpdated:
       "メニューが更新されました。注文とアシスタントの結果はクリアされました。注文前に現在の料理を確認してください。",
     refreshFailed:
@@ -355,6 +385,11 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     removeFilter: (label) => `Retirer ${label}`,
     otherDishes: "Autres plats",
     sectionsLabel: "Aller à une section",
+    soldOut: "Épuisé aujourd’hui",
+    special: "Spécialité",
+    specials: "Spécialités",
+    servedBetween: (from, until) => `Servi de ${from} à ${until}`,
+    notServedNow: "Pas servi en ce moment",
     menuUpdated:
       "Le restaurant a mis à jour le menu. Votre commande et les résultats de l’assistant ont été effacés. Vérifiez les plats avant de commander.",
     refreshFailed:
@@ -418,6 +453,11 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     removeFilter: (label) => `Bỏ ${label}`,
     otherDishes: "Món khác",
     sectionsLabel: "Chuyển đến mục",
+    soldOut: "Hôm nay hết món",
+    special: "Món đặc biệt",
+    specials: "Món đặc biệt",
+    servedBetween: (from, until) => `Phục vụ ${from}–${until}`,
+    notServedNow: "Hiện không phục vụ",
     menuUpdated:
       "Nhà hàng đã cập nhật thực đơn. Đơn món và kết quả trợ lý đã được xóa; hãy xem lại trước khi gọi món.",
     refreshFailed:

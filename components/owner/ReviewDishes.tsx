@@ -19,8 +19,10 @@ import {
   fetchDishes,
   reorderDishes,
   saveDishes,
+  setDishSoldOut,
   updateDish,
 } from "@/lib/api-client";
+import { restaurantClock, shortTime } from "@/lib/availability";
 import { cn } from "@/lib/cn";
 import { groupBySection, hasSections, moveDish, moveSection } from "@/lib/menu-sections";
 import { tagConflictMessages } from "@/lib/tag-conflicts";
@@ -159,7 +161,108 @@ function MoveButtons({
   );
 }
 
-export default function ReviewDishes() {
+/** Today's service, specials, and serving times. None of these need the dish confirmed again. */
+function AvailabilityControls({
+  dish,
+  soldOut,
+  onSoldOut,
+  onSpecial,
+  onServingTimes,
+}: {
+  dish: MenuItem;
+  soldOut: boolean;
+  onSoldOut: (soldOut: boolean) => void;
+  onSpecial: (special: boolean) => void;
+  onServingTimes: (from: string | null, until: string | null) => void;
+}) {
+  const [from, setFrom] = useState(shortTime(dish.available_from));
+  const [until, setUntil] = useState(shortTime(dish.available_until));
+  const saved = [shortTime(dish.available_from), shortTime(dish.available_until)];
+  const changed = from !== saved[0] || until !== saved[1];
+  const complete = Boolean(from) === Boolean(until);
+  const pillClass = (on: boolean) =>
+    cn(
+      "rounded-full px-4 py-2.5 text-sm font-medium transition-[box-shadow,background-color,color] duration-200",
+      on
+        ? "bg-ink text-white shadow-pressed-color"
+        : "bg-paper text-muted shadow-raised-sm hover:text-ink",
+    );
+
+  return (
+    <fieldset className="mt-5">
+      <legend className="eyebrow text-muted">Availability</legend>
+      <div className="mt-2 flex flex-wrap gap-2">
+        <button
+          type="button"
+          aria-pressed={soldOut}
+          onClick={() => onSoldOut(!soldOut)}
+          className={cn(pillClass(soldOut), soldOut && "bg-tomato")}
+        >
+          Sold out today
+        </button>
+        <button
+          type="button"
+          aria-pressed={Boolean(dish.special)}
+          onClick={() => onSpecial(!dish.special)}
+          className={pillClass(Boolean(dish.special))}
+        >
+          Special
+        </button>
+      </div>
+      <div className="mt-3 flex flex-wrap items-end gap-3">
+        <label className="block">
+          <span className={labelClass}>Served from</span>
+          <input
+            type="time"
+            value={from}
+            onChange={(e) => setFrom(e.target.value)}
+            className={cn(inputClass, "w-36")}
+          />
+        </label>
+        <label className="block">
+          <span className={labelClass}>until</span>
+          <input
+            type="time"
+            value={until}
+            onChange={(e) => setUntil(e.target.value)}
+            className={cn(inputClass, "w-36")}
+          />
+        </label>
+        {changed && (
+          <Button
+            type="button"
+            size="sm"
+            variant="secondary"
+            disabled={!complete}
+            onClick={() => onServingTimes(from || null, until || null)}
+          >
+            Save times
+          </Button>
+        )}
+        {(saved[0] || from) && (
+          <Button
+            type="button"
+            size="sm"
+            variant="ghost"
+            onClick={() => {
+              setFrom("");
+              setUntil("");
+              onServingTimes(null, null);
+            }}
+          >
+            Served all day
+          </Button>
+        )}
+      </div>
+      <p className="mt-1 text-xs text-muted">
+        Leave both empty if it&apos;s served whenever you&apos;re open. Sold out resets on its own
+        tomorrow.
+      </p>
+    </fieldset>
+  );
+}
+
+export default function ReviewDishes({ timezone }: { timezone: string }) {
   const [dishes, setDishes] = useState<MenuItem[]>([]);
   const [loaded, setLoaded] = useState(false);
   const [filter, setFilter] = useState<Filter>("all");
@@ -281,6 +384,24 @@ export default function ReviewDishes() {
     } finally {
       mutationPending.current = false;
       setMutating(false);
+    }
+  }
+
+  // Today's service day in the restaurant's time zone, for the sold-out switch.
+  const serviceDay = restaurantClock(timezone)?.date;
+
+  async function toggleSoldOut(dish: MenuItem, soldOut: boolean) {
+    if (mutationPending.current || pending.current.has(dish.id)) return;
+    setPending(dish.id, true);
+    try {
+      const saved = await setDishSoldOut(dish.id, soldOut);
+      persisted.current.set(saved.id, saved);
+      showLocally(saved);
+      toast(soldOut ? `${dish.name} is sold out for today` : `${dish.name} is available again`);
+    } catch (error) {
+      setProblem(error instanceof Error ? error.message : "That dish couldn't be updated.");
+    } finally {
+      setPending(dish.id, false);
     }
   }
 
@@ -571,6 +692,16 @@ export default function ReviewDishes() {
                                 className={inputClass}
                               />
                             </label>
+
+                            <AvailabilityControls
+                              dish={dish}
+                              soldOut={Boolean(serviceDay && dish.sold_out_on === serviceDay)}
+                              onSoldOut={(soldOut) => toggleSoldOut(dish, soldOut)}
+                              onSpecial={(special) => void save({ ...dish, special })}
+                              onServingTimes={(from, until) =>
+                                void save({ ...dish, available_from: from, available_until: until })
+                              }
+                            />
 
                             <fieldset className="mt-5">
                               <legend className="eyebrow text-muted">Contains</legend>

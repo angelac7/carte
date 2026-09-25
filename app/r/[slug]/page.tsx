@@ -59,6 +59,8 @@ export default async function RestaurantMenuPage({ params }: RestaurantMenuProps
       : languageFromAcceptHeader(acceptLanguage);
   const initialPrefs = parsePrefs(cookieStore.get(PREFS_COOKIE)?.value);
   const initialDisplay = parseDisplay(cookieStore.get(DISPLAY_COOKIE)?.value);
+  // This page renders once per visit; the browser keeps the clock current from here.
+  const renderedAt = new Date();
   // Short explanations already written in the diner's language, shown under each dish name.
   const initialSummaries = await getCachedSummaries(dishes, initialLanguage).catch(() => ({}));
 
@@ -70,8 +72,10 @@ export default async function RestaurantMenuPage({ params }: RestaurantMenuProps
         slug: restaurant.slug,
         cuisine: restaurant.cuisine,
         city: restaurant.city ?? "",
+        timezone: restaurant.timezone,
       }}
       dishes={dishes}
+      initialNow={renderedAt.getTime()}
       initialLanguage={initialLanguage}
       initialPrefs={initialPrefs}
       initialDisplay={initialDisplay}
