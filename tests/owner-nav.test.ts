@@ -26,15 +26,12 @@ describe("site navigation", () => {
     expect(labels).toContain("Review dishes");
   });
 
-  it("sends owners without a restaurant to setup, and adds claim review for admins", () => {
+  it("sends owners without a restaurant to setup, and adds admin tools for admins", () => {
     expect(ownerLinks(null, false)).toEqual([
       { href: "/dashboard/setup", label: "Set up your restaurant" },
       { href: "/dashboard/account", label: "Account" },
     ]);
-    expect(ownerLinks(null, true).at(-1)).toEqual({
-      href: "/admin/claims",
-      label: "Review claims",
-    });
+    expect(ownerLinks(null, true).at(-1)).toEqual({ href: "/admin", label: "Admin" });
   });
 
   it("keeps the diner pages the same for everyone", () => {

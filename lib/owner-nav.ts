@@ -39,6 +39,6 @@ export function ownerLinks(
         { href: "/dashboard/setup", label: "Set up your restaurant" },
         { href: "/dashboard/account", label: "Account" },
       ];
-  if (admin) links.push({ href: "/admin/claims", label: "Review claims" });
+  if (admin) links.push({ href: "/admin", label: "Admin" });
   return links;
 }

@@ -19,6 +19,14 @@ export default async function DashboardLayout({ children }: { children: React.Re
       <PublicHeader signedIn />
       {restaurant && <LocationSwitcher restaurants={all} currentId={restaurant.id} />}
       <OwnerTabs links={ownerLinks(restaurant, admin)} />
+      {restaurant?.suspended && (
+        <div className="mx-auto max-w-5xl px-5 pt-5 print:hidden">
+          <Notice tone="warning" role="alert">
+            Carte has suspended this menu, so diners can&apos;t see it. It may break the terms of
+            use; contact Carte to have it reviewed.
+          </Notice>
+        </div>
+      )}
       {latestClaim && ["approved", "rejected", "transferred"].includes(latestClaim.status) && (
         <div className="mx-auto max-w-5xl px-5 pt-5 print:hidden">
           <Notice tone={latestClaim.status === "approved" ? "success" : "warning"}>

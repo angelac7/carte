@@ -35,8 +35,8 @@ export default async function ClaimReview({
     <>
       <PublicHeader />
       <main id="main" className="mx-auto max-w-4xl px-5 pt-12 pb-32 md:pb-12">
-        <ButtonLink href="/dashboard" variant="ghost">
-          Dashboard
+        <ButtonLink href="/admin" variant="ghost">
+          Admin
         </ButtonLink>
         <h1 className="mt-5 font-serif text-4xl">Restaurant claim review</h1>
         <p className="mt-3 text-muted">

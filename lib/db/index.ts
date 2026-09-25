@@ -17,12 +17,14 @@ export type Restaurant = {
   price_range?: number;
   logo_url?: string | null;
   cover_url?: string | null;
+  /** Set by Carte when a menu breaks the rules; diners can't see it. */
+  suspended?: boolean;
   /** The signed-in person's part in this restaurant, when looked up for them. */
   role?: RestaurantRole;
 };
 
 const RESTAURANT_COLUMNS =
-  "id, name, slug, cuisine, city, timezone, phone, website, reservation_url, price_range, logo_url, cover_url";
+  "id, name, slug, cuisine, city, timezone, phone, website, reservation_url, price_range, logo_url, cover_url, suspended";
 const DISH_COLUMNS =
   "id, name, description, price, allergens, dietary_tags, notes, confirmed, photo_url, revision, source_language, section, sort_order, sold_out_on, special, available_from, available_until, sizes, addons, allergen_list, removable, may_contain, spice";
 
@@ -69,6 +71,8 @@ export async function getRestaurantBySlug(
     .from("restaurants")
     .select(RESTAURANT_COLUMNS)
     .eq("slug", slug)
+    // A suspended menu is gone for diners; its owner still reaches it from the dashboard.
+    .eq("suspended", false)
     .maybeSingle();
   if (error) throw error;
   return data as unknown as Restaurant | null;
@@ -80,6 +84,7 @@ export async function listListedMenuSlugs(supabase: SupabaseClient): Promise<str
     .from("restaurants")
     .select("slug, menu_items!inner(id)")
     .eq("listed", true)
+    .eq("suspended", false)
     .eq("menu_items.confirmed", true)
     .limit(1, { referencedTable: "menu_items" })
     .order("slug")
