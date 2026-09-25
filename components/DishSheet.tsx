@@ -2,6 +2,7 @@
 import Image from "next/image";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Chip } from "@/components/Chip";
+import { ReportDish } from "@/components/ReportDish";
 import { Sheet } from "@/components/Sheet";
 import { fetchInsight } from "@/lib/api-client";
 import { DINER_STRINGS } from "@/lib/i18n/diner-strings";
@@ -246,6 +247,10 @@ export function DishSheet({
             <p className="text-xs leading-relaxed text-muted">{t.disclaimer}</p>
           </div>
         )}
+      </div>
+
+      <div className="mt-6 border-t border-ink/10 pt-4">
+        <ReportDish restaurantSlug={restaurantSlug} dishId={dish.id} language={language} />
       </div>
     </Sheet>
   );

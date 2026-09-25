@@ -11,6 +11,7 @@ import { MenuStreamEventSchema, ScanStreamEventSchema } from "@/types/menu-strea
 import type { TasteProfile, TasteRequest } from "@/types/taste";
 import type { Recommendation, RecommendRequest } from "@/types/recommend";
 import type { DishInsight } from "@/types/insight";
+import type { ReportRequest } from "@/types/report";
 
 /** Sends owners to the login page if their session has expired. */
 function checkSignedIn(res: Response): void {
@@ -196,6 +197,16 @@ export function trackDishView(dishId: string): void {
     body: JSON.stringify({ dish: dishId }),
     keepalive: true,
   }).catch(() => {});
+}
+
+/** Tells the restaurant a dish's details look wrong. Throws if the report wasn't saved. */
+export async function sendDishReport(report: ReportRequest): Promise<void> {
+  const res = await fetch("/api/report", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(report),
+  });
+  if (!res.ok) throw new Error("Report failed.");
 }
 
 /** Asks for a taste profile built from the diner's own ratings and saved dishes. */

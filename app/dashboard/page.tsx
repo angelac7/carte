@@ -3,6 +3,7 @@ import { after } from "next/server";
 import Link from "@/components/OfflineLink";
 import { BlurFade } from "@/components/motion/BlurFade";
 import { NumberTicker } from "@/components/motion/NumberTicker";
+import { DinerReports } from "@/components/owner/DinerReports";
 import { OwnerPageHeader } from "@/components/owner/OwnerPageHeader";
 import { ProgressRing } from "@/components/owner/ProgressRing";
 import { ViewsChart } from "@/components/owner/ViewsChart";
@@ -13,6 +14,7 @@ import { listDishes } from "@/lib/db";
 import { getDailyViews, getDishViews } from "@/lib/db/owner-stats";
 import { getClaim } from "@/lib/db/places";
 import { getRestaurantProfile } from "@/lib/db/profile";
+import { listOpenReports } from "@/lib/db/reports";
 import { buildChecklist } from "@/lib/owner-checklist";
 import { prepareExplanations } from "@/lib/prepare-explanations";
 
@@ -23,12 +25,13 @@ const panelClass = "rounded-panel bg-paper p-6 shadow-raised sm:p-8";
 
 export default async function DashboardHome() {
   const { supabase, restaurant } = await requireRestaurant();
-  const [dishes, profile, claim, dishViews, daily] = await Promise.all([
+  const [dishes, profile, claim, dishViews, daily, reports] = await Promise.all([
     listDishes(supabase, restaurant.id),
     getRestaurantProfile(supabase, restaurant.id),
     getClaim(supabase, restaurant.id),
     getDishViews(supabase).catch(() => []),
     getDailyViews(supabase).catch(() => []),
+    listOpenReports(supabase, restaurant.id).catch(() => []),
   ]);
 
   // Catch up on explanations for any confirmed dish that doesn't have one yet.
@@ -68,6 +71,12 @@ export default async function DashboardHome() {
           Print your QR code
         </ButtonLink>
       </OwnerPageHeader>
+
+      {reports.length > 0 && (
+        <div className="mt-12">
+          <DinerReports reports={reports} now={new Date()} />
+        </div>
+      )}
 
       <div className="mt-12 grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-4">
         {stats.map((stat, index) => (
