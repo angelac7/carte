@@ -405,10 +405,9 @@ export default function ReviewDishes({ timezone }: { timezone: string }) {
     }
   }
 
-  async function saveSection(dish: MenuItem) {
-    const draft = sectionDrafts[dish.id];
-    if (draft === undefined) return;
-    const section = draft.trim();
+  // Reads the field itself, so a quick tab away right after typing still saves.
+  async function saveSection(dish: MenuItem, typed: string) {
+    const section = typed.trim();
     if (section !== (dish.section ?? "") && (await save({ ...dish, section }))) {
       toast(section ? `${dish.name} moved to ${section}` : `${dish.name} has no section now`);
     }
@@ -688,7 +687,9 @@ export default function ReviewDishes({ timezone }: { timezone: string }) {
                                     [dish.id]: e.target.value,
                                   }))
                                 }
-                                onBlur={() => void saveSection(dish)}
+                                onBlur={(event) =>
+                                  void saveSection(dish, event.currentTarget.value)
+                                }
                                 className={inputClass}
                               />
                             </label>

@@ -510,7 +510,7 @@ export function DinerMenu({
                   className="scroll-mt-48"
                 >
                   {sectioned && (
-                    <h2 className="mb-6 font-serif text-4xl leading-none tracking-tight sm:text-5xl">
+                    <h2 className="mb-5 font-serif text-3xl leading-none tracking-tight sm:text-4xl">
                       {sectionTitle(group)}
                     </h2>
                   )}
