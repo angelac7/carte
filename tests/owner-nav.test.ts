@@ -11,6 +11,7 @@ describe("site navigation", () => {
       "QR code",
       "Profile",
       "Map listing",
+      "Account",
       "Diner menu",
     ]);
     expect(ownerLinks({ slug: "maru" }, false).at(-1)?.href).toBe("/r/maru");
@@ -19,6 +20,7 @@ describe("site navigation", () => {
   it("sends owners without a restaurant to setup, and adds claim review for admins", () => {
     expect(ownerLinks(null, false)).toEqual([
       { href: "/dashboard/setup", label: "Set up your restaurant" },
+      { href: "/dashboard/account", label: "Account" },
     ]);
     expect(ownerLinks(null, true).at(-1)).toEqual({
       href: "/admin/claims",

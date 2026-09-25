@@ -49,3 +49,17 @@ export async function deleteStoredPhoto(
   const { error } = await createAdminClient().storage.from(BUCKET).remove([path]);
   if (error) throw error;
 }
+
+/** Deletes every photo in a restaurant's directory, for when its owner deletes their account. */
+export async function deleteAllRestaurantPhotos(restaurantId: string): Promise<void> {
+  const storage = createAdminClient().storage.from(BUCKET);
+  for (;;) {
+    const { data, error } = await storage.list(restaurantId, { limit: 100 });
+    if (error) throw error;
+    if (!data || data.length === 0) return;
+    const { error: removeError } = await storage.remove(
+      data.map((file) => `${restaurantId}/${file.name}`),
+    );
+    if (removeError) throw removeError;
+  }
+}

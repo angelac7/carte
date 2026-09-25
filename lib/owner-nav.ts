@@ -21,9 +21,13 @@ export function ownerLinks(restaurant: { slug: string } | null, admin: boolean):
         { href: "/dashboard/qr", label: "QR code" },
         { href: "/dashboard/profile", label: "Profile" },
         { href: "/dashboard/claim", label: "Map listing" },
+        { href: "/dashboard/account", label: "Account" },
         { href: `/r/${restaurant.slug}`, label: "Diner menu" },
       ]
-    : [{ href: "/dashboard/setup", label: "Set up your restaurant" }];
+    : [
+        { href: "/dashboard/setup", label: "Set up your restaurant" },
+        { href: "/dashboard/account", label: "Account" },
+      ];
   if (admin) links.push({ href: "/admin/claims", label: "Review claims" });
   return links;
 }
