@@ -5,6 +5,7 @@ import { cache } from "react";
 import { LiveDinerMenu } from "@/components/LiveDinerMenu";
 import { getConfirmedDishes, getRestaurantBySlug } from "@/lib/db";
 import { getCachedSummaries } from "@/lib/db/insights";
+import { getPopularDishIds } from "@/lib/db/popular";
 import { parsePrefs, PREFS_COOKIE } from "@/lib/diner-prefs";
 import { DISPLAY_COOKIE, parseDisplay } from "@/lib/display-prefs";
 import { isLanguageCode, LANGUAGE_COOKIE, languageFromAcceptHeader } from "@/lib/languages";
@@ -62,7 +63,10 @@ export default async function RestaurantMenuPage({ params }: RestaurantMenuProps
   // This page renders once per visit; the browser keeps the clock current from here.
   const renderedAt = new Date();
   // Short explanations already written in the diner's language, shown under each dish name.
-  const initialSummaries = await getCachedSummaries(dishes, initialLanguage).catch(() => ({}));
+  const [initialSummaries, popularIds] = await Promise.all([
+    getCachedSummaries(dishes, initialLanguage).catch(() => ({})),
+    getPopularDishIds(supabase, restaurant.id).catch(() => [] as string[]),
+  ]);
 
   return (
     <LiveDinerMenu
@@ -86,6 +90,7 @@ export default async function RestaurantMenuPage({ params }: RestaurantMenuProps
       initialPrefs={initialPrefs}
       initialDisplay={initialDisplay}
       initialSummaries={initialSummaries}
+      popularIds={popularIds}
     />
   );
 }

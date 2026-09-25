@@ -90,6 +90,8 @@ type DinerMenuProps = {
   initialDisplay: DisplayPrefs;
   /** One-line dish explanations already written in the initial language. */
   initialSummaries?: DishSummaries;
+  /** The restaurant's most-opened dishes this month, from anonymous view counts. */
+  popularIds?: string[];
   onPreferencesChange?: (preferences: {
     initialLanguage: LanguageCode;
     initialPrefs: DinerPrefs;
@@ -105,6 +107,7 @@ export function DinerMenu({
   initialPrefs,
   initialDisplay,
   initialSummaries = {},
+  popularIds = [],
   initialNow,
   onPreferencesChange,
 }: DinerMenuProps) {
@@ -596,6 +599,7 @@ export function DinerMenu({
                         text={textFor(dish)}
                         summary={summaries[language]?.[summaryKey(dish)]}
                         spiceLabel={dish.spice ? dishText.spiceLevels[dish.spice] : ""}
+                        popular={popularIds.includes(dish.id)}
                         availability={dishAvailability(dish, clock)}
                         servingWindow={
                           dish.available_from && dish.available_until

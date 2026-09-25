@@ -48,6 +48,7 @@ export type DinerStrings = {
   call: string;
   website: string;
   reserve: string;
+  popular: string;
   sizes: string;
   addons: string;
   chooseOptions: string;
@@ -92,6 +93,7 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     call: "Call",
     website: "Website",
     reserve: "Reserve a table",
+    popular: "Popular",
     sizes: "Sizes",
     addons: "Add-ons",
     chooseOptions: "Choose options",
@@ -189,6 +191,7 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     call: "Llamar",
     website: "Sitio web",
     reserve: "Reservar mesa",
+    popular: "Popular",
     sizes: "Tamaños",
     addons: "Extras",
     chooseOptions: "Elegir opciones",
@@ -287,6 +290,7 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     call: "致电",
     website: "网站",
     reserve: "预订座位",
+    popular: "人气",
     sizes: "规格",
     addons: "加料",
     chooseOptions: "选择选项",
@@ -375,6 +379,7 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     call: "전화하기",
     website: "웹사이트",
     reserve: "예약하기",
+    popular: "인기",
     sizes: "사이즈",
     addons: "추가 옵션",
     chooseOptions: "옵션 선택",
@@ -468,6 +473,7 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     call: "電話する",
     website: "ウェブサイト",
     reserve: "予約する",
+    popular: "人気",
     sizes: "サイズ",
     addons: "トッピング",
     chooseOptions: "オプションを選ぶ",
@@ -562,6 +568,7 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     call: "Appeler",
     website: "Site web",
     reserve: "Réserver une table",
+    popular: "Populaire",
     sizes: "Tailles",
     addons: "Suppléments",
     chooseOptions: "Choisir les options",
@@ -661,6 +668,7 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     call: "Gọi điện",
     website: "Trang web",
     reserve: "Đặt bàn",
+    popular: "Phổ biến",
     sizes: "Cỡ",
     addons: "Món thêm",
     chooseOptions: "Chọn tùy chọn",

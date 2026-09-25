@@ -25,6 +25,8 @@ type DishCardProps = {
   servingWindow?: string;
   /** How spicy it is, like "Medium", when it's spicy at all. */
   spiceLabel?: string;
+  /** One of the dishes diners open most here. */
+  popular?: boolean;
   t: DinerStrings;
   /** The diner's avoided allergens, to say what to leave out or watch for. */
   avoid?: Allergen[];
@@ -52,6 +54,7 @@ export function DishCard({
   availability = "available",
   servingWindow = "",
   spiceLabel = "",
+  popular = false,
   t,
   avoid = [],
   detailsLabel,
@@ -95,8 +98,15 @@ export function DishCard({
             <span className="shrink-0 font-mono text-base tabular-nums">{dish.price}</span>
           )}
         </div>
-        {(dish.special || availability !== "available" || servingWindow || spiceLabel) && (
+        {(dish.special ||
+          availability !== "available" ||
+          servingWindow ||
+          spiceLabel ||
+          popular) && (
           <div className="mt-2 flex flex-wrap gap-2 text-xs font-semibold">
+            {popular && (
+              <span className="rounded-full bg-ink px-3 py-1 text-white">{t.popular}</span>
+            )}
             {spiceLabel && (
               <span className="rounded-full px-3 py-1 text-tomato shadow-pressed-sm">
                 <span aria-hidden="true">🌶 </span>
