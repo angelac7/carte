@@ -40,7 +40,12 @@ export default async function RestaurantMenuPage({ params }: RestaurantMenuProps
   return (
     <LiveDinerMenu
       key={slug}
-      restaurant={{ name: restaurant.name, slug: restaurant.slug, cuisine: restaurant.cuisine }}
+      restaurant={{
+        name: restaurant.name,
+        slug: restaurant.slug,
+        cuisine: restaurant.cuisine,
+        city: restaurant.city ?? "",
+      }}
       dishes={dishes}
       initialLanguage={initialLanguage}
       initialPrefs={initialPrefs}

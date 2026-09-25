@@ -1,0 +1,115 @@
+"use client";
+import Image from "next/image";
+import { Chip } from "@/components/Chip";
+import { DishActions } from "@/components/DishActions";
+import { QuantityStepper } from "@/components/QuantityStepper";
+import type { DinerStrings } from "@/lib/i18n/diner-strings";
+import type { LanguageCode } from "@/lib/languages";
+import { showOriginalName } from "@/lib/menu-search";
+import type { DishText, MenuItem } from "@/types/menu";
+
+type DishCardProps = {
+  dish: MenuItem;
+  text: DishText;
+  t: DinerStrings;
+  detailsLabel: string;
+  stepperLabels: { add: string; increase: string; decrease: string };
+  restaurant: { name: string; slug: string; cuisine: string };
+  language: LanguageCode;
+  quantity: number;
+  onQuantity: (quantity: number) => void;
+  onOpen: () => void;
+};
+
+/**
+ * One dish on the diner menu. The whole card opens its details; saving, rating, and adding
+ * to the order sit above that in their own buttons. Allergens and kitchen notes are always
+ * shown in full and never animated.
+ */
+export function DishCard({
+  dish,
+  text,
+  t,
+  detailsLabel,
+  stepperLabels,
+  restaurant,
+  language,
+  quantity,
+  onQuantity,
+  onOpen,
+}: DishCardProps) {
+  return (
+    <li className="group relative flex flex-col rounded-panel bg-paper shadow-raised transition-shadow duration-300 hover:shadow-raised-lg">
+      {dish.photo_url && (
+        <div className="relative m-3 mb-0 aspect-[16/9] overflow-hidden rounded-[1.5rem]">
+          <Image
+            src={dish.photo_url}
+            alt=""
+            fill
+            sizes="(min-width: 1024px) 480px, 100vw"
+            className="object-cover transition-transform duration-700 group-hover:scale-105"
+          />
+        </div>
+      )}
+
+      <div className="flex flex-1 flex-col p-6 sm:p-7">
+        <div className="flex items-baseline justify-between gap-4">
+          <h3 className="min-w-0 font-serif text-2xl leading-tight tracking-tight">
+            {/* Stretched over the card, so a tap anywhere outside the other buttons opens details. */}
+            <button
+              type="button"
+              onClick={onOpen}
+              aria-label={`${detailsLabel}: ${text.name}`}
+              className="text-left after:absolute after:inset-0 after:rounded-panel after:content-[''] focus-visible:outline-none focus-visible:after:outline-2 focus-visible:after:outline-offset-3 focus-visible:after:outline-accent"
+            >
+              {text.name}
+            </button>
+          </h3>
+          {dish.price && (
+            <span className="shrink-0 font-mono text-base tabular-nums">{dish.price}</span>
+          )}
+        </div>
+        {showOriginalName(text.name, dish.name) && (
+          <p lang={dish.source_language || undefined} className="mt-1 text-sm text-muted">
+            {dish.name}
+          </p>
+        )}
+        {text.description && (
+          <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-muted">{text.description}</p>
+        )}
+
+        <div className="mt-4 flex flex-wrap items-center gap-2 text-xs">
+          {dish.allergens.length > 0 ? (
+            <>
+              <span className="eyebrow text-muted">{t.contains}</span>
+              {dish.allergens.map((allergen) => (
+                <Chip key={allergen} label={t.allergens[allergen]} tone="allergen" />
+              ))}
+            </>
+          ) : (
+            <span className="text-muted">{t.noMajorAllergens}</span>
+          )}
+        </div>
+        {dish.dietary_tags.length > 0 && (
+          <div className="mt-2 flex flex-wrap gap-2 text-xs">
+            {dish.dietary_tags.map((tag) => (
+              <Chip key={tag} label={t.tags[tag]} tone="tag" />
+            ))}
+          </div>
+        )}
+        {text.notes && (
+          <p className="mt-3 text-sm leading-relaxed">
+            <span className="font-medium">{t.kitchenNote}</span> {text.notes}
+          </p>
+        )}
+
+        {/* Keeps the buttons along the bottom when cards in a row have different heights. */}
+        <div aria-hidden="true" className="min-h-5 flex-1" />
+        <div className="relative z-10 flex flex-wrap items-center justify-between gap-3 border-t border-ink/10 pt-5">
+          <DishActions dish={dish} restaurant={restaurant} language={language} />
+          <QuantityStepper quantity={quantity} onChange={onQuantity} labels={stepperLabels} />
+        </div>
+      </div>
+    </li>
+  );
+}

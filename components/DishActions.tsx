@@ -16,7 +16,7 @@ type DishActionsProps = {
 };
 
 const pill = (active: boolean) =>
-  `rounded-full px-4 py-2.5 text-sm font-medium transition-[box-shadow,background-color,color] duration-200 ${
+  `min-h-10 rounded-full px-3.5 py-2 text-sm font-medium transition-[box-shadow,background-color,color] duration-200 ${
     active
       ? "bg-ink text-white shadow-pressed-color"
       : "bg-paper text-muted shadow-raised-sm hover:text-ink active:shadow-pressed-sm"
@@ -42,7 +42,7 @@ export function DishActions({ dish, restaurant, language }: DishActionsProps) {
   const entry = findDiaryEntry(state, dish.id);
 
   return (
-    <div className="mt-3 flex flex-wrap gap-2">
+    <div className="flex flex-wrap gap-2">
       <button
         aria-pressed={saved}
         onClick={() => {

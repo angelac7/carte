@@ -1,9 +1,15 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { ExtractedDish, MenuItem } from "@/types/menu";
 
-export type Restaurant = { id: string; name: string; slug: string; cuisine: string };
+export type Restaurant = {
+  id: string;
+  name: string;
+  slug: string;
+  cuisine: string;
+  city?: string | null;
+};
 
-const RESTAURANT_COLUMNS = "id, name, slug, cuisine";
+const RESTAURANT_COLUMNS = "id, name, slug, cuisine, city";
 const DISH_COLUMNS =
   "id, name, description, price, allergens, dietary_tags, notes, confirmed, photo_url, revision, source_language";
 

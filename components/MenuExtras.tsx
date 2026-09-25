@@ -1,15 +1,8 @@
 "use client";
-import Link from "@/components/OfflineLink";
 import { useEffect } from "react";
 import { MY_CARTE_STRINGS } from "@/lib/i18n/my-carte-strings";
 import type { LanguageCode } from "@/lib/languages";
-import {
-  isRestaurantSaved,
-  recordMenuSize,
-  similarDishes,
-  toggleSavedRestaurant,
-} from "@/lib/my-carte";
-import { useMyCarteWriter } from "@/lib/use-my-carte-writer";
+import { recordMenuSize, similarDishes } from "@/lib/my-carte";
 import { updateMyCarte, useMyCarte } from "@/lib/my-carte-store";
 import type { DishText, MenuItem } from "@/types/menu";
 
@@ -22,7 +15,7 @@ type MenuExtrasProps = {
   onOpenDish: (dishId: string) => void;
 };
 
-/** Save this menu, link to My Carte, and show dishes similar to what the diner liked. */
+/** Shows dishes similar to what the diner liked before, and remembers the menu's size. */
 export function MenuExtras({
   restaurant,
   language,
@@ -32,7 +25,6 @@ export function MenuExtras({
   onOpenDish,
 }: MenuExtrasProps) {
   const t = MY_CARTE_STRINGS[language];
-  const saveOnDevice = useMyCarteWriter(language);
   const state = useMyCarte();
 
   // Remember the menu's size for the Menu master challenge.
@@ -40,34 +32,17 @@ export function MenuExtras({
     updateMyCarte((current) => recordMenuSize(current, restaurant.slug, menuSize));
   }, [restaurant.slug, menuSize]);
 
-  const saved = isRestaurantSaved(state, restaurant.slug);
   const liked = [...state.diary.filter((entry) => entry.rating >= 4), ...state.dishes];
   const alreadyKnown = new Set([
     ...state.diary.map((entry) => entry.dishId),
     ...state.dishes.map((dish) => dish.dishId),
   ]);
   const similar = similarDishes(liked, candidates, alreadyKnown, 3);
-  const linkClass = "underline underline-offset-4 hover:text-accent";
 
   return (
     <>
-      <div className="mt-4 flex flex-wrap gap-x-4 gap-y-2 text-sm">
-        <button
-          aria-pressed={saved}
-          onClick={() =>
-            saveOnDevice((current) => toggleSavedRestaurant(current, restaurant, Date.now()))
-          }
-          className={linkClass}
-        >
-          {saved ? `♥ ${t.menuSaved}` : `♡ ${t.saveMenu}`}
-        </button>
-        <Link href="/my" className={linkClass}>
-          {t.myCarte}
-        </Link>
-      </div>
-
       {similar.length > 0 && (
-        <div className="mt-5 rounded-control p-5 shadow-pressed">
+        <div className="mt-6 rounded-panel p-6 shadow-pressed">
           <h2 className="eyebrow text-muted">{t.similarTitle}</h2>
           <ul className="mt-3 space-y-1.5">
             {similar.map((dish) => (
