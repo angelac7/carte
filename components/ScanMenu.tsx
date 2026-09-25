@@ -20,6 +20,7 @@ import {
   matchBrowserLanguage,
   ORIGINAL_LANGUAGE,
   type LanguageCode,
+  textDirection,
 } from "@/lib/languages";
 import { toggleValue } from "@/lib/toggle-value";
 import type { ScannedMenu } from "@/types/camera";
@@ -85,7 +86,12 @@ export function ScanMenu({ language, initialPrefs }: ScanMenuProps) {
   );
 
   return (
-    <main id="main" lang={htmlLang(language)} className="mx-auto max-w-3xl px-5 pt-4 pb-20">
+    <main
+      id="main"
+      lang={htmlLang(language)}
+      dir={textDirection(language)}
+      className="mx-auto max-w-3xl px-5 pt-4 pb-20"
+    >
       <div className="mt-8 flex flex-wrap gap-3">
         {uploadButton}
         <Button onClick={() => setCardOpen(true)} variant="secondary" size="lg">

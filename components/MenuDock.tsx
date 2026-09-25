@@ -49,7 +49,7 @@ function DockButton({
         {item.label}
       </span>
       {item.badge ? (
-        <span className="absolute -top-1 -right-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-accent px-1 font-mono text-[11px] font-medium text-white tabular-nums">
+        <span className="absolute -top-1 -end-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-accent px-1 font-mono text-[11px] font-medium text-white tabular-nums">
           {item.badge}
         </span>
       ) : null}

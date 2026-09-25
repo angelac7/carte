@@ -8,15 +8,29 @@ type PageHeroProps = {
   intro?: string;
   image?: string | null;
   lang?: string;
+  /** "rtl" for right-to-left languages like Arabic. */
+  dir?: "rtl" | "ltr";
   /** Line up with a narrow (max-w-3xl) page body instead of the wide default. */
   narrow?: boolean;
   children?: ReactNode;
 };
 
 /** An inverted ink page header: oversized serif type over a slowly zooming photo or fine ink texture. */
-export function PageHero({ title, intro, image, lang, narrow = false, children }: PageHeroProps) {
+export function PageHero({
+  title,
+  intro,
+  image,
+  lang,
+  dir,
+  narrow = false,
+  children,
+}: PageHeroProps) {
   return (
-    <header lang={lang} className="texture-ink relative isolate overflow-hidden text-white">
+    <header
+      lang={lang}
+      dir={dir}
+      className="texture-ink relative isolate overflow-hidden text-white"
+    >
       {image && (
         <>
           <Image

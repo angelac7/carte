@@ -38,6 +38,7 @@ import {
   isLanguageCode,
   LANGUAGE_COOKIE,
   languageFromAcceptHeader,
+  textDirection,
 } from "@/lib/languages";
 import { publicAsset } from "@/lib/public-asset";
 import { checkRateLimit, clientKeyFromHeaders } from "@/lib/rate-limit";
@@ -88,7 +89,7 @@ function DishGrid({
                 monogram={dish.dish_name.charAt(0)}
               >
                 {dish.price && (
-                  <Badge className="right-3 left-auto tabular-nums">{dish.price}</Badge>
+                  <Badge className="end-3 start-auto tabular-nums">{dish.price}</Badge>
                 )}
               </CardImage>
               <div className="flex flex-1 flex-col px-6 pt-3 pb-6">
@@ -278,6 +279,7 @@ export default async function DiscoverPage({ searchParams }: DiscoverProps) {
         intro={t.intro}
         image={publicAsset("images/discover.jpg")}
         lang={htmlLang(language)}
+        dir={textDirection(language)}
       >
         <Link
           href="/places"
@@ -290,6 +292,7 @@ export default async function DiscoverPage({ searchParams }: DiscoverProps) {
       <main
         id="main"
         lang={htmlLang(language)}
+        dir={textDirection(language)}
         className="relative z-10 mx-auto -mt-10 max-w-5xl px-5 pb-20"
       >
         <form

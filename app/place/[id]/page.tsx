@@ -17,6 +17,7 @@ import {
   isLanguageCode,
   LANGUAGE_COOKIE,
   languageFromAcceptHeader,
+  textDirection,
 } from "@/lib/languages";
 import { coordinatesUrl, isValidPlaceId, type OsmPlace } from "@/lib/places/normalize";
 import { checkRateLimit, clientKeyFromHeaders } from "@/lib/rate-limit";
@@ -76,6 +77,7 @@ export default async function PlacePage({ params }: { params: Promise<{ id: stri
             title={place.name}
             intro={place.cuisine.join(", ") || undefined}
             lang={htmlLang(language)}
+            dir={textDirection(language)}
             narrow
           >
             {address && <p className="text-white/80">{address}</p>}
@@ -109,6 +111,7 @@ export default async function PlacePage({ params }: { params: Promise<{ id: stri
           <main
             id="main"
             lang={htmlLang(language)}
+            dir={textDirection(language)}
             className="relative z-10 mx-auto -mt-10 max-w-3xl px-5 pb-20"
           >
             <section className="rounded-panel bg-paper p-6 shadow-raised-lg sm:p-8">

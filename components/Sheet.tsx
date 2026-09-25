@@ -107,7 +107,7 @@ export function Sheet({ title, closeLabel, onClose, children, media, subtitle }:
             onClick={onClose}
             variant="ghost"
             size="sm"
-            className="-mt-1 -mr-2 shrink-0"
+            className="-mt-1 -me-2 shrink-0"
           >
             {closeLabel}
           </Button>

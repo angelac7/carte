@@ -10,7 +10,7 @@ describe("language detection", () => {
   });
 
   it("falls back to English for unsupported or missing languages", () => {
-    expect(languageFromAcceptHeader("de-DE,de;q=0.9")).toBe("en");
+    expect(languageFromAcceptHeader("it-IT,it;q=0.9")).toBe("en");
     expect(languageFromAcceptHeader("")).toBe("en");
   });
 

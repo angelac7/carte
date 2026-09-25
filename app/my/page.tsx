@@ -11,6 +11,7 @@ import {
   isLanguageCode,
   LANGUAGE_COOKIE,
   languageFromAcceptHeader,
+  textDirection,
 } from "@/lib/languages";
 import { publicAsset } from "@/lib/public-asset";
 
@@ -34,6 +35,7 @@ export default async function MyCartePage() {
         intro={t.intro}
         image={publicAsset("images/my.jpg")}
         lang={htmlLang(language)}
+        dir={textDirection(language)}
         narrow
       >
         <p className="text-sm text-white/70">{t.offlineNote}</p>

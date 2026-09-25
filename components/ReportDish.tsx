@@ -34,7 +34,7 @@ export function ReportDish({ restaurantSlug, dishId, language }: ReportDishProps
       <button
         type="button"
         onClick={() => setStep("open")}
-        className="py-3 text-left text-sm text-muted underline underline-offset-4 hover:text-ink"
+        className="py-3 text-start text-sm text-muted underline underline-offset-4 hover:text-ink"
       >
         {t.open}
       </button>

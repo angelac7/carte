@@ -131,4 +131,108 @@ export const CHAT_STRINGS: Record<LanguageCode, ChatStrings> = {
       "Người ăn chay nên gọi món gì?",
     ],
   },
+
+  pt: {
+    open: "Perguntar sobre este cardápio",
+    title: "Assistente do cardápio",
+    intro:
+      "Pergunte sobre pratos, ingredientes ou alérgenos. As respostas vêm apenas do cardápio deste restaurante, então sempre confirme alergias com o garçom.",
+    placeholder: "Digite uma pergunta",
+    send: "Enviar",
+    close: "Fechar",
+    thinking: "Pensando…",
+    error: "O assistente não está disponível agora. Pergunte ao garçom.",
+    limit: "Você atingiu o limite de perguntas por enquanto. Peça mais ajuda ao garçom.",
+    suggestions: [
+      "O que posso comer se não como glúten?",
+      "Quais pratos não têm frutos do mar?",
+      "O que é bom para um vegetariano?",
+    ],
+  },
+  de: {
+    open: "Fragen zu dieser Speisekarte",
+    title: "Speisekarten-Assistent",
+    intro:
+      "Fragen Sie nach Gerichten, Zutaten oder Allergenen. Die Antworten stammen nur aus der Speisekarte dieses Restaurants, klären Sie Allergien also immer mit dem Servicepersonal.",
+    placeholder: "Frage eingeben",
+    send: "Senden",
+    close: "Schließen",
+    thinking: "Einen Moment…",
+    error: "Der Assistent ist gerade nicht verfügbar. Bitte fragen Sie das Servicepersonal.",
+    limit:
+      "Sie haben das Fragenlimit vorerst erreicht. Bitte wenden Sie sich an das Servicepersonal.",
+    suggestions: [
+      "Was kann ich glutenfrei essen?",
+      "Welche Gerichte enthalten keine Schalentiere?",
+      "Was passt für Vegetarier?",
+    ],
+  },
+  ar: {
+    open: "اسأل عن هذه القائمة",
+    title: "مساعد القائمة",
+    intro:
+      "اسأل عن الأطباق أو المكونات أو مسببات الحساسية. تأتي الإجابات من قائمة هذا المطعم فقط، لذا تأكد دائمًا من الحساسية مع النادل.",
+    placeholder: "اكتب سؤالًا",
+    send: "إرسال",
+    close: "إغلاق",
+    thinking: "جارٍ التفكير…",
+    error: "المساعد غير متاح الآن. يرجى سؤال النادل.",
+    limit: "لقد وصلت إلى حد الأسئلة حاليًا. يرجى طلب المساعدة من النادل.",
+    suggestions: [
+      "ماذا يمكنني أن آكل إذا كنت أتجنب الغلوتين؟",
+      "ما الأطباق التي لا تحتوي على المحار والقشريات؟",
+      "ما المناسب للنباتيين؟",
+    ],
+  },
+  hi: {
+    open: "इस मेन्यू के बारे में पूछें",
+    title: "मेन्यू सहायक",
+    intro:
+      "व्यंजनों, सामग्री या एलर्जेन के बारे में पूछें। जवाब केवल इस रेस्तराँ के मेन्यू से आते हैं, इसलिए एलर्जी की पुष्टि हमेशा अपने वेटर से करें।",
+    placeholder: "सवाल लिखें",
+    send: "भेजें",
+    close: "बंद करें",
+    thinking: "सोच रहे हैं…",
+    error: "सहायक अभी उपलब्ध नहीं है। कृपया अपने वेटर से पूछें।",
+    limit: "अभी के लिए आपकी सवालों की सीमा पूरी हो गई है। कृपया अपने वेटर से मदद लें।",
+    suggestions: [
+      "अगर मैं ग्लूटेन नहीं खाता तो क्या खा सकता हूँ?",
+      "किन व्यंजनों में शेलफ़िश नहीं है?",
+      "शाकाहारी लोगों के लिए क्या अच्छा है?",
+    ],
+  },
+  th: {
+    open: "ถามเกี่ยวกับเมนูนี้",
+    title: "ผู้ช่วยเมนู",
+    intro:
+      "ถามเกี่ยวกับอาหาร ส่วนผสม หรือสารก่อภูมิแพ้ได้ คำตอบมาจากเมนูของร้านนี้เท่านั้น จึงควรยืนยันเรื่องอาการแพ้กับพนักงานเสมอ",
+    placeholder: "พิมพ์คำถาม",
+    send: "ส่ง",
+    close: "ปิด",
+    thinking: "กำลังคิด…",
+    error: "ผู้ช่วยยังไม่พร้อมใช้งานในตอนนี้ โปรดสอบถามพนักงาน",
+    limit: "คุณถามครบจำนวนแล้วในตอนนี้ โปรดขอความช่วยเหลือจากพนักงาน",
+    suggestions: [
+      "ถ้าไม่ทานกลูเตน ทานอะไรได้บ้าง",
+      "เมนูไหนไม่มีสัตว์น้ำมีเปลือก",
+      "มีอะไรเหมาะสำหรับคนทานมังสวิรัติบ้าง",
+    ],
+  },
+  tl: {
+    open: "Magtanong tungkol sa menu na ito",
+    title: "Katulong sa menu",
+    intro:
+      "Magtanong tungkol sa mga putahe, sangkap, o allergen. Mula lang sa menu ng restawrang ito ang mga sagot, kaya laging kumpirmahin ang allergy sa inyong server.",
+    placeholder: "Mag-type ng tanong",
+    send: "Ipadala",
+    close: "Isara",
+    thinking: "Nag-iisip…",
+    error: "Hindi available ang katulong ngayon. Pakitanong ang inyong server.",
+    limit: "Naabot mo na ang limitasyon ng tanong sa ngayon. Humingi ng tulong sa inyong server.",
+    suggestions: [
+      "Ano ang puwede kong kainin kung iniiwasan ko ang gluten?",
+      "Aling mga putahe ang walang shellfish?",
+      "Ano ang mainam para sa vegetarian?",
+    ],
+  },
 };

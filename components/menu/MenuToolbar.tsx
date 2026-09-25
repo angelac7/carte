@@ -22,7 +22,7 @@ type MenuToolbarProps = {
 };
 
 const pillClass =
-  "flex shrink-0 items-center gap-1.5 rounded-full py-2 pr-2 pl-3.5 text-sm font-medium whitespace-nowrap transition-colors";
+  "flex shrink-0 items-center gap-1.5 rounded-full py-2 ps-3.5 pe-2 text-sm font-medium whitespace-nowrap transition-colors";
 
 /** Search and the diner's allergy and diet filters, kept in reach while scrolling the menu. */
 export function MenuToolbar({
@@ -46,7 +46,7 @@ export function MenuToolbar({
         <span className="sr-only">{t.searchPlaceholder}</span>
         <span
           aria-hidden="true"
-          className="pointer-events-none absolute top-1/2 left-4 h-5 w-5 -translate-y-1/2 text-muted"
+          className="pointer-events-none absolute top-1/2 start-4 h-5 w-5 -translate-y-1/2 text-muted"
         >
           <SearchIcon />
         </span>
@@ -56,7 +56,7 @@ export function MenuToolbar({
           onChange={(event) => onQuery(event.target.value)}
           placeholder={t.searchPlaceholder}
           maxLength={80}
-          className={fieldClass("rounded-full pl-12")}
+          className={fieldClass("rounded-full ps-12")}
         />
       </label>
 

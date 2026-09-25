@@ -13,7 +13,7 @@ import { requestTasteProfile } from "@/lib/api-client";
 import { useDinerPrefs } from "@/lib/use-diner-prefs";
 import { type DinerPrefs } from "@/lib/diner-prefs";
 import { MY_CARTE_STRINGS } from "@/lib/i18n/my-carte-strings";
-import { htmlLang, type LanguageCode } from "@/lib/languages";
+import { htmlLang, type LanguageCode, textDirection } from "@/lib/languages";
 import {
   computeChallenges,
   EMPTY_MY_CARTE,
@@ -119,7 +119,12 @@ export function MyCarte({ language, initialPrefs }: MyCarteProps) {
   const challenges = computeChallenges(state, new Date());
 
   return (
-    <main id="main" lang={htmlLang(language)} className="mx-auto max-w-3xl px-5 pt-4 pb-20">
+    <main
+      id="main"
+      lang={htmlLang(language)}
+      dir={textDirection(language)}
+      className="mx-auto max-w-3xl px-5 pt-4 pb-20"
+    >
       {/* Scrolls sideways on narrow phones instead of wrapping onto two rows. */}
       <div className="-mx-5 mt-8 overflow-x-auto px-5 pb-1">
         <div
@@ -355,7 +360,7 @@ export function MyCarte({ language, initialPrefs }: MyCarteProps) {
       />
 
       <div className="mt-16 border-t border-ink/15 pt-5">
-        <Button onClick={clearAll} variant="danger" size="sm" className="-ml-3">
+        <Button onClick={clearAll} variant="danger" size="sm" className="-ms-3">
           {t.clearAll}
         </Button>
       </div>

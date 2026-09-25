@@ -258,4 +258,204 @@ export const CAMERA_STRINGS: Record<LanguageCode, CameraStrings> = {
     scanAnother: "Quét thực đơn khác",
     dishesFound: (count) => `Tìm thấy ${count} món`,
   },
+
+  pt: {
+    scanPartial:
+      "Só os primeiros 60 pratos foram lidos. Fotografe o restante separadamente. Sempre confirme os alérgenos com a equipe.",
+    photoButton: "Encontrar um prato pela foto",
+    photoIntro: "Tire uma foto de um prato, como o de outra mesa, para encontrá-lo neste cardápio.",
+    takePhoto: "Tirar ou escolher uma foto",
+    photoSearching: "Procurando uma correspondência…",
+    photoNone: "Nenhuma correspondência. Tente uma foto mais nítida ou pergunte ao garçom.",
+    photoFailed: "A busca por foto não está disponível agora.",
+    photoLimit:
+      "Você usou os recursos de foto várias vezes recentemente. Tente de novo daqui a pouco.",
+    likely: "Provável",
+    possible: "Possível",
+    hiddenByFilters: "Oculto pelos seus filtros",
+    photoDisclaimer: "As correspondências são palpites da IA a partir da foto.",
+    scanTitle: "Escanear um cardápio de papel",
+    scanIntro:
+      "Em um restaurante que não está no Carte? Fotografe o cardápio para traduzi-lo e sinalizar possíveis alérgenos.",
+    reading: "Lendo o cardápio…",
+    readingHint: "Os pratos aparecem abaixo conforme são lidos.",
+    scanFailed:
+      "Não foi possível ler o cardápio. Tente uma foto mais nítida e bem iluminada do cardápio inteiro.",
+    warning:
+      "Este restaurante não está no Carte, então nada aqui foi confirmado pela cozinha. Os alérgenos são palpites da IA a partir do texto, e os pratos muitas vezes têm ingredientes que o cardápio não lista. Sempre pergunte à equipe.",
+    checking: "Verificando suas alergias:",
+    noAllergiesSet:
+      "Você ainda não escolheu nenhuma alergia. Abra seu cartão de alergia para escolhê-las e ver os alertas.",
+    mayContain: "Pode conter",
+    noneDetected:
+      "Nenhum alérgeno encontrado no texto do cardápio. Mesmo assim, pergunte à equipe.",
+    showCard: "Mostrar meu cartão de alergia",
+    scanAnother: "Escanear outro cardápio",
+    dishesFound: (count) => (count === 1 ? "1 prato encontrado" : `${count} pratos encontrados`),
+  },
+  de: {
+    scanPartial:
+      "Nur die ersten 60 Gerichte wurden gelesen. Fotografieren Sie den Rest separat. Klären Sie Allergene immer mit dem Personal.",
+    photoButton: "Gericht per Foto finden",
+    photoIntro:
+      "Fotografieren Sie ein Gericht, etwa an einem anderen Tisch, um es auf dieser Karte zu finden.",
+    takePhoto: "Foto aufnehmen oder auswählen",
+    photoSearching: "Suche nach einem Treffer…",
+    photoNone:
+      "Kein Treffer. Versuchen Sie ein schärferes Foto oder fragen Sie das Servicepersonal.",
+    photoFailed: "Die Fotosuche ist gerade nicht verfügbar.",
+    photoLimit:
+      "Sie haben die Fotofunktionen zuletzt mehrmals genutzt. Versuchen Sie es bald wieder.",
+    likely: "Wahrscheinlich",
+    possible: "Möglich",
+    hiddenByFilters: "Durch Ihre Filter ausgeblendet",
+    photoDisclaimer: "Die Treffer sind Vermutungen einer KI anhand des Fotos.",
+    scanTitle: "Papierkarte scannen",
+    scanIntro:
+      "In einem Restaurant ohne Carte? Fotografieren Sie die Speisekarte, um sie zu übersetzen und mögliche Allergene zu markieren.",
+    reading: "Speisekarte wird gelesen…",
+    readingHint: "Die Gerichte erscheinen unten, sobald sie gelesen sind.",
+    scanFailed:
+      "Die Speisekarte konnte nicht gelesen werden. Versuchen Sie ein schärferes, gut beleuchtetes Foto der ganzen Karte.",
+    warning:
+      "Dieses Restaurant ist nicht bei Carte, daher ist hier nichts von der Küche bestätigt. Allergene sind Vermutungen einer KI anhand des Textes, und Gerichte enthalten oft Dinge, die nicht auf der Karte stehen. Fragen Sie immer das Personal.",
+    checking: "Wir prüfen auf Ihre Allergien:",
+    noAllergiesSet:
+      "Sie haben noch keine Allergien gewählt. Öffnen Sie Ihre Allergiekarte, um sie auszuwählen und Warnungen zu sehen.",
+    mayContain: "Kann enthalten",
+    noneDetected:
+      "Im Text der Karte wurden keine Allergene gefunden. Fragen Sie trotzdem das Personal.",
+    showCard: "Meine Allergiekarte zeigen",
+    scanAnother: "Weitere Speisekarte scannen",
+    dishesFound: (count) => (count === 1 ? "1 Gericht gefunden" : `${count} Gerichte gefunden`),
+  },
+  ar: {
+    scanPartial:
+      "تمت قراءة أول 60 طبقًا فقط. صوّر القسم المتبقي بشكل منفصل. تأكد دائمًا من مسببات الحساسية مع الموظفين.",
+    photoButton: "ابحث عن طبق بالصورة",
+    photoIntro: "التقط صورة لطبق، مثل طبق على طاولة أخرى، للعثور عليه في هذه القائمة.",
+    takePhoto: "التقط صورة أو اخترها",
+    photoSearching: "جارٍ البحث عن تطابق…",
+    photoNone: "لم يتم العثور على تطابق. جرّب صورة أوضح أو اسأل النادل.",
+    photoFailed: "البحث بالصورة غير متاح الآن.",
+    photoLimit: "لقد استخدمت ميزات الصور عدة مرات مؤخرًا. حاول مرة أخرى بعد قليل.",
+    likely: "تطابق محتمل جدًا",
+    possible: "تطابق ممكن",
+    hiddenByFilters: "مخفي بسبب عوامل التصفية",
+    photoDisclaimer: "التطابقات تخمينات من الذكاء الاصطناعي بناءً على الصورة.",
+    scanTitle: "امسح قائمة ورقية",
+    scanIntro:
+      "في مطعم غير موجود على Carte؟ التقط صورة لقائمته لترجمتها وتحديد مسببات الحساسية المحتملة.",
+    reading: "جارٍ قراءة القائمة…",
+    readingHint: "تظهر الأطباق أدناه فور قراءتها.",
+    scanFailed: "تعذّرت قراءة القائمة. جرّب صورة أوضح وجيدة الإضاءة للقائمة كاملة.",
+    warning:
+      "هذا المطعم غير موجود على Carte، لذا لم يؤكد المطبخ أي شيء هنا. مسببات الحساسية تخمينات من الذكاء الاصطناعي بناءً على نص القائمة، وغالبًا ما تحتوي الأطباق على مكونات لا تذكرها القائمة. اسأل الموظفين دائمًا.",
+    checking: "نتحقق من الحساسية لديك:",
+    noAllergiesSet: "لم تختر أي حساسية بعد. افتح بطاقة الحساسية لاختيارها ورؤية التحذيرات.",
+    mayContain: "قد يحتوي على",
+    noneDetected: "لم يُعثر على مسببات حساسية في نص القائمة. اسأل الموظفين مع ذلك.",
+    showCard: "اعرض بطاقة الحساسية",
+    scanAnother: "امسح قائمة أخرى",
+    dishesFound: (count) =>
+      count === 1 ? "تم العثور على طبق واحد" : `تم العثور على ${count} أطباق`,
+  },
+  hi: {
+    scanPartial:
+      "सिर्फ़ पहले 60 व्यंजन पढ़े गए। बाकी हिस्से की अलग से फ़ोटो लें। एलर्जेन की पुष्टि हमेशा स्टाफ़ से करें।",
+    photoButton: "फ़ोटो से व्यंजन खोजें",
+    photoIntro:
+      "किसी व्यंजन की फ़ोटो लें, जैसे दूसरी टेबल पर रखे व्यंजन की, ताकि उसे इस मेन्यू में खोजा जा सके।",
+    takePhoto: "फ़ोटो लें या चुनें",
+    photoSearching: "मिलान खोज रहे हैं…",
+    photoNone: "कोई मिलान नहीं मिला। साफ़ फ़ोटो आज़माएँ या अपने वेटर से पूछें।",
+    photoFailed: "फ़ोटो से खोज अभी उपलब्ध नहीं है।",
+    photoLimit: "आपने हाल में कई बार फ़ोटो सुविधाएँ इस्तेमाल की हैं। थोड़ी देर बाद फिर कोशिश करें।",
+    likely: "संभावित मिलान",
+    possible: "हो सकता है",
+    hiddenByFilters: "आपके फ़िल्टर से छिपा है",
+    photoDisclaimer: "मिलान फ़ोटो के आधार पर AI का अनुमान हैं।",
+    scanTitle: "कागज़ का मेन्यू स्कैन करें",
+    scanIntro:
+      "ऐसे रेस्तराँ में हैं जो Carte पर नहीं है? मेन्यू की फ़ोटो लें ताकि उसका अनुवाद हो और संभावित एलर्जेन दिखें।",
+    reading: "मेन्यू पढ़ा जा रहा है…",
+    readingHint: "जैसे-जैसे व्यंजन पढ़े जाएँगे, वे नीचे दिखेंगे।",
+    scanFailed:
+      "मेन्यू पढ़ा नहीं जा सका। पूरे मेन्यू की ज़्यादा साफ़ और अच्छी रोशनी वाली फ़ोटो आज़माएँ।",
+    warning:
+      "यह रेस्तराँ Carte पर नहीं है, इसलिए यहाँ कुछ भी रसोई द्वारा पुष्ट नहीं है। एलर्जेन मेन्यू के टेक्स्ट से AI का अनुमान हैं, और व्यंजनों में अक्सर ऐसी चीज़ें होती हैं जो मेन्यू में नहीं लिखी होतीं। हमेशा स्टाफ़ से पूछें।",
+    checking: "आपकी एलर्जी की जाँच:",
+    noAllergiesSet:
+      "आपने अभी कोई एलर्जी नहीं चुनी है। उन्हें चुनने और चेतावनियाँ देखने के लिए अपना एलर्जी कार्ड खोलें।",
+    mayContain: "इसमें हो सकता है",
+    noneDetected: "मेन्यू के टेक्स्ट में कोई एलर्जेन नहीं दिखा। फिर भी स्टाफ़ से पूछें।",
+    showCard: "मेरा एलर्जी कार्ड दिखाएँ",
+    scanAnother: "दूसरा मेन्यू स्कैन करें",
+    dishesFound: (count) => (count === 1 ? "1 व्यंजन मिला" : `${count} व्यंजन मिले`),
+  },
+  th: {
+    scanPartial:
+      "อ่านได้เฉพาะ 60 เมนูแรก โปรดถ่ายรูปส่วนที่เหลือแยกต่างหาก และยืนยันสารก่อภูมิแพ้กับพนักงานเสมอ",
+    photoButton: "หาเมนูจากรูปถ่าย",
+    photoIntro: "ถ่ายรูปอาหาร เช่น จานที่โต๊ะอื่น เพื่อหาเมนูนั้นในเมนูนี้",
+    takePhoto: "ถ่ายหรือเลือกรูป",
+    photoSearching: "กำลังหาเมนูที่ตรงกัน…",
+    photoNone: "ไม่พบเมนูที่ตรงกัน ลองถ่ายรูปให้ชัดขึ้นหรือสอบถามพนักงาน",
+    photoFailed: "ยังค้นหาจากรูปไม่ได้ในตอนนี้",
+    photoLimit: "คุณใช้ฟีเจอร์รูปภาพหลายครั้งแล้วเมื่อสักครู่ โปรดลองใหม่อีกครั้งในภายหลัง",
+    likely: "น่าจะตรงกัน",
+    possible: "อาจตรงกัน",
+    hiddenByFilters: "ถูกซ่อนตามตัวกรองของคุณ",
+    photoDisclaimer: "ผลที่ตรงกันเป็นการคาดเดาของ AI จากรูปภาพ",
+    scanTitle: "สแกนเมนูกระดาษ",
+    scanIntro:
+      "อยู่ที่ร้านที่ไม่ได้อยู่บน Carte ใช่ไหม ถ่ายรูปเมนูเพื่อแปลและดูสารก่อภูมิแพ้ที่อาจมี",
+    reading: "กำลังอ่านเมนู…",
+    readingHint: "เมนูจะแสดงด้านล่างทันทีที่อ่านเสร็จ",
+    scanFailed: "อ่านเมนูไม่ได้ ลองถ่ายรูปเมนูทั้งหมดให้ชัดและมีแสงสว่างเพียงพอ",
+    warning:
+      "ร้านนี้ไม่ได้อยู่บน Carte จึงไม่มีข้อมูลใดที่ครัวยืนยันแล้ว สารก่อภูมิแพ้เป็นการคาดเดาของ AI จากข้อความในเมนู และอาหารมักมีส่วนผสมที่เมนูไม่ได้ระบุ โปรดสอบถามพนักงานทุกครั้ง",
+    checking: "กำลังตรวจสอบอาการแพ้ของคุณ:",
+    noAllergiesSet: "คุณยังไม่ได้เลือกอาการแพ้ เปิดบัตรแจ้งอาการแพ้เพื่อเลือกและดูคำเตือน",
+    mayContain: "อาจมี",
+    noneDetected: "ไม่พบสารก่อภูมิแพ้ในข้อความเมนู แต่ควรสอบถามพนักงานอยู่ดี",
+    showCard: "แสดงบัตรแจ้งอาการแพ้",
+    scanAnother: "สแกนเมนูอื่น",
+    dishesFound: (count) => `พบ ${count} เมนู`,
+  },
+  tl: {
+    scanPartial:
+      "Ang unang 60 putahe lang ang nabasa. Kunan nang hiwalay ang natitirang bahagi. Laging kumpirmahin ang allergen sa staff.",
+    photoButton: "Hanapin ang putahe gamit ang litrato",
+    photoIntro:
+      "Kunan ng litrato ang isang putahe, tulad ng nasa ibang mesa, para mahanap ito sa menu na ito.",
+    takePhoto: "Kumuha o pumili ng litrato",
+    photoSearching: "Naghahanap ng katugma…",
+    photoNone:
+      "Walang nahanap na katugma. Subukan ang mas malinaw na litrato o magtanong sa server.",
+    photoFailed: "Hindi available ang paghahanap gamit ang litrato ngayon.",
+    photoLimit:
+      "Ilang beses mo nang ginamit ang mga feature ng litrato kamakailan. Subukan ulit mamaya.",
+    likely: "Malamang na katugma",
+    possible: "Posibleng katugma",
+    hiddenByFilters: "Nakatago dahil sa mga filter mo",
+    photoDisclaimer: "Hula ng AI mula sa litrato ang mga katugma.",
+    scanTitle: "I-scan ang papel na menu",
+    scanIntro:
+      "Nasa restawrang wala sa Carte? Kunan ng litrato ang menu para maisalin ito at makita ang posibleng allergen.",
+    reading: "Binabasa ang menu…",
+    readingHint: "Lalabas sa ibaba ang mga putahe habang binabasa.",
+    scanFailed:
+      "Hindi mabasa ang menu. Subukan ang mas malinaw at maliwanag na litrato ng buong menu.",
+    warning:
+      "Wala sa Carte ang restawrang ito, kaya walang kinumpirma ang kusina rito. Hula ng AI mula sa teksto ng menu ang mga allergen, at madalas may mga sangkap ang putahe na hindi nakalista. Laging magtanong sa staff.",
+    checking: "Sinusuri ang mga allergy mo:",
+    noAllergiesSet:
+      "Wala ka pang napiling allergy. Buksan ang allergy card mo para pumili at makita ang mga babala.",
+    mayContain: "Maaaring may",
+    noneDetected: "Walang nakitang allergen sa teksto ng menu. Magtanong pa rin sa staff.",
+    showCard: "Ipakita ang allergy card ko",
+    scanAnother: "Mag-scan ng ibang menu",
+    dishesFound: (count) => (count === 1 ? "1 putahe ang nahanap" : `${count} putahe ang nahanap`),
+  },
 };

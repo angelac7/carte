@@ -40,4 +40,35 @@ export const DOCK_STRINGS: Record<LanguageCode, DockStrings> = {
     photo: "Ảnh",
     allergies: "Dị ứng",
   },
+
+  pt: {
+    label: "Ferramentas do cardápio",
+    order: "Pedido",
+    ask: "Perguntar",
+    photo: "Foto",
+    allergies: "Alergias",
+  },
+  de: {
+    label: "Menü-Werkzeuge",
+    order: "Bestellung",
+    ask: "Fragen",
+    photo: "Foto",
+    allergies: "Allergien",
+  },
+  ar: { label: "أدوات القائمة", order: "الطلب", ask: "اسأل", photo: "صورة", allergies: "الحساسية" },
+  hi: { label: "मेन्यू टूल", order: "ऑर्डर", ask: "पूछें", photo: "फ़ोटो", allergies: "एलर्जी" },
+  th: {
+    label: "เครื่องมือเมนู",
+    order: "สั่งอาหาร",
+    ask: "ถาม",
+    photo: "รูปภาพ",
+    allergies: "อาการแพ้",
+  },
+  tl: {
+    label: "Mga tool ng menu",
+    order: "Order",
+    ask: "Magtanong",
+    photo: "Litrato",
+    allergies: "Allergy",
+  },
 };

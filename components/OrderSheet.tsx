@@ -149,7 +149,7 @@ export function OrderSheet({
               {people.map((person) => (
                 <span
                   key={person}
-                  className="flex items-center gap-1 rounded-full py-1 pr-1 pl-4 text-sm shadow-pressed-sm"
+                  className="flex items-center gap-1 rounded-full py-1 ps-4 pe-1 text-sm shadow-pressed-sm"
                 >
                   {person}
                   <button
@@ -321,7 +321,7 @@ export function OrderSheet({
             <Button onClick={() => setMode("split")} variant="secondary">
               {t.splitBill}
             </Button>
-            <Button onClick={onClear} variant="danger" size="sm" className="ml-auto">
+            <Button onClick={onClear} variant="danger" size="sm" className="ms-auto">
               {t.clearOrder}
             </Button>
           </div>

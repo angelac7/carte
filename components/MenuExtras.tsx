@@ -49,7 +49,7 @@ export function MenuExtras({
               <li key={dish.id}>
                 <button
                   onClick={() => onOpenDish(dish.id)}
-                  className="text-left text-sm underline underline-offset-4 hover:text-muted"
+                  className="text-start text-sm underline underline-offset-4 hover:text-muted"
                 >
                   {textFor(dish).name}
                 </button>

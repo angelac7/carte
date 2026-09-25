@@ -61,7 +61,7 @@ function Group({ title, children }: { title: string; children: ReactNode }) {
 
 function List({ items }: { items: string[] }) {
   return (
-    <ul className="list-disc space-y-1 pl-5">
+    <ul className="list-disc space-y-1 ps-5">
       {items.map((item) => (
         <li key={item}>{item}</li>
       ))}

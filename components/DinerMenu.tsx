@@ -53,6 +53,7 @@ import {
   LANGUAGE_COOKIE,
   LANGUAGES,
   type LanguageCode,
+  textDirection,
 } from "@/lib/languages";
 import { filterDishes } from "@/lib/menu-filters";
 import { formatList } from "@/lib/format-list";
@@ -395,7 +396,7 @@ export function DinerMenu({
 
   if (dishes.length === 0) {
     return (
-      <div lang={htmlLang(language)}>
+      <div lang={htmlLang(language)} dir={textDirection(language)}>
         {hero}
         <main id="main" className="mx-auto max-w-5xl px-5 py-12">
           <EmptyState>{t.notReady}</EmptyState>
@@ -416,7 +417,7 @@ export function DinerMenu({
   }
 
   return (
-    <div lang={htmlLang(language)}>
+    <div lang={htmlLang(language)} dir={textDirection(language)}>
       {hero}
 
       <main id="main" className="mx-auto max-w-5xl px-5 pb-36">
@@ -511,7 +512,7 @@ export function DinerMenu({
           <button
             type="button"
             onClick={() => setPanel("helper")}
-            className="texture-ink group flex w-full items-center gap-5 rounded-panel p-6 text-left text-white shadow-raised transition-transform duration-200 hover:-translate-y-0.5 sm:p-7"
+            className="texture-ink group flex w-full items-center gap-5 rounded-panel p-6 text-start text-white shadow-raised transition-transform duration-200 hover:-translate-y-0.5 sm:p-7"
           >
             <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-accent shadow-pressed-color">
               <span aria-hidden="true" className="h-6 w-6">
@@ -528,7 +529,7 @@ export function DinerMenu({
             </span>
             <span
               aria-hidden="true"
-              className="ml-auto text-2xl transition-transform duration-200 group-hover:translate-x-1"
+              className="ms-auto text-2xl transition-transform duration-200 group-hover:translate-x-1"
             >
               →
             </span>

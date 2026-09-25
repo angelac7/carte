@@ -88,11 +88,11 @@ export function MenuChat({
       animate={{ y: 0, opacity: 1 }}
       transition={{ type: "spring", bounce: 0.15, duration: 0.45 }}
       onKeyDown={(e) => e.key === "Escape" && onClose()}
-      className="fixed inset-x-0 bottom-0 z-30 flex max-h-[80svh] flex-col rounded-t-panel bg-paper shadow-raised-lg sm:inset-x-auto sm:right-5 sm:bottom-5 sm:w-[26rem] sm:rounded-panel print:hidden"
+      className="fixed inset-x-0 bottom-0 z-30 flex max-h-[80svh] flex-col rounded-t-panel bg-paper shadow-raised-lg sm:inset-x-auto sm:end-5 sm:bottom-5 sm:w-[26rem] sm:rounded-panel print:hidden"
     >
       <header className="flex items-center justify-between border-b border-ink/10 px-6 py-4">
         <h2 className="font-serif text-2xl tracking-tight">{t.title}</h2>
-        <Button onClick={onClose} variant="ghost" size="sm" className="-mr-2">
+        <Button onClick={onClose} variant="ghost" size="sm" className="-me-2">
           {t.close}
         </Button>
       </header>
@@ -106,7 +106,7 @@ export function MenuChat({
               <button
                 key={suggestion}
                 onClick={() => ask(suggestion)}
-                className="rounded-full bg-paper px-4 py-2.5 text-left text-sm shadow-raised-sm transition-[box-shadow,color] duration-200 hover:text-accent active:shadow-pressed-sm"
+                className="rounded-full bg-paper px-4 py-2.5 text-start text-sm shadow-raised-sm transition-[box-shadow,color] duration-200 hover:text-accent active:shadow-pressed-sm"
               >
                 {suggestion}
               </button>
@@ -124,8 +124,8 @@ export function MenuChat({
             <p
               className={`max-w-[85%] rounded-[1.25rem] px-4 py-2.5 text-sm leading-relaxed whitespace-pre-line ${
                 message.role === "user"
-                  ? "rounded-br-md bg-accent text-white"
-                  : "rounded-bl-md shadow-pressed-sm"
+                  ? "rounded-ee-md bg-accent text-white"
+                  : "rounded-es-md shadow-pressed-sm"
               }`}
             >
               {message.content}

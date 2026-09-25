@@ -62,7 +62,7 @@ export function Badge({ children, tone = "light", className }: BadgeProps) {
   return (
     <span
       className={cn(
-        "eyebrow absolute top-3 left-3 rounded-full px-3 py-1.5 backdrop-blur",
+        "eyebrow absolute top-3 start-3 rounded-full px-3 py-1.5 backdrop-blur",
         tone === "light" && "bg-paper/90 text-ink shadow-raised-sm",
         tone === "basil" && "bg-basil text-white",
         tone === "dark" && "bg-ink text-white",

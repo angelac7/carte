@@ -11,6 +11,7 @@ import {
   isLanguageCode,
   LANGUAGE_COOKIE,
   languageFromAcceptHeader,
+  textDirection,
 } from "@/lib/languages";
 import { publicAsset } from "@/lib/public-asset";
 
@@ -34,6 +35,7 @@ export default async function ScanPage() {
         intro={t.scanIntro}
         image={publicAsset("images/scan.jpg")}
         lang={htmlLang(language)}
+        dir={textDirection(language)}
         narrow
       />
       <ScanMenu

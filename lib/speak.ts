@@ -9,6 +9,12 @@ export const SPEECH_LANG: Record<LanguageCode, string> = {
   ja: "ja-JP",
   fr: "fr-FR",
   vi: "vi-VN",
+  pt: "pt-BR",
+  de: "de-DE",
+  ar: "ar-SA",
+  hi: "hi-IN",
+  th: "th-TH",
+  tl: "fil-PH",
 };
 
 export function canSpeak(): boolean {

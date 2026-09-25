@@ -59,7 +59,7 @@ export function PhraseCards({
             <button
               type="button"
               onClick={() => setOpen(id)}
-              className="w-full rounded-control px-4 py-3 text-left shadow-raised-sm transition-[box-shadow] hover:shadow-raised active:shadow-pressed-sm"
+              className="w-full rounded-control px-4 py-3 text-start shadow-raised-sm transition-[box-shadow] hover:shadow-raised active:shadow-pressed-sm"
             >
               <span lang={htmlLang(language)} className="block text-sm">
                 {t.phrases[id]}

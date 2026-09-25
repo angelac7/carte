@@ -21,6 +21,7 @@ import {
   isLanguageCode,
   LANGUAGE_COOKIE,
   languageFromAcceptHeader,
+  textDirection,
 } from "@/lib/languages";
 import { distanceMeters, formatDistance, type OsmPlace } from "@/lib/places/normalize";
 import { geocode, searchPlaces } from "@/lib/places/osm";
@@ -100,11 +101,13 @@ export default async function PlacesPage({ searchParams }: { searchParams: Promi
         intro={t.intro}
         image={publicAsset("images/places.jpg")}
         lang={htmlLang(language)}
+        dir={textDirection(language)}
       />
 
       <main
         id="main"
         lang={htmlLang(language)}
+        dir={textDirection(language)}
         className="relative z-10 mx-auto -mt-10 max-w-5xl px-5 pb-20"
       >
         <form
@@ -187,7 +190,7 @@ export default async function PlacesPage({ searchParams }: { searchParams: Promi
                             {formatDistance(place.distance, language)}
                           </Badge>
                           {carteSlug && (
-                            <Badge tone="basil" className="right-3 left-auto">
+                            <Badge tone="basil" className="end-3 start-auto">
                               {t.onCarte}
                             </Badge>
                           )}

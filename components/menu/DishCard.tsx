@@ -89,7 +89,7 @@ export function DishCard({
               type="button"
               onClick={onOpen}
               aria-label={`${detailsLabel}: ${text.name}`}
-              className="text-left after:absolute after:inset-0 after:rounded-panel after:content-[''] focus-visible:outline-none focus-visible:after:outline-2 focus-visible:after:outline-offset-3 focus-visible:after:outline-accent"
+              className="text-start after:absolute after:inset-0 after:rounded-panel after:content-[''] focus-visible:outline-none focus-visible:after:outline-2 focus-visible:after:outline-offset-3 focus-visible:after:outline-accent"
             >
               {text.name}
             </button>
