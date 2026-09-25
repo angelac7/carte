@@ -2,37 +2,37 @@ import { logOut } from "@/app/auth/actions";
 import { NavBar } from "@/components/NavBar";
 import { PublicTabBar } from "@/components/PublicTabBar";
 import { Button, ButtonLink } from "@/components/ui/button";
-import { getHeaderAccount, type HeaderAccount } from "@/lib/auth";
-import { DINER_LINKS, ownerLinks } from "@/lib/owner-nav";
+import { isSignedIn } from "@/lib/auth";
+import { DINER_LINKS } from "@/lib/owner-nav";
 
 type PublicHeaderProps = {
-  /** Pass the account when the page already has it, to skip looking it up again. */
-  account?: HeaderAccount | null;
+  /** Pass it when the page already knows, to skip checking the session again. */
+  signedIn?: boolean;
 };
 
 /**
- * The header on every page. Everyone sees the same links; signed-in owners also get their
- * restaurant pages under "My restaurant", plus Log out instead of Log in and Sign up.
+ * The header on every page. Everyone sees the same links; signed-in owners get Log out and
+ * Dashboard where signed-out visitors get Log in and Sign up.
  */
-export async function PublicHeader({ account }: PublicHeaderProps = {}) {
-  const owner = account === undefined ? await getHeaderAccount() : account;
+export async function PublicHeader({ signedIn }: PublicHeaderProps = {}) {
+  const owner = signedIn ?? (await isSignedIn());
   return (
     <>
       <NavBar
         homeHref="/"
         links={DINER_LINKS}
-        ownerMenu={
-          owner
-            ? { label: "My restaurant", links: ownerLinks(owner.restaurant, owner.admin) }
-            : undefined
-        }
         trailing={
           owner ? (
-            <form action={logOut}>
-              <Button type="submit" variant="ghost" size="sm">
-                Log out
-              </Button>
-            </form>
+            <>
+              <form action={logOut}>
+                <Button type="submit" variant="ghost" size="sm">
+                  Log out
+                </Button>
+              </form>
+              <ButtonLink href="/dashboard" size="sm" shine>
+                Dashboard
+              </ButtonLink>
+            </>
           ) : (
             <>
               <ButtonLink href="/login" variant="ghost" size="sm">

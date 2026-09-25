@@ -16,7 +16,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
   const latestClaim = restaurant ? (await listPlaceClaims(supabase, restaurant.id))[0] : null;
   return (
     <>
-      <PublicHeader account={{ restaurant, admin }} />
+      <PublicHeader signedIn />
       <OwnerTabs links={ownerLinks(restaurant, admin)} />
       {latestClaim && ["approved", "rejected", "transferred"].includes(latestClaim.status) && (
         <div className="mx-auto max-w-5xl px-5 pt-5">
