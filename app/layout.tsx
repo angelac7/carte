@@ -3,6 +3,7 @@ import { DM_Sans, JetBrains_Mono, Playfair_Display } from "next/font/google";
 import { MotionProvider } from "@/components/motion/MotionProvider";
 import { ServiceWorkerRegistration } from "@/components/ServiceWorkerRegistration";
 import { Toasts } from "@/components/Toasts";
+import { siteUrl } from "@/lib/site-url";
 import "./globals.css";
 
 // Editorial serif for headlines, a clean sans for reading, and mono for small labels.
@@ -22,10 +23,15 @@ const jetbrains = JetBrains_Mono({
   variable: "--font-jetbrains",
 });
 
+const DESCRIPTION = "Menus with confirmed allergens, translations, and answers for every diner.";
+
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl()),
   title: "Carte",
-  description: "Menus with confirmed allergens, translations, and answers for every diner.",
+  description: DESCRIPTION,
   icons: { icon: "/icon.svg", apple: "/icon.svg" },
+  openGraph: { siteName: "Carte", type: "website", title: "Carte", description: DESCRIPTION },
+  twitter: { card: "summary_large_image" },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

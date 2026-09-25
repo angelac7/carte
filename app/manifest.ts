@@ -7,8 +7,8 @@ export default function manifest(): MetadataRoute.Manifest {
     description: "Menus with confirmed allergens, translations, and answers for every diner.",
     start_url: "/my",
     display: "standalone",
-    background_color: "#f6f7f4",
-    theme_color: "#1c2a39",
+    background_color: "#e0e5ec",
+    theme_color: "#0a0c10",
     icons: [{ src: "/icon.svg", sizes: "any", type: "image/svg+xml" }],
   };
 }

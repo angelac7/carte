@@ -39,6 +39,20 @@ export async function getRestaurantBySlug(
   return data as unknown as Restaurant | null;
 }
 
+/** Links to every menu shown on Discover: listed, with at least one confirmed dish. */
+export async function listListedMenuSlugs(supabase: SupabaseClient): Promise<string[]> {
+  const { data, error } = await supabase
+    .from("restaurants")
+    .select("slug, menu_items!inner(id)")
+    .eq("listed", true)
+    .eq("menu_items.confirmed", true)
+    .limit(1, { referencedTable: "menu_items" })
+    .order("slug")
+    .limit(5000);
+  if (error) throw error;
+  return (data ?? []).map((row) => (row as { slug: string }).slug);
+}
+
 export async function createRestaurant(
   supabase: SupabaseClient,
   ownerId: string,

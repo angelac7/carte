@@ -23,7 +23,20 @@ const findRestaurant = cache(async (slug: string) =>
 
 export async function generateMetadata({ params }: RestaurantMenuProps): Promise<Metadata> {
   const restaurant = await findRestaurant((await params).slug);
-  return { title: restaurant ? `${restaurant.name} | Carte` : "Menu | Carte" };
+  if (!restaurant) return { title: "Menu | Carte" };
+  const place = [restaurant.cuisine, restaurant.city].filter(Boolean).join(" · ");
+  const description = `${place ? `${place}. ` : ""}See the menu with allergen and diet filters, in 7 languages.`;
+  return {
+    title: `${restaurant.name} | Carte`,
+    description,
+    openGraph: {
+      siteName: "Carte",
+      type: "website",
+      title: `${restaurant.name} menu`,
+      description,
+      url: `/r/${restaurant.slug}`,
+    },
+  };
 }
 
 export default async function RestaurantMenuPage({ params }: RestaurantMenuProps) {
