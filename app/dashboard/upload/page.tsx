@@ -5,6 +5,6 @@ import { requireRestaurant } from "@/lib/auth";
 export const metadata: Metadata = { title: "Upload menu | Carte" };
 
 export default async function UploadPage() {
-  await requireRestaurant();
+  await requireRestaurant("/dashboard/upload");
   return <UploadMenu />;
 }

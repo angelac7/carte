@@ -225,7 +225,11 @@ export default function ReviewDishes() {
   async function clearMenu() {
     if (mutationPending.current || pending.current.size > 0) return;
     if (
-      !window.confirm(`Delete all ${dishes.length} dishes and their photos? This can’t be undone.`)
+      !window.confirm(
+        dishes.length === 1
+          ? "Delete the 1 dish and its photo? This can’t be undone."
+          : `Delete all ${dishes.length} dishes and their photos? This can’t be undone.`,
+      )
     )
       return;
     mutationPending.current = true;

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { cookies, headers } from "next/headers";
 import { notFound } from "next/navigation";
+import { cache } from "react";
 import { LiveDinerMenu } from "@/components/LiveDinerMenu";
 import { getConfirmedDishes, getRestaurantBySlug } from "@/lib/db";
 import { parsePrefs, PREFS_COOKIE } from "@/lib/diner-prefs";
@@ -11,17 +12,25 @@ import { isValidSlug } from "@/lib/slug";
 import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
-export const metadata: Metadata = { title: "Menu | Carte" };
 
 type RestaurantMenuProps = { params: Promise<{ slug: string }> };
 
+/** Looked up once per visit, for both the tab title and the page. */
+const findRestaurant = cache(async (slug: string) =>
+  isValidSlug(slug) ? getRestaurantBySlug(await createClient(), slug) : null,
+);
+
+export async function generateMetadata({ params }: RestaurantMenuProps): Promise<Metadata> {
+  const restaurant = await findRestaurant((await params).slug);
+  return { title: restaurant ? `${restaurant.name} | Carte` : "Menu | Carte" };
+}
+
 export default async function RestaurantMenuPage({ params }: RestaurantMenuProps) {
   const { slug } = await params;
-  if (!isValidSlug(slug)) notFound();
+  const restaurant = await findRestaurant(slug);
+  if (!restaurant) notFound();
 
   const supabase = await createClient();
-  const restaurant = await getRestaurantBySlug(supabase, slug);
-  if (!restaurant) notFound();
 
   // Filtered to confirmed dishes in the database, then again here as a safety net.
   const dishes = confirmedOnly(await getConfirmedDishes(supabase, restaurant.id));

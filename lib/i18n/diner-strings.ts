@@ -67,7 +67,7 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     hideContaining: "Hide dishes that contain",
     showOnly: "Show only dishes marked",
     showing: (shown, total, hidden) =>
-      `Showing ${shown} of ${total} dishes.${hidden > 0 ? ` ${hidden} hidden by your filters.` : ""}`,
+      `Showing ${shown} of ${total} ${total === 1 ? "dish" : "dishes"}.${hidden > 0 ? ` ${hidden} hidden by your filters.` : ""}`,
     clearFilters: "Clear filters",
     noMatch:
       "No dishes match your filters. Try removing one, or ask your server what the kitchen can adjust.",
@@ -127,7 +127,7 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     hideContaining: "Ocultar platos que contienen",
     showOnly: "Mostrar solo platos marcados como",
     showing: (shown, total, hidden) =>
-      `Mostrando ${shown} de ${total} platos.${hidden > 0 ? ` ${hidden} ocultos por sus filtros.` : ""}`,
+      `Mostrando ${shown} de ${total} ${total === 1 ? "plato" : "platos"}.${hidden > 0 ? ` ${hidden} ${hidden === 1 ? "oculto" : "ocultos"} por sus filtros.` : ""}`,
     clearFilters: "Borrar filtros",
     noMatch:
       "Ningún plato coincide con sus filtros. Quite alguno o pregunte a su mesero qué puede adaptar la cocina.",

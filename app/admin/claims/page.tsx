@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { requireUser } from "@/lib/auth";
 import { isCarteAdmin, listPlaceClaims, listClaimEvents } from "@/lib/db/claims";
@@ -6,6 +7,9 @@ import { Button, ButtonLink } from "@/components/ui/button";
 import { fieldClass } from "@/components/ui/field";
 import { Notice } from "@/components/ui/notice";
 import { PublicHeader } from "@/components/PublicHeader";
+
+export const metadata: Metadata = { title: "Review claims | Carte" };
+
 const errors: Record<string, string> = {
   invalid: "Enter at least 20 characters describing your ownership verification.",
   stale: "This claim changed. Review the refreshed queue before deciding.",

@@ -149,7 +149,9 @@ export default async function DashboardHome() {
                 <p className="mt-1 text-sm text-muted">
                   {stepsDone === checklist.length
                     ? "Every step is done."
-                    : `${checklist.length - stepsDone} steps to go.`}
+                    : checklist.length - stepsDone === 1
+                      ? "1 step to go."
+                      : `${checklist.length - stepsDone} steps to go.`}
                 </p>
               </div>
             </div>
@@ -169,7 +171,7 @@ export default async function DashboardHome() {
                           : "text-transparent shadow-pressed-sm",
                       )}
                     >
-                      ✓
+                      {item.done && "✓"}
                     </span>
                     <span className="flex-1">
                       <span className={cn("block text-sm", item.done && "text-muted line-through")}>

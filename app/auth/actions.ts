@@ -104,5 +104,5 @@ export async function resetPassword(_previous: AuthState, formData: FormData): P
   const { error } = await supabase.auth.updateUser({ password: password.data });
   if (error)
     return { error: "Your password couldn't be updated. Request a new link and try again." };
-  redirect("/dashboard");
+  redirect("/");
 }

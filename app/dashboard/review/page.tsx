@@ -5,6 +5,6 @@ import { requireRestaurant } from "@/lib/auth";
 export const metadata: Metadata = { title: "Review dishes | Carte" };
 
 export default async function ReviewPage() {
-  await requireRestaurant();
+  await requireRestaurant("/dashboard/review");
   return <ReviewDishes />;
 }

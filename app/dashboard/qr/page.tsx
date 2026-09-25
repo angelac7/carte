@@ -11,7 +11,7 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "QR code | Carte" };
 
 export default async function QrPage() {
-  const { restaurant } = await requireRestaurant();
+  const { restaurant } = await requireRestaurant("/dashboard/qr");
   const requestHeaders = await headers();
   const host = requestHeaders.get("host") ?? "localhost:3000";
   const protocol = requestHeaders.get("x-forwarded-proto") ?? "http";

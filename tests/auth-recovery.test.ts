@@ -59,7 +59,7 @@ it("sends a recovery callback and updates the authenticated owner's password", a
   expect(auth.resetPasswordForEmail).toHaveBeenCalledWith("owner@example.com", {
     redirectTo: expect.stringContaining("/auth/callback?next=/reset-password"),
   });
-  await expect(resetPassword({}, form())).rejects.toThrow("redirect:/dashboard");
+  await expect(resetPassword({}, form())).rejects.toThrow(/^redirect:\/$/);
   expect(auth.updateUser).toHaveBeenCalledWith({ password: "password123" });
 });
 it("rejects expired sessions and mismatched passwords", async () => {

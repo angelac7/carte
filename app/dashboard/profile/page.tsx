@@ -7,7 +7,7 @@ import { getRestaurantProfile } from "@/lib/db/profile";
 export const metadata: Metadata = { title: "Restaurant profile | Carte" };
 
 export default async function ProfilePage() {
-  const { supabase, restaurant } = await requireRestaurant();
+  const { supabase, restaurant } = await requireRestaurant("/dashboard/profile");
   const profile = await getRestaurantProfile(supabase, restaurant.id);
 
   return (

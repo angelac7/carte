@@ -60,7 +60,7 @@ export const CAMERA_STRINGS: Record<LanguageCode, CameraStrings> = {
     noneDetected: "No allergens spotted in the menu text. Still ask staff.",
     showCard: "Show my allergy card",
     scanAnother: "Scan another menu",
-    dishesFound: (count) => `${count} dishes found`,
+    dishesFound: (count) => (count === 1 ? "1 dish found" : `${count} dishes found`),
   },
   es: {
     scanPartial:
@@ -96,7 +96,7 @@ export const CAMERA_STRINGS: Record<LanguageCode, CameraStrings> = {
       "No se detectaron alérgenos en el texto del menú. Pregunte de todos modos al personal.",
     showCard: "Mostrar mi tarjeta de alergias",
     scanAnother: "Escanear otro menú",
-    dishesFound: (count) => `${count} platos encontrados`,
+    dishesFound: (count) => (count === 1 ? "1 plato encontrado" : `${count} platos encontrados`),
   },
   zh: {
     scanPartial: "只读取了前60道菜。请单独拍摄剩余部分。务必向工作人员确认过敏原。",
@@ -225,7 +225,8 @@ export const CAMERA_STRINGS: Record<LanguageCode, CameraStrings> = {
     noneDetected: "Aucun allergène repéré dans le texte du menu. Demandez quand même au personnel.",
     showCard: "Montrer ma carte d'allergies",
     scanAnother: "Scanner un autre menu",
-    dishesFound: (count) => `${count} plats trouvés`,
+    // French uses the singular for zero and one.
+    dishesFound: (count) => (count <= 1 ? `${count} plat trouvé` : `${count} plats trouvés`),
   },
   vi: {
     scanPartial:

@@ -154,7 +154,7 @@ export default function UploadPage() {
                 aria-live="polite"
                 className="font-serif text-4xl leading-none tracking-tighter sm:text-5xl"
               >
-                {reading ? `${dishes.length} dishes so far` : `${dishes.length} dishes found`}
+                {`${dishes.length} ${dishes.length === 1 ? "dish" : "dishes"} ${reading ? "so far" : "found"}`}
               </h2>
               <p className="mt-1 text-sm text-muted">
                 Allergens are suggestions. You’ll confirm each dish on the next step.

@@ -532,7 +532,8 @@ export const BACKUP_STRINGS: Record<
     invalid:
       "Could not use this backup. Choose a valid Carte file under 2 MB. Merged collections must have at most 200 entries of each kind.",
     done: "Backup restored.",
-    counts: (d, r, e) => `${d} saved dishes · ${r} restaurants · ${e} diary entries`,
+    counts: (d, r, e) =>
+      `${d} saved ${d === 1 ? "dish" : "dishes"} · ${r} ${r === 1 ? "restaurant" : "restaurants"} · ${e} diary ${e === 1 ? "entry" : "entries"}`,
   },
   es: {
     title: "Copia de seguridad",
@@ -549,7 +550,8 @@ export const BACKUP_STRINGS: Record<
     invalid:
       "Elige una copia de Carte válida de menos de 2 MB. Máximo 200 entradas de cada tipo al combinar.",
     done: "Copia restaurada.",
-    counts: (d, r, e) => `${d} platos · ${r} restaurantes · ${e} entradas`,
+    counts: (d, r, e) =>
+      `${d} ${d === 1 ? "plato" : "platos"} · ${r} ${r === 1 ? "restaurante" : "restaurantes"} · ${e} ${e === 1 ? "entrada" : "entradas"}`,
   },
   zh: {
     title: "备份与恢复",
@@ -613,7 +615,8 @@ export const BACKUP_STRINGS: Record<
     invalid:
       "Choisissez un fichier Carte valide de moins de 2 Mo. Maximum 200 entrées de chaque type après fusion.",
     done: "Sauvegarde restaurée.",
-    counts: (d, r, e) => `${d} plats · ${r} restaurants · ${e} entrées`,
+    counts: (d, r, e) =>
+      `${d} ${d <= 1 ? "plat" : "plats"} · ${r} ${r <= 1 ? "restaurant" : "restaurants"} · ${e} ${e <= 1 ? "entrée" : "entrées"}`,
   },
   vi: {
     title: "Sao lưu và khôi phục",
