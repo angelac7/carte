@@ -2,35 +2,37 @@ import { logOut } from "@/app/auth/actions";
 import { NavBar } from "@/components/NavBar";
 import { PublicTabBar } from "@/components/PublicTabBar";
 import { Button, ButtonLink } from "@/components/ui/button";
-import { hasSessionCookie } from "@/lib/auth";
+import { getHeaderAccount, type HeaderAccount } from "@/lib/auth";
+import { DINER_LINKS, ownerLinks } from "@/lib/owner-nav";
 
-const LINKS = [
-  { href: "/discover", label: "Discover" },
-  { href: "/places", label: "Nearby" },
-  { href: "/scan", label: "Scan a menu" },
-  { href: "/my", label: "My Carte" },
-];
+type PublicHeaderProps = {
+  /** Pass the account when the page already has it, to skip looking it up again. */
+  account?: HeaderAccount | null;
+};
 
-/** The same site for everyone; signed-in owners also get a way back to their dashboard. */
-export async function PublicHeader() {
-  const signedIn = await hasSessionCookie();
+/**
+ * The header on every page. Everyone sees the same links; signed-in owners also get their
+ * restaurant pages under "My restaurant", plus Log out instead of Log in and Sign up.
+ */
+export async function PublicHeader({ account }: PublicHeaderProps = {}) {
+  const owner = account === undefined ? await getHeaderAccount() : account;
   return (
     <>
       <NavBar
         homeHref="/"
-        links={LINKS}
+        links={DINER_LINKS}
+        ownerMenu={
+          owner
+            ? { label: "My restaurant", links: ownerLinks(owner.restaurant, owner.admin) }
+            : undefined
+        }
         trailing={
-          signedIn ? (
-            <>
-              <form action={logOut}>
-                <Button type="submit" variant="ghost" size="sm">
-                  Log out
-                </Button>
-              </form>
-              <ButtonLink href="/dashboard" size="sm" shine>
-                Dashboard
-              </ButtonLink>
-            </>
+          owner ? (
+            <form action={logOut}>
+              <Button type="submit" variant="ghost" size="sm">
+                Log out
+              </Button>
+            </form>
           ) : (
             <>
               <ButtonLink href="/login" variant="ghost" size="sm">

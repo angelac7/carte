@@ -1,9 +1,11 @@
-import { OwnerHeader } from "@/components/owner/OwnerHeader";
+import { OwnerTabs } from "@/components/owner/OwnerTabs";
+import { PublicHeader } from "@/components/PublicHeader";
 import { requireUser } from "@/lib/auth";
 import { Notice } from "@/components/ui/notice";
 import { ButtonLink } from "@/components/ui/button";
 import { isCarteAdmin, listPlaceClaims } from "@/lib/db/claims";
 import { getOwnerRestaurant } from "@/lib/db";
+import { ownerLinks } from "@/lib/owner-nav";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { supabase, user } = await requireUser();
@@ -14,7 +16,8 @@ export default async function DashboardLayout({ children }: { children: React.Re
   const latestClaim = restaurant ? (await listPlaceClaims(supabase, restaurant.id))[0] : null;
   return (
     <>
-      <OwnerHeader restaurant={restaurant} admin={admin} />
+      <PublicHeader account={{ restaurant, admin }} />
+      <OwnerTabs links={ownerLinks(restaurant, admin)} />
       {latestClaim && ["approved", "rejected", "transferred"].includes(latestClaim.status) && (
         <div className="mx-auto max-w-5xl px-5 pt-5">
           <Notice tone={latestClaim.status === "approved" ? "success" : "warning"}>
@@ -25,7 +28,8 @@ export default async function DashboardLayout({ children }: { children: React.Re
           </Notice>
         </div>
       )}
-      {children}
+      {/* Room for the phone tab bar, which is on every page. */}
+      <div className="pb-28 md:pb-0">{children}</div>
     </>
   );
 }

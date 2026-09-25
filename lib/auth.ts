@@ -3,6 +3,7 @@ import { safeNextPath } from "@/lib/safe-redirect";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { getOwnerRestaurant } from "@/lib/db";
+import { isCarteAdmin } from "@/lib/db/claims";
 import { createClient } from "@/lib/supabase/server";
 
 /** For owner pages: sends signed-out visitors to the login page. */
@@ -51,4 +52,24 @@ export async function redirectIfSignedIn(next = "/dashboard") {
 export async function hasSessionCookie(): Promise<boolean> {
   const store = await cookies();
   return store.getAll().some((cookie) => /^sb-.+-auth-token(\.\d+)?$/.test(cookie.name));
+}
+
+export type HeaderAccount = { restaurant: { name: string; slug: string } | null; admin: boolean };
+
+/**
+ * The signed-in owner's restaurant and admin status for the header, or null when signed out.
+ * Visitors without a session cookie skip every network call, so public pages stay fast.
+ */
+export async function getHeaderAccount(): Promise<HeaderAccount | null> {
+  if (!(await hasSessionCookie())) return null;
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return null;
+  const [restaurant, admin] = await Promise.all([
+    getOwnerRestaurant(supabase, user.id),
+    isCarteAdmin(supabase).catch(() => false),
+  ]);
+  return { restaurant, admin };
 }
