@@ -31,8 +31,32 @@ export function signupErrorMessage(error: AuthFailure): string {
   return "Your account couldn't be created. Please try again. If it continues, contact the site owner.";
 }
 
+/**
+ * Deliberate public messages for login. A wrong password and an unknown email get the same
+ * message, so the form never reveals which emails have accounts.
+ */
+export function loginErrorMessage(error: AuthFailure): string {
+  switch (error.code) {
+    case "invalid_credentials":
+    case "user_not_found":
+      return "That email and password don't match an account.";
+    case "email_not_confirmed":
+      return "Confirm your email first, using the link we sent you, then log in.";
+    case "user_banned":
+      return "This account can't log in right now. Please contact the site owner.";
+    case "over_request_rate_limit":
+      return "Too many login attempts. Wait a few minutes before trying again.";
+  }
+  if (error.status === 400) return "That email and password don't match an account.";
+  if (error.status === 429)
+    return "Too many login attempts. Wait a few minutes before trying again.";
+  if (error.status === 401 || error.status === 403)
+    return "The account service configuration needs attention. Please contact the site owner.";
+  return "Carte couldn't reach the account service. Please try again in a moment.";
+}
+
 /** Only bounded machine codes and HTTP status are logged, never emails, passwords or tokens. */
-export function signupErrorDiagnostic(error: AuthFailure) {
+export function authErrorDiagnostic(error: AuthFailure) {
   return {
     code:
       typeof error.code === "string" && /^[a-z_]{1,64}$/.test(error.code) ? error.code : "unknown",

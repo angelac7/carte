@@ -2,7 +2,7 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { z } from "zod";
-import { signupErrorDiagnostic, signupErrorMessage } from "@/lib/auth-errors";
+import { loginErrorMessage, authErrorDiagnostic, signupErrorMessage } from "@/lib/auth-errors";
 import { safeNextPath } from "@/lib/safe-redirect";
 import { checkRateLimit, clientKeyFromHeaders } from "@/lib/rate-limit";
 import { createClient } from "@/lib/supabase/server";
@@ -25,7 +25,10 @@ export async function logIn(_prev: AuthState, formData: FormData): Promise<AuthS
 
   const supabase = await createClient();
   const { error } = await supabase.auth.signInWithPassword(parsed.data);
-  if (error) return { error: "That email and password don't match an account." };
+  if (error) {
+    console.error("Login failed:", authErrorDiagnostic(error));
+    return { error: loginErrorMessage(error) };
+  }
   redirect(safeNextPath(String(formData.get("next") ?? "")));
 }
 
@@ -45,7 +48,7 @@ export async function signUp(_prev: AuthState, formData: FormData): Promise<Auth
     options: { emailRedirectTo: `${origin}/auth/callback?next=${encodeURIComponent(next)}` },
   });
   if (error) {
-    console.error("Signup failed:", signupErrorDiagnostic(error));
+    console.error("Signup failed:", authErrorDiagnostic(error));
     return { error: signupErrorMessage(error) };
   }
   if (!data.session) return { message: "Check your email for a confirmation link, then log in." };
