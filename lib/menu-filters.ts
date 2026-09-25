@@ -1,4 +1,4 @@
-import type { Allergen, DietaryTag } from "@/lib/allergens";
+import { conflictingTags, type Allergen, type DietaryTag } from "@/lib/allergens";
 import type { MenuItem } from "@/types/menu";
 
 export type DinerFilters = { avoid: Allergen[]; onlyTags: DietaryTag[] };
@@ -8,7 +8,10 @@ export function confirmedOnly(dishes: MenuItem[]): MenuItem[] {
   return dishes.filter((dish) => dish.confirmed);
 }
 
-/** Hides dishes with any avoided allergen, and keeps only dishes with every selected tag. */
+/**
+ * Hides dishes with any avoided allergen, and keeps only dishes with every selected tag.
+ * A tag the dish's own allergens contradict (like vegan with fish) never counts.
+ */
 export function filterDishes<T extends Pick<MenuItem, "allergens" | "dietary_tags">>(
   dishes: T[],
   { avoid, onlyTags }: DinerFilters,
@@ -16,6 +19,9 @@ export function filterDishes<T extends Pick<MenuItem, "allergens" | "dietary_tag
   return dishes.filter(
     (dish) =>
       !dish.allergens.some((allergen) => avoid.includes(allergen)) &&
-      onlyTags.every((tag) => dish.dietary_tags.includes(tag)),
+      onlyTags.every(
+        (tag) =>
+          dish.dietary_tags.includes(tag) && conflictingTags(dish.allergens, [tag]).length === 0,
+      ),
   );
 }

@@ -4,6 +4,7 @@ import { getOwnerContext } from "@/lib/auth";
 import { addDishes, deleteAllDishes, deleteDish, listDishes, updateDish } from "@/lib/db";
 import { getDishPhoto } from "@/lib/db/photos";
 import { deleteStoredPhoto } from "@/lib/storage/dish-photos";
+import { tagConflictMessages } from "@/lib/tag-conflicts";
 import { ExtractedDishSchema, MenuItemSchema } from "@/types/menu";
 
 const SaveRequest = z.object({ items: z.array(ExtractedDishSchema).max(300) });
@@ -45,6 +46,9 @@ export async function PUT(req: Request) {
     await req.json().catch(() => null),
   );
   if (!parsed.success) return fail("That dish was not in the expected format.");
+  // A contradicted diet tag (like vegan with eggs) would mislead diners, so it can't be confirmed.
+  const conflicts = tagConflictMessages(parsed.data.allergens, parsed.data.dietary_tags);
+  if (parsed.data.confirmed && conflicts.length > 0) return fail(conflicts.join(" "));
   const updated = await updateDish(owner.supabase, owner.restaurant.id, parsed.data);
   if (!updated)
     return fail(

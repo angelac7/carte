@@ -1,5 +1,11 @@
 import { z } from "zod";
-import { ALLERGENS, DIETARY_TAGS, isAiSuggestedTag, isAllergen } from "@/lib/allergens";
+import {
+  ALLERGENS,
+  conflictingTags,
+  DIETARY_TAGS,
+  isAiSuggestedTag,
+  isAllergen,
+} from "@/lib/allergens";
 
 export const SourceLanguageSchema = z
   .string()
@@ -22,15 +28,26 @@ const tagList = z
   .nullish()
   .transform((list) => (list ?? []).filter(isAiSuggestedTag));
 
-/** A dish as the AI read it from a menu photo. Allergens are suggestions, not confirmed. */
-export const ExtractedDishSchema = z.object({
-  source_language: SourceLanguageSchema.optional(),
-  name: text,
-  description: text,
-  price: text,
-  likely_allergens: allergenList,
-  dietary_tags: tagList,
-});
+/**
+ * A dish as the AI read it from a menu photo. Allergens are suggestions, not confirmed.
+ * Suggested diet tags that its own allergens contradict (like vegan with eggs) are dropped.
+ */
+export const ExtractedDishSchema = z
+  .object({
+    source_language: SourceLanguageSchema.optional(),
+    name: text,
+    description: text,
+    price: text,
+    likely_allergens: allergenList,
+    dietary_tags: tagList,
+  })
+  .transform((dish) => {
+    const contradicted = conflictingTags(dish.likely_allergens, dish.dietary_tags);
+    return {
+      ...dish,
+      dietary_tags: dish.dietary_tags.filter((tag) => !contradicted.includes(tag)),
+    };
+  });
 
 export const ExtractedMenuSchema = z.object({
   items: z
