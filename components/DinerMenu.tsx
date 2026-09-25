@@ -529,7 +529,7 @@ export function DinerMenu({
             </span>
             <span
               aria-hidden="true"
-              className="ms-auto text-2xl transition-transform duration-200 group-hover:translate-x-1"
+              className="ms-auto text-2xl transition-transform duration-200 group-hover:translate-x-1 rtl:-scale-x-100 rtl:group-hover:-translate-x-1"
             >
               →
             </span>

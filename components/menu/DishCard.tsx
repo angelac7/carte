@@ -154,7 +154,7 @@ export function DishCard({
           aria-hidden="true"
           className="mt-3 text-sm font-medium text-accent transition-transform duration-200 group-hover:translate-x-0.5"
         >
-          {explainLabel} →
+          {explainLabel} <span className="inline-block rtl:-scale-x-100">→</span>
         </p>
 
         <div className="mt-4 flex flex-wrap items-center gap-2 text-xs">

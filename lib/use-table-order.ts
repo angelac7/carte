@@ -11,7 +11,7 @@ function showCodeInAddress(code: string | null) {
   const url = new URL(window.location.href);
   if (code) url.searchParams.set("table", code);
   else url.searchParams.delete("table");
-  window.history.replaceState(null, "", url);
+  window.history.replaceState(null, "", url.toString());
 }
 
 /**
