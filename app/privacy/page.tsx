@@ -42,6 +42,12 @@ export default function PrivacyPage() {
           dish&apos;s count for the day. The count says nothing about who you are.
         </li>
         <li>
+          <strong>What diners look for.</strong> When you use allergy or diet filters on a menu, or
+          search for something it doesn&apos;t have, we add one to that restaurant&apos;s daily
+          totals, once per visit. The restaurant sees only the totals, and a search appears only
+          after more than one visit looks for it.
+        </li>
+        <li>
           <strong>Reports.</strong> If you report a problem with a dish, we keep the dish, the kind
           of problem, and any words you type, so the restaurant can fix it. We ask you not to
           include your name or contact details.

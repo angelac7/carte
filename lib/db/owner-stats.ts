@@ -39,3 +39,25 @@ export async function getDailyViews(
     views: Number(row.views),
   }));
 }
+
+export type DinerInterest = {
+  kind: "avoid" | "diet" | "missed_search";
+  value: string;
+  uses: number;
+};
+
+/** What diners filtered for and searched without finding, over the last month. */
+export async function getDinerInterest(
+  supabase: SupabaseClient,
+  restaurantId: string,
+  days = 30,
+): Promise<DinerInterest[]> {
+  const { data, error } = await supabase.rpc("restaurant_diner_interest", {
+    restaurant: restaurantId,
+    days,
+  });
+  if (error) throw error;
+  return (
+    (data ?? []) as { kind: DinerInterest["kind"]; value: string; uses: number | string }[]
+  ).map((row) => ({ kind: row.kind, value: row.value, uses: Number(row.uses) }));
+}

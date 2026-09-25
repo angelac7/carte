@@ -263,6 +263,29 @@ export async function setTableLine(code: string, line: string, quantity: number)
   return (await tableRequest<{ lines: TableLines }>({ method: "PUT", body })).lines;
 }
 
+/**
+ * Counts what diners look for, once per visit for each filter set or missed search, so owners
+ * know what to add. Anonymous totals only; failures are ignored.
+ */
+export function noteDinerInterest(
+  restaurantSlug: string,
+  interest: { avoid?: string[]; diets?: string[]; missed?: string },
+): void {
+  const key = `carte-interest:${restaurantSlug}:${JSON.stringify(interest)}`;
+  try {
+    if (sessionStorage.getItem(key)) return;
+    sessionStorage.setItem(key, "1");
+  } catch {
+    /* Without session storage, still count it; the server limits how often. */
+  }
+  fetch("/api/interest", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ restaurant: restaurantSlug, ...interest }),
+    keepalive: true,
+  }).catch(() => {});
+}
+
 /** Asks for a taste profile built from the diner's own ratings and saved dishes. */
 export async function requestTasteProfile(request: TasteRequest): Promise<TasteProfile> {
   const res = await fetch("/api/taste", {

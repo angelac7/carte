@@ -29,7 +29,13 @@ import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Notice } from "@/components/ui/notice";
 import { uncheckedAllergens, type Allergen, type DietaryTag } from "@/lib/allergens";
-import { fetchSummaries, fetchTranslations, trackDishView } from "@/lib/api-client";
+import {
+  fetchSummaries,
+  fetchTranslations,
+  noteDinerInterest,
+  trackDishView,
+} from "@/lib/api-client";
+import { normalizeSearch } from "@/lib/diner-interest";
 import { useOffline } from "@/lib/use-offline";
 import { useTableOrder } from "@/lib/use-table-order";
 import { useDinerPrefs } from "@/lib/use-diner-prefs";
@@ -185,6 +191,20 @@ export function DinerMenu({
       .catch(() => {});
   }, [language, restaurant.slug]);
 
+  // Tell the restaurant, anonymously, which allergies and diets diners filter for.
+  useEffect(() => {
+    if (avoid.length === 0 && onlyTags.length === 0) return;
+    const timer = setTimeout(
+      () =>
+        noteDinerInterest(restaurant.slug, {
+          avoid: [...avoid].sort(),
+          diets: [...onlyTags].sort(),
+        }),
+      3000,
+    );
+    return () => clearTimeout(timer);
+  }, [avoid, onlyTags, restaurant.slug]);
+
   // Larger text and high contrast apply to the whole page while this menu is open.
   useEffect(() => {
     applyDisplay(display);
@@ -293,6 +313,22 @@ export function DinerMenu({
     const text = textFor(dish);
     return matchesSearch([text.name, dish.name, text.description, text.notes], query);
   });
+  // A search nothing on the menu matches, whatever the filters, tells the owner what's missing.
+  const missedSearch =
+    query.length >= 3 &&
+    !dishes.some((dish) => {
+      const text = textFor(dish);
+      return matchesSearch([text.name, dish.name, text.description, text.notes], query);
+    });
+  useEffect(() => {
+    if (!missedSearch) return;
+    const timer = setTimeout(
+      () => noteDinerInterest(restaurant.slug, { missed: normalizeSearch(query) }),
+      2000,
+    );
+    return () => clearTimeout(timer);
+  }, [missedSearch, query, restaurant.slug]);
+
   // Specials first, then menu headings in the owner's order. A search keeps the same grouping.
   const specials = listed.filter((dish) => dish.special);
   const groups = [
