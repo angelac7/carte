@@ -61,6 +61,14 @@ export function SiteFooter() {
           Allergen information on Carte menus is confirmed by each restaurant. Kitchens share
           equipment and recipes change, so always tell your server about allergies.
         </p>
+        <nav aria-label="Legal" className="mt-4 flex gap-5 text-xs">
+          <Link href="/privacy" className={linkClass}>
+            Privacy policy
+          </Link>
+          <Link href="/terms" className={linkClass}>
+            Terms of use
+          </Link>
+        </nav>
       </div>
     </footer>
   );

@@ -86,6 +86,19 @@ export function AuthForm({
           {pending ? "One moment…" : copy.submit}
         </Button>
       </form>
+      {mode === "signup" && (
+        <p className="mt-4 text-sm text-muted">
+          By creating an account, you agree to the{" "}
+          <Link href="/terms" className="text-ink underline underline-offset-4">
+            terms of use
+          </Link>{" "}
+          and{" "}
+          <Link href="/privacy" className="text-ink underline underline-offset-4">
+            privacy policy
+          </Link>
+          .
+        </p>
+      )}
       {mode === "login" && (
         <Link href="/forgot-password" className="mt-4 inline-block text-sm underline">
           Forgot your password?

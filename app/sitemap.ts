@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 
-const PUBLIC_PAGES = ["", "/discover", "/places", "/scan", "/signup"];
+const PUBLIC_PAGES = ["", "/discover", "/places", "/scan", "/signup", "/privacy", "/terms"];
 
 /** Public pages, plus every menu its owner chose to show on Discover. */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {

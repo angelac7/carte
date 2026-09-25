@@ -77,12 +77,14 @@ export function NavBar({ homeHref, links, trailing }: NavBarProps) {
               stroke="currentColor"
               strokeWidth="2"
               strokeLinecap="round"
+              initial={false}
               animate={{ d: open ? "M6 6 L18 18" : "M4 7 L20 7" }}
             />
             <motion.path
               stroke="currentColor"
               strokeWidth="2"
               strokeLinecap="round"
+              initial={false}
               animate={{ d: open ? "M6 18 L18 6" : "M4 17 L20 17" }}
             />
           </svg>
