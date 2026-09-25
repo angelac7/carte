@@ -3,11 +3,16 @@ import { z } from "zod";
 import { getOwnerContext } from "@/lib/auth";
 import { addDishes, deleteAllDishes, deleteDish, listDishes, updateDish } from "@/lib/db";
 import { getDishPhoto } from "@/lib/db/photos";
+import { withoutDuplicates } from "@/lib/menu-dedupe";
 import { deleteStoredPhoto } from "@/lib/storage/dish-photos";
 import { tagConflictMessages } from "@/lib/tag-conflicts";
 import { ExtractedDishSchema, MenuItemSchema } from "@/types/menu";
 
-const SaveRequest = z.object({ items: z.array(ExtractedDishSchema).max(300) });
+const SaveRequest = z.object({
+  items: z.array(ExtractedDishSchema).max(300),
+  // Menu uploads skip dishes already on the menu; dishes added by hand never do.
+  skipExisting: z.boolean().optional(),
+});
 const Version = z.number().int().positive();
 const DeleteRequest = z.union([
   z.object({ id: z.uuid(), revision: Version }),
@@ -29,13 +34,23 @@ export async function GET() {
   return NextResponse.json(await listDishes(owner.supabase, owner.restaurant.id));
 }
 
-/** Saves dishes from a menu scan or added by hand. New dishes always start unconfirmed. */
+/**
+ * Saves dishes from a menu scan or added by hand, and returns the dishes actually added.
+ * New dishes always start unconfirmed.
+ */
 export async function POST(req: Request) {
   const owner = await getOwnerContext();
   if (!owner) return fail(LOGIN_REQUIRED, 401);
   const parsed = SaveRequest.safeParse(await req.json().catch(() => null));
   if (!parsed.success) return fail("The dishes to save were not in the expected format.");
-  return NextResponse.json(await addDishes(owner.supabase, owner.restaurant.id, parsed.data.items));
+  const { items, skipExisting } = parsed.data;
+  const toAdd = skipExisting
+    ? withoutDuplicates(
+        (await listDishes(owner.supabase, owner.restaurant.id)).map((dish) => dish.name),
+        items,
+      )
+    : items;
+  return NextResponse.json(await addDishes(owner.supabase, owner.restaurant.id, toAdd));
 }
 
 /** Updates one dish's details, allergens, tags, notes, or confirmation. */

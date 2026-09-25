@@ -69,7 +69,7 @@ it("blocks new menu uploads while the previous menu saves", async () => {
   vi.mocked(saveDishes).mockImplementation(
     () =>
       new Promise((resolve) => {
-        finish = () => resolve([]);
+        finish = () => resolve([{ id: "soup", name: "Soup" }] as never);
       }),
   );
   const { container } = render(createElement(UploadMenu));
@@ -84,8 +84,9 @@ it("blocks new menu uploads while the previous menu saves", async () => {
   });
   expect(streamMenuImage).toHaveBeenCalledTimes(1);
   await act(async () => finish());
+  expect(saveDishes).toHaveBeenCalledWith(expect.any(Array), { skipExisting: true });
   expect(
-    screen.getByText("Saved to your menu. Review each dish to confirm its allergens."),
+    screen.getByText("Saved 1 dish to your menu. Review each one to confirm its allergens."),
   ).toBeDefined();
 });
 it("keeps diary edits open and explains a failed device save", () => {

@@ -13,10 +13,21 @@ import type { ExtractedDish } from "@/types/menu";
 
 type Status = "idle" | "reading" | "ready" | "saving" | "saved" | "error";
 
+function savedMessage(added: number, read: number): string {
+  const skipped = read - added;
+  if (added === 0)
+    return "Every one of these dishes is already on your menu, so nothing new was added.";
+  const saved = `Saved ${added} ${added === 1 ? "dish" : "dishes"} to your menu. Review each one to confirm its allergens.`;
+  return skipped > 0
+    ? `${saved} ${skipped} ${skipped === 1 ? "was" : "were"} already on your menu, so ${skipped === 1 ? "it wasn’t" : "they weren’t"} added again.`
+    : saved;
+}
+
 export default function UploadPage() {
   const [dishes, setDishes] = useState<ExtractedDish[]>([]);
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState("");
+  const [addedCount, setAddedCount] = useState(0);
   const [fileName, setFileName] = useState("");
   const [dragging, setDragging] = useState(false);
   const pending = useRef(false);
@@ -53,7 +64,9 @@ export default function UploadPage() {
     pending.current = true;
     setStatus("saving");
     try {
-      await saveDishes(dishes);
+      // Skip dishes already on the menu, so uploading the same menu twice doesn't double it.
+      const added = await saveDishes(dishes, { skipExisting: true });
+      setAddedCount(added.length);
       setStatus("saved");
     } catch {
       setStatus("error");
@@ -160,7 +173,7 @@ export default function UploadPage() {
 
           {status === "saved" && (
             <Notice tone="success" className="mt-4">
-              Saved to your menu. Review each dish to confirm its allergens.
+              {savedMessage(addedCount, dishes.length)}
             </Notice>
           )}
 

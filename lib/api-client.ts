@@ -43,7 +43,9 @@ export async function fetchDishes(): Promise<MenuItem[]> {
   return res.json() as Promise<MenuItem[]>;
 }
 
-export const saveDishes = (items: ExtractedDish[]) => sendToItems<MenuItem[]>("POST", { items });
+/** Saves dishes and returns the ones added. With `skipExisting`, dishes already on the menu are left out. */
+export const saveDishes = (items: ExtractedDish[], options: { skipExisting?: boolean } = {}) =>
+  sendToItems<MenuItem[]>("POST", { items, ...options });
 export const updateDish = (dish: MenuItem) => sendToItems<MenuItem>("PUT", dish);
 export const deleteDish = (id: string, revision?: number) =>
   sendToItems<{ ok: boolean }>("DELETE", { id, revision });
