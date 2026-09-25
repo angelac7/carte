@@ -5,6 +5,8 @@ const PRESSED = {
 
 type ToggleChipProps = {
   label: string;
+  /** A fuller name for screen readers, when the same label appears in more than one group. */
+  ariaLabel?: string;
   pressed: boolean;
   tone: keyof typeof PRESSED;
   onToggle: () => void;
@@ -14,10 +16,11 @@ type ToggleChipProps = {
  * A pill button that switches on and off, used for allergens and tags.
  * Off is raised from the clay; on is filled and pressed in, so the state never relies on shadow alone.
  */
-export function ToggleChip({ label, pressed, tone, onToggle }: ToggleChipProps) {
+export function ToggleChip({ label, ariaLabel, pressed, tone, onToggle }: ToggleChipProps) {
   return (
     <button
       type="button"
+      aria-label={ariaLabel}
       aria-pressed={pressed}
       onClick={onToggle}
       className={`rounded-full px-4 py-2.5 text-sm font-medium transition-[box-shadow,background-color,color,transform] duration-200 ease-out active:translate-y-px ${

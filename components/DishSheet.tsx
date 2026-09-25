@@ -2,7 +2,9 @@
 import Image from "next/image";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Chip } from "@/components/Chip";
-import { allergensChecked } from "@/lib/allergens";
+import { allergensChecked, type Allergen } from "@/lib/allergens";
+import { formatList } from "@/lib/format-list";
+import { mustLeaveOut, tracesOf } from "@/lib/menu-filters";
 import { ReportDish } from "@/components/ReportDish";
 import { Sheet } from "@/components/Sheet";
 import { fetchInsight } from "@/lib/api-client";
@@ -16,6 +18,8 @@ import type { DishText, MenuItem } from "@/types/menu";
 type DishSheetProps = {
   dish: MenuItem;
   text: DishText;
+  /** The diner's avoided allergens, to say what to leave out or watch for. */
+  avoid?: Allergen[];
   language: LanguageCode;
   restaurantSlug: string;
   /** Called once the explanation arrives, so the menu can show its summary too. */
@@ -69,6 +73,7 @@ function List({ items }: { items: string[] }) {
 export function DishSheet({
   dish,
   text,
+  avoid = [],
   language,
   restaurantSlug,
   onExplained,
@@ -170,6 +175,42 @@ export function DishSheet({
           <Chip key={tag} label={d.tags[tag]} tone="tag" />
         ))}
       </div>
+      {(dish.removable?.length ?? 0) > 0 && (
+        <div className="mt-2 flex flex-wrap items-center gap-2 text-xs">
+          <span className="eyebrow text-muted">{d.canBeWithout}</span>
+          {dish.removable!.map((allergen) => (
+            <Chip key={allergen} label={d.allergens[allergen]} tone="allergen" />
+          ))}
+        </div>
+      )}
+      {(dish.may_contain?.length ?? 0) > 0 && (
+        <div className="mt-2 flex flex-wrap items-center gap-2 text-xs">
+          <span className="eyebrow text-muted">{d.mayContain}</span>
+          {dish.may_contain!.map((allergen) => (
+            <Chip key={allergen} label={d.allergens[allergen]} tone="allergen" />
+          ))}
+        </div>
+      )}
+      {mustLeaveOut(dish, avoid).length > 0 && (
+        <p className="mt-3 rounded-control border border-saffron/40 bg-saffron-soft px-3 py-2 text-sm font-medium text-saffron-ink">
+          {d.askWithout(
+            formatList(
+              mustLeaveOut(dish, avoid).map((allergen) => d.allergens[allergen]),
+              language,
+            ),
+          )}
+        </p>
+      )}
+      {tracesOf(dish, avoid).length > 0 && (
+        <p className="mt-3 rounded-control border border-tomato/40 bg-tomato/10 px-3 py-2 text-sm font-medium text-tomato">
+          {d.tracesWarning(
+            formatList(
+              tracesOf(dish, avoid).map((allergen) => d.allergens[allergen]),
+              language,
+            ),
+          )}
+        </p>
+      )}
       {text.notes && (
         <p className="mt-2 text-sm leading-relaxed">
           <span className="font-medium">{d.kitchenNote}</span> {text.notes}

@@ -13,6 +13,9 @@ type FilterSheetProps = {
   onlyTags: DietaryTag[];
   /** How many dishes the current filters leave, so the button can say so. */
   shownCount: number;
+  /** Also hide dishes that may contain traces of an avoided allergen. */
+  hideTraces: boolean;
+  onHideTraces: (hideTraces: boolean) => void;
   onChange: (avoid: Allergen[], onlyTags: DietaryTag[]) => void;
   onClose: () => void;
 };
@@ -24,6 +27,8 @@ export function FilterSheet({
   avoid,
   onlyTags,
   shownCount,
+  hideTraces,
+  onHideTraces,
   onChange,
   onClose,
 }: FilterSheetProps) {
@@ -43,6 +48,19 @@ export function FilterSheet({
           ))}
         </div>
       </fieldset>
+
+      <label className="mt-5 flex cursor-pointer items-start gap-3 rounded-control p-4 shadow-pressed-sm">
+        <input
+          type="checkbox"
+          checked={hideTraces}
+          onChange={(event) => onHideTraces(event.target.checked)}
+          className="mt-0.5 h-5 w-5 shrink-0 accent-accent"
+        />
+        <span>
+          <span className="block text-sm font-medium">{t.hideTraces}</span>
+          <span className="mt-0.5 block text-xs text-muted">{t.hideTracesHint}</span>
+        </span>
+      </label>
 
       <fieldset className="mt-7">
         <legend className="eyebrow text-muted">{t.showOnly}</legend>

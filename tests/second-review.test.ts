@@ -24,7 +24,8 @@ import { prepareChatHistory } from "@/lib/chat-history";
 import { ChatRequestSchema } from "@/types/chat";
 import { splitBill } from "@/lib/bill";
 import { GET } from "@/app/discover/filters/route";
-import { parsePrefs, PREFS_COOKIE } from "@/lib/diner-prefs";
+import { EMPTY_PREFS, parsePrefs, PREFS_COOKIE, serializePrefs } from "@/lib/diner-prefs";
+import { NextRequest } from "next/server";
 import { safeNextPath } from "@/lib/safe-redirect";
 it("refuses foreign photo deletion, including another tenant and encoded paths", async () => {
   for (const url of [
@@ -68,12 +69,21 @@ it("allocates every cent and makes tax, tip and total agree", () => {
   ).toEqual({ A: 3.34, B: 3.33, C: 3.33 });
 });
 it("persists validated Discover filters before opening results", () => {
+  // A trace setting chosen on a menu survives choosing filters on Discover.
   const response = GET(
-    new Request("https://carte.test/discover/filters?avoid=milk&avoid=invalid&tag=vegan&q=salad"),
+    new NextRequest(
+      "https://carte.test/discover/filters?avoid=milk&avoid=invalid&tag=vegan&q=salad",
+      {
+        headers: {
+          cookie: `${PREFS_COOKIE}=${serializePrefs({ ...EMPTY_PREFS, hideTraces: true })}`,
+        },
+      },
+    ),
   );
   expect(parsePrefs(response.cookies.get(PREFS_COOKIE)?.value)).toEqual({
     avoid: ["milk"],
     onlyTags: ["vegan"],
+    hideTraces: true,
   });
   expect(response.headers.get("location")).toContain("/discover?");
 });

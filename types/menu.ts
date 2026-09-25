@@ -96,6 +96,10 @@ export const MenuItemSchema = z.object({
   sold_out_on: z.string().nullable().optional(),
   /** Shown with the specials at the top of the menu. */
   special: z.boolean().optional(),
+  /** Allergens in the dish the kitchen can leave out on request. */
+  removable: z.array(z.enum(ALLERGENS)).max(ALLERGENS.length).optional(),
+  /** Allergens not in the recipe that may get in, like through a shared fryer. */
+  may_contain: z.array(z.enum(ALLERGENS)).max(ALLERGENS.length).optional(),
   /** Which allergen list the owner checked when confirming: 1 was the original 9, 2 is all 14. */
   allergen_list: z.number().int().min(1).max(2).optional(),
   sizes: z.array(DishSizeSchema).max(8).optional(),

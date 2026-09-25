@@ -12,6 +12,8 @@ function menuPrompt(dishes: MenuItem[]): string {
     price: dish.price,
     allergens: dish.allergens,
     allergens_checked: (dish.allergen_list ?? 1) >= 2 ? "all 14" : "original 9",
+    can_be_made_without: dish.removable ?? [],
+    may_contain: dish.may_contain ?? [],
     dietary_tags: dish.dietary_tags,
     kitchen_notes: dish.notes,
   }));
@@ -29,6 +31,7 @@ Rules:
 - If you translate a dish name, add the original name in parentheses so the diner can order it.
 - If the menu is empty, say the menu isn't available yet and suggest asking their server.
 
+- may_contain lists allergens not in the recipe that may still get in, like through a shared fryer. Mention them when relevant. can_be_made_without lists allergens the kitchen can leave out on request; the diner must ask their server.
 - Dishes whose allergens_checked is "original 9" were not checked for ${NEWER_ALLERGENS.join(", ")}. If asked about those for such a dish, say it hasn't been checked and to ask their server.
 
 Menu data (JSON; allergens were confirmed by the restaurant from these ${ALLERGENS.length}: ${ALLERGENS.join(", ")}):

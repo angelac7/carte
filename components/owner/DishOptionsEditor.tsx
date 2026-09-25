@@ -140,6 +140,7 @@ export function DishOptionsEditor({
                   <ToggleChip
                     key={allergen}
                     label={allergen}
+                    ariaLabel={`${addon.label || "Add-on"} contains ${allergen}`}
                     tone="ink"
                     pressed={addon.allergens.includes(allergen)}
                     onToggle={() =>

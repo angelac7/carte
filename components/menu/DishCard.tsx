@@ -1,7 +1,9 @@
 "use client";
 import Image from "next/image";
 import { Chip } from "@/components/Chip";
-import { allergensChecked } from "@/lib/allergens";
+import { allergensChecked, type Allergen } from "@/lib/allergens";
+import { formatList } from "@/lib/format-list";
+import { mustLeaveOut, tracesOf } from "@/lib/menu-filters";
 import { DishActions } from "@/components/DishActions";
 import { SparkleIcon } from "@/components/icons";
 import { QuantityStepper } from "@/components/QuantityStepper";
@@ -22,6 +24,8 @@ type DishCardProps = {
   /** Its daily serving window, like "Served 11:00–15:00", if it has one. */
   servingWindow?: string;
   t: DinerStrings;
+  /** The diner's avoided allergens, to say what to leave out or watch for. */
+  avoid?: Allergen[];
   detailsLabel: string;
   explainLabel: string;
   stepperLabels: { add: string; increase: string; decrease: string };
@@ -46,6 +50,7 @@ export function DishCard({
   availability = "available",
   servingWindow = "",
   t,
+  avoid = [],
   detailsLabel,
   explainLabel,
   stepperLabels,
@@ -147,6 +152,34 @@ export function DishCard({
             </span>
           )}
         </div>
+        {(dish.may_contain?.length ?? 0) > 0 && (
+          <div className="mt-2 flex flex-wrap items-center gap-2 text-xs">
+            <span className="eyebrow text-muted">{t.mayContain}</span>
+            {dish.may_contain!.map((allergen) => (
+              <Chip key={allergen} label={t.allergens[allergen]} tone="allergen" />
+            ))}
+          </div>
+        )}
+        {mustLeaveOut(dish, avoid).length > 0 && (
+          <p className="mt-3 rounded-control border border-saffron/40 bg-saffron-soft px-3 py-2 text-sm font-medium text-saffron-ink">
+            {t.askWithout(
+              formatList(
+                mustLeaveOut(dish, avoid).map((allergen) => t.allergens[allergen]),
+                language,
+              ),
+            )}
+          </p>
+        )}
+        {tracesOf(dish, avoid).length > 0 && (
+          <p className="mt-3 rounded-control border border-tomato/40 bg-tomato/10 px-3 py-2 text-sm font-medium text-tomato">
+            {t.tracesWarning(
+              formatList(
+                tracesOf(dish, avoid).map((allergen) => t.allergens[allergen]),
+                language,
+              ),
+            )}
+          </p>
+        )}
         {dish.dietary_tags.length > 0 && (
           <div className="mt-2 flex flex-wrap gap-2 text-xs">
             {dish.dietary_tags.map((tag) => (

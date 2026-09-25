@@ -55,10 +55,10 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 it("uses current device preferences instead of cached menu HTML", () => {
-  writePrefsCookie({ avoid: ["milk"], onlyTags: ["vegan"] });
+  writePrefsCookie({ avoid: ["milk"], onlyTags: ["vegan"], hideTraces: true });
   const { result } = renderHook(() => useDinerPrefs(EMPTY_PREFS));
-  expect(result.current[0]).toEqual({ avoid: ["milk"], onlyTags: ["vegan"] });
-  act(() => writePrefsCookie({ avoid: ["eggs"], onlyTags: [] }));
+  expect(result.current[0]).toEqual({ avoid: ["milk"], onlyTags: ["vegan"], hideTraces: true });
+  act(() => writePrefsCookie({ avoid: ["eggs"], onlyTags: [], hideTraces: false }));
   expect(result.current[0].avoid).toEqual(["eggs"]);
 });
 it("blocks new menu uploads while the previous menu saves", async () => {

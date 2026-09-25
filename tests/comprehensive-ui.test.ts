@@ -106,7 +106,7 @@ it("excludes an ordered dish after allergy preferences change", async () => {
     }),
   );
   fireEvent.click(screen.getByRole("button", { name: TABLE_STRINGS.en.add }));
-  act(() => writePrefsCookie({ avoid: ["milk"], onlyTags: [] }));
+  act(() => writePrefsCookie({ avoid: ["milk"], onlyTags: [], hideTraces: false }));
   fireEvent.click(
     screen.getByRole("button", { name: new RegExp(`^${DOCK_STRINGS.en.order}( [0-9]+)?$`, "i") }),
   );

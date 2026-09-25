@@ -339,8 +339,23 @@ export default function ReviewDishes({ timezone }: { timezone: string }) {
   }
 
   // Lock the dish while saving so whole-dish writes cannot arrive out of order.
-  const toggleAllergen = (dish: MenuItem, allergen: Allergen) =>
-    save({ ...dish, allergens: toggleValue(dish.allergens, allergen), confirmed: false });
+  // A dish's own allergens, what can be left out, and what may get in stay consistent.
+  const toggleAllergen = (dish: MenuItem, allergen: Allergen) => {
+    const allergens = toggleValue(dish.allergens, allergen);
+    return save({
+      ...dish,
+      allergens,
+      removable: (dish.removable ?? []).filter((a) => allergens.includes(a)),
+      may_contain: (dish.may_contain ?? []).filter((a) => !allergens.includes(a)),
+      confirmed: false,
+    });
+  };
+
+  const toggleRemovable = (dish: MenuItem, allergen: Allergen) =>
+    save({ ...dish, removable: toggleValue(dish.removable ?? [], allergen), confirmed: false });
+
+  const toggleMayContain = (dish: MenuItem, allergen: Allergen) =>
+    save({ ...dish, may_contain: toggleValue(dish.may_contain ?? [], allergen), confirmed: false });
 
   const toggleTag = (dish: MenuItem, tag: DietaryTag) =>
     save({ ...dish, dietary_tags: toggleValue(dish.dietary_tags, tag), confirmed: false });
@@ -769,6 +784,64 @@ export default function ReviewDishes({ timezone }: { timezone: string }) {
                                     tone="ink"
                                     pressed={dish.allergens.includes(allergen)}
                                     onToggle={() => toggleAllergen(dish, allergen)}
+                                  />
+                                ))}
+                              </div>
+                            </fieldset>
+
+                            {dish.allergens.length > 0 && (
+                              <fieldset className="mt-4">
+                                <legend className="eyebrow text-muted">Can be made without</legend>
+
+                                <p className="mt-1 text-xs text-muted">
+                                  Allergens the kitchen can leave out on request. Diners avoiding
+                                  only these still see the dish, with &ldquo;Ask for it
+                                  without…&rdquo;.
+                                </p>
+
+                                <div className="mt-2 flex flex-wrap gap-2">
+                                  {dish.allergens.map((allergen) => (
+                                    <ToggleChip
+                                      key={allergen}
+
+                                      label={allergen}
+
+                                      tone="ink"
+
+                                      ariaLabel={`Can leave out ${allergen}`}
+
+                                      pressed={(dish.removable ?? []).includes(allergen)}
+
+                                      onToggle={() => toggleRemovable(dish, allergen)}
+                                    />
+                                  ))}
+                                </div>
+                              </fieldset>
+                            )}
+
+                            <fieldset className="mt-4">
+                              <legend className="eyebrow text-muted">May contain</legend>
+
+                              <p className="mt-1 text-xs text-muted">
+                                Not in the recipe, but could get in, like through a shared fryer.
+                              </p>
+
+                              <div className="mt-2 flex flex-wrap gap-2">
+                                {ALLERGENS.filter(
+                                  (allergen) => !dish.allergens.includes(allergen),
+                                ).map((allergen) => (
+                                  <ToggleChip
+                                    key={allergen}
+
+                                    label={allergen}
+
+                                    tone="ink"
+
+                                    ariaLabel={`May contain ${allergen}`}
+
+                                    pressed={(dish.may_contain ?? []).includes(allergen)}
+
+                                    onToggle={() => toggleMayContain(dish, allergen)}
                                   />
                                 ))}
                               </div>

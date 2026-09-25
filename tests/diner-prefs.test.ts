@@ -3,7 +3,11 @@ import { EMPTY_PREFS, parsePrefs, serializePrefs } from "@/lib/diner-prefs";
 
 describe("diner preferences", () => {
   it("round-trips saved filters", () => {
-    const prefs = { avoid: ["peanuts" as const, "wheat" as const], onlyTags: ["vegan" as const] };
+    const prefs = {
+      avoid: ["peanuts" as const, "wheat" as const],
+      onlyTags: ["vegan" as const],
+      hideTraces: true,
+    };
     expect(parsePrefs(serializePrefs(prefs))).toEqual(prefs);
   });
 

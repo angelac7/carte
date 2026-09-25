@@ -23,7 +23,7 @@ const props = {
   restaurant: { name: "Cafe", slug: "cafe", cuisine: "" },
   dishes: [dish],
   initialLanguage: "en" as const,
-  initialPrefs: { avoid: [], onlyTags: [] },
+  initialPrefs: { avoid: [], onlyTags: [], hideTraces: false },
   initialDisplay: DEFAULT_DISPLAY,
 };
 afterEach(() => {

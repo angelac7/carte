@@ -208,7 +208,7 @@ export function DinerMenu({
 
   // Filters are remembered on this device and applied at every Carte menu.
   function updateFilters(nextAvoid: Allergen[], nextOnlyTags: DietaryTag[]) {
-    setPrefs({ avoid: nextAvoid, onlyTags: nextOnlyTags });
+    setPrefs({ ...prefs, avoid: nextAvoid, onlyTags: nextOnlyTags });
   }
 
   function openDetails(dishId: string) {
@@ -235,7 +235,13 @@ export function DinerMenu({
     });
   }
 
-  const shown = filterDishes(dishes, { avoid, onlyTags });
+  // The menu itself shows dishes that need an allergen left out, or may contain traces, with
+  // labels saying so. AI features never get those dishes.
+  const shown = filterDishes(
+    dishes,
+    { avoid, onlyTags },
+    { allowRemovable: true, allowTraces: !prefs.hideTraces },
+  );
   // Dishes hidden only because they were never checked for an allergen this diner avoids.
   const uncheckedDishes = dishes.filter(
     (dish) =>
@@ -566,6 +572,7 @@ export function DinerMenu({
                             : ""
                         }
                         t={t}
+                        avoid={avoid}
                         detailsLabel={dishText.details}
                         explainLabel={dishText.explainLink}
                         stepperLabels={tableText}
@@ -619,6 +626,8 @@ export function DinerMenu({
           avoid={avoid}
           onlyTags={onlyTags}
           shownCount={shown.length}
+          hideTraces={prefs.hideTraces}
+          onHideTraces={(hideTraces) => setPrefs({ ...prefs, hideTraces })}
           onChange={updateFilters}
           onClose={() => setPanel(null)}
         />
@@ -628,6 +637,7 @@ export function DinerMenu({
           key={openDish.id}
           dish={openDish}
           text={textFor(openDish)}
+          avoid={avoid}
           language={language}
           restaurantSlug={restaurant.slug}
           onExplained={(insight) => rememberSummary(openDish, insight.summary)}

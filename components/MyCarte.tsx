@@ -103,7 +103,7 @@ export function MyCarte({ language, initialPrefs }: MyCarteProps) {
 
   function toggleAllergy(allergen: Allergen) {
     const next = toggleValue(avoid, allergen);
-    setPrefs({ avoid: next, onlyTags });
+    setPrefs({ ...prefs, avoid: next, onlyTags });
   }
 
   function clearAll() {

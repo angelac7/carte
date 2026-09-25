@@ -103,3 +103,26 @@ it("checks add-on allergens and asks for a fresh review when add-ons change", as
   );
   expect(salad.rows[0].confirmed).toBe(false);
 });
+
+it("keeps leave-out and may-contain lists consistent with the dish", async () => {
+  await expect(
+    db.exec(
+      `update public.menu_items set allergens = '{}', removable = array['sesame'] where id = '${ids.Cake}'`,
+    ),
+  ).rejects.toThrow(/menu_items_removable_in_dish/);
+  await expect(
+    db.exec(
+      `update public.menu_items set allergens = array['milk'], may_contain = array['milk'] where id = '${ids.Cake}'`,
+    ),
+  ).rejects.toThrow(/menu_items_may_contain_not_in_dish/);
+  await db.exec(
+    `update public.menu_items set allergens = array['milk'], confirmed = true where id = '${ids.Cake}'`,
+  );
+  await db.exec(
+    `update public.menu_items set may_contain = array['peanuts'] where id = '${ids.Cake}'`,
+  );
+  const cake = await db.query<{ confirmed: boolean }>(
+    `select confirmed from public.menu_items where id = '${ids.Cake}'`,
+  );
+  expect(cake.rows[0].confirmed).toBe(false);
+});

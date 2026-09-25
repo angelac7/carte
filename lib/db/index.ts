@@ -19,7 +19,7 @@ export type Restaurant = {
 const RESTAURANT_COLUMNS =
   "id, name, slug, cuisine, city, timezone, phone, website, reservation_url, price_range, logo_url, cover_url";
 const DISH_COLUMNS =
-  "id, name, description, price, allergens, dietary_tags, notes, confirmed, photo_url, revision, source_language, section, sort_order, sold_out_on, special, available_from, available_until, sizes, addons, allergen_list";
+  "id, name, description, price, allergens, dietary_tags, notes, confirmed, photo_url, revision, source_language, section, sort_order, sold_out_on, special, available_from, available_until, sizes, addons, allergen_list, removable, may_contain";
 
 export async function getOwnerRestaurant(
   supabase: SupabaseClient,
@@ -157,6 +157,13 @@ export async function updateDish(
       ...(dish.section !== undefined && { section: dish.section }),
       ...(dish.special !== undefined && { special: dish.special }),
       ...(dish.sizes !== undefined && { sizes: dish.sizes }),
+      // Kept consistent with the dish's own allergens, which the database also checks.
+      ...(dish.removable !== undefined && {
+        removable: dish.removable.filter((allergen) => dish.allergens.includes(allergen)),
+      }),
+      ...(dish.may_contain !== undefined && {
+        may_contain: dish.may_contain.filter((allergen) => !dish.allergens.includes(allergen)),
+      }),
       // Set only when the owner presses Confirm, never passed through from a request.
       ...(dish.allergen_list !== undefined && { allergen_list: dish.allergen_list }),
       ...(dish.addons !== undefined && { addons: dish.addons }),

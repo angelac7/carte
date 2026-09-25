@@ -56,7 +56,7 @@ export function ScanMenu({ language, initialPrefs }: ScanMenuProps) {
 
   function toggleAllergy(allergen: Allergen) {
     const next = toggleValue(avoid, allergen);
-    setPrefs({ avoid: next, onlyTags });
+    setPrefs({ ...prefs, avoid: next, onlyTags });
   }
 
   const hasDishes = Boolean(menu && menu.dishes.length > 0);

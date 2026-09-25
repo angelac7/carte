@@ -54,6 +54,12 @@ export type DinerStrings = {
   addToOrder: string;
   inOrder: (count: number) => string;
   addonBlocked: string;
+  mayContain: string;
+  canBeWithout: string;
+  askWithout: (allergens: string) => string;
+  tracesWarning: (allergens: string) => string;
+  hideTraces: string;
+  hideTracesHint: string;
   allergens: Record<Allergen, string>;
   tags: Record<DietaryTag, string>;
 };
@@ -85,6 +91,12 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     addToOrder: "Add to order",
     inOrder: (n) => (n === 1 ? "1 in your order" : `${n} in your order`),
     addonBlocked: "Contains an allergen you avoid",
+    mayContain: "May contain",
+    canBeWithout: "Can be made without",
+    askWithout: (l) => `Ask for it without ${l}`,
+    tracesWarning: (l) => `May contain traces of ${l}`,
+    hideTraces: "Also hide dishes that may contain traces",
+    hideTracesHint: "For severe allergies: hides dishes made with shared fryers or equipment.",
     menuUpdated:
       "The restaurant updated this menu. Your order and assistant results were cleared; review the current dishes before ordering.",
     refreshFailed:
@@ -170,6 +182,13 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     addToOrder: "Añadir al pedido",
     inOrder: (n) => `${n} en su pedido`,
     addonBlocked: "Contiene un alérgeno que evita",
+    mayContain: "Puede contener",
+    canBeWithout: "Se puede preparar sin",
+    askWithout: (l) => `Pídalo sin ${l}`,
+    tracesWarning: (l) => `Puede contener trazas de ${l}`,
+    hideTraces: "Ocultar también platos que puedan contener trazas",
+    hideTracesHint:
+      "Para alergias graves: oculta platos hechos con freidoras o equipos compartidos.",
     menuUpdated:
       "El restaurante actualizó el menú. Se borraron tu pedido y los resultados del asistente; revisa los platos antes de pedir.",
     refreshFailed:
@@ -255,6 +274,12 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     addToOrder: "加入订单",
     inOrder: (n) => `订单中有 ${n} 份`,
     addonBlocked: "含有您避免的过敏原",
+    mayContain: "可能含有",
+    canBeWithout: "可去除",
+    askWithout: (l) => `点餐时请要求不加${l}`,
+    tracesWarning: (l) => `可能含有微量${l}`,
+    hideTraces: "同时隐藏可能含有微量过敏原的菜品",
+    hideTracesHint: "适用于严重过敏：隐藏使用共用炸锅或设备制作的菜品。",
     menuUpdated: "餐厅更新了菜单。你的点单和助手结果已清除；点餐前请查看最新菜品。",
     refreshFailed: "无法检查菜单更新。请向工作人员确认当前菜品和过敏原。",
     offlineMenu: "离线菜单副本：菜品及过敏原信息可能已更改。请向工作人员确认当前菜单及过敏原。",
@@ -331,6 +356,12 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     addToOrder: "주문에 추가",
     inOrder: (n) => `주문에 ${n}개`,
     addonBlocked: "피하는 알레르기 성분이 들어 있음",
+    mayContain: "함유 가능",
+    canBeWithout: "빼고 만들 수 있음",
+    askWithout: (l) => `${l} 빼 달라고 요청하세요`,
+    tracesWarning: (l) => `${l} 미량 함유 가능`,
+    hideTraces: "미량 함유 가능성이 있는 요리도 숨기기",
+    hideTracesHint: "심한 알레르기용: 튀김기나 조리 도구를 함께 쓰는 요리를 숨깁니다.",
     menuUpdated:
       "식당에서 메뉴를 업데이트했습니다. 주문과 도우미 결과가 초기화되었습니다. 주문 전에 현재 메뉴를 확인하세요.",
     refreshFailed:
@@ -412,6 +443,12 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     addToOrder: "注文に追加",
     inOrder: (n) => `注文に${n}点`,
     addonBlocked: "避けているアレルゲンを含みます",
+    mayContain: "混入の可能性",
+    canBeWithout: "抜いて作れます",
+    askWithout: (l) => `${l}抜きで注文してください`,
+    tracesWarning: (l) => `${l}が微量混入している可能性があります`,
+    hideTraces: "微量混入の可能性がある料理も隠す",
+    hideTracesHint: "重いアレルギーの方向け：フライヤーや調理器具を共用する料理を隠します。",
     menuUpdated:
       "メニューが更新されました。注文とアシスタントの結果はクリアされました。注文前に現在の料理を確認してください。",
     refreshFailed:
@@ -494,6 +531,13 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     addToOrder: "Ajouter à la commande",
     inOrder: (n) => `${n} dans votre commande`,
     addonBlocked: "Contient un allergène que vous évitez",
+    mayContain: "Peut contenir",
+    canBeWithout: "Peut être préparé sans",
+    askWithout: (l) => `Demandez-le sans ${l}`,
+    tracesWarning: (l) => `Peut contenir des traces de ${l}`,
+    hideTraces: "Masquer aussi les plats pouvant contenir des traces",
+    hideTracesHint:
+      "Pour les allergies graves : masque les plats préparés avec une friteuse ou du matériel partagé.",
     menuUpdated:
       "Le restaurant a mis à jour le menu. Votre commande et les résultats de l’assistant ont été effacés. Vérifiez les plats avant de commander.",
     refreshFailed:
@@ -580,6 +624,12 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     addToOrder: "Thêm vào đơn",
     inOrder: (n) => `${n} trong đơn của bạn`,
     addonBlocked: "Có chất gây dị ứng bạn tránh",
+    mayContain: "Có thể chứa",
+    canBeWithout: "Có thể làm không có",
+    askWithout: (l) => `Hãy yêu cầu không có ${l}`,
+    tracesWarning: (l) => `Có thể chứa vết ${l}`,
+    hideTraces: "Ẩn cả món có thể chứa vết chất gây dị ứng",
+    hideTracesHint: "Dành cho dị ứng nặng: ẩn các món dùng chung chảo chiên hoặc dụng cụ.",
     menuUpdated:
       "Nhà hàng đã cập nhật thực đơn. Đơn món và kết quả trợ lý đã được xóa; hãy xem lại trước khi gọi món.",
     refreshFailed:
