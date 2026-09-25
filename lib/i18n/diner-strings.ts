@@ -60,6 +60,13 @@ export type DinerStrings = {
   tracesWarning: (allergens: string) => string;
   hideTraces: string;
   hideTracesHint: string;
+  spiceFilter: string;
+  anySpice: string;
+  /** "Not spicy", then "mild at most", then "medium at most". */
+  spiceLimits: [string, string, string];
+  priceFilter: string;
+  anyPrice: string;
+  priceUnder: (amount: string) => string;
   allergens: Record<Allergen, string>;
   tags: Record<DietaryTag, string>;
 };
@@ -97,6 +104,12 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     tracesWarning: (l) => `May contain traces of ${l}`,
     hideTraces: "Also hide dishes that may contain traces",
     hideTracesHint: "For severe allergies: hides dishes made with shared fryers or equipment.",
+    spiceFilter: "How spicy?",
+    anySpice: "Any",
+    spiceLimits: ["Not spicy", "Mild at most", "Medium at most"],
+    priceFilter: "Price",
+    anyPrice: "Any price",
+    priceUnder: (a) => `Under ${a}`,
     menuUpdated:
       "The restaurant updated this menu. Your order and assistant results were cleared; review the current dishes before ordering.",
     refreshFailed:
@@ -189,6 +202,12 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     hideTraces: "Ocultar también platos que puedan contener trazas",
     hideTracesHint:
       "Para alergias graves: oculta platos hechos con freidoras o equipos compartidos.",
+    spiceFilter: "¿Qué tan picante?",
+    anySpice: "Cualquiera",
+    spiceLimits: ["Sin picante", "Suave como máximo", "Medio como máximo"],
+    priceFilter: "Precio",
+    anyPrice: "Cualquier precio",
+    priceUnder: (a) => `Menos de ${a}`,
     menuUpdated:
       "El restaurante actualizó el menú. Se borraron tu pedido y los resultados del asistente; revisa los platos antes de pedir.",
     refreshFailed:
@@ -280,6 +299,12 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     tracesWarning: (l) => `可能含有微量${l}`,
     hideTraces: "同时隐藏可能含有微量过敏原的菜品",
     hideTracesHint: "适用于严重过敏：隐藏使用共用炸锅或设备制作的菜品。",
+    spiceFilter: "辣度？",
+    anySpice: "不限",
+    spiceLimits: ["不辣", "最多微辣", "最多中辣"],
+    priceFilter: "价格",
+    anyPrice: "不限价格",
+    priceUnder: (a) => `${a} 以下`,
     menuUpdated: "餐厅更新了菜单。你的点单和助手结果已清除；点餐前请查看最新菜品。",
     refreshFailed: "无法检查菜单更新。请向工作人员确认当前菜品和过敏原。",
     offlineMenu: "离线菜单副本：菜品及过敏原信息可能已更改。请向工作人员确认当前菜单及过敏原。",
@@ -362,6 +387,12 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     tracesWarning: (l) => `${l} 미량 함유 가능`,
     hideTraces: "미량 함유 가능성이 있는 요리도 숨기기",
     hideTracesHint: "심한 알레르기용: 튀김기나 조리 도구를 함께 쓰는 요리를 숨깁니다.",
+    spiceFilter: "얼마나 맵게?",
+    anySpice: "상관없음",
+    spiceLimits: ["안 매움", "약간 매움까지", "보통까지"],
+    priceFilter: "가격",
+    anyPrice: "가격 상관없음",
+    priceUnder: (a) => `${a} 미만`,
     menuUpdated:
       "식당에서 메뉴를 업데이트했습니다. 주문과 도우미 결과가 초기화되었습니다. 주문 전에 현재 메뉴를 확인하세요.",
     refreshFailed:
@@ -449,6 +480,12 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     tracesWarning: (l) => `${l}が微量混入している可能性があります`,
     hideTraces: "微量混入の可能性がある料理も隠す",
     hideTracesHint: "重いアレルギーの方向け：フライヤーや調理器具を共用する料理を隠します。",
+    spiceFilter: "辛さは？",
+    anySpice: "指定なし",
+    spiceLimits: ["辛くない", "ピリ辛まで", "中辛まで"],
+    priceFilter: "価格",
+    anyPrice: "価格指定なし",
+    priceUnder: (a) => `${a}未満`,
     menuUpdated:
       "メニューが更新されました。注文とアシスタントの結果はクリアされました。注文前に現在の料理を確認してください。",
     refreshFailed:
@@ -538,6 +575,12 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     hideTraces: "Masquer aussi les plats pouvant contenir des traces",
     hideTracesHint:
       "Pour les allergies graves : masque les plats préparés avec une friteuse ou du matériel partagé.",
+    spiceFilter: "Quel piquant ?",
+    anySpice: "Peu importe",
+    spiceLimits: ["Pas épicé", "Doux au maximum", "Moyen au maximum"],
+    priceFilter: "Prix",
+    anyPrice: "Tous les prix",
+    priceUnder: (a) => `Moins de ${a}`,
     menuUpdated:
       "Le restaurant a mis à jour le menu. Votre commande et les résultats de l’assistant ont été effacés. Vérifiez les plats avant de commander.",
     refreshFailed:
@@ -630,6 +673,12 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     tracesWarning: (l) => `Có thể chứa vết ${l}`,
     hideTraces: "Ẩn cả món có thể chứa vết chất gây dị ứng",
     hideTracesHint: "Dành cho dị ứng nặng: ẩn các món dùng chung chảo chiên hoặc dụng cụ.",
+    spiceFilter: "Độ cay?",
+    anySpice: "Bất kỳ",
+    spiceLimits: ["Không cay", "Tối đa cay nhẹ", "Tối đa cay vừa"],
+    priceFilter: "Giá",
+    anyPrice: "Mọi mức giá",
+    priceUnder: (a) => `Dưới ${a}`,
     menuUpdated:
       "Nhà hàng đã cập nhật thực đơn. Đơn món và kết quả trợ lý đã được xóa; hãy xem lại trước khi gọi món.",
     refreshFailed:

@@ -4,6 +4,7 @@ import { ToggleChip } from "@/components/ToggleChip";
 import { Button } from "@/components/ui/button";
 import { ALLERGENS, DIETARY_TAGS, type Allergen, type DietaryTag } from "@/lib/allergens";
 import type { DinerStrings } from "@/lib/i18n/diner-strings";
+import { formatWhole } from "@/lib/prices";
 import { toggleValue } from "@/lib/toggle-value";
 
 type FilterSheetProps = {
@@ -16,6 +17,14 @@ type FilterSheetProps = {
   /** Also hide dishes that may contain traces of an avoided allergen. */
   hideTraces: boolean;
   onHideTraces: (hideTraces: boolean) => void;
+  /** The spiciest level wanted, or undefined for any. */
+  maxSpice?: number;
+  onMaxSpice: (maxSpice: number | undefined) => void;
+  /** "Under" amounts that suit this menu's prices; empty hides the price choice. */
+  priceSteps: number[];
+  maxPrice: number | null;
+  onMaxPrice: (maxPrice: number | null) => void;
+  currency: string;
   onChange: (avoid: Allergen[], onlyTags: DietaryTag[]) => void;
   onClose: () => void;
 };
@@ -29,6 +38,12 @@ export function FilterSheet({
   shownCount,
   hideTraces,
   onHideTraces,
+  maxSpice,
+  onMaxSpice,
+  priceSteps,
+  maxPrice,
+  onMaxPrice,
+  currency,
   onChange,
   onClose,
 }: FilterSheetProps) {
@@ -76,6 +91,50 @@ export function FilterSheet({
           ))}
         </div>
       </fieldset>
+
+      <fieldset className="mt-7">
+        <legend className="eyebrow text-muted">{t.spiceFilter}</legend>
+        <div className="mt-4 flex flex-wrap gap-2.5">
+          <ToggleChip
+            label={t.anySpice}
+            tone="ink"
+            pressed={maxSpice === undefined}
+            onToggle={() => onMaxSpice(undefined)}
+          />
+          {t.spiceLimits.map((label, level) => (
+            <ToggleChip
+              key={level}
+              label={label}
+              tone="ink"
+              pressed={maxSpice === level}
+              onToggle={() => onMaxSpice(maxSpice === level ? undefined : level)}
+            />
+          ))}
+        </div>
+      </fieldset>
+
+      {priceSteps.length > 0 && (
+        <fieldset className="mt-7">
+          <legend className="eyebrow text-muted">{t.priceFilter}</legend>
+          <div className="mt-4 flex flex-wrap gap-2.5">
+            <ToggleChip
+              label={t.anyPrice}
+              tone="ink"
+              pressed={maxPrice === null}
+              onToggle={() => onMaxPrice(null)}
+            />
+            {priceSteps.map((step) => (
+              <ToggleChip
+                key={step}
+                label={t.priceUnder(formatWhole(step, currency))}
+                tone="ink"
+                pressed={maxPrice === step}
+                onToggle={() => onMaxPrice(maxPrice === step ? null : step)}
+              />
+            ))}
+          </div>
+        </fieldset>
+      )}
 
       <div className="mt-8 flex flex-wrap items-center gap-3 border-t border-ink/10 pt-6">
         <Button onClick={onClose} size="lg" className="flex-1">

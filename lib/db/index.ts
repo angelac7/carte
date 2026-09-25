@@ -19,7 +19,7 @@ export type Restaurant = {
 const RESTAURANT_COLUMNS =
   "id, name, slug, cuisine, city, timezone, phone, website, reservation_url, price_range, logo_url, cover_url";
 const DISH_COLUMNS =
-  "id, name, description, price, allergens, dietary_tags, notes, confirmed, photo_url, revision, source_language, section, sort_order, sold_out_on, special, available_from, available_until, sizes, addons, allergen_list, removable, may_contain";
+  "id, name, description, price, allergens, dietary_tags, notes, confirmed, photo_url, revision, source_language, section, sort_order, sold_out_on, special, available_from, available_until, sizes, addons, allergen_list, removable, may_contain, spice";
 
 export async function getOwnerRestaurant(
   supabase: SupabaseClient,
@@ -127,6 +127,7 @@ export async function addDishes(
     description: dish.description,
     price: dish.price,
     section: dish.section ?? "",
+    spice: dish.spice ?? null,
     sort_order: start + index,
     allergens: dish.likely_allergens,
     dietary_tags: dish.dietary_tags,
@@ -156,6 +157,7 @@ export async function updateDish(
       // Layout and availability are left alone when the edit doesn't include them.
       ...(dish.section !== undefined && { section: dish.section }),
       ...(dish.special !== undefined && { special: dish.special }),
+      ...(dish.spice !== undefined && { spice: dish.spice }),
       ...(dish.sizes !== undefined && { sizes: dish.sizes }),
       // Kept consistent with the dish's own allergens, which the database also checks.
       ...(dish.removable !== undefined && {

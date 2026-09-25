@@ -28,6 +28,14 @@ const tagList = z
   .nullish()
   .transform((list) => (list ?? []).filter(isAiSuggestedTag));
 
+/** A spice level from AI output, clamped to 0–3; anything unreadable becomes "not set". */
+const spiceGuess = z.union([z.number(), z.string(), z.null()]).transform((value) => {
+  const n = Number(value);
+  return value === null || value === "" || !Number.isFinite(n)
+    ? null
+    : Math.max(0, Math.min(3, Math.round(n)));
+});
+
 /**
  * A dish as the AI read it from a menu photo. Allergens are suggestions, not confirmed.
  * Suggested diet tags that its own allergens contradict (like vegan with eggs) are dropped.
@@ -40,6 +48,8 @@ export const ExtractedDishSchema = z
     price: text,
     /** The menu heading the dish is listed under, like "Starters". */
     section: text.transform((value) => value.trim().slice(0, 80)).optional(),
+    /** 0 not spicy to 3 hot, guessed from the menu; the owner can change it. */
+    spice: spiceGuess.optional(),
     likely_allergens: allergenList,
     dietary_tags: tagList,
   })
@@ -96,6 +106,8 @@ export const MenuItemSchema = z.object({
   sold_out_on: z.string().nullable().optional(),
   /** Shown with the specials at the top of the menu. */
   special: z.boolean().optional(),
+  /** 0 not spicy to 3 hot, or null when not set. */
+  spice: z.number().int().min(0).max(3).nullable().optional(),
   /** Allergens in the dish the kitchen can leave out on request. */
   removable: z.array(z.enum(ALLERGENS)).max(ALLERGENS.length).optional(),
   /** Allergens not in the recipe that may get in, like through a shared fryer. */

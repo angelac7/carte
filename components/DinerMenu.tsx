@@ -57,7 +57,8 @@ import { filterDishes } from "@/lib/menu-filters";
 import { formatList } from "@/lib/format-list";
 import { matchesSearch } from "@/lib/menu-search";
 import { blockedAddons, dishQuantity, hasChoices, lineKey, parseLineKey } from "@/lib/order-lines";
-import { detectCurrency } from "@/lib/prices";
+import { priceSteps, startingPrice, withinComfort } from "@/lib/comfort-filters";
+import { detectCurrency, formatWhole } from "@/lib/prices";
 import { groupBySection, hasSections } from "@/lib/menu-sections";
 import { dishAvailability, restaurantClock, shortTime } from "@/lib/availability";
 import { toggleValue } from "@/lib/toggle-value";
@@ -114,6 +115,8 @@ export function DinerMenu({
   const { avoid, onlyTags } = prefs;
   const [order, setOrder] = useState<Record<string, number>>({});
   const [openDishId, setOpenDishId] = useState<string | null>(null);
+  // Price limits suit one menu's prices, so unlike spice they aren't remembered across menus.
+  const [maxPrice, setMaxPrice] = useState<number | null>(null);
   // The dish whose size and add-ons are being picked before it's added.
   const [choosingId, setChoosingId] = useState<string | null>(null);
   const [panel, setPanel] = useState<Panel>(null);
@@ -274,7 +277,13 @@ export function DinerMenu({
   const cover = restaurant.cover_url || (dishes.find((dish) => dish.photo_url)?.photo_url ?? null);
 
   const query = search.trim();
-  const listed = shown.filter((dish) => {
+  // Spice and price narrow what's listed, but never change the order or what AI features see.
+  const steps = priceSteps(dishes.map(startingPrice));
+  const comfortable = withinComfort(shown, {
+    maxSpice: prefs.maxSpice ?? null,
+    maxPrice: steps.includes(maxPrice ?? -1) ? maxPrice : null,
+  });
+  const listed = comfortable.filter((dish) => {
     const text = textFor(dish);
     return matchesSearch([text.name, dish.name, text.description, text.notes], query);
   });
@@ -415,7 +424,28 @@ export function DinerMenu({
           onOpenFilters={() => setPanel("filters")}
           onRemoveAllergen={(allergen) => updateFilters(toggleValue(avoid, allergen), onlyTags)}
           onRemoveTag={(tag) => updateFilters(avoid, toggleValue(onlyTags, tag))}
-          onClearFilters={() => updateFilters([], [])}
+          onClearFilters={() => {
+            updateFilters([], []);
+            setMaxPrice(null);
+          }}
+          extraPills={[
+            ...(prefs.maxSpice !== undefined
+              ? [
+                  {
+                    label: t.spiceLimits[prefs.maxSpice],
+                    onRemove: () => setPrefs({ ...prefs, maxSpice: undefined }),
+                  },
+                ]
+              : []),
+            ...(maxPrice !== null
+              ? [
+                  {
+                    label: t.priceUnder(formatWhole(maxPrice, currency)),
+                    onRemove: () => setMaxPrice(null),
+                  },
+                ]
+              : []),
+          ]}
           sections={
             sectioned
               ? groups.map((group, index) => ({ id: sectionId(index), label: sectionTitle(group) }))
@@ -562,6 +592,7 @@ export function DinerMenu({
                         dish={dish}
                         text={textFor(dish)}
                         summary={summaries[language]?.[summaryKey(dish)]}
+                        spiceLabel={dish.spice ? dishText.spiceLevels[dish.spice] : ""}
                         availability={dishAvailability(dish, clock)}
                         servingWindow={
                           dish.available_from && dish.available_until
@@ -625,9 +656,15 @@ export function DinerMenu({
           closeLabel={tableText.close}
           avoid={avoid}
           onlyTags={onlyTags}
-          shownCount={shown.length}
+          shownCount={comfortable.length}
           hideTraces={prefs.hideTraces}
           onHideTraces={(hideTraces) => setPrefs({ ...prefs, hideTraces })}
+          maxSpice={prefs.maxSpice}
+          onMaxSpice={(maxSpice) => setPrefs({ ...prefs, maxSpice })}
+          priceSteps={steps}
+          maxPrice={maxPrice}
+          onMaxPrice={setMaxPrice}
+          currency={currency}
           onChange={updateFilters}
           onClose={() => setPanel(null)}
         />

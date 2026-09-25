@@ -31,3 +31,10 @@ export function detectCurrency(prices: string[]): string {
 export function formatMoney(amount: number, symbol: string): string {
   return `${symbol}${amount.toFixed(2)}`;
 }
+
+/** A round amount without cents, like "$15" or "¥1,500"; other amounts keep their cents. */
+export function formatWhole(amount: number, symbol: string): string {
+  return Number.isInteger(amount)
+    ? `${symbol}${amount.toLocaleString("en-US")}`
+    : formatMoney(amount, symbol);
+}

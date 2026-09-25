@@ -720,25 +720,54 @@ export default function ReviewDishes({ timezone }: { timezone: string }) {
                               }}
                             />
 
-                            <label className="mt-5 block max-w-xs">
-                              <span className={labelClass}>Menu section</span>
-                              <input
-                                list="menu-section-names"
-                                maxLength={80}
-                                placeholder="For example: Starters"
-                                value={sectionDrafts[dish.id] ?? dish.section ?? ""}
-                                onChange={(e) =>
-                                  setSectionDrafts((prev) => ({
-                                    ...prev,
-                                    [dish.id]: e.target.value,
-                                  }))
-                                }
-                                onBlur={(event) =>
-                                  void saveSection(dish, event.currentTarget.value)
-                                }
-                                className={inputClass}
-                              />
-                            </label>
+                            <div className="mt-5 flex flex-wrap gap-4">
+                              <label className="block w-full max-w-xs">
+                                <span className={labelClass}>Menu section</span>
+                                <input
+                                  list="menu-section-names"
+                                  maxLength={80}
+                                  placeholder="For example: Starters"
+                                  value={sectionDrafts[dish.id] ?? dish.section ?? ""}
+                                  onChange={(e) =>
+                                    setSectionDrafts((prev) => ({
+                                      ...prev,
+                                      [dish.id]: e.target.value,
+                                    }))
+                                  }
+                                  onBlur={(event) =>
+                                    void saveSection(dish, event.currentTarget.value)
+                                  }
+                                  className={inputClass}
+                                />
+                              </label>
+
+                              <label className="block">
+                                <span className={labelClass}>Spice level</span>
+
+                                <select
+                                  value={dish.spice ?? ""}
+
+                                  onChange={(e) =>
+                                    void save({
+                                      ...dish,
+                                      spice: e.target.value === "" ? null : Number(e.target.value),
+                                    })
+                                  }
+
+                                  className={inputClass}
+                                >
+                                  <option value="">Not set</option>
+
+                                  <option value="0">Not spicy</option>
+
+                                  <option value="1">Mild</option>
+
+                                  <option value="2">Medium</option>
+
+                                  <option value="3">Hot</option>
+                                </select>
+                              </label>
+                            </div>
 
                             <div className="mt-5 flex flex-wrap items-center gap-3 text-sm">
                               <span className="text-muted">

@@ -15,6 +15,8 @@ export type DinerPrefs = {
   /** Also hide dishes that may contain traces of an avoided allergen. */
   hideTraces: boolean;
   severity?: Severity;
+  /** The spiciest level the diner wants: 0 not spicy, 1 mild, 2 medium. Unset means any. */
+  maxSpice?: number;
 };
 
 export const EMPTY_PREFS: DinerPrefs = {
@@ -29,6 +31,7 @@ const PrefsSchema = z.object({
   onlyTags: z.array(z.enum(DIETARY_TAGS)).catch([]),
   hideTraces: z.boolean().catch(false),
   severity: z.enum(SEVERITIES).catch("allergy"),
+  maxSpice: z.number().int().min(0).max(2).optional().catch(undefined),
 });
 
 /** Reads saved filters, ignoring anything unexpected. */

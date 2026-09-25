@@ -15,6 +15,8 @@ type MenuToolbarProps = {
   onRemoveAllergen: (allergen: Allergen) => void;
   onRemoveTag: (tag: DietaryTag) => void;
   onClearFilters: () => void;
+  /** More active filters to show as removable pills, like "Not spicy". */
+  extraPills?: { label: string; onRemove: () => void }[];
   /** Links to each menu heading, shown when the menu has sections. */
   sections?: { id: string; label: string }[];
 };
@@ -33,9 +35,10 @@ export function MenuToolbar({
   onRemoveAllergen,
   onRemoveTag,
   onClearFilters,
+  extraPills = [],
   sections = [],
 }: MenuToolbarProps) {
-  const count = avoid.length + onlyTags.length;
+  const count = avoid.length + onlyTags.length + extraPills.length;
 
   return (
     <div className="sticky top-0 z-20 -mx-5 border-b border-ink/10 bg-paper/90 px-5 py-3 backdrop-blur print:hidden">
@@ -104,6 +107,20 @@ export function MenuToolbar({
             className={cn(pillClass, "bg-basil-soft text-basil")}
           >
             {t.tags[tag]}
+            <span aria-hidden="true" className="px-1 text-base leading-none">
+              ×
+            </span>
+          </button>
+        ))}
+        {extraPills.map((pill) => (
+          <button
+            key={pill.label}
+            type="button"
+            onClick={pill.onRemove}
+            aria-label={t.removeFilter(pill.label)}
+            className={cn(pillClass, "bg-ink/10 text-ink")}
+          >
+            {pill.label}
             <span aria-hidden="true" className="px-1 text-base leading-none">
               ×
             </span>
