@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { DishHeader } from "@/components/DishHeader";
+import { DishOptionsEditor } from "@/components/owner/DishOptionsEditor";
 import { DishPhotoEditor } from "@/components/owner/DishPhotoEditor";
 import { OwnerPageHeader } from "@/components/owner/OwnerPageHeader";
 import { ProgressBar } from "@/components/ProgressBar";
@@ -270,6 +271,8 @@ export default function ReviewDishes({ timezone }: { timezone: string }) {
   const [problem, setProblem] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [adding, setAdding] = useState(false);
+  // The dish whose sizes and add-ons are open in the editor.
+  const [optionsId, setOptionsId] = useState<string | null>(null);
   const mutationPending = useRef(false);
   const [mutating, setMutating] = useState(false);
   const persisted = useRef(new Map<string, MenuItem>());
@@ -694,6 +697,30 @@ export default function ReviewDishes({ timezone }: { timezone: string }) {
                               />
                             </label>
 
+                            <div className="mt-5 flex flex-wrap items-center gap-3 text-sm">
+                              <span className="text-muted">
+                                {dish.sizes?.length || dish.addons?.length
+                                  ? [
+                                      dish.sizes?.length
+                                        ? `${dish.sizes.length} ${dish.sizes.length === 1 ? "size" : "sizes"}`
+                                        : "",
+                                      dish.addons?.length
+                                        ? `${dish.addons.length} ${dish.addons.length === 1 ? "add-on" : "add-ons"}`
+                                        : "",
+                                    ]
+                                      .filter(Boolean)
+                                      .join(" · ")
+                                  : "No sizes or add-ons"}
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() => setOptionsId(dish.id)}
+                                className="font-semibold underline underline-offset-4 hover:text-accent"
+                              >
+                                Edit sizes and add-ons
+                              </button>
+                            </div>
+
                             <AvailabilityControls
                               dish={dish}
                               soldOut={Boolean(serviceDay && dish.sold_out_on === serviceDay)}
@@ -808,6 +835,22 @@ export default function ReviewDishes({ timezone }: { timezone: string }) {
         </>
       )}
 
+      {optionsId &&
+        (() => {
+          const dish = dishes.find((d) => d.id === optionsId);
+          return dish ? (
+            <DishOptionsEditor
+              dish={dish}
+              onClose={() => setOptionsId(null)}
+              onSave={async (sizes, addons) => {
+                if (await save({ ...dish, sizes, addons, confirmed: false })) {
+                  setOptionsId(null);
+                  toast("Sizes and add-ons saved. Check the allergens and confirm again.");
+                }
+              }}
+            />
+          ) : null;
+        })()}
       {adding && (
         <Sheet title="Add a dish" closeLabel="Close" onClose={() => setAdding(false)}>
           <fieldset disabled={mutating} className="mt-4">

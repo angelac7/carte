@@ -86,3 +86,20 @@ it("needs both serving times, or neither", async () => {
     db.exec(`update public.menu_items set available_from = '11:00' where id = '${ids.Salad}'`),
   ).rejects.toThrow(/menu_items_serving_window/);
 });
+
+it("checks add-on allergens and asks for a fresh review when add-ons change", async () => {
+  await expect(
+    db.exec(`update public.menu_items
+      set addons = '[{"label":"Add nuts","price":"$1","allergens":["walnut dust"]}]'
+      where id = '${ids.Salad}'`),
+  ).rejects.toThrow(/check constraint/);
+  await db.exec(`update public.menu_items set confirmed = true where id = '${ids.Salad}'`);
+  await db.exec(`update public.menu_items
+    set addons = '[{"label":"Add egg","price":"$2","allergens":["eggs"]}]',
+        sizes = '[{"label":"Large","price":"$9"}]'
+    where id = '${ids.Salad}'`);
+  const salad = await db.query<{ confirmed: boolean }>(
+    `select confirmed from public.menu_items where id = '${ids.Salad}'`,
+  );
+  expect(salad.rows[0].confirmed).toBe(false);
+});

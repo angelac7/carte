@@ -46,6 +46,12 @@ export type DinerStrings = {
   call: string;
   website: string;
   reserve: string;
+  sizes: string;
+  addons: string;
+  chooseOptions: string;
+  addToOrder: string;
+  inOrder: (count: number) => string;
+  addonBlocked: string;
   allergens: Record<Allergen, string>;
   tags: Record<DietaryTag, string>;
 };
@@ -71,6 +77,12 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     call: "Call",
     website: "Website",
     reserve: "Reserve a table",
+    sizes: "Sizes",
+    addons: "Add-ons",
+    chooseOptions: "Choose options",
+    addToOrder: "Add to order",
+    inOrder: (n) => (n === 1 ? "1 in your order" : `${n} in your order`),
+    addonBlocked: "Contains an allergen you avoid",
     menuUpdated:
       "The restaurant updated this menu. Your order and assistant results were cleared; review the current dishes before ordering.",
     refreshFailed:
@@ -141,6 +153,12 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     call: "Llamar",
     website: "Sitio web",
     reserve: "Reservar mesa",
+    sizes: "Tamaños",
+    addons: "Extras",
+    chooseOptions: "Elegir opciones",
+    addToOrder: "Añadir al pedido",
+    inOrder: (n) => `${n} en su pedido`,
+    addonBlocked: "Contiene un alérgeno que evita",
     menuUpdated:
       "El restaurante actualizó el menú. Se borraron tu pedido y los resultados del asistente; revisa los platos antes de pedir.",
     refreshFailed:
@@ -211,6 +229,12 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     call: "致电",
     website: "网站",
     reserve: "预订座位",
+    sizes: "规格",
+    addons: "加料",
+    chooseOptions: "选择选项",
+    addToOrder: "加入订单",
+    inOrder: (n) => `订单中有 ${n} 份`,
+    addonBlocked: "含有您避免的过敏原",
     menuUpdated: "餐厅更新了菜单。你的点单和助手结果已清除；点餐前请查看最新菜品。",
     refreshFailed: "无法检查菜单更新。请向工作人员确认当前菜品和过敏原。",
     offlineMenu: "离线菜单副本：菜品及过敏原信息可能已更改。请向工作人员确认当前菜单及过敏原。",
@@ -274,6 +298,12 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     call: "전화하기",
     website: "웹사이트",
     reserve: "예약하기",
+    sizes: "사이즈",
+    addons: "추가 옵션",
+    chooseOptions: "옵션 선택",
+    addToOrder: "주문에 추가",
+    inOrder: (n) => `주문에 ${n}개`,
+    addonBlocked: "피하는 알레르기 성분이 들어 있음",
     menuUpdated:
       "식당에서 메뉴를 업데이트했습니다. 주문과 도우미 결과가 초기화되었습니다. 주문 전에 현재 메뉴를 확인하세요.",
     refreshFailed:
@@ -342,6 +372,12 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     call: "電話する",
     website: "ウェブサイト",
     reserve: "予約する",
+    sizes: "サイズ",
+    addons: "トッピング",
+    chooseOptions: "オプションを選ぶ",
+    addToOrder: "注文に追加",
+    inOrder: (n) => `注文に${n}点`,
+    addonBlocked: "避けているアレルゲンを含みます",
     menuUpdated:
       "メニューが更新されました。注文とアシスタントの結果はクリアされました。注文前に現在の料理を確認してください。",
     refreshFailed:
@@ -411,6 +447,12 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     call: "Appeler",
     website: "Site web",
     reserve: "Réserver une table",
+    sizes: "Tailles",
+    addons: "Suppléments",
+    chooseOptions: "Choisir les options",
+    addToOrder: "Ajouter à la commande",
+    inOrder: (n) => `${n} dans votre commande`,
+    addonBlocked: "Contient un allergène que vous évitez",
     menuUpdated:
       "Le restaurant a mis à jour le menu. Votre commande et les résultats de l’assistant ont été effacés. Vérifiez les plats avant de commander.",
     refreshFailed:
@@ -482,6 +524,12 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     call: "Gọi điện",
     website: "Trang web",
     reserve: "Đặt bàn",
+    sizes: "Cỡ",
+    addons: "Món thêm",
+    chooseOptions: "Chọn tùy chọn",
+    addToOrder: "Thêm vào đơn",
+    inOrder: (n) => `${n} trong đơn của bạn`,
+    addonBlocked: "Có chất gây dị ứng bạn tránh",
     menuUpdated:
       "Nhà hàng đã cập nhật thực đơn. Đơn món và kết quả trợ lý đã được xóa; hãy xem lại trước khi gọi món.",
     refreshFailed:

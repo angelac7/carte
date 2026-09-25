@@ -28,6 +28,8 @@ type DishCardProps = {
   language: LanguageCode;
   quantity: number;
   onQuantity: (quantity: number) => void;
+  /** For dishes with sizes or add-ons: opens the chooser instead of adding straight away. */
+  onChoose?: () => void;
   onOpen: () => void;
 };
 
@@ -50,6 +52,7 @@ export function DishCard({
   language,
   quantity,
   onQuantity,
+  onChoose,
   onOpen,
 }: DishCardProps) {
   return (
@@ -158,7 +161,20 @@ export function DishCard({
         <div aria-hidden="true" className="min-h-5 flex-1" />
         <div className="relative z-10 flex flex-wrap items-center justify-between gap-3 border-t border-ink/10 pt-5">
           <DishActions dish={dish} restaurant={restaurant} language={language} />
-          {availability === "available" ? (
+          {availability === "available" && onChoose ? (
+            <div className="flex items-center gap-3">
+              {quantity > 0 && (
+                <span className="text-sm text-muted tabular-nums">{t.inOrder(quantity)}</span>
+              )}
+              <button
+                type="button"
+                onClick={onChoose}
+                className="rounded-full bg-paper px-5 py-2.5 text-sm font-semibold shadow-raised-sm transition-[box-shadow,color,transform] duration-200 ease-out hover:-translate-y-px hover:text-accent active:translate-y-px active:shadow-pressed-sm"
+              >
+                {t.chooseOptions}
+              </button>
+            </div>
+          ) : availability === "available" ? (
             <QuantityStepper quantity={quantity} onChange={onQuantity} labels={stepperLabels} />
           ) : (
             <span className="text-sm font-medium text-muted">

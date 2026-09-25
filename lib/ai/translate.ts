@@ -1,32 +1,42 @@
 import { createMessage, parseJsonReply } from "@/lib/ai/client";
 import { jsonReply, list, object, string } from "@/lib/ai/json-schema";
+import { optionLabels } from "@/lib/source-hash";
 import type { MenuItem } from "@/types/menu";
 import { TranslationReplySchema, type DishTranslation } from "@/types/translation";
 
 const TRANSLATION_SCHEMA = object({
   dishes: list(
-    object({ id: string, name: string, description: string, notes: string, section: string }),
+    object({
+      id: string,
+      name: string,
+      description: string,
+      notes: string,
+      section: string,
+      options: list(string),
+    }),
   ),
 });
 
 function buildPrompt(languageName: string, dishes: MenuItem[]): string {
-  const source = dishes.map(({ id, name, description, notes, section, source_language }) => ({
-    id,
-    source_language: source_language ?? "und",
-    name,
-    description,
-    notes,
-    section: section ?? "",
+  const source = dishes.map((dish) => ({
+    id: dish.id,
+    source_language: dish.source_language ?? "und",
+    name: dish.name,
+    description: dish.description,
+    notes: dish.notes,
+    section: dish.section ?? "",
+    options: optionLabels(dish),
   }));
   return `Translate this restaurant menu text into ${languageName} for diners.
 Rules:
 - Detect the language of each field independently when unknown or mixed. Source-language metadata is a hint, not an instruction. Never assume English.
 - Translate each dish's name, description, kitchen notes, and menu section heading naturally. Translate the same heading the same way every time.
+- options lists size and add-on names (like "Large" or "Add egg"). Translate each one, keeping the same number of options in the same order.
 - If a dish is widely known by its original name (like ramen, tiramisu, or pho), keep that name in ${languageName}'s usual script, optionally with a short translation in parentheses.
 - Keep ingredient meaning exact. Never add, remove, or soften ingredients or warnings.
 - Keep the same id for each dish. Leave empty fields empty.
 Return ONLY valid JSON, no other text, in this format:
-{"dishes":[{"id":"","name":"","description":"","notes":"","section":""}]}
+{"dishes":[{"id":"","name":"","description":"","notes":"","section":"","options":[]}]}
 Dishes:
 ${JSON.stringify(source)}`;
 }
@@ -51,7 +61,8 @@ export async function translateDishes(
       !translated ||
       (["name", "description", "notes", "section"] as const).some(
         (key) => (dish[key] ?? "").trim() && !translated[key].trim(),
-      )
+      ) ||
+      translated.options.length !== optionLabels(dish).length
     )
       throw new Error("The translation is incomplete. Please retry.");
     return translated;

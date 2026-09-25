@@ -17,9 +17,13 @@ export function sourceHash(
  * saved translations, so adding sections only retranslates the dishes that have one.
  */
 export function translationHash(
-  dish: Pick<MenuItem, "name" | "description" | "notes" | "source_language" | "section">,
+  dish: Pick<
+    MenuItem,
+    "name" | "description" | "notes" | "source_language" | "section" | "sizes" | "addons"
+  >,
 ): string {
-  if (!dish.section) return sourceHash(dish);
+  const options = optionLabels(dish);
+  if (!dish.section && options.length === 0) return sourceHash(dish);
   return createHash("sha256")
     .update(
       JSON.stringify([
@@ -27,8 +31,14 @@ export function translationHash(
         dish.description,
         dish.notes,
         dish.source_language ?? "und",
-        dish.section,
+        dish.section ?? "",
+        ...(options.length > 0 ? [options] : []),
       ]),
     )
     .digest("hex");
+}
+
+/** A dish's size names then add-on names, the order translations keep them in. */
+export function optionLabels(dish: Pick<MenuItem, "sizes" | "addons">): string[] {
+  return [...(dish.sizes ?? []), ...(dish.addons ?? [])].map((option) => option.label);
 }

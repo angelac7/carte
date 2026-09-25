@@ -19,7 +19,7 @@ export type Restaurant = {
 const RESTAURANT_COLUMNS =
   "id, name, slug, cuisine, city, timezone, phone, website, reservation_url, price_range, logo_url, cover_url";
 const DISH_COLUMNS =
-  "id, name, description, price, allergens, dietary_tags, notes, confirmed, photo_url, revision, source_language, section, sort_order, sold_out_on, special, available_from, available_until";
+  "id, name, description, price, allergens, dietary_tags, notes, confirmed, photo_url, revision, source_language, section, sort_order, sold_out_on, special, available_from, available_until, sizes, addons";
 
 export async function getOwnerRestaurant(
   supabase: SupabaseClient,
@@ -156,6 +156,8 @@ export async function updateDish(
       // Layout and availability are left alone when the edit doesn't include them.
       ...(dish.section !== undefined && { section: dish.section }),
       ...(dish.special !== undefined && { special: dish.special }),
+      ...(dish.sizes !== undefined && { sizes: dish.sizes }),
+      ...(dish.addons !== undefined && { addons: dish.addons }),
       ...(dish.available_from !== undefined && {
         available_from: dish.available_from,
         available_until: dish.available_until ?? null,

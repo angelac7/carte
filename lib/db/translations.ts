@@ -12,6 +12,7 @@ type TranslationRow = {
   description: string;
   notes: string;
   section: string;
+  options: string[];
 };
 
 /** Splits dishes into those with an up-to-date saved translation and those still missing one. */
@@ -23,7 +24,7 @@ export async function getCachedTranslations(
 
   const { data, error } = await createAdminClient()
     .from("translations")
-    .select("menu_item_id, source_hash, name, description, notes, section")
+    .select("menu_item_id, source_hash, name, description, notes, section, options")
     .eq("language", language)
     .in(
       "menu_item_id",
@@ -42,6 +43,7 @@ export async function getCachedTranslations(
         description: row.description,
         notes: row.notes,
         section: row.section,
+        options: row.options ?? [],
       };
     } else {
       missing.push(dish);
@@ -56,7 +58,7 @@ export async function saveTranslations(
   translated: DishTranslation[],
 ): Promise<void> {
   const dishesById = new Map(dishes.map((dish) => [dish.id, dish]));
-  const rows = translated.flatMap(({ id, name, description, notes, section }) => {
+  const rows = translated.flatMap(({ id, name, description, notes, section, options }) => {
     const dish = dishesById.get(id);
     return dish
       ? [
@@ -68,6 +70,7 @@ export async function saveTranslations(
             description,
             notes,
             section,
+            options,
           },
         ]
       : [];

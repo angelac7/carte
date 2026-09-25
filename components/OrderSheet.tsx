@@ -10,17 +10,19 @@ import { formatList } from "@/lib/format-list";
 import { DINER_STRINGS } from "@/lib/i18n/diner-strings";
 import { TABLE_STRINGS } from "@/lib/i18n/table-strings";
 import type { LanguageCode } from "@/lib/languages";
-import { detectCurrency, formatMoney, parsePrice } from "@/lib/prices";
+import { choiceLabels, linePrice, orderLines } from "@/lib/order-lines";
+import { detectCurrency, formatMoney } from "@/lib/prices";
 import type { DishText, MenuItem } from "@/types/menu";
 
 type OrderSheetProps = {
   dishes: MenuItem[];
+  /** Quantities by order line: a dish's id, or the dish with its size and add-ons. */
   order: Record<string, number>;
   textFor: (dish: MenuItem) => DishText;
   language: LanguageCode;
   staffLanguage?: LanguageCode;
   avoid: Allergen[];
-  onQuantity: (dishId: string, quantity: number) => void;
+  onQuantity: (lineKey: string, quantity: number) => void;
   onClear: () => void;
   onClose: () => void;
 };
@@ -64,9 +66,7 @@ export function OrderSheet({
   const [taxPercent, setTaxPercent] = useState(8);
   const [tipPercent, setTipPercent] = useState(18);
 
-  const lines = dishes
-    .filter((dish) => order[dish.id])
-    .map((dish) => ({ dish, quantity: order[dish.id] }));
+  const lines = orderLines(dishes, order);
   const currency = detectCurrency(lines.map(({ dish }) => dish.price));
   const money = (amount: number) => formatMoney(amount, currency);
 
@@ -92,10 +92,17 @@ export function OrderSheet({
         onClose={() => setMode("list")}
       >
         <ul className="mt-4 space-y-3">
-          {lines.map(({ dish, quantity }) => (
-            <li lang={dish.source_language ?? "und"} key={dish.id} className="flex gap-3 text-xl">
+          {lines.map(({ key, dish, choice, quantity }) => (
+            <li lang={dish.source_language ?? "und"} key={key} className="flex gap-3 text-xl">
               <span className="font-medium tabular-nums">{quantity} ×</span>
-              <span>{dish.name}</span>
+              <span>
+                {dish.name}
+                {choice.size !== null || choice.addons.length > 0 ? (
+                  <span className="block text-base text-muted">
+                    {choiceLabels(dish, choice).join(" · ")}
+                  </span>
+                ) : null}
+              </span>
             </li>
           ))}
         </ul>
@@ -116,10 +123,10 @@ export function OrderSheet({
   }
 
   if (mode === "split") {
-    const billLines: BillLine[] = lines.map(({ dish, quantity }) => ({
-      price: parsePrice(dish.price),
+    const billLines: BillLine[] = lines.map(({ key, dish, choice, quantity }) => ({
+      price: linePrice(dish, choice),
       quantity,
-      person: assignees[dish.id] || null,
+      person: assignees[key] || null,
     }));
     const bill = splitBill(billLines, people, taxPercent / 100, tipPercent / 100);
 
@@ -169,22 +176,25 @@ export function OrderSheet({
 
         {people.length > 0 && (
           <ul className="mt-5 divide-y divide-line">
-            {lines.map(({ dish, quantity }) => (
+            {lines.map(({ key, dish, choice, quantity }) => (
               <li
                 lang={dish.source_language ?? "und"}
-                key={dish.id}
+                key={key}
                 className="flex items-center justify-between gap-3 py-2 text-sm"
               >
                 <span className="min-w-0">
                   {quantity} × {textFor(dish).name}
+                  {choice.size !== null || choice.addons.length > 0 ? (
+                    <span className="block text-xs text-muted">
+                      {choiceLabels(dish, choice, textFor(dish).options).join(" · ")}
+                    </span>
+                  ) : null}
                 </span>
                 <label className="shrink-0">
                   <span className="sr-only">{t.whoHad}</span>
                   <select
-                    value={assignees[dish.id] ?? ""}
-                    onChange={(e) =>
-                      setAssignees((prev) => ({ ...prev, [dish.id]: e.target.value }))
-                    }
+                    value={assignees[key] ?? ""}
+                    onChange={(e) => setAssignees((prev) => ({ ...prev, [key]: e.target.value }))}
                     className={fieldClass("w-auto py-2.5")}
                   >
                     <option value="">{t.shared}</option>
@@ -267,23 +277,34 @@ export function OrderSheet({
       ) : (
         <>
           <ul className="mt-4 divide-y divide-line">
-            {lines.map(({ dish, quantity }) => (
-              <li
-                lang={dish.source_language ?? "und"}
-                key={dish.id}
-                className="flex items-center justify-between gap-4 py-3"
-              >
-                <div className="min-w-0">
-                  <p className="font-medium">{textFor(dish).name}</p>
-                  <p className="text-sm text-muted tabular-nums">{dish.price}</p>
-                </div>
-                <QuantityStepper
-                  quantity={quantity}
-                  onChange={(next) => onQuantity(dish.id, next)}
-                  labels={t}
-                />
-              </li>
-            ))}
+            {lines.map(({ key, dish, choice, quantity }) => {
+              const chosen = choice.size !== null || choice.addons.length > 0;
+              const price = chosen ? linePrice(dish, choice) : null;
+              return (
+                <li
+                  lang={dish.source_language ?? "und"}
+                  key={key}
+                  className="flex items-center justify-between gap-4 py-3"
+                >
+                  <div className="min-w-0">
+                    <p className="font-medium">{textFor(dish).name}</p>
+                    {chosen && (
+                      <p className="text-sm text-muted">
+                        {choiceLabels(dish, choice, textFor(dish).options).join(" · ")}
+                      </p>
+                    )}
+                    <p className="text-sm text-muted tabular-nums">
+                      {price !== null ? money(price) : dish.price}
+                    </p>
+                  </div>
+                  <QuantityStepper
+                    quantity={quantity}
+                    onChange={(next) => onQuantity(key, next)}
+                    labels={t}
+                  />
+                </li>
+              );
+            })}
           </ul>
           <div className="mt-5 flex flex-wrap items-center gap-3">
             <Button onClick={() => setMode("server")}>{t.showServer}</Button>

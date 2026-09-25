@@ -11,6 +11,11 @@ export const DishTranslationSchema = z.object({
   description: text,
   notes: text,
   section: text,
+  /** Size names then add-on names, in the dish's own order. */
+  options: z
+    .array(z.string())
+    .nullish()
+    .transform((value) => value ?? []),
 });
 
 export const TranslationReplySchema = z.object({ dishes: z.array(DishTranslationSchema) });

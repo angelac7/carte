@@ -10,9 +10,7 @@ import { DISH_STRINGS } from "@/lib/i18n/dish-strings";
 import { canSpeak, speak } from "@/lib/speak";
 import type { LanguageCode } from "@/lib/languages";
 import type { DishInsight } from "@/types/insight";
-import type { MenuItem } from "@/types/menu";
-
-type DishText = { name: string; description: string; notes: string };
+import type { DishText, MenuItem } from "@/types/menu";
 
 type DishSheetProps = {
   dish: MenuItem;
@@ -173,6 +171,43 @@ export function DishSheet({
         <p className="mt-2 text-sm leading-relaxed">
           <span className="font-medium">{d.kitchenNote}</span> {text.notes}
         </p>
+      )}
+
+      {(dish.sizes?.length ?? 0) > 0 && (
+        <div className="mt-4 text-sm">
+          <h3 className="eyebrow text-muted">{d.sizes}</h3>
+          <ul className="mt-1 space-y-1">
+            {dish.sizes!.map((size, index) => (
+              <li key={index} className="flex justify-between gap-4">
+                <span>{text.options?.[index] || size.label}</span>
+                <span className="font-mono tabular-nums">{size.price}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+      {(dish.addons?.length ?? 0) > 0 && (
+        <div className="mt-4 text-sm">
+          <h3 className="eyebrow text-muted">{d.addons}</h3>
+          <ul className="mt-1 space-y-2">
+            {dish.addons!.map((addon, index) => (
+              <li key={index}>
+                <div className="flex justify-between gap-4">
+                  <span>{text.options?.[(dish.sizes?.length ?? 0) + index] || addon.label}</span>
+                  {addon.price && <span className="font-mono tabular-nums">+{addon.price}</span>}
+                </div>
+                {addon.allergens.length > 0 && (
+                  <div className="mt-1 flex flex-wrap items-center gap-1.5 text-xs">
+                    <span className="eyebrow text-muted">{d.contains}</span>
+                    {addon.allergens.map((allergen) => (
+                      <Chip key={allergen} label={d.allergens[allergen]} tone="allergen" />
+                    ))}
+                  </div>
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
 
       <div className="mt-6 border-t border-ink/10 pt-6">

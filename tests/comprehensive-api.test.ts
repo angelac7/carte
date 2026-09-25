@@ -72,5 +72,7 @@ it("keeps only requested translations and preserves their order", async () => {
     dishes: [{ ...translated, id: "unknown" }, translated],
   } as never);
   // A dish without a section gets an empty translated section.
-  expect(await translateDishes([dish], "Spanish")).toEqual([{ ...translated, section: "" }]);
+  expect(await translateDishes([dish], "Spanish")).toEqual([
+    { ...translated, section: "", options: [] },
+  ]);
 });

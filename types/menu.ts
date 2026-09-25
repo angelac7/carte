@@ -60,6 +60,22 @@ export const ExtractedMenuSchema = z.object({
 /** A daily serving time like "11:30", or "11:30:00" as the database returns it. */
 export const ServingTimeSchema = z.string().regex(/^([01]\d|2[0-3]):[0-5]\d(:[0-5]\d)?$/);
 
+const OptionLabelSchema = z.string().trim().min(1).max(60);
+const OptionPriceSchema = z.string().trim().max(20);
+
+/** A size a dish comes in, like "Large", with its own price. */
+export const DishSizeSchema = z.object({ label: OptionLabelSchema, price: OptionPriceSchema });
+
+/** Something a diner can add, like "Add egg". Its allergens come from the owner, like the dish's. */
+export const DishAddonSchema = z.object({
+  label: OptionLabelSchema,
+  price: OptionPriceSchema,
+  allergens: z.array(z.enum(ALLERGENS)).max(ALLERGENS.length),
+});
+
+export type DishSize = z.infer<typeof DishSizeSchema>;
+export type DishAddon = z.infer<typeof DishAddonSchema>;
+
 /** A saved dish. Only confirmed dishes will be shown to diners. */
 export const MenuItemSchema = z.object({
   source_language: SourceLanguageSchema.optional(),
@@ -80,6 +96,8 @@ export const MenuItemSchema = z.object({
   sold_out_on: z.string().nullable().optional(),
   /** Shown with the specials at the top of the menu. */
   special: z.boolean().optional(),
+  sizes: z.array(DishSizeSchema).max(8).optional(),
+  addons: z.array(DishAddonSchema).max(12).optional(),
   /** An optional daily serving window in the restaurant's time zone. */
   available_from: ServingTimeSchema.nullable().optional(),
   available_until: ServingTimeSchema.nullable().optional(),
@@ -91,4 +109,11 @@ export type ExtractedDish = z.infer<typeof ExtractedDishSchema>;
 export type MenuItem = z.infer<typeof MenuItemSchema>;
 
 /** A dish's text as shown to a diner, translated when available. */
-export type DishText = { name: string; description: string; notes: string; section?: string };
+export type DishText = {
+  name: string;
+  description: string;
+  notes: string;
+  section?: string;
+  /** Size names then add-on names, translated, in the dish's own order. */
+  options?: string[];
+};

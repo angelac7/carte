@@ -13,6 +13,7 @@ import {
   SparkleIcon,
 } from "@/components/icons";
 import { DishCard } from "@/components/menu/DishCard";
+import { DishChoiceSheet } from "@/components/menu/DishChoiceSheet";
 import { FilterSheet } from "@/components/menu/FilterSheet";
 import { MenuHero } from "@/components/menu/MenuHero";
 import { MenuToolbar } from "@/components/menu/MenuToolbar";
@@ -54,6 +55,7 @@ import {
 } from "@/lib/languages";
 import { filterDishes } from "@/lib/menu-filters";
 import { matchesSearch } from "@/lib/menu-search";
+import { blockedAddons, dishQuantity, hasChoices, lineKey, parseLineKey } from "@/lib/order-lines";
 import { detectCurrency } from "@/lib/prices";
 import { groupBySection, hasSections } from "@/lib/menu-sections";
 import { dishAvailability, restaurantClock, shortTime } from "@/lib/availability";
@@ -111,6 +113,8 @@ export function DinerMenu({
   const { avoid, onlyTags } = prefs;
   const [order, setOrder] = useState<Record<string, number>>({});
   const [openDishId, setOpenDishId] = useState<string | null>(null);
+  // The dish whose size and add-ons are being picked before it's added.
+  const [choosingId, setChoosingId] = useState<string | null>(null);
   const [panel, setPanel] = useState<Panel>(null);
   // Search only narrows the list on screen; the assistant and order still see every allowed dish.
   const [search, setSearch] = useState("");
@@ -196,6 +200,7 @@ export function DinerMenu({
       name: translated?.name || dish.name,
       description: translated?.description || dish.description,
       notes: translated?.notes || dish.notes,
+      options: translated?.options,
       section: translated?.section || dish.section || "",
     };
   }
@@ -232,11 +237,21 @@ export function DinerMenu({
   const shown = filterDishes(dishes, { avoid, onlyTags });
   const hiddenCount = dishes.length - shown.length;
   const filtering = avoid.length > 0 || onlyTags.length > 0;
-  const shownIds = new Set(shown.map((dish) => dish.id));
+  const shownById = new Map(shown.map((dish) => [dish.id, dish]));
+  // A line stays in the order only while its dish, and every add-on on it, passes the filters.
+  const lineAllowed = (key: string) => {
+    const { dishId, choice } = parseLineKey(key);
+    const dish = shownById.get(dishId);
+    if (!dish) return false;
+    const blocked = blockedAddons(dish, avoid);
+    return !choice.addons.some((index) => blocked.includes(index));
+  };
   const filteredOrder = Object.fromEntries(
-    Object.entries(order).filter(([id]) => shownIds.has(id)),
+    Object.entries(order).filter(([key]) => lineAllowed(key)),
   );
-  const excludedOrder = Object.keys(order).some((id) => !shownIds.has(id));
+  const excludedOrder = Object.keys(order).some((key) => !lineAllowed(key));
+  const currency = detectCurrency(dishes.map((dish) => dish.price));
+  const choosingDish = shown.find((dish) => dish.id === choosingId);
   const openDish = shown.find((dish) => dish.id === openDishId);
   const orderCount = Object.values(filteredOrder).reduce((sum, quantity) => sum + quantity, 0);
   const cover = restaurant.cover_url || (dishes.find((dish) => dish.photo_url)?.photo_url ?? null);
@@ -263,9 +278,7 @@ export function DinerMenu({
       : group.section
         ? textFor(group.dishes[0]).section || group.section
         : t.otherDishes;
-  const priceRange = restaurant.price_range
-    ? detectCurrency(dishes.map((dish) => dish.price)).repeat(restaurant.price_range)
-    : "";
+  const priceRange = restaurant.price_range ? currency.repeat(restaurant.price_range) : "";
   const details = [
     ...new Set([restaurant.cuisine, restaurant.city ?? "", priceRange].map((d) => d.trim())),
   ].filter(Boolean);
@@ -536,8 +549,9 @@ export function DinerMenu({
                         stepperLabels={tableText}
                         restaurant={restaurant}
                         language={language}
-                        quantity={order[dish.id] ?? 0}
+                        quantity={dishQuantity(filteredOrder, dish.id)}
                         onQuantity={(quantity) => setQuantity(dish.id, quantity)}
+                        onChoose={hasChoices(dish) ? () => setChoosingId(dish.id) : undefined}
                         onOpen={() => openDetails(dish.id)}
                       />
                     ))}
@@ -596,6 +610,23 @@ export function DinerMenu({
           restaurantSlug={restaurant.slug}
           onExplained={(insight) => rememberSummary(openDish, insight.summary)}
           onClose={() => setOpenDishId(null)}
+        />
+      )}
+      {choosingDish && (
+        <DishChoiceSheet
+          key={choosingDish.id}
+          dish={choosingDish}
+          text={textFor(choosingDish)}
+          t={t}
+          closeLabel={tableText.close}
+          avoid={avoid}
+          currency={currency}
+          onAdd={(choice) => {
+            const key = lineKey(choosingDish.id, choice);
+            setQuantity(key, (order[key] ?? 0) + 1);
+            setChoosingId(null);
+          }}
+          onClose={() => setChoosingId(null)}
         />
       )}
       {panel === "order" && (
