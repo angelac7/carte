@@ -26,6 +26,8 @@ type FilterSheetProps = {
   onMaxPrice: (maxPrice: number | null) => void;
   currency: string;
   onChange: (avoid: Allergen[], onlyTags: DietaryTag[]) => void;
+  /** Clears allergies, diets, spice, and price together. */
+  onClearAll: () => void;
   onClose: () => void;
 };
 
@@ -45,6 +47,7 @@ export function FilterSheet({
   onMaxPrice,
   currency,
   onChange,
+  onClearAll,
   onClose,
 }: FilterSheetProps) {
   return (
@@ -140,8 +143,11 @@ export function FilterSheet({
         <Button onClick={onClose} size="lg" className="flex-1">
           {t.showDishes(shownCount)}
         </Button>
-        {(avoid.length > 0 || onlyTags.length > 0) && (
-          <Button onClick={() => onChange([], [])} variant="ghost">
+        {(avoid.length > 0 ||
+          onlyTags.length > 0 ||
+          maxSpice !== undefined ||
+          maxPrice !== null) && (
+          <Button onClick={onClearAll} variant="ghost">
             {t.clearFilters}
           </Button>
         )}

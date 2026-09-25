@@ -209,6 +209,12 @@ export function DinerMenu({
     };
   }
 
+  // Clears everything shown as a pill, in one save so no setting overwrites another.
+  function clearAllFilters() {
+    setPrefs({ ...prefs, avoid: [], onlyTags: [], maxSpice: undefined });
+    setMaxPrice(null);
+  }
+
   // Filters are remembered on this device and applied at every Carte menu.
   function updateFilters(nextAvoid: Allergen[], nextOnlyTags: DietaryTag[]) {
     setPrefs({ ...prefs, avoid: nextAvoid, onlyTags: nextOnlyTags });
@@ -424,10 +430,7 @@ export function DinerMenu({
           onOpenFilters={() => setPanel("filters")}
           onRemoveAllergen={(allergen) => updateFilters(toggleValue(avoid, allergen), onlyTags)}
           onRemoveTag={(tag) => updateFilters(avoid, toggleValue(onlyTags, tag))}
-          onClearFilters={() => {
-            updateFilters([], []);
-            setMaxPrice(null);
-          }}
+          onClearFilters={clearAllFilters}
           extraPills={[
             ...(prefs.maxSpice !== undefined
               ? [
@@ -665,6 +668,7 @@ export function DinerMenu({
           maxPrice={maxPrice}
           onMaxPrice={setMaxPrice}
           currency={currency}
+          onClearAll={clearAllFilters}
           onChange={updateFilters}
           onClose={() => setPanel(null)}
         />
