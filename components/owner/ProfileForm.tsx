@@ -7,6 +7,7 @@ import { Notice } from "@/components/ui/notice";
 import { DISCOVER_STRINGS } from "@/lib/i18n/discover-strings";
 import {
   OCCASIONS,
+  PRICE_RANGES,
   TIMEZONES,
   WEEKDAYS,
   type RestaurantProfile,
@@ -129,6 +130,72 @@ export function ProfileForm({ profile }: { profile: RestaurantProfile }) {
           className={inputClass}
         />
       </label>
+
+      <fieldset>
+        <legend className="eyebrow text-muted">Contact and booking</legend>
+        <div className="mt-3 grid gap-4 sm:grid-cols-2">
+          <label className="block">
+            <span className={labelClass}>Phone</span>
+            <input
+              name="phone"
+              type="tel"
+              maxLength={40}
+              autoComplete="tel"
+              value={draft.phone}
+              onChange={(event) => setDraft({ ...draft, phone: event.target.value })}
+              placeholder="(607) 555-0123"
+              className={inputClass}
+            />
+          </label>
+          <label className="block">
+            <span className={labelClass}>Website</span>
+            <input
+              name="website"
+              inputMode="url"
+              maxLength={300}
+              value={draft.website}
+              onChange={(event) => setDraft({ ...draft, website: event.target.value })}
+              placeholder="example.com"
+              className={inputClass}
+            />
+          </label>
+        </div>
+        <label className="mt-4 block">
+          <span className={labelClass}>Reservation link</span>
+          <input
+            name="reservation_url"
+            inputMode="url"
+            maxLength={300}
+            value={draft.reservation_url}
+            onChange={(event) => setDraft({ ...draft, reservation_url: event.target.value })}
+            placeholder="Your booking page, like resy.com/…"
+            className={inputClass}
+          />
+          <span className="mt-1 block text-xs text-muted">
+            Diners see Call, Website, and Reserve buttons at the top of your menu for anything you
+            fill in.
+          </span>
+        </label>
+      </fieldset>
+
+      <fieldset>
+        <legend className="eyebrow text-muted">Price range</legend>
+        <div className="mt-3 flex flex-wrap gap-2.5">
+          {[0, ...PRICE_RANGES].map((level) => (
+            <label key={level} className={chipClass}>
+              <input
+                type="radio"
+                name="price_range"
+                value={level}
+                checked={draft.price_range === level}
+                onChange={() => setDraft({ ...draft, price_range: level })}
+                className="sr-only"
+              />
+              {level === 0 ? "Not set" : "$".repeat(level)}
+            </label>
+          ))}
+        </div>
+      </fieldset>
 
       <label className="block">
         <span className={labelClass}>Time zone</span>

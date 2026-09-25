@@ -3,7 +3,7 @@ import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { requireRestaurant } from "@/lib/auth";
 import { updateRestaurantProfile } from "@/lib/db/profile";
-import { ProfileSchema, WEEKDAYS } from "@/lib/restaurant-profile";
+import { ProfileSchema, WEEKDAYS, withWebScheme } from "@/lib/restaurant-profile";
 
 export type ProfileState = { error?: string; saved?: boolean; revision?: number };
 
@@ -38,12 +38,21 @@ export async function saveProfileAction(
     timezone: String(formData.get("timezone") ?? ""),
     hours: readHours(formData),
     occasions: formData.getAll("occasion").map(String),
+    phone: String(formData.get("phone") ?? ""),
+    website: withWebScheme(String(formData.get("website") ?? "")),
+    reservation_url: withWebScheme(String(formData.get("reservation_url") ?? "")),
+    price_range: Number(formData.get("price_range") ?? 0),
   });
   if (!parsed.success) {
+    const field = String(parsed.error.issues[0]?.path[0] ?? "");
     return {
       revision: _prev.revision,
       error:
-        "Check your hours: each open day needs an opening and closing time, or mark it closed.",
+        field === "website" || field === "reservation_url"
+          ? `Check your ${field === "website" ? "website" : "reservation link"}: enter a full web address, like https://example.com.`
+          : field === "hours"
+            ? "Check your hours: each open day needs an opening and closing time, or mark it closed."
+            : "Some details couldn't be saved. Check the form and try again.",
     };
   }
   if (!parsed.data.name) {

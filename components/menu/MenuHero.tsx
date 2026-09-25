@@ -14,10 +14,23 @@ type MenuHeroProps = {
   controls: ReactNode;
   /** A link along the top left, like My Carte. */
   lead?: ReactNode;
+  /** The restaurant's own logo, shown above its name. */
+  logo?: string | null;
+  /** Buttons under the name, like Call and Reserve. */
+  actions?: ReactNode;
 };
 
 /** The restaurant's name set large, over a slowly zooming dish photo or fine ink texture. */
-export function MenuHero({ name, details, cover, summary, controls, lead }: MenuHeroProps) {
+export function MenuHero({
+  name,
+  details,
+  cover,
+  summary,
+  controls,
+  lead,
+  logo,
+  actions,
+}: MenuHeroProps) {
   return (
     <header className="texture-ink relative isolate overflow-hidden text-white">
       {cover && (
@@ -42,6 +55,11 @@ export function MenuHero({ name, details, cover, summary, controls, lead }: Menu
           <div className="flex items-center gap-2">{controls}</div>
         </div>
         <div className="mt-16 sm:mt-24">
+          {logo && (
+            <div className="relative mb-6 h-16 w-16 overflow-hidden rounded-full bg-white shadow-raised-sm ring-2 ring-white/40 sm:h-20 sm:w-20">
+              <Image src={logo} alt="" fill sizes="80px" className="object-cover" />
+            </div>
+          )}
           <motion.h1
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
@@ -57,6 +75,7 @@ export function MenuHero({ name, details, cover, summary, controls, lead }: Menu
           )}
           <div aria-hidden="true" className="mt-7 h-1 w-20 bg-white" />
           <p className="eyebrow mt-5 text-white/60">{summary}</p>
+          {actions && <div className="mt-6 flex flex-wrap gap-2">{actions}</div>}
         </div>
       </div>
     </header>

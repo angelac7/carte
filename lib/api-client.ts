@@ -311,6 +311,31 @@ export async function uploadDishPhoto(
   return data;
 }
 
+/** Adds or replaces the restaurant's logo or cover photo; returns its address. */
+export async function uploadRestaurantImage(kind: "logo" | "cover", image: File): Promise<string> {
+  const form = new FormData();
+  form.append("kind", kind);
+  form.append("image", image);
+  const res = await fetch("/api/restaurant-image", { method: "POST", body: form });
+  checkSignedIn(res);
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok || typeof data.url !== "string") throw new Error(data.error ?? "Upload failed");
+  return data.url;
+}
+
+export async function removeRestaurantImage(kind: "logo" | "cover"): Promise<void> {
+  const res = await fetch("/api/restaurant-image", {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ kind }),
+  });
+  checkSignedIn(res);
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.error ?? "Removing the image failed");
+  }
+}
+
 export async function removeDishPhoto(
   dishId: string,
   revision?: number,

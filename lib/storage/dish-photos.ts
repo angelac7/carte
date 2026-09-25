@@ -63,3 +63,13 @@ export async function deleteAllRestaurantPhotos(restaurantId: string): Promise<v
     if (removeError) throw removeError;
   }
 }
+
+/** Stores a restaurant's logo or cover photo in its own folder, beside its dish photos. */
+export function storeRestaurantImage(
+  restaurantId: string,
+  kind: "logo" | "cover",
+  bytes: Buffer,
+  contentType: SupportedImageType,
+): Promise<string> {
+  return storeDishPhoto(restaurantId, `restaurant-${kind}`, bytes, contentType);
+}

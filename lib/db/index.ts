@@ -8,9 +8,16 @@ export type Restaurant = {
   cuisine: string;
   city?: string | null;
   timezone?: string;
+  phone?: string;
+  website?: string;
+  reservation_url?: string;
+  price_range?: number;
+  logo_url?: string | null;
+  cover_url?: string | null;
 };
 
-const RESTAURANT_COLUMNS = "id, name, slug, cuisine, city, timezone";
+const RESTAURANT_COLUMNS =
+  "id, name, slug, cuisine, city, timezone, phone, website, reservation_url, price_range, logo_url, cover_url";
 const DISH_COLUMNS =
   "id, name, description, price, allergens, dietary_tags, notes, confirmed, photo_url, revision, source_language, section, sort_order, sold_out_on, special, available_from, available_until";
 

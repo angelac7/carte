@@ -54,6 +54,7 @@ import {
 } from "@/lib/languages";
 import { filterDishes } from "@/lib/menu-filters";
 import { matchesSearch } from "@/lib/menu-search";
+import { detectCurrency } from "@/lib/prices";
 import { groupBySection, hasSections } from "@/lib/menu-sections";
 import { dishAvailability, restaurantClock, shortTime } from "@/lib/availability";
 import { toggleValue } from "@/lib/toggle-value";
@@ -64,7 +65,19 @@ type TranslationState = Partial<Record<LanguageCode, MenuTranslations | "failed"
 type Panel = "order" | "allergy-card" | "helper" | "display" | "chat" | "photo" | "filters" | null;
 
 type DinerMenuProps = {
-  restaurant: { name: string; slug: string; cuisine: string; city?: string; timezone?: string };
+  restaurant: {
+    name: string;
+    slug: string;
+    cuisine: string;
+    city?: string;
+    timezone?: string;
+    phone?: string;
+    website?: string;
+    reservation_url?: string;
+    price_range?: number;
+    logo_url?: string | null;
+    cover_url?: string | null;
+  };
   dishes: MenuItem[];
   /** When the page was made, so the server and browser agree on what's available at first. */
   initialNow?: number;
@@ -226,7 +239,7 @@ export function DinerMenu({
   const excludedOrder = Object.keys(order).some((id) => !shownIds.has(id));
   const openDish = shown.find((dish) => dish.id === openDishId);
   const orderCount = Object.values(filteredOrder).reduce((sum, quantity) => sum + quantity, 0);
-  const cover = dishes.find((dish) => dish.photo_url)?.photo_url ?? null;
+  const cover = restaurant.cover_url || (dishes.find((dish) => dish.photo_url)?.photo_url ?? null);
 
   const query = search.trim();
   const listed = shown.filter((dish) => {
@@ -250,8 +263,11 @@ export function DinerMenu({
       : group.section
         ? textFor(group.dishes[0]).section || group.section
         : t.otherDishes;
+  const priceRange = restaurant.price_range
+    ? detectCurrency(dishes.map((dish) => dish.price)).repeat(restaurant.price_range)
+    : "";
   const details = [
-    ...new Set([restaurant.cuisine, restaurant.city ?? ""].map((d) => d.trim())),
+    ...new Set([restaurant.cuisine, restaurant.city ?? "", priceRange].map((d) => d.trim())),
   ].filter(Boolean);
   const glassClass =
     "flex h-11 items-center gap-2 rounded-full border border-white/30 bg-white/10 px-3.5 text-sm font-medium text-white backdrop-blur transition-colors hover:border-white/60";
@@ -260,7 +276,37 @@ export function DinerMenu({
     <MenuHero
       name={restaurant.name}
       details={details}
-      cover={dishes.length > 0 ? cover : null}
+      cover={cover}
+      logo={restaurant.logo_url ?? null}
+      actions={
+        <>
+          {restaurant.reservation_url && (
+            <a
+              href={restaurant.reservation_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={glassClass}
+            >
+              {t.reserve}
+            </a>
+          )}
+          {restaurant.phone && (
+            <a href={`tel:${restaurant.phone.replace(/[^\d+]/g, "")}`} className={glassClass}>
+              {t.call}
+            </a>
+          )}
+          {restaurant.website && (
+            <a
+              href={restaurant.website}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={glassClass}
+            >
+              {t.website}
+            </a>
+          )}
+        </>
+      }
       summary={`${t.menuTitle} · ${t.dishCount(dishes.length)}`}
       lead={
         <OfflineLink href="/my" className={glassClass}>

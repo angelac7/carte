@@ -17,6 +17,6 @@ export default async function Image({ params }: { params: Promise<{ slug: string
   return shareImage({
     title: restaurant.name,
     subtitle: [restaurant.cuisine, restaurant.city].filter(Boolean).join(" · "),
-    photo: dishes.find((dish) => dish.photo_url)?.photo_url ?? null,
+    photo: restaurant.cover_url || (dishes.find((dish) => dish.photo_url)?.photo_url ?? null),
   });
 }

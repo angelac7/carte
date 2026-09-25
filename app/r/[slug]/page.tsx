@@ -73,6 +73,12 @@ export default async function RestaurantMenuPage({ params }: RestaurantMenuProps
         cuisine: restaurant.cuisine,
         city: restaurant.city ?? "",
         timezone: restaurant.timezone,
+        phone: restaurant.phone,
+        website: restaurant.website,
+        reservation_url: restaurant.reservation_url,
+        price_range: restaurant.price_range,
+        logo_url: restaurant.logo_url,
+        cover_url: restaurant.cover_url,
       }}
       dishes={dishes}
       initialNow={renderedAt.getTime()}

@@ -43,6 +43,9 @@ export type DinerStrings = {
   specials: string;
   servedBetween: (from: string, until: string) => string;
   notServedNow: string;
+  call: string;
+  website: string;
+  reserve: string;
   allergens: Record<Allergen, string>;
   tags: Record<DietaryTag, string>;
 };
@@ -65,6 +68,9 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     specials: "Specials",
     servedBetween: (from, until) => `Served ${from}–${until}`,
     notServedNow: "Not served right now",
+    call: "Call",
+    website: "Website",
+    reserve: "Reserve a table",
     menuUpdated:
       "The restaurant updated this menu. Your order and assistant results were cleared; review the current dishes before ordering.",
     refreshFailed:
@@ -132,6 +138,9 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     specials: "Especiales",
     servedBetween: (from, until) => `Se sirve de ${from} a ${until}`,
     notServedNow: "No se sirve ahora",
+    call: "Llamar",
+    website: "Sitio web",
+    reserve: "Reservar mesa",
     menuUpdated:
       "El restaurante actualizó el menú. Se borraron tu pedido y los resultados del asistente; revisa los platos antes de pedir.",
     refreshFailed:
@@ -199,6 +208,9 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     specials: "特色菜",
     servedBetween: (from, until) => `供应时间 ${from}–${until}`,
     notServedNow: "当前不供应",
+    call: "致电",
+    website: "网站",
+    reserve: "预订座位",
     menuUpdated: "餐厅更新了菜单。你的点单和助手结果已清除；点餐前请查看最新菜品。",
     refreshFailed: "无法检查菜单更新。请向工作人员确认当前菜品和过敏原。",
     offlineMenu: "离线菜单副本：菜品及过敏原信息可能已更改。请向工作人员确认当前菜单及过敏原。",
@@ -259,6 +271,9 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     specials: "스페셜 메뉴",
     servedBetween: (from, until) => `${from}–${until} 제공`,
     notServedNow: "지금은 제공되지 않음",
+    call: "전화하기",
+    website: "웹사이트",
+    reserve: "예약하기",
     menuUpdated:
       "식당에서 메뉴를 업데이트했습니다. 주문과 도우미 결과가 초기화되었습니다. 주문 전에 현재 메뉴를 확인하세요.",
     refreshFailed:
@@ -324,6 +339,9 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     specials: "本日のおすすめ",
     servedBetween: (from, until) => `${from}〜${until} 提供`,
     notServedNow: "現在は提供していません",
+    call: "電話する",
+    website: "ウェブサイト",
+    reserve: "予約する",
     menuUpdated:
       "メニューが更新されました。注文とアシスタントの結果はクリアされました。注文前に現在の料理を確認してください。",
     refreshFailed:
@@ -390,6 +408,9 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     specials: "Spécialités",
     servedBetween: (from, until) => `Servi de ${from} à ${until}`,
     notServedNow: "Pas servi en ce moment",
+    call: "Appeler",
+    website: "Site web",
+    reserve: "Réserver une table",
     menuUpdated:
       "Le restaurant a mis à jour le menu. Votre commande et les résultats de l’assistant ont été effacés. Vérifiez les plats avant de commander.",
     refreshFailed:
@@ -458,6 +479,9 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     specials: "Món đặc biệt",
     servedBetween: (from, until) => `Phục vụ ${from}–${until}`,
     notServedNow: "Hiện không phục vụ",
+    call: "Gọi điện",
+    website: "Trang web",
+    reserve: "Đặt bàn",
     menuUpdated:
       "Nhà hàng đã cập nhật thực đơn. Đơn món và kết quả trợ lý đã được xóa; hãy xem lại trước khi gọi món.",
     refreshFailed:

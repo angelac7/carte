@@ -2,7 +2,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { normalizeProfile, type RestaurantProfile } from "@/lib/restaurant-profile";
 
 const PROFILE_COLUMNS =
-  "revision, name, listed, description, cuisine, city, address, timezone, hours, occasions";
+  "revision, name, listed, description, cuisine, city, address, timezone, hours, occasions, phone, website, reservation_url, price_range";
 
 export async function getRestaurantProfile(
   supabase: SupabaseClient,

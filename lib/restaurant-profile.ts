@@ -58,6 +58,25 @@ export const DEFAULT_HOURS = Object.fromEntries(
   WEEKDAYS.map((day) => [day, { open: "11:00", close: "21:00" }]),
 ) as FullHours;
 
+/** A web address, or empty. Only http and https links are allowed. */
+const WebAddressSchema = z
+  .string()
+  .trim()
+  .max(300)
+  .refine((value) => value === "" || /^https?:\/\/[^\s]+\.[^\s]+$/i.test(value), {
+    message: "Enter a full web address, like https://example.com",
+  });
+
+/** Adds https:// to an address typed without it, like "example.com". */
+export function withWebScheme(value: string): string {
+  const trimmed = value.trim();
+  if (!trimmed || /^https?:\/\//i.test(trimmed)) return trimmed;
+  return `https://${trimmed}`;
+}
+
+/** $ to $$$$, or 0 when not set. */
+export const PRICE_RANGES = [1, 2, 3, 4] as const;
+
 export const ProfileSchema = z.object({
   revision: z.number().int().positive().optional(),
   name: z.string().trim().max(120),
@@ -69,6 +88,10 @@ export const ProfileSchema = z.object({
   timezone: z.enum(TIMEZONES),
   hours: HoursSchema,
   occasions: z.array(z.enum(OCCASIONS)).max(OCCASIONS.length),
+  phone: z.string().trim().max(40),
+  website: WebAddressSchema,
+  reservation_url: WebAddressSchema,
+  price_range: z.number().int().min(0).max(4),
 });
 export type RestaurantProfile = z.infer<typeof ProfileSchema>;
 
@@ -82,6 +105,10 @@ export const DEFAULT_PROFILE: RestaurantProfile = {
   timezone: DEFAULT_TIMEZONE,
   hours: DEFAULT_HOURS,
   occasions: [],
+  phone: "",
+  website: "",
+  reservation_url: "",
+  price_range: 0,
 };
 
 export function isOccasion(value: string): value is Occasion {
