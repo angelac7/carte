@@ -9,6 +9,7 @@ describe("site navigation", () => {
       "Upload",
       "Review dishes",
       "QR code",
+      "Printed menu",
       "Profile",
       "Map listing",
       "Team",

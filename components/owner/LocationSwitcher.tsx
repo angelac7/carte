@@ -15,7 +15,7 @@ export function LocationSwitcher({
 }) {
   const form = useRef<HTMLFormElement>(null);
   return (
-    <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-3 px-5 pt-4 text-sm">
+    <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-3 px-5 pt-4 text-sm print:hidden">
       {restaurants.length > 1 && (
         <form ref={form} action={switchRestaurantAction} className="flex items-center gap-2">
           <label htmlFor="location" className="text-muted">

@@ -20,7 +20,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
       {restaurant && <LocationSwitcher restaurants={all} currentId={restaurant.id} />}
       <OwnerTabs links={ownerLinks(restaurant, admin)} />
       {latestClaim && ["approved", "rejected", "transferred"].includes(latestClaim.status) && (
-        <div className="mx-auto max-w-5xl px-5 pt-5">
+        <div className="mx-auto max-w-5xl px-5 pt-5 print:hidden">
           <Notice tone={latestClaim.status === "approved" ? "success" : "warning"}>
             Map claim {latestClaim.status}. {latestClaim.review_note}
             <ButtonLink href="/dashboard/claim" variant="ghost" size="sm">

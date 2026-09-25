@@ -270,3 +270,13 @@ html:has(.landing-snap) {
 .ken-burns {
   animation: ken-burns 24s ease-in-out infinite alternate;
 }
+
+/* Printed pages get even margins, and no clay background behind the paper menu. */
+@page {
+  margin: 14mm;
+}
+@media print {
+  body {
+    background: #fff;
+  }
+}

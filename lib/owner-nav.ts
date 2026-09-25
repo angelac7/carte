@@ -24,6 +24,7 @@ export function ownerLinks(
         { href: "/dashboard/upload", label: "Upload" },
         { href: "/dashboard/review", label: "Review dishes" },
         { href: "/dashboard/qr", label: "QR code" },
+        { href: "/dashboard/print", label: "Printed menu" },
         { href: "/dashboard/profile", label: "Profile" },
         ...(owner
           ? [
