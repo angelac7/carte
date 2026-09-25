@@ -15,6 +15,8 @@ type MenuToolbarProps = {
   onRemoveAllergen: (allergen: Allergen) => void;
   onRemoveTag: (tag: DietaryTag) => void;
   onClearFilters: () => void;
+  /** Links to each menu heading, shown when the menu has sections. */
+  sections?: { id: string; label: string }[];
 };
 
 const pillClass =
@@ -31,6 +33,7 @@ export function MenuToolbar({
   onRemoveAllergen,
   onRemoveTag,
   onClearFilters,
+  sections = [],
 }: MenuToolbarProps) {
   const count = avoid.length + onlyTags.length;
 
@@ -116,6 +119,23 @@ export function MenuToolbar({
           </button>
         )}
       </div>
+
+      {sections.length > 1 && (
+        <nav
+          aria-label={t.sectionsLabel}
+          className="-mx-5 mt-2 flex gap-1 overflow-x-auto px-5 pb-1"
+        >
+          {sections.map((section) => (
+            <a
+              key={section.id}
+              href={`#${section.id}`}
+              className="shrink-0 rounded-full px-3.5 py-2 text-sm font-medium whitespace-nowrap text-muted transition-colors hover:text-ink"
+            >
+              {section.label}
+            </a>
+          ))}
+        </nav>
+      )}
     </div>
   );
 }

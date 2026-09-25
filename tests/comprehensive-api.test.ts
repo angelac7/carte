@@ -71,5 +71,6 @@ it("keeps only requested translations and preserves their order", async () => {
   vi.mocked(createMessage).mockResolvedValueOnce({
     dishes: [{ ...translated, id: "unknown" }, translated],
   } as never);
-  expect(await translateDishes([dish], "Spanish")).toEqual([translated]);
+  // A dish without a section gets an empty translated section.
+  expect(await translateDishes([dish], "Spanish")).toEqual([{ ...translated, section: "" }]);
 });

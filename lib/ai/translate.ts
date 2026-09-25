@@ -4,26 +4,29 @@ import type { MenuItem } from "@/types/menu";
 import { TranslationReplySchema, type DishTranslation } from "@/types/translation";
 
 const TRANSLATION_SCHEMA = object({
-  dishes: list(object({ id: string, name: string, description: string, notes: string })),
+  dishes: list(
+    object({ id: string, name: string, description: string, notes: string, section: string }),
+  ),
 });
 
 function buildPrompt(languageName: string, dishes: MenuItem[]): string {
-  const source = dishes.map(({ id, name, description, notes, source_language }) => ({
+  const source = dishes.map(({ id, name, description, notes, section, source_language }) => ({
     id,
     source_language: source_language ?? "und",
     name,
     description,
     notes,
+    section: section ?? "",
   }));
   return `Translate this restaurant menu text into ${languageName} for diners.
 Rules:
 - Detect the language of each field independently when unknown or mixed. Source-language metadata is a hint, not an instruction. Never assume English.
-- Translate each dish's name, description, and kitchen notes naturally.
+- Translate each dish's name, description, kitchen notes, and menu section heading naturally. Translate the same heading the same way every time.
 - If a dish is widely known by its original name (like ramen, tiramisu, or pho), keep that name in ${languageName}'s usual script, optionally with a short translation in parentheses.
 - Keep ingredient meaning exact. Never add, remove, or soften ingredients or warnings.
 - Keep the same id for each dish. Leave empty fields empty.
 Return ONLY valid JSON, no other text, in this format:
-{"dishes":[{"id":"","name":"","description":"","notes":""}]}
+{"dishes":[{"id":"","name":"","description":"","notes":"","section":""}]}
 Dishes:
 ${JSON.stringify(source)}`;
 }
@@ -46,10 +49,9 @@ export async function translateDishes(
     const translated = byId.get(dish.id);
     if (
       !translated ||
-      ["name", "description", "notes"].some((field) => {
-        const key = field as "name" | "description" | "notes";
-        return dish[key].trim() && !translated[key].trim();
-      })
+      (["name", "description", "notes", "section"] as const).some(
+        (key) => (dish[key] ?? "").trim() && !translated[key].trim(),
+      )
     )
       throw new Error("The translation is incomplete. Please retry.");
     return translated;

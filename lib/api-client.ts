@@ -21,7 +21,10 @@ function checkSignedIn(res: Response): void {
   if (res.status === 401) window.location.assign("/login");
 }
 
-async function sendToItems<T>(method: "POST" | "PUT" | "DELETE", body: unknown): Promise<T> {
+async function sendToItems<T>(
+  method: "POST" | "PUT" | "PATCH" | "DELETE",
+  body: unknown,
+): Promise<T> {
   const res = await fetch("/api/items", {
     method,
     headers: { "Content-Type": "application/json" },
@@ -49,6 +52,9 @@ export async function fetchDishes(): Promise<MenuItem[]> {
 export const saveDishes = (items: ExtractedDish[], options: { skipExisting?: boolean } = {}) =>
   sendToItems<MenuItem[]>("POST", { items, ...options });
 export const updateDish = (dish: MenuItem) => sendToItems<MenuItem>("PUT", dish);
+/** Saves a new dish order; returns the dishes whose order changed, with their new versions. */
+export const reorderDishes = (order: string[]) =>
+  sendToItems<{ id: string; revision: number; sort_order: number }[]>("PATCH", { order });
 export const deleteDish = (id: string, revision?: number) =>
   sendToItems<{ ok: boolean }>("DELETE", { id, revision });
 

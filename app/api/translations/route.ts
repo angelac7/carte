@@ -40,8 +40,8 @@ export async function GET(req: Request) {
     if (missing.length > 0) {
       const fresh = await translateDishes(missing, languageName(language));
       await saveTranslations(language, missing, fresh);
-      for (const { id, name, description, notes } of fresh)
-        found[id] = { name, description, notes };
+      for (const { id, name, description, notes, section } of fresh)
+        found[id] = { name, description, notes, section };
     }
     return NextResponse.json({ translations: found });
   } catch (err) {

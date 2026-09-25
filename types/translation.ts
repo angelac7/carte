@@ -10,6 +10,7 @@ export const DishTranslationSchema = z.object({
   name: text,
   description: text,
   notes: text,
+  section: text,
 });
 
 export const TranslationReplySchema = z.object({ dishes: z.array(DishTranslationSchema) });

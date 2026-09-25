@@ -54,6 +54,7 @@ import {
 } from "@/lib/languages";
 import { filterDishes } from "@/lib/menu-filters";
 import { matchesSearch } from "@/lib/menu-search";
+import { groupBySection, hasSections } from "@/lib/menu-sections";
 import { toggleValue } from "@/lib/toggle-value";
 import type { DishText, MenuItem } from "@/types/menu";
 import type { MenuTranslations } from "@/types/translation";
@@ -165,6 +166,7 @@ export function DinerMenu({
       name: translated?.name || dish.name,
       description: translated?.description || dish.description,
       notes: translated?.notes || dish.notes,
+      section: translated?.section || dish.section || "",
     };
   }
 
@@ -214,6 +216,12 @@ export function DinerMenu({
     const text = textFor(dish);
     return matchesSearch([text.name, dish.name, text.description, text.notes], query);
   });
+  // Menu headings, in the owner's order; a search shows matches under their headings too.
+  const groups = groupBySection(listed);
+  const sectioned = hasSections(groups);
+  const sectionId = (index: number) => `menu-section-${index}`;
+  const sectionTitle = (group: (typeof groups)[number]) =>
+    group.section ? textFor(group.dishes[0]).section || group.section : t.otherDishes;
   const details = [
     ...new Set([restaurant.cuisine, restaurant.city ?? ""].map((d) => d.trim())),
   ].filter(Boolean);
@@ -304,6 +312,11 @@ export function DinerMenu({
           onRemoveAllergen={(allergen) => updateFilters(toggleValue(avoid, allergen), onlyTags)}
           onRemoveTag={(tag) => updateFilters(avoid, toggleValue(onlyTags, tag))}
           onClearFilters={() => updateFilters([], [])}
+          sections={
+            sectioned
+              ? groups.map((group, index) => ({ id: sectionId(index), label: sectionTitle(group) }))
+              : []
+          }
         />
 
         <div className="mt-6 grid gap-6 lg:grid-cols-[1.1fr_1fr]">
@@ -414,25 +427,41 @@ export function DinerMenu({
               </Button>
             </EmptyState>
           ) : (
-            <ul className="mt-8 grid gap-6 lg:grid-cols-2">
-              {listed.map((dish) => (
-                <DishCard
-                  key={dish.id}
-                  dish={dish}
-                  text={textFor(dish)}
-                  summary={summaries[language]?.[summaryKey(dish)]}
-                  t={t}
-                  detailsLabel={dishText.details}
-                  explainLabel={dishText.explainLink}
-                  stepperLabels={tableText}
-                  restaurant={restaurant}
-                  language={language}
-                  quantity={order[dish.id] ?? 0}
-                  onQuantity={(quantity) => setQuantity(dish.id, quantity)}
-                  onOpen={() => openDetails(dish.id)}
-                />
+            <div className="mt-8 space-y-14">
+              {groups.map((group, index) => (
+                <section
+                  key={group.section || "other"}
+                  id={sectionId(index)}
+                  aria-label={sectioned ? sectionTitle(group) : undefined}
+                  className="scroll-mt-48"
+                >
+                  {sectioned && (
+                    <h2 className="mb-6 font-serif text-4xl leading-none tracking-tight sm:text-5xl">
+                      {sectionTitle(group)}
+                    </h2>
+                  )}
+                  <ul className="grid gap-6 lg:grid-cols-2">
+                    {group.dishes.map((dish) => (
+                      <DishCard
+                        key={dish.id}
+                        dish={dish}
+                        text={textFor(dish)}
+                        summary={summaries[language]?.[summaryKey(dish)]}
+                        t={t}
+                        detailsLabel={dishText.details}
+                        explainLabel={dishText.explainLink}
+                        stepperLabels={tableText}
+                        restaurant={restaurant}
+                        language={language}
+                        quantity={order[dish.id] ?? 0}
+                        onQuantity={(quantity) => setQuantity(dish.id, quantity)}
+                        onOpen={() => openDetails(dish.id)}
+                      />
+                    ))}
+                  </ul>
+                </section>
               ))}
-            </ul>
+            </div>
           )}
         </section>
       </main>

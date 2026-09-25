@@ -38,6 +38,8 @@ export const ExtractedDishSchema = z
     name: text,
     description: text,
     price: text,
+    /** The menu heading the dish is listed under, like "Starters". */
+    section: text.transform((value) => value.trim().slice(0, 80)).optional(),
     likely_allergens: allergenList,
     dietary_tags: tagList,
   })
@@ -67,6 +69,10 @@ export const MenuItemSchema = z.object({
   dietary_tags: z.array(z.enum(DIETARY_TAGS)),
   notes: z.string().max(2000),
   confirmed: z.boolean(),
+  /** The menu heading the dish is listed under, like "Starters". Empty when there's none. */
+  section: z.string().trim().max(80).optional(),
+  /** The owner's order for the menu, lowest first. Changed only by reordering. */
+  sort_order: z.number().int().optional(),
   // Set only by the photo upload route, never by dish edits.
   photo_url: z.string().nullable().optional(),
 });
@@ -75,4 +81,4 @@ export type ExtractedDish = z.infer<typeof ExtractedDishSchema>;
 export type MenuItem = z.infer<typeof MenuItemSchema>;
 
 /** A dish's text as shown to a diner, translated when available. */
-export type DishText = { name: string; description: string; notes: string };
+export type DishText = { name: string; description: string; notes: string; section?: string };

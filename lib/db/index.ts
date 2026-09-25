@@ -11,7 +11,7 @@ export type Restaurant = {
 
 const RESTAURANT_COLUMNS = "id, name, slug, cuisine, city";
 const DISH_COLUMNS =
-  "id, name, description, price, allergens, dietary_tags, notes, confirmed, photo_url, revision, source_language";
+  "id, name, description, price, allergens, dietary_tags, notes, confirmed, photo_url, revision, source_language, section, sort_order";
 
 export async function getOwnerRestaurant(
   supabase: SupabaseClient,
@@ -73,6 +73,7 @@ export async function listDishes(
     .from("menu_items")
     .select(DISH_COLUMNS)
     .eq("restaurant_id", restaurantId)
+    .order("sort_order")
     .order("created_at");
   if (error) throw error;
   return (data ?? []) as unknown as MenuItem[];
@@ -88,6 +89,7 @@ export async function getConfirmedDishes(
     .select(DISH_COLUMNS)
     .eq("restaurant_id", restaurantId)
     .eq("confirmed", true)
+    .order("sort_order")
     .order("created_at");
   if (error) throw error;
   return (data ?? []) as unknown as MenuItem[];
@@ -100,12 +102,24 @@ export async function addDishes(
   dishes: ExtractedDish[],
 ): Promise<MenuItem[]> {
   if (dishes.length === 0) return [];
-  const rows = dishes.map((dish) => ({
+  // New dishes go after the existing ones, in the order they were read or added.
+  const { data: last, error: lastError } = await supabase
+    .from("menu_items")
+    .select("sort_order")
+    .eq("restaurant_id", restaurantId)
+    .order("sort_order", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (lastError) throw lastError;
+  const start = ((last as { sort_order: number } | null)?.sort_order ?? 0) + 1;
+  const rows = dishes.map((dish, index) => ({
     restaurant_id: restaurantId,
     source_language: dish.source_language ?? "und",
     name: dish.name,
     description: dish.description,
     price: dish.price,
+    section: dish.section ?? "",
+    sort_order: start + index,
     allergens: dish.likely_allergens,
     dietary_tags: dish.dietary_tags,
     notes: "",
@@ -131,6 +145,8 @@ export async function updateDish(
       allergens: dish.allergens,
       dietary_tags: dish.dietary_tags,
       notes: dish.notes,
+      // Left alone when the edit doesn't include it.
+      ...(dish.section !== undefined && { section: dish.section }),
       confirmed: dish.confirmed,
     })
     .eq("id", dish.id)
@@ -140,6 +156,20 @@ export async function updateDish(
     .maybeSingle();
   if (error) throw error;
   return data as unknown as MenuItem | null;
+}
+
+/** Saves a new dish order and returns the dishes whose order changed, with their new versions. */
+export async function reorderDishes(
+  supabase: SupabaseClient,
+  restaurantId: string,
+  orderedIds: string[],
+): Promise<{ id: string; revision: number; sort_order: number }[]> {
+  const { data, error } = await supabase.rpc("reorder_dishes", {
+    restaurant: restaurantId,
+    ordered: orderedIds,
+  });
+  if (error) throw error;
+  return (data ?? []) as { id: string; revision: number; sort_order: number }[];
 }
 
 export async function deleteDish(

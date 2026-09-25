@@ -1,7 +1,14 @@
 import { after, NextResponse } from "next/server";
 import { z } from "zod";
 import { getOwnerContext } from "@/lib/auth";
-import { addDishes, deleteAllDishes, deleteDish, listDishes, updateDish } from "@/lib/db";
+import {
+  addDishes,
+  deleteAllDishes,
+  deleteDish,
+  listDishes,
+  reorderDishes,
+  updateDish,
+} from "@/lib/db";
 import { getDishPhoto } from "@/lib/db/photos";
 import { withoutDuplicates } from "@/lib/menu-dedupe";
 import { prepareExplanations } from "@/lib/prepare-explanations";
@@ -22,6 +29,7 @@ const DeleteRequest = z.union([
     expected: z.array(z.object({ id: z.uuid(), revision: Version })).max(10000),
   }),
 ]);
+const ReorderRequest = z.object({ order: z.array(z.uuid()).min(1).max(10000) });
 const LOGIN_REQUIRED = "Log in to manage your menu.";
 
 function fail(message: string, status = 400) {
@@ -74,6 +82,17 @@ export async function PUT(req: Request) {
   // Explain a newly confirmed dish right away, so the first diner to open it doesn't wait.
   if (updated.confirmed) after(() => prepareExplanations([updated], owner.restaurant.name));
   return NextResponse.json(updated);
+}
+
+/** Saves the owner's dish order. Returns each moved dish's new version. */
+export async function PATCH(req: Request) {
+  const owner = await getOwnerContext();
+  if (!owner) return fail(LOGIN_REQUIRED, 401);
+  const parsed = ReorderRequest.safeParse(await req.json().catch(() => null));
+  if (!parsed.success) return fail("The new order was not in the expected format.");
+  return NextResponse.json(
+    await reorderDishes(owner.supabase, owner.restaurant.id, parsed.data.order),
+  );
 }
 
 /** Deletes one dish, or every dish, along with their photos. */

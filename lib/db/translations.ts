@@ -1,6 +1,6 @@
 import "server-only";
 import type { LanguageCode } from "@/lib/languages";
-import { sourceHash } from "@/lib/source-hash";
+import { translationHash } from "@/lib/source-hash";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { MenuItem } from "@/types/menu";
 import type { DishTranslation, MenuTranslations } from "@/types/translation";
@@ -11,6 +11,7 @@ type TranslationRow = {
   name: string;
   description: string;
   notes: string;
+  section: string;
 };
 
 /** Splits dishes into those with an up-to-date saved translation and those still missing one. */
@@ -22,7 +23,7 @@ export async function getCachedTranslations(
 
   const { data, error } = await createAdminClient()
     .from("translations")
-    .select("menu_item_id, source_hash, name, description, notes")
+    .select("menu_item_id, source_hash, name, description, notes, section")
     .eq("language", language)
     .in(
       "menu_item_id",
@@ -35,8 +36,13 @@ export async function getCachedTranslations(
   const missing: MenuItem[] = [];
   for (const dish of dishes) {
     const row = saved.get(dish.id);
-    if (row && row.source_hash === sourceHash(dish)) {
-      found[dish.id] = { name: row.name, description: row.description, notes: row.notes };
+    if (row && row.source_hash === translationHash(dish)) {
+      found[dish.id] = {
+        name: row.name,
+        description: row.description,
+        notes: row.notes,
+        section: row.section,
+      };
     } else {
       missing.push(dish);
     }
@@ -50,10 +56,20 @@ export async function saveTranslations(
   translated: DishTranslation[],
 ): Promise<void> {
   const dishesById = new Map(dishes.map((dish) => [dish.id, dish]));
-  const rows = translated.flatMap(({ id, name, description, notes }) => {
+  const rows = translated.flatMap(({ id, name, description, notes, section }) => {
     const dish = dishesById.get(id);
     return dish
-      ? [{ menu_item_id: id, language, source_hash: sourceHash(dish), name, description, notes }]
+      ? [
+          {
+            menu_item_id: id,
+            language,
+            source_hash: translationHash(dish),
+            name,
+            description,
+            notes,
+            section,
+          },
+        ]
       : [];
   });
   if (rows.length === 0) return;

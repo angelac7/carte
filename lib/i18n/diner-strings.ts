@@ -35,6 +35,9 @@ export type DinerStrings = {
   /** An active allergen filter as a short pill, like "No milk". */
   avoidPill: (allergen: string) => string;
   removeFilter: (label: string) => string;
+  /** The heading for dishes the owner hasn't put in a section. */
+  otherDishes: string;
+  sectionsLabel: string;
   allergens: Record<Allergen, string>;
   tags: Record<DietaryTag, string>;
 };
@@ -50,6 +53,8 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     helperPitch: "Tell Carte about your table and get suggestions that respect your filters.",
     avoidPill: (a) => `No ${a}`,
     removeFilter: (label) => `Remove ${label}`,
+    otherDishes: "More dishes",
+    sectionsLabel: "Jump to a section",
     menuUpdated:
       "The restaurant updated this menu. Your order and assistant results were cleared; review the current dishes before ordering.",
     refreshFailed:
@@ -110,6 +115,8 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     helperPitch: "Cuéntale a Carte sobre tu mesa y recibe sugerencias que respetan tus filtros.",
     avoidPill: (a) => `Sin ${a}`,
     removeFilter: (label) => `Quitar ${label}`,
+    otherDishes: "Más platos",
+    sectionsLabel: "Ir a una sección",
     menuUpdated:
       "El restaurante actualizó el menú. Se borraron tu pedido y los resultados del asistente; revisa los platos antes de pedir.",
     refreshFailed:
@@ -170,6 +177,8 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     helperPitch: "告诉 Carte 你们这桌的情况，获取符合筛选条件的推荐。",
     avoidPill: (a) => `不含${a}`,
     removeFilter: (label) => `移除${label}`,
+    otherDishes: "更多菜品",
+    sectionsLabel: "跳转到分类",
     menuUpdated: "餐厅更新了菜单。你的点单和助手结果已清除；点餐前请查看最新菜品。",
     refreshFailed: "无法检查菜单更新。请向工作人员确认当前菜品和过敏原。",
     offlineMenu: "离线菜单副本：菜品及过敏原信息可能已更改。请向工作人员确认当前菜单及过敏原。",
@@ -223,6 +232,8 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     helperPitch: "일행 정보를 알려 주시면 필터에 맞는 요리를 추천해 드려요.",
     avoidPill: (a) => `${a} 제외`,
     removeFilter: (label) => `${label} 해제`,
+    otherDishes: "다른 요리",
+    sectionsLabel: "섹션으로 이동",
     menuUpdated:
       "식당에서 메뉴를 업데이트했습니다. 주문과 도우미 결과가 초기화되었습니다. 주문 전에 현재 메뉴를 확인하세요.",
     refreshFailed:
@@ -281,6 +292,8 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     helperPitch: "テーブルの人数や好みを教えていただくと、フィルターに合う料理をおすすめします。",
     avoidPill: (a) => `${a}なし`,
     removeFilter: (label) => `${label}を解除`,
+    otherDishes: "その他の料理",
+    sectionsLabel: "セクションへ移動",
     menuUpdated:
       "メニューが更新されました。注文とアシスタントの結果はクリアされました。注文前に現在の料理を確認してください。",
     refreshFailed:
@@ -340,6 +353,8 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
       "Parlez de votre table à Carte et recevez des suggestions qui respectent vos filtres.",
     avoidPill: (a) => `Sans ${a}`,
     removeFilter: (label) => `Retirer ${label}`,
+    otherDishes: "Autres plats",
+    sectionsLabel: "Aller à une section",
     menuUpdated:
       "Le restaurant a mis à jour le menu. Votre commande et les résultats de l’assistant ont été effacés. Vérifiez les plats avant de commander.",
     refreshFailed:
@@ -401,6 +416,8 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     helperPitch: "Hãy cho Carte biết về bàn của bạn để nhận gợi ý phù hợp với bộ lọc.",
     avoidPill: (a) => `Không ${a}`,
     removeFilter: (label) => `Bỏ ${label}`,
+    otherDishes: "Món khác",
+    sectionsLabel: "Chuyển đến mục",
     menuUpdated:
       "Nhà hàng đã cập nhật thực đơn. Đơn món và kết quả trợ lý đã được xóa; hãy xem lại trước khi gọi món.",
     refreshFailed:

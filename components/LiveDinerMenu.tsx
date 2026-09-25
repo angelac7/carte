@@ -21,6 +21,8 @@ function fingerprint(dishes: Props["dishes"]) {
       d.dietary_tags,
       d.photo_url,
       d.source_language,
+      d.section,
+      d.sort_order,
     ]),
   );
 }

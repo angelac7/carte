@@ -13,6 +13,7 @@ List every dish and drink you can see, in menu order. If some writing is hard to
 Preserve the original language of names and descriptions; never assume English.
 source_language is the BCP 47 language code of the dish text (for example ja, es, ar, th). Use und for mixed or uncertain text.
 description is one short phrase in that language.
+section is the menu heading the dish is listed under (for example Starters, Noodles, or Drinks), copied as written; use "" if the menu has no headings.
 likely_allergens may only include: ${ALLERGENS.join(", ")}.
 dietary_tags may include: ${AI_SUGGESTED_TAGS.join(", ")}.
 These are guesses for the restaurant to confirm, so include an allergen
@@ -21,7 +22,7 @@ Soy sauce, miso, and gochujang usually contain wheat. Noodles (ramen, ramyun, ud
 Only add a dietary tag like gluten-free or vegan if you are highly confident
 from the listed ingredients. When unsure, leave the tag out.
 Return ONLY valid JSON, no other text, in this format:
-{"items":[{"source_language":"","name":"","description":"","price":"","likely_allergens":[],"dietary_tags":[]}]}`;
+{"items":[{"source_language":"","name":"","description":"","price":"","section":"","likely_allergens":[],"dietary_tags":[]}]}`;
 
 // Structured output: every dish comes back in exactly this shape, and allergens and
 // tags can only be values from Carte's own lists.
@@ -32,6 +33,7 @@ const MENU_SCHEMA = object({
       name: string,
       description: string,
       price: string,
+      section: string,
       likely_allergens: list(oneOf(ALLERGENS)),
       dietary_tags: list(oneOf(AI_SUGGESTED_TAGS)),
     }),
