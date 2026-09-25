@@ -5,6 +5,10 @@ import type { LanguageCode } from "@/lib/languages";
 export type DishStrings = {
   details: string;
   whatItIs: string;
+  nameMeaning: string;
+  served: string;
+  /** On each dish card, a hint that tapping opens the full explanation. */
+  explainLink: string;
   taste: string;
   background: string;
   glossary: string;
@@ -27,9 +31,12 @@ export const DISH_STRINGS: Record<LanguageCode, DishStrings> = {
   en: {
     details: "Details",
     whatItIs: "What it is",
+    nameMeaning: "About the name",
+    served: "How it's served",
+    explainLink: "Explain this dish",
     taste: "Taste",
     background: "Background",
-    glossary: "Ingredients to know",
+    glossary: "Words to know",
     spice: "Spice",
     spiceLevels: ["Not spicy", "Mild", "Medium", "Hot"],
     richness: "Richness",
@@ -48,9 +55,12 @@ export const DISH_STRINGS: Record<LanguageCode, DishStrings> = {
   es: {
     details: "Detalles",
     whatItIs: "Qué es",
+    nameMeaning: "Sobre el nombre",
+    served: "Cómo se sirve",
+    explainLink: "Explicar este plato",
     taste: "Sabor",
     background: "Origen",
-    glossary: "Ingredientes a conocer",
+    glossary: "Palabras a conocer",
     spice: "Picante",
     spiceLevels: ["Sin picante", "Suave", "Medio", "Picante"],
     richness: "Contundencia",
@@ -73,9 +83,12 @@ export const DISH_STRINGS: Record<LanguageCode, DishStrings> = {
   zh: {
     details: "详情",
     whatItIs: "这是什么",
+    nameMeaning: "菜名含义",
+    served: "上菜方式",
+    explainLink: "了解这道菜",
     taste: "口味",
     background: "背景",
-    glossary: "食材小知识",
+    glossary: "菜单用语解释",
     spice: "辣度",
     spiceLevels: ["不辣", "微辣", "中辣", "特辣"],
     richness: "浓郁度",
@@ -93,9 +106,12 @@ export const DISH_STRINGS: Record<LanguageCode, DishStrings> = {
   ko: {
     details: "자세히",
     whatItIs: "어떤 요리인가요",
+    nameMeaning: "이름의 뜻",
+    served: "제공 방식",
+    explainLink: "이 요리 알아보기",
     taste: "맛",
     background: "유래",
-    glossary: "알아두면 좋은 재료",
+    glossary: "알아두면 좋은 단어",
     spice: "매운 정도",
     spiceLevels: ["안 매움", "약간 매움", "보통", "매움"],
     richness: "진한 정도",
@@ -114,9 +130,12 @@ export const DISH_STRINGS: Record<LanguageCode, DishStrings> = {
   ja: {
     details: "詳細",
     whatItIs: "どんな料理？",
+    nameMeaning: "名前の意味",
+    served: "提供スタイル",
+    explainLink: "この料理について",
     taste: "味",
     background: "由来",
-    glossary: "知っておきたい食材",
+    glossary: "知っておきたい言葉",
     spice: "辛さ",
     spiceLevels: ["辛くない", "ピリ辛", "中辛", "辛口"],
     richness: "こってり度",
@@ -135,9 +154,12 @@ export const DISH_STRINGS: Record<LanguageCode, DishStrings> = {
   fr: {
     details: "Détails",
     whatItIs: "Ce que c'est",
+    nameMeaning: "À propos du nom",
+    served: "Comment il est servi",
+    explainLink: "Découvrir ce plat",
     taste: "Goût",
     background: "Origine",
-    glossary: "Ingrédients à connaître",
+    glossary: "Mots à connaître",
     spice: "Piquant",
     spiceLevels: ["Pas épicé", "Doux", "Moyen", "Fort"],
     richness: "Richesse",
@@ -160,9 +182,12 @@ export const DISH_STRINGS: Record<LanguageCode, DishStrings> = {
   vi: {
     details: "Chi tiết",
     whatItIs: "Món này là gì",
+    nameMeaning: "Ý nghĩa tên món",
+    served: "Cách phục vụ",
+    explainLink: "Tìm hiểu món này",
     taste: "Hương vị",
     background: "Nguồn gốc",
-    glossary: "Nguyên liệu cần biết",
+    glossary: "Từ ngữ cần biết",
     spice: "Độ cay",
     spiceLevels: ["Không cay", "Cay nhẹ", "Cay vừa", "Rất cay"],
     richness: "Độ đậm đà",

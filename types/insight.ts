@@ -24,6 +24,8 @@ export const DishInsightSchema = z.object({
   nativeName: text,
   nativeLang: text,
   phonetic: text,
+  // Explanations saved before this was added don't have it, so it reads as empty.
+  nameMeaning: text,
   spice: level,
   richness: level,
   portion: z.enum(["small", "single", "share"]).catch("single"),
@@ -31,7 +33,7 @@ export const DishInsightSchema = z.object({
   glossary: z
     .array(z.object({ term: text, meaning: text }))
     .nullish()
-    .transform((list) => (list ?? []).filter((g) => g.term && g.meaning).slice(0, 6)),
+    .transform((list) => (list ?? []).filter((g) => g.term && g.meaning).slice(0, 8)),
   pairings: shortList(4),
   askKitchen: shortList(3),
 });

@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Chip } from "@/components/Chip";
 import { Sheet } from "@/components/Sheet";
 import { fetchInsight } from "@/lib/api-client";
@@ -18,6 +18,8 @@ type DishSheetProps = {
   text: DishText;
   language: LanguageCode;
   restaurantSlug: string;
+  /** Called once the explanation arrives, so the menu can show its summary too. */
+  onExplained?: (insight: DishInsight) => void;
   onClose: () => void;
 };
 
@@ -43,40 +45,52 @@ function Meter({ label, level, words }: { label: string; level: number; words: s
   );
 }
 
-function Section({ title, body }: { title: string; body: string }) {
-  if (!body) return null;
+/** One part of the explanation, set in its own inset box. */
+function Group({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <div>
+    <section className="rounded-control p-4 shadow-pressed-sm sm:p-5">
       <h3 className="eyebrow text-muted">{title}</h3>
-      <p className="mt-1 text-sm leading-relaxed">{body}</p>
-    </div>
+      <div className="mt-2 text-sm leading-relaxed">{children}</div>
+    </section>
   );
 }
 
-function List({ title, items }: { title: string; items: string[] }) {
+function List({ items }: { items: string[] }) {
   return (
-    <div>
-      <h3 className="eyebrow text-muted">{title}</h3>
-      <ul className="mt-1 list-disc space-y-1 pl-5 text-sm leading-relaxed">
-        {items.map((item) => (
-          <li key={item}>{item}</li>
-        ))}
-      </ul>
-    </div>
+    <ul className="list-disc space-y-1 pl-5">
+      {items.map((item) => (
+        <li key={item}>{item}</li>
+      ))}
+    </ul>
   );
 }
 
 /** A detail card that explains one dish, opened by tapping "Details" on the diner menu. */
-export function DishSheet({ dish, text, language, restaurantSlug, onClose }: DishSheetProps) {
+export function DishSheet({
+  dish,
+  text,
+  language,
+  restaurantSlug,
+  onExplained,
+  onClose,
+}: DishSheetProps) {
   const t = DISH_STRINGS[language];
   const d = DINER_STRINGS[language];
-  const key = `${dish.id}:${language}`;
+  // Includes the dish's version, so an edit during the visit fetches a fresh explanation.
+  const key = `${dish.id}:${dish.revision ?? 0}:${language}`;
   const [results, setResults] = useState<Record<string, DishInsight | "failed">>(() =>
     Object.fromEntries(insightCache),
   );
   const requested = useRef(new Set<string>());
   const result = results[key];
   const insight = result && result !== "failed" ? result : undefined;
+  const explained = useRef(onExplained);
+  useEffect(() => {
+    explained.current = onExplained;
+  });
+  useEffect(() => {
+    if (insight) explained.current?.(insight);
+  }, [insight]);
 
   useEffect(() => {
     if (results[key] !== undefined || requested.current.has(key)) return;
@@ -172,37 +186,62 @@ export function DishSheet({ dish, text, language, restaurantSlug, onClose }: Dis
           </p>
         )}
         {insight && (
-          <div className="space-y-5">
-            <Section title={t.whatItIs} body={insight.summary} />
-            <Section title={t.taste} body={insight.taste} />
-            <div className="grid grid-cols-2 gap-4">
-              <Meter label={t.spice} level={insight.spice} words={t.spiceLevels} />
-              <Meter label={t.richness} level={insight.richness} words={t.richnessLevels} />
-            </div>
-            <div>
-              <h3 className="eyebrow text-muted">{t.portion}</h3>
-              <p className="mt-1 text-sm">{t.portionLabels[insight.portion]}</p>
-              {insight.portionNote && (
-                <p className="mt-1 text-sm leading-relaxed text-muted">{insight.portionNote}</p>
-              )}
-            </div>
-            <Section title={t.background} body={insight.background} />
+          <div className="space-y-4">
+            {(insight.summary || insight.nameMeaning) && (
+              <Group title={t.whatItIs}>
+                {insight.summary && <p className="text-base">{insight.summary}</p>}
+                {insight.nameMeaning && (
+                  <p className="mt-3">
+                    <span className="font-medium">{t.nameMeaning}:</span>{" "}
+                    <span className="text-muted">{insight.nameMeaning}</span>
+                  </p>
+                )}
+              </Group>
+            )}
             {insight.glossary.length > 0 && (
-              <div>
-                <h3 className="eyebrow text-muted">{t.glossary}</h3>
-                <dl className="mt-1 space-y-1 text-sm leading-relaxed">
+              <Group title={t.glossary}>
+                <dl className="divide-y divide-ink/10">
                   {insight.glossary.map((entry) => (
-                    <div key={entry.term}>
-                      <dt className="inline font-medium">{entry.term}: </dt>
-                      <dd className="inline text-muted">{entry.meaning}</dd>
+                    <div key={entry.term} className="py-2 first:pt-0 last:pb-0">
+                      <dt className="font-medium">{entry.term}</dt>
+                      <dd className="text-muted">{entry.meaning}</dd>
                     </div>
                   ))}
                 </dl>
-              </div>
+              </Group>
             )}
-            {insight.pairings.length > 0 && <List title={t.pairings} items={insight.pairings} />}
+            <Group title={t.taste}>
+              {insight.taste && <p>{insight.taste}</p>}
+              <div className="mt-4 grid grid-cols-2 gap-4">
+                <Meter label={t.spice} level={insight.spice} words={t.spiceLevels} />
+                <Meter label={t.richness} level={insight.richness} words={t.richnessLevels} />
+              </div>
+            </Group>
+            <Group title={t.served}>
+              <p>
+                <span className="font-medium">{t.portionLabels[insight.portion]}</span>
+                {insight.portionNote && (
+                  <span className="text-muted"> · {insight.portionNote}</span>
+                )}
+              </p>
+              {insight.pairings.length > 0 && (
+                <>
+                  <h4 className="mt-4 font-medium">{t.pairings}</h4>
+                  <div className="mt-1">
+                    <List items={insight.pairings} />
+                  </div>
+                </>
+              )}
+            </Group>
+            {insight.background && (
+              <Group title={t.background}>
+                <p>{insight.background}</p>
+              </Group>
+            )}
             {insight.askKitchen.length > 0 && (
-              <List title={t.askKitchen} items={insight.askKitchen} />
+              <Group title={t.askKitchen}>
+                <List items={insight.askKitchen} />
+              </Group>
             )}
             <p className="text-xs leading-relaxed text-muted">{t.disclaimer}</p>
           </div>

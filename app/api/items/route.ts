@@ -1,9 +1,10 @@
-import { NextResponse } from "next/server";
+import { after, NextResponse } from "next/server";
 import { z } from "zod";
 import { getOwnerContext } from "@/lib/auth";
 import { addDishes, deleteAllDishes, deleteDish, listDishes, updateDish } from "@/lib/db";
 import { getDishPhoto } from "@/lib/db/photos";
 import { withoutDuplicates } from "@/lib/menu-dedupe";
+import { prepareExplanations } from "@/lib/prepare-explanations";
 import { deleteStoredPhoto } from "@/lib/storage/dish-photos";
 import { tagConflictMessages } from "@/lib/tag-conflicts";
 import { ExtractedDishSchema, MenuItemSchema } from "@/types/menu";
@@ -70,6 +71,8 @@ export async function PUT(req: Request) {
       "This dish changed in another tab or was deleted. Reload to review the latest version.",
       409,
     );
+  // Explain a newly confirmed dish right away, so the first diner to open it doesn't wait.
+  if (updated.confirmed) after(() => prepareExplanations([updated], owner.restaurant.name));
   return NextResponse.json(updated);
 }
 

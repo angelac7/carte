@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { after } from "next/server";
 import Link from "@/components/OfflineLink";
 import { BlurFade } from "@/components/motion/BlurFade";
 import { NumberTicker } from "@/components/motion/NumberTicker";
@@ -13,6 +14,7 @@ import { getDailyViews, getDishViews } from "@/lib/db/owner-stats";
 import { getClaim } from "@/lib/db/places";
 import { getRestaurantProfile } from "@/lib/db/profile";
 import { buildChecklist } from "@/lib/owner-checklist";
+import { prepareExplanations } from "@/lib/prepare-explanations";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "Dashboard | Carte" };
@@ -28,6 +30,9 @@ export default async function DashboardHome() {
     getDishViews(supabase).catch(() => []),
     getDailyViews(supabase).catch(() => []),
   ]);
+
+  // Catch up on explanations for any confirmed dish that doesn't have one yet.
+  after(() => prepareExplanations(dishes, restaurant.name));
 
   const confirmed = dishes.filter((dish) => dish.confirmed).length;
   const needReview = dishes.length - confirmed;

@@ -2,6 +2,7 @@
 import Image from "next/image";
 import { Chip } from "@/components/Chip";
 import { DishActions } from "@/components/DishActions";
+import { SparkleIcon } from "@/components/icons";
 import { QuantityStepper } from "@/components/QuantityStepper";
 import type { DinerStrings } from "@/lib/i18n/diner-strings";
 import type { LanguageCode } from "@/lib/languages";
@@ -11,8 +12,11 @@ import type { DishText, MenuItem } from "@/types/menu";
 type DishCardProps = {
   dish: MenuItem;
   text: DishText;
+  /** A one-line AI explanation of what the dish is, when one has been written. */
+  summary?: string;
   t: DinerStrings;
   detailsLabel: string;
+  explainLabel: string;
   stepperLabels: { add: string; increase: string; decrease: string };
   restaurant: { name: string; slug: string; cuisine: string };
   language: LanguageCode;
@@ -29,8 +33,10 @@ type DishCardProps = {
 export function DishCard({
   dish,
   text,
+  summary,
   t,
   detailsLabel,
+  explainLabel,
   stepperLabels,
   restaurant,
   language,
@@ -74,9 +80,24 @@ export function DishCard({
             {dish.name}
           </p>
         )}
+        {summary && (
+          <p className="mt-3 flex gap-2 text-[0.9375rem] leading-snug">
+            <span aria-hidden="true" className="mt-0.5 h-4 w-4 shrink-0 text-accent">
+              <SparkleIcon />
+            </span>
+            <span>{summary}</span>
+          </p>
+        )}
         {text.description && (
           <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-muted">{text.description}</p>
         )}
+        {/* The whole card opens the explanation; this just says so. */}
+        <p
+          aria-hidden="true"
+          className="mt-3 text-sm font-medium text-accent transition-transform duration-200 group-hover:translate-x-0.5"
+        >
+          {explainLabel} →
+        </p>
 
         <div className="mt-4 flex flex-wrap items-center gap-2 text-xs">
           {dish.allergens.length > 0 ? (

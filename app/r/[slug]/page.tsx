@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { cache } from "react";
 import { LiveDinerMenu } from "@/components/LiveDinerMenu";
 import { getConfirmedDishes, getRestaurantBySlug } from "@/lib/db";
+import { getCachedSummaries } from "@/lib/db/insights";
 import { parsePrefs, PREFS_COOKIE } from "@/lib/diner-prefs";
 import { DISPLAY_COOKIE, parseDisplay } from "@/lib/display-prefs";
 import { isLanguageCode, LANGUAGE_COOKIE, languageFromAcceptHeader } from "@/lib/languages";
@@ -45,6 +46,8 @@ export default async function RestaurantMenuPage({ params }: RestaurantMenuProps
       : languageFromAcceptHeader(acceptLanguage);
   const initialPrefs = parsePrefs(cookieStore.get(PREFS_COOKIE)?.value);
   const initialDisplay = parseDisplay(cookieStore.get(DISPLAY_COOKIE)?.value);
+  // Short explanations already written in the diner's language, shown under each dish name.
+  const initialSummaries = await getCachedSummaries(dishes, initialLanguage).catch(() => ({}));
 
   return (
     <LiveDinerMenu
@@ -59,6 +62,7 @@ export default async function RestaurantMenuPage({ params }: RestaurantMenuProps
       initialLanguage={initialLanguage}
       initialPrefs={initialPrefs}
       initialDisplay={initialDisplay}
+      initialSummaries={initialSummaries}
     />
   );
 }

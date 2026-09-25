@@ -1,4 +1,5 @@
 import { prepareChatHistory } from "@/lib/chat-history";
+import type { DishSummaries } from "@/lib/dish-summaries";
 import type { DinerFilters } from "@/lib/menu-filters";
 import { createLineReader, parseJsonLine } from "@/lib/json-lines";
 import type { LanguageCode } from "@/lib/languages";
@@ -161,6 +162,18 @@ export async function fetchInsight(
   const data = await res.json().catch(() => ({}));
   if (!res.ok || !data.insight) throw new Error(data.error ?? "Dish details failed.");
   return data.insight as DishInsight;
+}
+
+/** Short explanations already written for this menu in a language. Never waits on AI. */
+export async function fetchSummaries(
+  restaurantSlug: string,
+  language: LanguageCode,
+): Promise<DishSummaries> {
+  const params = new URLSearchParams({ restaurant: restaurantSlug, lang: language });
+  const res = await fetch(`/api/summaries?${params}`);
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok || !data.summaries) throw new Error(data.error ?? "Summaries failed.");
+  return data.summaries as DishSummaries;
 }
 
 /** Asks for dish suggestions that respect the diner's filters. */

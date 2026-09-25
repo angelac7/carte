@@ -28,7 +28,7 @@ import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Notice } from "@/components/ui/notice";
 import { type Allergen, type DietaryTag } from "@/lib/allergens";
-import { fetchTranslations, trackDishView } from "@/lib/api-client";
+import { fetchSummaries, fetchTranslations, trackDishView } from "@/lib/api-client";
 import { useOffline } from "@/lib/use-offline";
 import { useDinerPrefs } from "@/lib/use-diner-prefs";
 import { type DinerPrefs } from "@/lib/diner-prefs";
@@ -38,6 +38,7 @@ import {
   writeDisplayCookie,
   type DisplayPrefs,
 } from "@/lib/display-prefs";
+import { summaryKey, type DishSummaries } from "@/lib/dish-summaries";
 import { DINER_STRINGS } from "@/lib/i18n/diner-strings";
 import { DISH_STRINGS } from "@/lib/i18n/dish-strings";
 import { DOCK_STRINGS } from "@/lib/i18n/dock-strings";
@@ -66,6 +67,8 @@ type DinerMenuProps = {
   initialLanguage: LanguageCode;
   initialPrefs: DinerPrefs;
   initialDisplay: DisplayPrefs;
+  /** One-line dish explanations already written in the initial language. */
+  initialSummaries?: DishSummaries;
   onPreferencesChange?: (preferences: {
     initialLanguage: LanguageCode;
     initialPrefs: DinerPrefs;
@@ -80,6 +83,7 @@ export function DinerMenu({
   initialLanguage,
   initialPrefs,
   initialDisplay,
+  initialSummaries = {},
   onPreferencesChange,
 }: DinerMenuProps) {
   const offline = useOffline();
@@ -95,6 +99,10 @@ export function DinerMenu({
   const [display, setDisplay] = useState<DisplayPrefs>(initialDisplay);
   const requested = useRef(new Set<LanguageCode>());
   const [translationAttempt, setTranslationAttempt] = useState(0);
+  const [summaries, setSummaries] = useState<Partial<Record<LanguageCode, DishSummaries>>>({
+    [initialLanguage]: initialSummaries,
+  });
+  const summariesRequested = useRef(new Set<LanguageCode>([initialLanguage]));
   useEffect(() => {
     onPreferencesChange?.({
       initialLanguage: language,
@@ -117,6 +125,17 @@ export function DinerMenu({
       .then((result) => setByLanguage((prev) => ({ ...prev, [language]: result })))
       .catch(() => setByLanguage((prev) => ({ ...prev, [language]: "failed" })));
   }, [language, restaurant.slug, translationAttempt, needsTranslation]);
+
+  // Load the short explanations already written in a language the first time it's picked.
+  useEffect(() => {
+    if (summariesRequested.current.has(language)) return;
+    summariesRequested.current.add(language);
+    fetchSummaries(restaurant.slug, language)
+      .then((found) =>
+        setSummaries((prev) => ({ ...prev, [language]: { ...found, ...prev[language] } })),
+      )
+      .catch(() => {});
+  }, [language, restaurant.slug]);
 
   // Larger text and high contrast apply to the whole page while this menu is open.
   useEffect(() => {
@@ -158,6 +177,15 @@ export function DinerMenu({
     setPanel(null);
     setOpenDishId(dishId);
     trackDishView(dishId);
+  }
+
+  // Once a diner opens a dish, its card shows the explanation's summary too.
+  function rememberSummary(dish: MenuItem, summary: string) {
+    if (!summary) return;
+    setSummaries((prev) => ({
+      ...prev,
+      [language]: { ...prev[language], [summaryKey(dish)]: summary },
+    }));
   }
 
   function setQuantity(dishId: string, quantity: number) {
@@ -392,8 +420,10 @@ export function DinerMenu({
                   key={dish.id}
                   dish={dish}
                   text={textFor(dish)}
+                  summary={summaries[language]?.[summaryKey(dish)]}
                   t={t}
                   detailsLabel={dishText.details}
+                  explainLabel={dishText.explainLink}
                   stepperLabels={tableText}
                   restaurant={restaurant}
                   language={language}
@@ -452,6 +482,7 @@ export function DinerMenu({
           text={textFor(openDish)}
           language={language}
           restaurantSlug={restaurant.slug}
+          onExplained={(insight) => rememberSummary(openDish, insight.summary)}
           onClose={() => setOpenDishId(null)}
         />
       )}
