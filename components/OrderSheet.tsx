@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { AllergyStatement } from "@/components/AllergyCard";
+import { OrderTogether } from "@/components/OrderTogether";
 import { QuantityStepper } from "@/components/QuantityStepper";
 import { Sheet } from "@/components/Sheet";
 import { Button } from "@/components/ui/button";
@@ -26,6 +27,11 @@ type OrderSheetProps = {
   onQuantity: (lineKey: string, quantity: number) => void;
   onClear: () => void;
   onClose: () => void;
+  /** The table's shared order, when there is one. */
+  tableCode?: string | null;
+  tableEnded?: boolean;
+  onStartTogether?: () => Promise<string>;
+  onLeaveTogether?: () => void;
 };
 
 type Mode = "list" | "split" | "server";
@@ -59,6 +65,10 @@ export function OrderSheet({
   onQuantity,
   onClear,
   onClose,
+  tableCode = null,
+  tableEnded = false,
+  onStartTogether,
+  onLeaveTogether,
 }: OrderSheetProps) {
   const t = TABLE_STRINGS[language];
   const [mode, setMode] = useState<Mode>("list");
@@ -316,6 +326,15 @@ export function OrderSheet({
             </Button>
           </div>
         </>
+      )}
+      {onStartTogether && onLeaveTogether && (
+        <OrderTogether
+          t={t}
+          code={tableCode}
+          ended={tableEnded}
+          onStart={onStartTogether}
+          onLeave={onLeaveTogether}
+        />
       )}
     </Sheet>
   );

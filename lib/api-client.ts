@@ -229,6 +229,40 @@ export async function sendDishReport(report: ReportRequest): Promise<void> {
   if (!res.ok) throw new Error("Report failed.");
 }
 
+/** Thrown when a table's shared order has ended or can't be found. */
+export class TableEndedError extends Error {}
+
+async function tableRequest<T>(init: RequestInit, query = ""): Promise<T> {
+  const res = await fetch(`/api/table${query}`, {
+    ...init,
+    headers: { "Content-Type": "application/json" },
+    cache: "no-store",
+  });
+  const data = await res.json().catch(() => ({}));
+  if (res.status === 404) throw new TableEndedError(data.error ?? "Ended");
+  if (!res.ok) throw new Error(data.error ?? "Shared order failed.");
+  return data as T;
+}
+
+type TableLines = Record<string, number>;
+
+/** Starts a shared order for the table from this phone's order; returns its code. */
+export const startTableOrder = (restaurantSlug: string, order: TableLines) =>
+  tableRequest<{ code: string; lines: TableLines }>({
+    method: "POST",
+    body: JSON.stringify({ restaurant: restaurantSlug, order }),
+  });
+
+export async function fetchTableOrder(restaurantSlug: string, code: string): Promise<TableLines> {
+  const params = new URLSearchParams({ restaurant: restaurantSlug, code });
+  return (await tableRequest<{ lines: TableLines }>({ method: "GET" }, `?${params}`)).lines;
+}
+
+export async function setTableLine(code: string, line: string, quantity: number) {
+  const body = JSON.stringify({ code, line, quantity });
+  return (await tableRequest<{ lines: TableLines }>({ method: "PUT", body })).lines;
+}
+
 /** Asks for a taste profile built from the diner's own ratings and saved dishes. */
 export async function requestTasteProfile(request: TasteRequest): Promise<TasteProfile> {
   const res = await fetch("/api/taste", {

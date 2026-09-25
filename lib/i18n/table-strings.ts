@@ -40,6 +40,15 @@ export type TableStrings = {
   severityLabel: string;
   severities: Record<Severity, string>;
   forStaff: string;
+  orderTogether: string;
+  togetherHint: string;
+  copyLink: string;
+  linkCopied: string;
+  shareLink: string;
+  togetherOn: string;
+  leaveTogether: string;
+  togetherEnded: string;
+  togetherFailed: string;
 };
 
 export const TABLE_STRINGS: Record<LanguageCode, TableStrings> = {
@@ -76,6 +85,16 @@ export const TABLE_STRINGS: Record<LanguageCode, TableStrings> = {
     request:
       "Please make sure my food does not contain these, including in sauces, oils, and garnishes. Please tell me if a dish can't be made without them. Thank you.",
     forStaff: "For restaurant staff",
+    orderTogether: "Order together",
+    togetherHint:
+      "Share this link so everyone at your table can add to one order from their own phone.",
+    copyLink: "Copy link",
+    linkCopied: "Link copied",
+    shareLink: "Share",
+    togetherOn: "Shared order: everyone with the link can add dishes.",
+    leaveTogether: "Leave shared order",
+    togetherEnded: "This shared order has ended, so your order is back on this phone only.",
+    togetherFailed: "The shared order couldn't be started. Try again.",
     statementIntolerance: "I have a food intolerance to:",
     severeNote:
       "This allergy is severe: even a trace can make me very ill. Please use clean utensils and surfaces, and check every ingredient.",
@@ -115,6 +134,16 @@ export const TABLE_STRINGS: Record<LanguageCode, TableStrings> = {
     request:
       "Por favor, asegúrese de que mi comida no contenga estos ingredientes, incluso en salsas, aceites y guarniciones. Avíseme si algún plato no se puede preparar sin ellos. Gracias.",
     forStaff: "Para el personal del restaurante",
+    orderTogether: "Pedir juntos",
+    togetherHint:
+      "Comparta este enlace para que todos en su mesa agreguen platos a un solo pedido desde su teléfono.",
+    copyLink: "Copiar enlace",
+    linkCopied: "Enlace copiado",
+    shareLink: "Compartir",
+    togetherOn: "Pedido compartido: todos los que tengan el enlace pueden agregar platos.",
+    leaveTogether: "Salir del pedido compartido",
+    togetherEnded: "Este pedido compartido terminó; su pedido ahora está solo en este teléfono.",
+    togetherFailed: "No se pudo iniciar el pedido compartido. Inténtelo de nuevo.",
     statementIntolerance: "Tengo intolerancia alimentaria a:",
     severeNote:
       "Esta alergia es grave: incluso una traza puede hacerme enfermar gravemente. Por favor, use utensilios y superficies limpios y revise cada ingrediente.",
@@ -154,6 +183,15 @@ export const TABLE_STRINGS: Record<LanguageCode, TableStrings> = {
     request:
       "请确保我的餐点不含这些成分，包括酱汁、油和配菜。如果某道菜无法去除这些成分，请告诉我。谢谢。",
     forStaff: "给餐厅员工",
+    orderTogether: "一起点餐",
+    togetherHint: "分享此链接，同桌的每个人都能用自己的手机往同一份订单里加菜。",
+    copyLink: "复制链接",
+    linkCopied: "已复制链接",
+    shareLink: "分享",
+    togetherOn: "共享订单：有链接的人都可以加菜。",
+    leaveTogether: "退出共享订单",
+    togetherEnded: "此共享订单已结束，您的订单现在只保存在这部手机上。",
+    togetherFailed: "无法开始共享订单，请重试。",
     statementIntolerance: "我对以下食物不耐受：",
     severeNote:
       "我的过敏很严重：即使微量也可能让我病得很重。请使用干净的餐具和台面，并检查每一种配料。",
@@ -193,6 +231,16 @@ export const TABLE_STRINGS: Record<LanguageCode, TableStrings> = {
     request:
       "소스, 기름, 고명을 포함해 제 음식에 이 재료들이 들어가지 않도록 확인해 주세요. 이 재료 없이 만들 수 없는 요리가 있으면 알려 주세요. 감사합니다.",
     forStaff: "레스토랑 직원용",
+    orderTogether: "함께 주문하기",
+    togetherHint:
+      "이 링크를 공유하면 같은 테이블의 모두가 각자 휴대폰으로 하나의 주문에 요리를 추가할 수 있어요.",
+    copyLink: "링크 복사",
+    linkCopied: "링크를 복사했어요",
+    shareLink: "공유",
+    togetherOn: "공유 주문: 링크가 있는 사람은 누구나 요리를 추가할 수 있어요.",
+    leaveTogether: "공유 주문 나가기",
+    togetherEnded: "공유 주문이 종료되어 이제 이 휴대폰에만 주문이 남아 있어요.",
+    togetherFailed: "공유 주문을 시작하지 못했어요. 다시 시도해 주세요.",
     statementIntolerance: "저는 다음 식품에 불내증이 있습니다:",
     severeNote:
       "제 알레르기는 심합니다. 아주 적은 양도 심각한 증상을 일으킬 수 있습니다. 깨끗한 조리 도구와 조리대를 사용하고 모든 재료를 확인해 주세요.",
@@ -232,6 +280,16 @@ export const TABLE_STRINGS: Record<LanguageCode, TableStrings> = {
     request:
       "ソース、油、付け合わせを含め、料理にこれらが入らないようにしてください。除去できない料理があれば教えてください。よろしくお願いします。",
     forStaff: "レストランスタッフ向け",
+    orderTogether: "みんなで注文",
+    togetherHint:
+      "このリンクを共有すると、同じテーブルの全員が自分のスマホから一つの注文に料理を追加できます。",
+    copyLink: "リンクをコピー",
+    linkCopied: "リンクをコピーしました",
+    shareLink: "共有",
+    togetherOn: "共有注文：リンクを知っている人は誰でも料理を追加できます。",
+    leaveTogether: "共有注文をやめる",
+    togetherEnded: "共有注文は終了しました。注文はこのスマホだけに残っています。",
+    togetherFailed: "共有注文を開始できませんでした。もう一度お試しください。",
     statementIntolerance: "私は次の食品に不耐症があります：",
     severeNote:
       "私のアレルギーは重度です。ごく微量でも重い症状が出ることがあります。清潔な調理器具と調理台を使い、すべての材料を確認してください。",
@@ -271,6 +329,17 @@ export const TABLE_STRINGS: Record<LanguageCode, TableStrings> = {
     request:
       "Veuillez vous assurer que mon plat n'en contient pas, y compris dans les sauces, les huiles et les garnitures. Dites-moi si un plat ne peut pas être préparé sans. Merci.",
     forStaff: "Pour le personnel du restaurant",
+    orderTogether: "Commander ensemble",
+    togetherHint:
+      "Partagez ce lien pour que toute la table ajoute des plats à une seule commande depuis son téléphone.",
+    copyLink: "Copier le lien",
+    linkCopied: "Lien copié",
+    shareLink: "Partager",
+    togetherOn: "Commande partagée : toute personne ayant le lien peut ajouter des plats.",
+    leaveTogether: "Quitter la commande partagée",
+    togetherEnded:
+      "Cette commande partagée est terminée ; votre commande reste seulement sur ce téléphone.",
+    togetherFailed: "La commande partagée n’a pas pu démarrer. Réessayez.",
     statementIntolerance: "J’ai une intolérance alimentaire à :",
     severeNote:
       "Cette allergie est grave : même une trace peut me rendre très malade. Merci d’utiliser des ustensiles et des surfaces propres et de vérifier chaque ingrédient.",
@@ -310,6 +379,16 @@ export const TABLE_STRINGS: Record<LanguageCode, TableStrings> = {
     request:
       "Vui lòng đảm bảo món ăn của tôi không chứa các thành phần này, kể cả trong nước sốt, dầu và đồ trang trí. Xin báo cho tôi nếu món nào không thể làm mà không có chúng. Cảm ơn.",
     forStaff: "Dành cho nhân viên nhà hàng",
+    orderTogether: "Gọi món cùng nhau",
+    togetherHint:
+      "Chia sẻ liên kết này để mọi người cùng bàn có thể thêm món vào một đơn từ điện thoại của mình.",
+    copyLink: "Sao chép liên kết",
+    linkCopied: "Đã sao chép liên kết",
+    shareLink: "Chia sẻ",
+    togetherOn: "Đơn chung: ai có liên kết đều có thể thêm món.",
+    leaveTogether: "Rời đơn chung",
+    togetherEnded: "Đơn chung đã kết thúc, đơn của bạn giờ chỉ còn trên điện thoại này.",
+    togetherFailed: "Không thể bắt đầu đơn chung. Vui lòng thử lại.",
     statementIntolerance: "Tôi không dung nạp các thực phẩm sau:",
     severeNote:
       "Tôi bị dị ứng nặng: chỉ một lượng rất nhỏ cũng có thể khiến tôi bị bệnh nặng. Vui lòng dùng dụng cụ và bề mặt sạch, và kiểm tra từng nguyên liệu.",

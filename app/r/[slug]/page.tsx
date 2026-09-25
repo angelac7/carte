@@ -15,7 +15,10 @@ import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 
-type RestaurantMenuProps = { params: Promise<{ slug: string }> };
+type RestaurantMenuProps = {
+  params: Promise<{ slug: string }>;
+  searchParams: Promise<{ table?: string }>;
+};
 
 /** Looked up once per visit, for both the tab title and the page. */
 const findRestaurant = cache(async (slug: string) =>
@@ -40,8 +43,11 @@ export async function generateMetadata({ params }: RestaurantMenuProps): Promise
   };
 }
 
-export default async function RestaurantMenuPage({ params }: RestaurantMenuProps) {
+export default async function RestaurantMenuPage({ params, searchParams }: RestaurantMenuProps) {
   const { slug } = await params;
+  // A shared table order, opened from a friend's link.
+  const table = (await searchParams).table;
+  const tableCode = table && /^[a-z2-9]{10}$/.test(table) ? table : null;
   const restaurant = await findRestaurant(slug);
   if (!restaurant) notFound();
 
@@ -91,6 +97,7 @@ export default async function RestaurantMenuPage({ params }: RestaurantMenuProps
       initialDisplay={initialDisplay}
       initialSummaries={initialSummaries}
       popularIds={popularIds}
+      initialTableCode={tableCode}
     />
   );
 }

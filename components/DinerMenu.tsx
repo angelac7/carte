@@ -31,6 +31,7 @@ import { Notice } from "@/components/ui/notice";
 import { uncheckedAllergens, type Allergen, type DietaryTag } from "@/lib/allergens";
 import { fetchSummaries, fetchTranslations, trackDishView } from "@/lib/api-client";
 import { useOffline } from "@/lib/use-offline";
+import { useTableOrder } from "@/lib/use-table-order";
 import { useDinerPrefs } from "@/lib/use-diner-prefs";
 import { type DinerPrefs } from "@/lib/diner-prefs";
 import {
@@ -92,6 +93,8 @@ type DinerMenuProps = {
   initialSummaries?: DishSummaries;
   /** The restaurant's most-opened dishes this month, from anonymous view counts. */
   popularIds?: string[];
+  /** A shared table order to join, from a friend's link. */
+  initialTableCode?: string | null;
   onPreferencesChange?: (preferences: {
     initialLanguage: LanguageCode;
     initialPrefs: DinerPrefs;
@@ -108,6 +111,7 @@ export function DinerMenu({
   initialDisplay,
   initialSummaries = {},
   popularIds = [],
+  initialTableCode = null,
   initialNow,
   onPreferencesChange,
 }: DinerMenuProps) {
@@ -116,7 +120,8 @@ export function DinerMenu({
   const [byLanguage, setByLanguage] = useState<TranslationState>({});
   const [prefs, setPrefs] = useDinerPrefs(initialPrefs);
   const { avoid, onlyTags } = prefs;
-  const [order, setOrder] = useState<Record<string, number>>({});
+  const table = useTableOrder(restaurant.slug, initialTableCode);
+  const { order, setQuantity } = table;
   const [openDishId, setOpenDishId] = useState<string | null>(null);
   // Price limits suit one menu's prices, so unlike spice they aren't remembered across menus.
   const [maxPrice, setMaxPrice] = useState<number | null>(null);
@@ -236,15 +241,6 @@ export function DinerMenu({
       ...prev,
       [language]: { ...prev[language], [summaryKey(dish)]: summary },
     }));
-  }
-
-  function setQuantity(dishId: string, quantity: number) {
-    setOrder((prev) => {
-      const next = { ...prev };
-      if (quantity > 0) next[dishId] = quantity;
-      else delete next[dishId];
-      return next;
-    });
   }
 
   // The menu itself shows dishes that need an allergen left out, or may contain traces, with
@@ -716,7 +712,11 @@ export function DinerMenu({
           avoid={avoid}
           severity={prefs.severity}
           onQuantity={setQuantity}
-          onClear={() => setOrder({})}
+          onClear={table.clear}
+          tableCode={table.code}
+          tableEnded={table.ended}
+          onStartTogether={table.startShared}
+          onLeaveTogether={table.leaveShared}
           onClose={() => setPanel(null)}
         />
       )}
