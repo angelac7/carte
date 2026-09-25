@@ -60,6 +60,7 @@ export const DEFAULT_HOURS = Object.fromEntries(
 
 export const ProfileSchema = z.object({
   revision: z.number().int().positive().optional(),
+  name: z.string().trim().max(120),
   listed: z.boolean(),
   description: z.string().trim().max(500),
   cuisine: z.string().trim().max(60),
@@ -72,6 +73,7 @@ export const ProfileSchema = z.object({
 export type RestaurantProfile = z.infer<typeof ProfileSchema>;
 
 export const DEFAULT_PROFILE: RestaurantProfile = {
+  name: "",
   listed: false,
   description: "",
   cuisine: "",

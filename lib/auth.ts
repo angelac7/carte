@@ -1,5 +1,6 @@
 import "server-only";
 import { safeNextPath } from "@/lib/safe-redirect";
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { getOwnerRestaurant } from "@/lib/db";
 import { createClient } from "@/lib/supabase/server";
@@ -41,4 +42,13 @@ export async function redirectIfSignedIn(next = "/dashboard") {
     data: { user },
   } = await supabase.auth.getUser();
   if (user) redirect(safeNextPath(next));
+}
+
+/**
+ * Whether this visitor has a login session cookie. Only used to choose header buttons, so it
+ * skips a network check; anything that needs the account still verifies it with requireUser.
+ */
+export async function hasSessionCookie(): Promise<boolean> {
+  const store = await cookies();
+  return store.getAll().some((cookie) => /^sb-.+-auth-token(\.\d+)?$/.test(cookie.name));
 }

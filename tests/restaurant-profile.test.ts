@@ -47,3 +47,14 @@ describe("cleanTerms", () => {
     ]);
   });
 });
+
+describe("restaurant name on the profile", () => {
+  it("is trimmed and limited in length", () => {
+    expect(ProfileSchema.parse({ ...DEFAULT_PROFILE, name: "  Maru Kitchen  " }).name).toBe(
+      "Maru Kitchen",
+    );
+    expect(ProfileSchema.safeParse({ ...DEFAULT_PROFILE, name: "x".repeat(121) }).success).toBe(
+      false,
+    );
+  });
+});

@@ -87,7 +87,7 @@ it("does not submit a manually added dish twice while saving", async () => {
   await act(async () => finish([{ ...dish, id: "new" }]));
 });
 it("retains profile values after successful form actions", async () => {
-  render(createElement(ProfileForm, { profile: DEFAULT_PROFILE }));
+  render(createElement(ProfileForm, { profile: { ...DEFAULT_PROFILE, name: "Cafe" } }));
   const city = screen.getByRole("textbox", { name: "City" }) as HTMLInputElement;
   fireEvent.change(city, { target: { value: "Tokyo" } });
   fireEvent.click(screen.getByRole("button", { name: "Save profile" }));

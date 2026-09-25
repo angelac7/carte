@@ -29,6 +29,7 @@ export async function saveProfileAction(
   const { supabase, restaurant } = await requireRestaurant();
   const parsed = ProfileSchema.extend({ revision: z.number().int().positive() }).safeParse({
     revision: Number(formData.get("revision")),
+    name: String(formData.get("name") ?? ""),
     listed: formData.get("listed") === "on",
     description: String(formData.get("description") ?? ""),
     cuisine: String(formData.get("cuisine") ?? ""),
@@ -44,6 +45,9 @@ export async function saveProfileAction(
       error:
         "Check your hours: each open day needs an opening and closing time, or mark it closed.",
     };
+  }
+  if (!parsed.data.name) {
+    return { revision: parsed.data.revision, error: "Add your restaurant's name." };
   }
   let revision: number | null;
   try {

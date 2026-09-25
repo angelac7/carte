@@ -8,7 +8,7 @@ type OwnerHeaderProps = { admin?: boolean; restaurant: { name: string; slug: str
 export function OwnerHeader({ restaurant, admin }: OwnerHeaderProps) {
   const links = restaurant
     ? [
-        { href: "/dashboard", label: "Home" },
+        { href: "/dashboard", label: "Dashboard" },
         { href: "/dashboard/upload", label: "Upload" },
         { href: "/dashboard/review", label: "Review dishes" },
         { href: "/dashboard/qr", label: "QR code" },
@@ -22,7 +22,8 @@ export function OwnerHeader({ restaurant, admin }: OwnerHeaderProps) {
 
   return (
     <NavBar
-      homeHref="/dashboard"
+      // The logo leads to the public site, which is the same for everyone.
+      homeHref="/"
       links={links}
       subtitle={restaurant?.name}
       trailing={

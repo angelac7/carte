@@ -39,6 +39,20 @@ export function ProfileForm({ profile }: { profile: RestaurantProfile }) {
   return (
     <form action={formAction} className="mt-10 space-y-8">
       <input type="hidden" name="revision" value={state.revision ?? draft.revision ?? ""} />
+      <label className="block">
+        <span className={labelClass}>Restaurant name</span>
+        <input
+          name="name"
+          required
+          maxLength={120}
+          value={draft.name}
+          onChange={(event) => setDraft({ ...draft, name: event.target.value })}
+          className={inputClass}
+        />
+        <span className="mt-1 block text-xs text-muted">
+          Shown in large type at the top of your diner menu.
+        </span>
+      </label>
       <label className="flex cursor-pointer items-start gap-4 rounded-panel bg-paper p-6 shadow-raised transition-[outline-color] has-checked:outline-2 has-checked:outline-offset-2 has-checked:outline-basil">
         <input
           type="checkbox"

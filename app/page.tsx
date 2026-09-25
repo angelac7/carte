@@ -10,7 +10,6 @@ import { PublicHeader } from "@/components/PublicHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { ButtonLink } from "@/components/ui/button";
 import { panelClass } from "@/components/ui/panel";
-import { redirectIfSignedIn } from "@/lib/auth";
 import { searchRestaurants } from "@/lib/db/discover";
 import { publicAsset } from "@/lib/public-asset";
 import { createClient } from "@/lib/supabase/server";
@@ -85,8 +84,6 @@ const FEATURE_COPY: Omit<Feature, "image">[] = [
 ];
 
 export default async function LandingPage() {
-  await redirectIfSignedIn();
-
   const restaurants = await searchRestaurants(await createClient(), "").catch(() => []);
   const features: Feature[] = FEATURE_COPY.map((feature) => ({
     ...feature,
