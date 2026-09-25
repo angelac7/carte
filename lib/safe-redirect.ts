@@ -12,3 +12,8 @@ export function safeNextPath(next: unknown, fallback = "/dashboard"): string {
   }
   return next;
 }
+
+/** The page a login link asked to return to, or undefined when it didn't ask for a safe one. */
+export function requestedNextPath(next: unknown): string | undefined {
+  return safeNextPath(next, "") || undefined;
+}

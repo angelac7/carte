@@ -29,7 +29,8 @@ export async function logIn(_prev: AuthState, formData: FormData): Promise<AuthS
     console.error("Login failed:", authErrorDiagnostic(error));
     return { error: loginErrorMessage(error) };
   }
-  redirect(safeNextPath(String(formData.get("next") ?? "")));
+  // Home, like everyone else, unless they were sent here from a particular page.
+  redirect(safeNextPath(formData.get("next"), "/"));
 }
 
 export async function signUp(_prev: AuthState, formData: FormData): Promise<AuthState> {

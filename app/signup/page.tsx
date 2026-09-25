@@ -1,4 +1,4 @@
-import { safeNextPath } from "@/lib/safe-redirect";
+import { requestedNextPath } from "@/lib/safe-redirect";
 import type { Metadata } from "next";
 import { AuthForm } from "@/components/AuthForm";
 import { PublicHeader } from "@/components/PublicHeader";
@@ -11,7 +11,7 @@ export default async function SignupPage({
 }: {
   searchParams: Promise<{ next?: string }>;
 }) {
-  const next = safeNextPath((await searchParams).next ?? null);
+  const next = requestedNextPath((await searchParams).next);
   await redirectIfSignedIn(next);
   return (
     <>

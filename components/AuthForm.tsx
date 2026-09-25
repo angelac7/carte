@@ -28,9 +28,10 @@ const inputClass = fieldClass("mt-2");
 
 export function AuthForm({
   mode,
-  next = "/dashboard",
+  next,
 }: {
   mode: "login" | "signup";
+  /** The page to return to afterward. Without one, login goes home and signup to setup. */
   next?: string;
 }) {
   const [state, formAction, pending] = useActionState<AuthState, FormData>(
@@ -50,7 +51,7 @@ export function AuthForm({
         action={formAction}
         className="mt-10 space-y-5 rounded-panel bg-paper p-6 shadow-raised-lg sm:p-8"
       >
-        <input type="hidden" name="next" value={next} />
+        {next && <input type="hidden" name="next" value={next} />}
         <label className="block">
           <span className="eyebrow text-muted">Email</span>
           <input name="email" type="email" required autoComplete="email" className={inputClass} />
@@ -93,7 +94,7 @@ export function AuthForm({
       <p className="mt-6 text-sm text-muted">
         {copy.switchText}{" "}
         <Link
-          href={`${copy.switchHref}?next=${encodeURIComponent(next)}`}
+          href={next ? `${copy.switchHref}?next=${encodeURIComponent(next)}` : copy.switchHref}
           className="text-ink underline underline-offset-4 hover:text-muted"
         >
           {copy.switchLabel}

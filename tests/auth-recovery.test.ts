@@ -46,6 +46,14 @@ it("preserves the claim destination through login and signup", async () => {
   );
   expect(auth.signUp.mock.calls[0][0].options.emailRedirectTo).toContain(encodeURIComponent(next));
 });
+it("sends owners home after login, and new owners to setup, when no page was requested", async () => {
+  const data = form();
+  data.delete("next");
+  await expect(logIn({}, data)).rejects.toThrow(/^redirect:\/$/);
+  await expect(signUp({}, data)).rejects.toThrow(
+    `redirect:/dashboard/setup?next=${encodeURIComponent("/dashboard")}`,
+  );
+});
 it("sends a recovery callback and updates the authenticated owner's password", async () => {
   expect(await requestPasswordReset({}, form())).toHaveProperty("message");
   expect(auth.resetPasswordForEmail).toHaveBeenCalledWith("owner@example.com", {

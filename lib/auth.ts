@@ -35,8 +35,8 @@ export async function getOwnerContext() {
   return { supabase, user, restaurant };
 }
 
-/** For the landing, login, and signup pages: signed-in owners go straight to the dashboard. */
-export async function redirectIfSignedIn(next = "/dashboard") {
+/** For the login and signup pages: signed-in visitors go home, or to the page they asked for. */
+export async function redirectIfSignedIn(next = "/") {
   const supabase = await createClient();
   const {
     data: { user },

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { safeNextPath } from "@/lib/safe-redirect";
+import { requestedNextPath, safeNextPath } from "@/lib/safe-redirect";
 
 describe("safeNextPath", () => {
   it("allows pages on this site", () => {
@@ -9,6 +9,15 @@ describe("safeNextPath", () => {
   it("blocks other websites and missing values", () => {
     for (const bad of ["https://evil.example", "//evil.example", "/\\evil.example", null]) {
       expect(safeNextPath(bad)).toBe("/dashboard");
+    }
+  });
+});
+
+describe("requestedNextPath", () => {
+  it("keeps a page on this site and drops anything else", () => {
+    expect(requestedNextPath("/dashboard/upload")).toBe("/dashboard/upload");
+    for (const bad of [undefined, "", "https://evil.example", "//evil.example"]) {
+      expect(requestedNextPath(bad)).toBeUndefined();
     }
   });
 });
