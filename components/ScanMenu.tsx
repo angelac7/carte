@@ -210,6 +210,8 @@ export function ScanMenu({ language, initialPrefs }: ScanMenuProps) {
         <AllergyCard
           language={language}
           avoid={avoid}
+          severity={prefs.severity}
+          onSeverity={(severity) => setPrefs({ ...prefs, severity })}
           onToggle={toggleAllergy}
           onClose={() => setCardOpen(false)}
           staffLanguage={staffLanguage}

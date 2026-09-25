@@ -7,6 +7,7 @@ describe("diner preferences", () => {
       avoid: ["peanuts" as const, "wheat" as const],
       onlyTags: ["vegan" as const],
       hideTraces: true,
+      severity: "severe" as const,
     };
     expect(parsePrefs(serializePrefs(prefs))).toEqual(prefs);
   });

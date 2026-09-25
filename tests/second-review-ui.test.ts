@@ -57,7 +57,12 @@ afterEach(() => {
 it("uses current device preferences instead of cached menu HTML", () => {
   writePrefsCookie({ avoid: ["milk"], onlyTags: ["vegan"], hideTraces: true });
   const { result } = renderHook(() => useDinerPrefs(EMPTY_PREFS));
-  expect(result.current[0]).toEqual({ avoid: ["milk"], onlyTags: ["vegan"], hideTraces: true });
+  expect(result.current[0]).toEqual({
+    avoid: ["milk"],
+    onlyTags: ["vegan"],
+    hideTraces: true,
+    severity: "allergy",
+  });
   act(() => writePrefsCookie({ avoid: ["eggs"], onlyTags: [], hideTraces: false }));
   expect(result.current[0].avoid).toEqual(["eggs"]);
 });

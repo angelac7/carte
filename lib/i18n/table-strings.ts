@@ -1,3 +1,4 @@
+import type { Severity } from "@/lib/diner-prefs";
 import type { LanguageCode } from "@/lib/languages";
 
 // The allergy statement and request are safety-critical and never AI-generated.
@@ -33,7 +34,11 @@ export type TableStrings = {
   chooseAllergies: string;
   noAllergies: string;
   statement: string;
+  statementIntolerance: string;
   request: string;
+  severeNote: string;
+  severityLabel: string;
+  severities: Record<Severity, string>;
   forStaff: string;
 };
 
@@ -71,6 +76,11 @@ export const TABLE_STRINGS: Record<LanguageCode, TableStrings> = {
     request:
       "Please make sure my food does not contain these, including in sauces, oils, and garnishes. Please tell me if a dish can't be made without them. Thank you.",
     forStaff: "For restaurant staff",
+    statementIntolerance: "I have a food intolerance to:",
+    severeNote:
+      "This allergy is severe: even a trace can make me very ill. Please use clean utensils and surfaces, and check every ingredient.",
+    severityLabel: "How serious is it?",
+    severities: { allergy: "Allergy", severe: "Severe allergy", intolerance: "Intolerance" },
   },
   es: {
     add: "Agregar",
@@ -105,6 +115,11 @@ export const TABLE_STRINGS: Record<LanguageCode, TableStrings> = {
     request:
       "Por favor, asegúrese de que mi comida no contenga estos ingredientes, incluso en salsas, aceites y guarniciones. Avíseme si algún plato no se puede preparar sin ellos. Gracias.",
     forStaff: "Para el personal del restaurante",
+    statementIntolerance: "Tengo intolerancia alimentaria a:",
+    severeNote:
+      "Esta alergia es grave: incluso una traza puede hacerme enfermar gravemente. Por favor, use utensilios y superficies limpios y revise cada ingrediente.",
+    severityLabel: "¿Qué tan grave es?",
+    severities: { allergy: "Alergia", severe: "Alergia grave", intolerance: "Intolerancia" },
   },
   zh: {
     add: "加入",
@@ -139,6 +154,11 @@ export const TABLE_STRINGS: Record<LanguageCode, TableStrings> = {
     request:
       "请确保我的餐点不含这些成分，包括酱汁、油和配菜。如果某道菜无法去除这些成分，请告诉我。谢谢。",
     forStaff: "给餐厅员工",
+    statementIntolerance: "我对以下食物不耐受：",
+    severeNote:
+      "我的过敏很严重：即使微量也可能让我病得很重。请使用干净的餐具和台面，并检查每一种配料。",
+    severityLabel: "严重程度如何？",
+    severities: { allergy: "过敏", severe: "严重过敏", intolerance: "不耐受" },
   },
   ko: {
     add: "담기",
@@ -173,6 +193,11 @@ export const TABLE_STRINGS: Record<LanguageCode, TableStrings> = {
     request:
       "소스, 기름, 고명을 포함해 제 음식에 이 재료들이 들어가지 않도록 확인해 주세요. 이 재료 없이 만들 수 없는 요리가 있으면 알려 주세요. 감사합니다.",
     forStaff: "레스토랑 직원용",
+    statementIntolerance: "저는 다음 식품에 불내증이 있습니다:",
+    severeNote:
+      "제 알레르기는 심합니다. 아주 적은 양도 심각한 증상을 일으킬 수 있습니다. 깨끗한 조리 도구와 조리대를 사용하고 모든 재료를 확인해 주세요.",
+    severityLabel: "얼마나 심한가요?",
+    severities: { allergy: "알레르기", severe: "심한 알레르기", intolerance: "불내증" },
   },
   ja: {
     add: "追加",
@@ -207,6 +232,11 @@ export const TABLE_STRINGS: Record<LanguageCode, TableStrings> = {
     request:
       "ソース、油、付け合わせを含め、料理にこれらが入らないようにしてください。除去できない料理があれば教えてください。よろしくお願いします。",
     forStaff: "レストランスタッフ向け",
+    statementIntolerance: "私は次の食品に不耐症があります：",
+    severeNote:
+      "私のアレルギーは重度です。ごく微量でも重い症状が出ることがあります。清潔な調理器具と調理台を使い、すべての材料を確認してください。",
+    severityLabel: "どのくらい重いですか？",
+    severities: { allergy: "アレルギー", severe: "重度のアレルギー", intolerance: "不耐症" },
   },
   fr: {
     add: "Ajouter",
@@ -241,6 +271,11 @@ export const TABLE_STRINGS: Record<LanguageCode, TableStrings> = {
     request:
       "Veuillez vous assurer que mon plat n'en contient pas, y compris dans les sauces, les huiles et les garnitures. Dites-moi si un plat ne peut pas être préparé sans. Merci.",
     forStaff: "Pour le personnel du restaurant",
+    statementIntolerance: "J’ai une intolérance alimentaire à :",
+    severeNote:
+      "Cette allergie est grave : même une trace peut me rendre très malade. Merci d’utiliser des ustensiles et des surfaces propres et de vérifier chaque ingrédient.",
+    severityLabel: "Quelle gravité ?",
+    severities: { allergy: "Allergie", severe: "Allergie grave", intolerance: "Intolérance" },
   },
   vi: {
     add: "Thêm",
@@ -275,5 +310,10 @@ export const TABLE_STRINGS: Record<LanguageCode, TableStrings> = {
     request:
       "Vui lòng đảm bảo món ăn của tôi không chứa các thành phần này, kể cả trong nước sốt, dầu và đồ trang trí. Xin báo cho tôi nếu món nào không thể làm mà không có chúng. Cảm ơn.",
     forStaff: "Dành cho nhân viên nhà hàng",
+    statementIntolerance: "Tôi không dung nạp các thực phẩm sau:",
+    severeNote:
+      "Tôi bị dị ứng nặng: chỉ một lượng rất nhỏ cũng có thể khiến tôi bị bệnh nặng. Vui lòng dùng dụng cụ và bề mặt sạch, và kiểm tra từng nguyên liệu.",
+    severityLabel: "Mức độ nghiêm trọng?",
+    severities: { allergy: "Dị ứng", severe: "Dị ứng nặng", intolerance: "Không dung nạp" },
   },
 };

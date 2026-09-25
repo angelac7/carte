@@ -84,6 +84,7 @@ it("persists validated Discover filters before opening results", () => {
     avoid: ["milk"],
     onlyTags: ["vegan"],
     hideTraces: true,
+    severity: "allergy",
   });
   expect(response.headers.get("location")).toContain("/discover?");
 });

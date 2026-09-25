@@ -5,19 +5,30 @@ import { ALLERGENS, DIETARY_TAGS, type Allergen, type DietaryTag } from "@/lib/a
 // without an account, and the server can show filtered results on the very first load.
 export const PREFS_COOKIE = "carte-prefs";
 
+/** How serious the diner says their allergies are, shown to staff on the allergy card. */
+export const SEVERITIES = ["allergy", "severe", "intolerance"] as const;
+export type Severity = (typeof SEVERITIES)[number];
+
 export type DinerPrefs = {
   avoid: Allergen[];
   onlyTags: DietaryTag[];
   /** Also hide dishes that may contain traces of an avoided allergen. */
   hideTraces: boolean;
+  severity?: Severity;
 };
 
-export const EMPTY_PREFS: DinerPrefs = { avoid: [], onlyTags: [], hideTraces: false };
+export const EMPTY_PREFS: DinerPrefs = {
+  avoid: [],
+  onlyTags: [],
+  hideTraces: false,
+  severity: "allergy",
+};
 
 const PrefsSchema = z.object({
   avoid: z.array(z.enum(ALLERGENS)).catch([]),
   onlyTags: z.array(z.enum(DIETARY_TAGS)).catch([]),
   hideTraces: z.boolean().catch(false),
+  severity: z.enum(SEVERITIES).catch("allergy"),
 });
 
 /** Reads saved filters, ignoring anything unexpected. */

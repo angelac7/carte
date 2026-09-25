@@ -1,13 +1,13 @@
 "use client";
 import { useState } from "react";
+import { AllergyStatement } from "@/components/AllergyCard";
 import { QuantityStepper } from "@/components/QuantityStepper";
 import { Sheet } from "@/components/Sheet";
 import { Button } from "@/components/ui/button";
 import { fieldClass } from "@/components/ui/field";
 import type { Allergen } from "@/lib/allergens";
+import type { Severity } from "@/lib/diner-prefs";
 import { splitBill, type BillLine } from "@/lib/bill";
-import { formatList } from "@/lib/format-list";
-import { DINER_STRINGS } from "@/lib/i18n/diner-strings";
 import { TABLE_STRINGS } from "@/lib/i18n/table-strings";
 import type { LanguageCode } from "@/lib/languages";
 import { choiceLabels, linePrice, orderLines } from "@/lib/order-lines";
@@ -22,6 +22,7 @@ type OrderSheetProps = {
   language: LanguageCode;
   staffLanguage?: LanguageCode;
   avoid: Allergen[];
+  severity?: Severity;
   onQuantity: (lineKey: string, quantity: number) => void;
   onClear: () => void;
   onClose: () => void;
@@ -54,6 +55,7 @@ export function OrderSheet({
   language,
   staffLanguage = "en",
   avoid,
+  severity = "allergy",
   onQuantity,
   onClear,
   onClose,
@@ -107,15 +109,13 @@ export function OrderSheet({
           ))}
         </ul>
         {avoid.length > 0 && (
-          <div lang={staffLanguage} className="mt-6 rounded-control border-2 border-tomato p-4">
-            <p className="font-medium">{TABLE_STRINGS[staffLanguage].statement}</p>
-            <p className="mt-1 text-xl">
-              {formatList(
-                avoid.map((allergen) => DINER_STRINGS[staffLanguage].allergens[allergen]),
-                staffLanguage,
-              )}
-            </p>
-            <p className="mt-2 text-sm leading-relaxed">{TABLE_STRINGS[staffLanguage].request}</p>
+          <div className="mt-6 rounded-control border-2 border-tomato p-4">
+            <AllergyStatement
+              language={staffLanguage}
+              avoid={avoid}
+              severity={severity}
+              large={false}
+            />
           </div>
         )}
       </Sheet>

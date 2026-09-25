@@ -669,6 +669,7 @@ export function DinerMenu({
           textFor={textFor}
           language={language}
           avoid={avoid}
+          severity={prefs.severity}
           onQuantity={setQuantity}
           onClear={() => setOrder({})}
           onClose={() => setPanel(null)}
@@ -679,6 +680,8 @@ export function DinerMenu({
           staffLanguage={staffLanguage}
           language={language}
           avoid={avoid}
+          severity={prefs.severity}
+          onSeverity={(severity) => setPrefs({ ...prefs, severity })}
           onToggle={(allergen) => updateFilters(toggleValue(avoid, allergen), onlyTags)}
           onClose={() => setPanel(null)}
         />
