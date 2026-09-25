@@ -1,6 +1,7 @@
 "use client";
 import Image from "next/image";
 import { Chip } from "@/components/Chip";
+import { allergensChecked } from "@/lib/allergens";
 import { DishActions } from "@/components/DishActions";
 import { SparkleIcon } from "@/components/icons";
 import { QuantityStepper } from "@/components/QuantityStepper";
@@ -141,7 +142,9 @@ export function DishCard({
               ))}
             </>
           ) : (
-            <span className="text-muted">{t.noMajorAllergens}</span>
+            <span className="text-muted">
+              {t.noMajorAllergens(allergensChecked(dish.allergen_list))}
+            </span>
           )}
         </div>
         {dish.dietary_tags.length > 0 && (

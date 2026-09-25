@@ -28,7 +28,7 @@ import { PhotoLookup } from "@/components/PhotoLookup";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Notice } from "@/components/ui/notice";
-import { type Allergen, type DietaryTag } from "@/lib/allergens";
+import { uncheckedAllergens, type Allergen, type DietaryTag } from "@/lib/allergens";
 import { fetchSummaries, fetchTranslations, trackDishView } from "@/lib/api-client";
 import { useOffline } from "@/lib/use-offline";
 import { useDinerPrefs } from "@/lib/use-diner-prefs";
@@ -54,6 +54,7 @@ import {
   type LanguageCode,
 } from "@/lib/languages";
 import { filterDishes } from "@/lib/menu-filters";
+import { formatList } from "@/lib/format-list";
 import { matchesSearch } from "@/lib/menu-search";
 import { blockedAddons, dishQuantity, hasChoices, lineKey, parseLineKey } from "@/lib/order-lines";
 import { detectCurrency } from "@/lib/prices";
@@ -235,6 +236,16 @@ export function DinerMenu({
   }
 
   const shown = filterDishes(dishes, { avoid, onlyTags });
+  // Dishes hidden only because they were never checked for an allergen this diner avoids.
+  const uncheckedDishes = dishes.filter(
+    (dish) =>
+      uncheckedAllergens(dish.allergen_list, avoid).length > 0 &&
+      !dish.allergens.some((allergen) => avoid.includes(allergen)),
+  );
+  const uncheckedCount = uncheckedDishes.length;
+  const uncheckedNames = [
+    ...new Set(uncheckedDishes.flatMap((dish) => uncheckedAllergens(dish.allergen_list, avoid))),
+  ];
   const hiddenCount = dishes.length - shown.length;
   const filtering = avoid.length > 0 || onlyTags.length > 0;
   const shownById = new Map(shown.map((dish) => [dish.id, dish]));
@@ -409,6 +420,17 @@ export function DinerMenu({
         <div className="mt-6 grid gap-6 lg:grid-cols-[1.1fr_1fr]">
           <div className="space-y-3">
             <Notice>{t.safetyNotice}</Notice>
+            {uncheckedCount > 0 && (
+              <Notice>
+                {t.uncheckedHidden(
+                  uncheckedCount,
+                  formatList(
+                    uncheckedNames.map((allergen) => t.allergens[allergen]),
+                    language,
+                  ),
+                )}
+              </Notice>
+            )}
             {offline && (
               <Notice tone="warning" role="alert">
                 {t.offlineMenu}

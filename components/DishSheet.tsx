@@ -2,6 +2,7 @@
 import Image from "next/image";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Chip } from "@/components/Chip";
+import { allergensChecked } from "@/lib/allergens";
 import { ReportDish } from "@/components/ReportDish";
 import { Sheet } from "@/components/Sheet";
 import { fetchInsight } from "@/lib/api-client";
@@ -161,7 +162,9 @@ export function DishSheet({
             ))}
           </>
         ) : (
-          <span className="text-muted">{d.noMajorAllergens}</span>
+          <span className="text-muted">
+            {d.noMajorAllergens(allergensChecked(dish.allergen_list))}
+          </span>
         )}
         {dish.dietary_tags.map((tag) => (
           <Chip key={tag} label={d.tags[tag]} tone="tag" />

@@ -16,6 +16,8 @@ export type DishResult = {
   hours: WeeklyHours;
   occasions: Occasion[];
   photo_url: string | null;
+  /** Which allergen list the dish was checked against: 1 was the original 9, 2 is all 14. */
+  allergen_list?: number;
 };
 
 export type RestaurantResult = {
@@ -43,6 +45,7 @@ export type TrendingDish = {
   city: string;
   views: number;
   photo_url: string | null;
+  allergen_list?: number;
 };
 
 export type DiscoverFilters = {

@@ -1,5 +1,6 @@
 import { after, NextResponse } from "next/server";
 import { z } from "zod";
+import { ALLERGEN_LIST_VERSION } from "@/lib/allergens";
 import { getOwnerContext } from "@/lib/auth";
 import {
   addDishes,
@@ -66,9 +67,11 @@ export async function POST(req: Request) {
 export async function PUT(req: Request) {
   const owner = await getOwnerContext();
   if (!owner) return fail(LOGIN_REQUIRED, 401);
-  const parsed = MenuItemSchema.extend({ revision: Version }).safeParse(
-    await req.json().catch(() => null),
-  );
+  const parsed = MenuItemSchema.extend({
+    revision: Version,
+    // True only when the owner pressed Confirm, after seeing every allergen on the list.
+    confirm: z.boolean().optional(),
+  }).safeParse(await req.json().catch(() => null));
   if (!parsed.success) return fail("That dish was not in the expected format.");
   if (!parsed.data.available_from !== !parsed.data.available_until) {
     return fail("Set both serving times, or neither.");
@@ -76,7 +79,12 @@ export async function PUT(req: Request) {
   // A contradicted diet tag (like vegan with eggs) would mislead diners, so it can't be confirmed.
   const conflicts = tagConflictMessages(parsed.data.allergens, parsed.data.dietary_tags);
   if (parsed.data.confirmed && conflicts.length > 0) return fail(conflicts.join(" "));
-  const updated = await updateDish(owner.supabase, owner.restaurant.id, parsed.data);
+  const { confirm, ...dish } = parsed.data;
+  const updated = await updateDish(owner.supabase, owner.restaurant.id, {
+    ...dish,
+    // Only pressing Confirm vouches for the full allergen list; other saves leave it alone.
+    allergen_list: confirm && dish.confirmed ? ALLERGEN_LIST_VERSION : undefined,
+  });
   if (!updated)
     return fail(
       "This dish changed in another tab or was deleted. Reload to review the latest version.",

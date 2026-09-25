@@ -13,7 +13,15 @@ import { Button, ButtonLink } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { fieldClass, labelClass } from "@/components/ui/field";
 import { Notice } from "@/components/ui/notice";
-import { ALLERGENS, DIETARY_TAGS, type Allergen, type DietaryTag } from "@/lib/allergens";
+import {
+  ALLERGEN_LIST_VERSION,
+  ALLERGENS,
+  DIETARY_TAGS,
+  NEWER_ALLERGENS,
+  US_ALLERGENS,
+  type Allergen,
+  type DietaryTag,
+} from "@/lib/allergens";
 import {
   deleteAllDishes,
   deleteDish,
@@ -263,6 +271,9 @@ function AvailabilityControls({
   );
 }
 
+/** Confirmed against today's full allergen list, not just the original 9. */
+const checkedForAll = (dish: MenuItem) => (dish.allergen_list ?? 1) >= ALLERGEN_LIST_VERSION;
+
 export default function ReviewDishes({ timezone }: { timezone: string }) {
   const [dishes, setDishes] = useState<MenuItem[]>([]);
   const [loaded, setLoaded] = useState(false);
@@ -303,11 +314,14 @@ export default function ReviewDishes({ timezone }: { timezone: string }) {
     setDishes((prev) => prev.map((dish) => (dish.id === updated.id ? updated : dish)));
   }
 
-  async function save(updated: MenuItem): Promise<MenuItem | null> {
+  async function save(
+    updated: MenuItem,
+    options: { confirm?: boolean } = {},
+  ): Promise<MenuItem | null> {
     if (mutationPending.current || pending.current.has(updated.id)) return null;
     setPending(updated.id, true);
     try {
-      const saved = await updateDish(updated);
+      const saved = await updateDish(updated, options);
       persisted.current.set(saved.id, saved);
       showLocally(saved);
       setProblem("");
@@ -332,7 +346,7 @@ export default function ReviewDishes({ timezone }: { timezone: string }) {
     save({ ...dish, dietary_tags: toggleValue(dish.dietary_tags, tag), confirmed: false });
 
   async function confirmDish(dish: MenuItem) {
-    const saved = await save({ ...dish, confirmed: true });
+    const saved = await save({ ...dish, confirmed: true }, { confirm: true });
     if (saved?.confirmed) toast(`✓ ${saved.name} confirmed`);
   }
 
@@ -463,11 +477,15 @@ export default function ReviewDishes({ timezone }: { timezone: string }) {
   }
 
   const total = dishes.length;
-  const done = dishes.filter((dish) => dish.confirmed).length;
+  const done = dishes.filter((dish) => dish.confirmed && checkedForAll(dish)).length;
+  const olderList = dishes.filter((dish) => dish.confirmed && !checkedForAll(dish)).length;
   const needle = search.trim().toLowerCase();
   const shown = dishes.filter(
     (dish) =>
-      (filter === "all" || (filter === "confirmed" ? dish.confirmed : !dish.confirmed)) &&
+      (filter === "all" ||
+        (filter === "confirmed"
+          ? dish.confirmed && checkedForAll(dish)
+          : !(dish.confirmed && checkedForAll(dish)))) &&
       (!needle || dish.name.toLowerCase().includes(needle)),
   );
   // Reordering only makes sense with the whole menu in view.
@@ -503,6 +521,16 @@ export default function ReviewDishes({ timezone }: { timezone: string }) {
           <Button type="button" onClick={() => window.location.reload()} className="ml-3">
             Reload latest menu
           </Button>
+        </Notice>
+      )}
+
+      {olderList > 0 && (
+        <Notice className="mt-6">
+          Carte now covers {ALLERGENS.length} allergens.{" "}
+          {olderList === 1 ? "1 dish was" : `${olderList} dishes were`} confirmed before{" "}
+          {NEWER_ALLERGENS.join(", ")} were added. Check those and press &ldquo;Confirm all{" "}
+          {ALLERGENS.length} allergens&rdquo; so diners who avoid them can see{" "}
+          {olderList === 1 ? "it" : "them"}.
         </Notice>
       )}
 
@@ -786,8 +814,22 @@ export default function ReviewDishes({ timezone }: { timezone: string }) {
                             </label>
 
                             <div className="mt-6 flex items-center justify-between border-t border-ink/10 pt-5">
-                              {dish.confirmed ? (
+                              {dish.confirmed && checkedForAll(dish) ? (
                                 <p className="text-sm font-medium text-basil">✓ Confirmed</p>
+                              ) : dish.confirmed ? (
+                                <div className="flex flex-wrap items-center gap-3">
+                                  <Button
+                                    variant="basil"
+                                    size="sm"
+                                    onClick={() => confirmDish(dish)}
+                                    disabled={conflicts.length > 0}
+                                  >
+                                    Confirm all {ALLERGENS.length} allergens
+                                  </Button>
+                                  <span className="text-xs text-muted">
+                                    Confirmed for the original {US_ALLERGENS.length}
+                                  </span>
+                                </div>
                               ) : (
                                 <Button
                                   variant="basil"

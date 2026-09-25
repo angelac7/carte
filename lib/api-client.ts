@@ -51,7 +51,9 @@ export async function fetchDishes(): Promise<MenuItem[]> {
 /** Saves dishes and returns the ones added. With `skipExisting`, dishes already on the menu are left out. */
 export const saveDishes = (items: ExtractedDish[], options: { skipExisting?: boolean } = {}) =>
   sendToItems<MenuItem[]>("POST", { items, ...options });
-export const updateDish = (dish: MenuItem) => sendToItems<MenuItem>("PUT", dish);
+/** Saves a dish. `confirm` is only for the Confirm button: it vouches for every allergen. */
+export const updateDish = (dish: MenuItem, options: { confirm?: boolean } = {}) =>
+  sendToItems<MenuItem>("PUT", { ...dish, ...options });
 /** Saves a new dish order; returns the dishes whose order changed, with their new versions. */
 export const reorderDishes = (order: string[]) =>
   sendToItems<{ id: string; revision: number; sort_order: number }[]>("PATCH", { order });

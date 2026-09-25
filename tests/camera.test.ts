@@ -19,7 +19,7 @@ describe("ScannedMenuSchema", () => {
     const menu = ScannedMenuSchema.parse({
       menuLanguage: "ja",
       dishes: [
-        { original: "ラーメン", name: "Ramen", allergens: ["wheat", "celery"] },
+        { original: "ラーメン", name: "Ramen", allergens: ["wheat", "kiwi"] },
         { original: "", name: "" },
       ],
     });

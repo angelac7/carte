@@ -7,6 +7,7 @@ import { ScrollProgress } from "@/components/motion/ScrollProgress";
 import { NumberTicker } from "@/components/motion/NumberTicker";
 import { Particles } from "@/components/motion/Particles";
 import { PublicHeader } from "@/components/PublicHeader";
+import { ALLERGENS } from "@/lib/allergens";
 import { SiteFooter } from "@/components/SiteFooter";
 import { ButtonLink } from "@/components/ui/button";
 import { panelClass } from "@/components/ui/panel";
@@ -32,7 +33,7 @@ const MENU_WORDS = ["Menu", "Menú", "메뉴", "メニュー", "菜单", "Thực
 
 const STATS = [
   { value: 7, label: "languages, with allergen names written by people" },
-  { value: 9, label: "major allergens, confirmed by the kitchen" },
+  { value: ALLERGENS.length, label: "major allergens, confirmed by the kitchen" },
   { value: 1, label: "photo is all it takes to build a menu" },
   { value: 0, label: "accounts needed to use Carte as a diner" },
 ];

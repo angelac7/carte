@@ -1,5 +1,5 @@
-/** The 9 major US allergens. Prompts, filters, and UI all read from this one list. */
-export const ALLERGENS = [
+/** The 9 major US allergens, which Carte has covered from the start. */
+export const US_ALLERGENS = [
   "milk",
   "eggs",
   "fish",
@@ -10,6 +10,35 @@ export const ALLERGENS = [
   "soy",
   "sesame",
 ] as const;
+
+/** The rest of the EU's 14. Dishes confirmed before these were added weren't checked for them. */
+export const NEWER_ALLERGENS = ["celery", "mustard", "lupin", "mollusks", "sulfites"] as const;
+
+/**
+ * The 14 major allergens. Prompts, filters, and UI all read from this one list; the database
+ * checks in supabase/migrations must match it.
+ */
+export const ALLERGENS = [...US_ALLERGENS, ...NEWER_ALLERGENS] as const;
+
+/** Which list an owner checks when confirming now: 1 was the original 9, 2 is all 14. */
+export const ALLERGEN_LIST_VERSION = 2;
+
+/** How many allergens a dish was checked for, from the list it was confirmed against. */
+export function allergensChecked(allergenList: number | undefined): number {
+  return (allergenList ?? 1) >= 2 ? ALLERGENS.length : US_ALLERGENS.length;
+}
+
+/**
+ * The avoided allergens a dish was never checked for. It can't be vouched for to that diner,
+ * so it's hidden from them, with a note to ask staff.
+ */
+export function uncheckedAllergens(
+  allergenList: number | undefined,
+  avoid: readonly Allergen[],
+): Allergen[] {
+  if ((allergenList ?? 1) >= 2) return [];
+  return avoid.filter((allergen) => (NEWER_ALLERGENS as readonly string[]).includes(allergen));
+}
 
 /** Tags the AI may suggest from ingredients, for the owner to confirm. */
 export const AI_SUGGESTED_TAGS = ["vegan", "vegetarian", "gluten-free"] as const;

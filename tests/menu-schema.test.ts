@@ -5,7 +5,7 @@ describe("ExtractedDishSchema", () => {
   it("keeps only known allergens and dietary tags", () => {
     const dish = ExtractedDishSchema.parse({
       name: "Mushroom Ramyun",
-      likely_allergens: ["wheat", "celery", "milk"],
+      likely_allergens: ["wheat", "kiwi", "milk"],
       dietary_tags: ["vegetarian", "keto"],
     });
     expect(dish.likely_allergens).toEqual(["wheat", "milk"]);

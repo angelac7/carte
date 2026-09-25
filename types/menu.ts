@@ -96,6 +96,8 @@ export const MenuItemSchema = z.object({
   sold_out_on: z.string().nullable().optional(),
   /** Shown with the specials at the top of the menu. */
   special: z.boolean().optional(),
+  /** Which allergen list the owner checked when confirming: 1 was the original 9, 2 is all 14. */
+  allergen_list: z.number().int().min(1).max(2).optional(),
   sizes: z.array(DishSizeSchema).max(8).optional(),
   addons: z.array(DishAddonSchema).max(12).optional(),
   /** An optional daily serving window in the restaurant's time zone. */

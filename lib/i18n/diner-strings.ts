@@ -15,7 +15,9 @@ export type DinerStrings = {
   clearFilters: string;
   noMatch: string;
   contains: string;
-  noMajorAllergens: string;
+  noMajorAllergens: (checked: number) => string;
+  /** Dishes hidden because they weren't checked for an allergen the diner avoids. */
+  uncheckedHidden: (count: number, allergens: string) => string;
   kitchenNote: string;
   translating: string;
   translationFailed: string;
@@ -105,7 +107,11 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     noMatch:
       "No dishes match your filters. Try removing one, or ask your server what the kitchen can adjust.",
     contains: "Contains",
-    noMajorAllergens: "None of the 9 major allergens listed",
+    noMajorAllergens: (n) => `None of the ${n} major allergens listed`,
+    uncheckedHidden: (count, list) =>
+      count === 1
+        ? `1 dish hasn't been checked for ${list} yet, so it's hidden. Ask your server about it.`
+        : `${count} dishes haven't been checked for ${list} yet, so they're hidden. Ask your server about them.`,
     kitchenNote: "Kitchen note:",
     translating: "Translating menu…",
     translationFailed:
@@ -122,6 +128,11 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
       wheat: "wheat",
       soy: "soy",
       sesame: "sesame",
+      celery: "celery",
+      mustard: "mustard",
+      lupin: "lupin",
+      mollusks: "mollusks",
+      sulfites: "sulfites",
     },
     tags: {
       vegan: "vegan",
@@ -181,7 +192,11 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     noMatch:
       "Ningún plato coincide con sus filtros. Quite alguno o pregunte a su mesero qué puede adaptar la cocina.",
     contains: "Contiene",
-    noMajorAllergens: "No se indica ninguno de los 9 alérgenos principales",
+    noMajorAllergens: (n) => `No se indica ninguno de los ${n} alérgenos principales`,
+    uncheckedHidden: (count, list) =>
+      count === 1
+        ? `1 plato aún no se ha revisado para ${list}, así que está oculto. Pregunte a su mesero.`
+        : `${count} platos aún no se han revisado para ${list}, así que están ocultos. Pregunte a su mesero.`,
     kitchenNote: "Nota de cocina:",
     translating: "Traduciendo el menú…",
     translationFailed:
@@ -198,6 +213,11 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
       wheat: "trigo",
       soy: "soya",
       sesame: "sésamo",
+      celery: "apio",
+      mustard: "mostaza",
+      lupin: "altramuz",
+      mollusks: "moluscos",
+      sulfites: "sulfitos",
     },
     tags: {
       vegan: "vegano",
@@ -252,7 +272,9 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     clearFilters: "清除筛选",
     noMatch: "没有符合筛选条件的菜品。请尝试移除筛选条件，或询问服务员厨房可以如何调整。",
     contains: "含有",
-    noMajorAllergens: "未标注 9 种主要过敏原中的任何一种",
+    noMajorAllergens: (n) => `未标注 ${n} 种主要过敏原中的任何一种`,
+    uncheckedHidden: (count, list) =>
+      `${count} 道菜尚未检查是否含有${list}，因此已隐藏。请询问服务员。`,
     kitchenNote: "厨房备注：",
     translating: "正在翻译菜单…",
     translationFailed: "暂时无法翻译，菜单以原语言显示。",
@@ -267,6 +289,11 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
       wheat: "小麦",
       soy: "大豆",
       sesame: "芝麻",
+      celery: "芹菜",
+      mustard: "芥末",
+      lupin: "羽扇豆",
+      mollusks: "软体动物",
+      sulfites: "亚硫酸盐",
     },
     tags: {
       vegan: "纯素",
@@ -326,7 +353,9 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     noMatch:
       "필터에 맞는 요리가 없습니다. 필터를 하나 해제하거나, 주방에서 조정 가능한지 직원에게 문의해 주세요.",
     contains: "포함",
-    noMajorAllergens: "9대 주요 알레르기 유발 성분 표시 없음",
+    noMajorAllergens: (n) => `${n}대 주요 알레르기 유발 성분 표시 없음`,
+    uncheckedHidden: (count, list) =>
+      `요리 ${count}개는 아직 ${list} 확인이 되지 않아 숨겨졌습니다. 직원에게 문의하세요.`,
     kitchenNote: "주방 메모:",
     translating: "메뉴 번역 중…",
     translationFailed: "지금은 번역을 사용할 수 없어 원래 언어로 메뉴를 표시합니다.",
@@ -341,6 +370,11 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
       wheat: "밀",
       soy: "대두",
       sesame: "참깨",
+      celery: "셀러리",
+      mustard: "겨자",
+      lupin: "루핀",
+      mollusks: "연체동물",
+      sulfites: "아황산염",
     },
     tags: {
       vegan: "비건",
@@ -400,7 +434,9 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     noMatch:
       "条件に合う料理がありません。フィルターを外すか、対応できるかスタッフにお尋ねください。",
     contains: "含む",
-    noMajorAllergens: "主要アレルゲン9品目の表示なし",
+    noMajorAllergens: (n) => `主要アレルゲン${n}品目の表示なし`,
+    uncheckedHidden: (count, list) =>
+      `${count}品は${list}の確認がまだのため非表示です。スタッフにお尋ねください。`,
     kitchenNote: "厨房メモ：",
     translating: "メニューを翻訳中…",
     translationFailed: "現在翻訳を利用できないため、元の言語でメニューを表示しています。",
@@ -415,6 +451,11 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
       wheat: "小麦",
       soy: "大豆",
       sesame: "ごま",
+      celery: "セロリ",
+      mustard: "マスタード",
+      lupin: "ルピナス",
+      mollusks: "軟体動物",
+      sulfites: "亜硫酸塩",
     },
     tags: {
       vegan: "ヴィーガン",
@@ -476,7 +517,11 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     noMatch:
       "Aucun plat ne correspond à vos filtres. Retirez-en un ou demandez au serveur ce que la cuisine peut adapter.",
     contains: "Contient",
-    noMajorAllergens: "Aucun des 9 allergènes majeurs n'est indiqué",
+    noMajorAllergens: (n) => `Aucun des ${n} allergènes majeurs n’est indiqué`,
+    uncheckedHidden: (count, list) =>
+      count === 1
+        ? `1 plat n’a pas encore été vérifié pour : ${list}. Il est masqué. Demandez au serveur.`
+        : `${count} plats n’ont pas encore été vérifiés pour : ${list}. Ils sont masqués. Demandez au serveur.`,
     kitchenNote: "Note de la cuisine :",
     translating: "Traduction du menu…",
     translationFailed:
@@ -493,6 +538,11 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
       wheat: "blé",
       soy: "soja",
       sesame: "sésame",
+      celery: "céleri",
+      mustard: "moutarde",
+      lupin: "lupin",
+      mollusks: "mollusques",
+      sulfites: "sulfites",
     },
     tags: {
       vegan: "végan",
@@ -552,7 +602,9 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     noMatch:
       "Không có món nào phù hợp với bộ lọc. Hãy bỏ bớt một bộ lọc, hoặc hỏi nhân viên phục vụ xem bếp có thể điều chỉnh gì.",
     contains: "Chứa",
-    noMajorAllergens: "Không ghi nhận chất nào trong 9 chất gây dị ứng chính",
+    noMajorAllergens: (n) => `Không ghi nhận chất nào trong ${n} chất gây dị ứng chính`,
+    uncheckedHidden: (count, list) =>
+      `${count} món chưa được kiểm tra về ${list} nên đã bị ẩn. Hãy hỏi nhân viên phục vụ.`,
     kitchenNote: "Ghi chú của bếp:",
     translating: "Đang dịch thực đơn…",
     translationFailed: "Hiện không thể dịch, nên thực đơn được hiển thị bằng ngôn ngữ gốc.",
@@ -567,6 +619,11 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
       wheat: "lúa mì",
       soy: "đậu nành",
       sesame: "mè",
+      celery: "cần tây",
+      mustard: "mù tạt",
+      lupin: "đậu lupin",
+      mollusks: "động vật thân mềm",
+      sulfites: "sulfit",
     },
     tags: {
       vegan: "thuần chay",

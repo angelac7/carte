@@ -12,7 +12,13 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { fieldClass } from "@/components/ui/field";
 import { Notice } from "@/components/ui/notice";
 import { cravingToTerms } from "@/lib/ai/craving";
-import { ALLERGENS, DIETARY_TAGS, isAllergen, isDietaryTag } from "@/lib/allergens";
+import {
+  ALLERGENS,
+  allergensChecked,
+  DIETARY_TAGS,
+  isAllergen,
+  isDietaryTag,
+} from "@/lib/allergens";
 import { cn } from "@/lib/cn";
 import {
   listCities,
@@ -102,7 +108,9 @@ function DishGrid({
                       ))}
                     </>
                   ) : (
-                    <span className="text-muted">{d.noMajorAllergens}</span>
+                    <span className="text-muted">
+                      {d.noMajorAllergens(allergensChecked(dish.allergen_list))}
+                    </span>
                   )}
                   {dish.dietary_tags.map((tag) => (
                     <Chip key={tag} label={d.tags[tag]} tone="tag" />

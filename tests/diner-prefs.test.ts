@@ -10,7 +10,7 @@ describe("diner preferences", () => {
   it("ignores missing or garbled cookies", () => {
     expect(parsePrefs(undefined)).toEqual(EMPTY_PREFS);
     expect(parsePrefs("not json")).toEqual(EMPTY_PREFS);
-    expect(parsePrefs(serializePrefs({ avoid: ["celery"], onlyTags: [] } as never))).toEqual(
+    expect(parsePrefs(serializePrefs({ avoid: ["kiwi"], onlyTags: [] } as never))).toEqual(
       EMPTY_PREFS,
     );
   });

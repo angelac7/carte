@@ -322,3 +322,26 @@ it("requires review when a source language is corrected", async () => {
   );
   expect(changed.confirmed).toBe(false);
 });
+
+describe("Discover and the newer allergens", () => {
+  it("hides dishes never checked for a newer allergen the diner avoids", async () => {
+    await db.exec(`
+      insert into auth.users values ('00000000-0000-0000-0000-00000000c0de');
+      insert into public.restaurants (owner_id, name, slug, listed)
+        values ('00000000-0000-0000-0000-00000000c0de', 'Checked', 'checked-for-14', true);
+      insert into public.menu_items (restaurant_id, name, confirmed, allergen_list)
+        select id, 'Salad', true, 2 from public.restaurants where slug = 'checked-for-14';
+    `);
+    const result = await db.query<{ restaurant_slug: string; allergen_list: number }>(
+      `select * from public.search_dishes('salad', avoid => array['mustard'])`,
+    );
+    expect(result.rows.map((row) => row.restaurant_slug)).toEqual(["checked-for-14"]);
+    expect(result.rows[0].allergen_list).toBe(2);
+    await db.exec(`update public.menu_items set allergens = array['mustard', 'celery']
+      where restaurant_id = (select id from public.restaurants where slug = 'checked-for-14')`);
+    const avoided = await db.query(
+      `select * from public.search_dishes('salad', avoid => array['mustard'])`,
+    );
+    expect(avoided.rows).toEqual([]);
+  });
+});
