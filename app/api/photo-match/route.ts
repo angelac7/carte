@@ -7,6 +7,7 @@ import { readImageUpload } from "@/lib/read-image-upload";
 import { filterDishes } from "@/lib/menu-filters";
 import { PhotoMatchRequestSchema } from "@/types/camera";
 import { createClient } from "@/lib/supabase/server";
+import { reportError } from "@/lib/report-error";
 
 /** Finds which of a restaurant's confirmed dishes a photo shows. */
 export async function POST(req: Request) {
@@ -42,7 +43,7 @@ export async function POST(req: Request) {
     );
     return NextResponse.json({ matches });
   } catch (err) {
-    console.error("Photo match failed:", err);
+    reportError("Photo match failed", err);
     return NextResponse.json({ error: "unavailable" }, { status: 502 });
   }
 }

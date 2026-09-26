@@ -7,6 +7,7 @@ import { normalizeSearch } from "@/lib/diner-interest";
 import { checkRateLimit, clientKey } from "@/lib/rate-limit";
 import { isValidSlug } from "@/lib/slug";
 import { createClient } from "@/lib/supabase/server";
+import { reportError } from "@/lib/report-error";
 
 const Interest = z.object({
   restaurant: z.string().refine(isValidSlug),
@@ -29,6 +30,6 @@ export async function POST(req: Request) {
     avoid: [...new Set(avoid)],
     diets: [...new Set(diets)],
     missed: normalizeSearch(missed),
-  }).catch((err) => console.error("Recording diner interest failed:", err));
+  }).catch((err) => reportError("Recording diner interest failed", err));
   return NextResponse.json({ ok: true });
 }

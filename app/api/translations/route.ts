@@ -7,6 +7,7 @@ import { isLanguageCode, languageName } from "@/lib/languages";
 import { checkRateLimit, clientKey } from "@/lib/rate-limit";
 import { isValidSlug } from "@/lib/slug";
 import { createClient } from "@/lib/supabase/server";
+import { reportError } from "@/lib/report-error";
 
 export const dynamic = "force-dynamic";
 
@@ -45,7 +46,7 @@ export async function GET(req: Request) {
     }
     return NextResponse.json({ translations: found });
   } catch (err) {
-    console.error("Menu translation failed:", err);
+    reportError("Menu translation failed", err);
     return NextResponse.json({ error: "Translation isn't available right now." }, { status: 502 });
   }
 }

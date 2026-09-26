@@ -6,6 +6,7 @@ import { checkRateLimit } from "@/lib/rate-limit";
 import type { SupportedImageType } from "@/lib/upload-rules";
 import { readImageUpload } from "@/lib/read-image-upload";
 import type { MenuStreamEvent } from "@/types/menu-stream";
+import { reportError } from "@/lib/report-error";
 
 function fail(message: string, status: number) {
   return NextResponse.json({ error: message }, { status });
@@ -43,7 +44,7 @@ async function* readMenu(
     }
     yield count > 0 ? { type: "done" } : { type: "error", message: UNREADABLE };
   } catch (err) {
-    console.error("Menu extraction failed:", err);
+    reportError("Menu extraction failed", err);
     yield { type: "error", message: count > 0 ? PARTIAL : UNREADABLE };
   }
 }

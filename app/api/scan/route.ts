@@ -6,6 +6,7 @@ import { checkRateLimit, clientKey } from "@/lib/rate-limit";
 import { readImageUpload } from "@/lib/read-image-upload";
 import type { SupportedImageType } from "@/lib/upload-rules";
 import type { ScanStreamEvent } from "@/types/menu-stream";
+import { reportError } from "@/lib/report-error";
 
 /** Reads and translates a paper menu from a restaurant that isn't on Carte. Nothing is stored. */
 export async function POST(req: Request) {
@@ -41,7 +42,7 @@ async function* scanMenu(
     }
     yield { type: "done" };
   } catch (err) {
-    console.error("Menu scan failed:", err);
+    reportError("Menu scan failed", err);
     yield { type: "error", message: "unavailable" };
   }
 }

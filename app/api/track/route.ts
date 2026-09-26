@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { recordDishView } from "@/lib/db/stats";
 import { checkRateLimit, clientKey } from "@/lib/rate-limit";
+import { reportError } from "@/lib/report-error";
 
 const Body = z.object({ dish: z.uuid() });
 
@@ -19,7 +20,7 @@ export async function POST(req: Request) {
   try {
     await recordDishView(parsed.data.dish);
   } catch (err) {
-    console.error("Recording a dish view failed:", err);
+    reportError("Recording a dish view failed", err);
   }
   return NextResponse.json({ ok: true });
 }

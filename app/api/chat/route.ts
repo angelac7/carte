@@ -10,6 +10,7 @@ import { isValidSlug } from "@/lib/slug";
 import { createClient } from "@/lib/supabase/server";
 import { ChatRequestSchema, type ChatMessage, type ChatStreamEvent } from "@/types/chat";
 import type { MenuItem } from "@/types/menu";
+import { reportError } from "@/lib/report-error";
 
 const QUESTIONS_PER_WINDOW = 20;
 const WINDOW_MS = 10 * 60 * 1000; // 10 minutes
@@ -34,7 +35,7 @@ export async function POST(req: Request) {
     const { language, messages } = parsed.data;
     return ndjsonResponse(answer(dishes, languageName(language), messages, req.signal));
   } catch (err) {
-    console.error("Menu chat failed:", err);
+    reportError("Menu chat failed", err);
     return NextResponse.json({ error: "unavailable" }, { status: 502 });
   }
 }
@@ -54,7 +55,7 @@ async function* answer(
     }
     yield wrote ? { type: "done" } : { type: "error" };
   } catch (err) {
-    console.error("Menu chat failed:", err);
+    reportError("Menu chat failed", err);
     yield { type: "error" };
   }
 }

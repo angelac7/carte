@@ -7,6 +7,7 @@ import { isLanguageCode, languageName, type LanguageCode } from "@/lib/languages
 import { checkRateLimit, clientKey } from "@/lib/rate-limit";
 import { isValidSlug } from "@/lib/slug";
 import { createClient } from "@/lib/supabase/server";
+import { reportError } from "@/lib/report-error";
 
 export const dynamic = "force-dynamic";
 
@@ -41,7 +42,7 @@ export async function GET(req: Request) {
     await saveInsight(dish, language, insight);
     return NextResponse.json({ insight });
   } catch (err) {
-    console.error("Dish explanation failed:", err);
+    reportError("Dish explanation failed", err);
     return NextResponse.json({ error: "Dish details aren't available." }, { status: 502 });
   }
 }

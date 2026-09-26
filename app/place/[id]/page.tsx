@@ -23,6 +23,7 @@ import { coordinatesUrl, isValidPlaceId, type OsmPlace } from "@/lib/places/norm
 import { checkRateLimit, clientKeyFromHeaders } from "@/lib/rate-limit";
 import { getPlace } from "@/lib/places/osm";
 import { createClient } from "@/lib/supabase/server";
+import { reportError } from "@/lib/report-error";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "Restaurant | Carte" };
@@ -52,7 +53,7 @@ export default async function PlacePage({ params }: { params: Promise<{ id: stri
     }
     place = await getPlace(id);
   } catch (err) {
-    console.error("Place lookup failed:", err);
+    reportError("Place lookup failed", err);
     failed = true;
   }
   if (!place && !failed) notFound();

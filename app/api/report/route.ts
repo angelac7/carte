@@ -5,6 +5,7 @@ import { checkRateLimit, clientKey } from "@/lib/rate-limit";
 import { isValidSlug } from "@/lib/slug";
 import { createClient } from "@/lib/supabase/server";
 import { ReportRequestSchema } from "@/types/report";
+import { reportError } from "@/lib/report-error";
 
 /** A diner tells the restaurant a dish's details look wrong. Nothing about the diner is kept. */
 export async function POST(req: Request) {
@@ -32,7 +33,7 @@ export async function POST(req: Request) {
     });
     return NextResponse.json({ ok: true });
   } catch (err) {
-    console.error("Saving a dish report failed:", err);
+    reportError("Saving a dish report failed", err);
     return NextResponse.json({ error: "The report couldn't be sent." }, { status: 502 });
   }
 }

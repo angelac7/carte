@@ -5,6 +5,7 @@ import { getDishPhoto, setDishPhoto } from "@/lib/db/photos";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { readImageUpload } from "@/lib/read-image-upload";
 import { deleteStoredPhoto, storeDishPhoto } from "@/lib/storage/dish-photos";
+import { reportError } from "@/lib/report-error";
 
 const DishId = z.uuid();
 const Version = z.number().int().positive();
@@ -60,7 +61,7 @@ export async function POST(req: Request) {
     await deleteStoredPhoto(current.photoUrl, owner.restaurant.id).catch(() => {});
     return NextResponse.json({ photoUrl, revision });
   } catch (err) {
-    console.error("Dish photo upload failed:", err);
+    reportError("Dish photo upload failed", err);
     return fail("The photo couldn't be saved. Try again.", 502);
   }
 }

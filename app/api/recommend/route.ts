@@ -7,6 +7,7 @@ import { filterDishes } from "@/lib/menu-filters";
 import { checkRateLimit, clientKey } from "@/lib/rate-limit";
 import { createClient } from "@/lib/supabase/server";
 import { RecommendRequestSchema } from "@/types/recommend";
+import { reportError } from "@/lib/report-error";
 
 /** Suggests dishes from a restaurant's confirmed menu, after applying the diner's filters. */
 export async function POST(req: Request) {
@@ -40,7 +41,7 @@ export async function POST(req: Request) {
     );
     return NextResponse.json({ recommendation });
   } catch (err) {
-    console.error("Recommendation failed:", err);
+    reportError("Recommendation failed", err);
     return NextResponse.json({ error: "unavailable" }, { status: 502 });
   }
 }

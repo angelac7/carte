@@ -6,6 +6,7 @@ import { deleteAccount, passwordMatches } from "@/lib/account";
 import { requireUser } from "@/lib/auth";
 import { listMyRestaurants } from "@/lib/db";
 import { checkRateLimit } from "@/lib/rate-limit";
+import { reportError } from "@/lib/report-error";
 
 export type AccountState = { error?: string; message?: string };
 
@@ -86,7 +87,7 @@ export async function deleteAccountAction(
       owned.map((restaurant) => restaurant.id),
     );
   } catch (err) {
-    console.error("Account deletion failed:", err);
+    reportError("Account deletion failed", err);
     return { error: "Your account couldn't be deleted. Please try again." };
   }
   // The login no longer exists; clear this browser's session cookies too.

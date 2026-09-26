@@ -1,5 +1,6 @@
 import { createHmac } from "node:crypto";
 import { consumeRateLimit } from "@/lib/db/rate-limits";
+import { reportError } from "@/lib/report-error";
 
 /** Atomic limits shared by every server. Fail closed if the counter store is unavailable. */
 export async function checkRateLimit(
@@ -13,7 +14,7 @@ export async function checkRateLimit(
     const hash = createHmac("sha256", secret).update(key).digest("hex");
     return await consumeRateLimit(hash, limit, windowMs);
   } catch (error) {
-    console.error("Rate limit check unavailable:", error);
+    reportError("Rate limit check unavailable", error);
     return false;
   }
 }

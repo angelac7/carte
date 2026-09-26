@@ -1,12 +1,14 @@
 "use client";
 import { useEffect } from "react";
 import { Button, ButtonLink } from "@/components/ui/button";
+import { reportClientError } from "@/lib/report-client-error";
 
 type ErrorPageProps = { error: Error & { digest?: string }; reset: () => void };
 
 export default function ErrorPage({ error, reset }: ErrorPageProps) {
   useEffect(() => {
     console.error(error);
+    reportClientError(error);
   }, [error]);
 
   return (

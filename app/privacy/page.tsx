@@ -102,6 +102,11 @@ export default function PrivacyPage() {
         <li>
           <strong>OpenStreetMap</strong> provides map data for Nearby.
         </li>
+        <li>
+          <strong>Sentry</strong> tells us when something on Carte breaks. Its reports say which
+          page failed, what went wrong, and your browser type. We strip out anything about you
+          first: no name, email, network address, cookies, searches, or allergy choices.
+        </li>
       </ul>
 
       <h2>Children</h2>

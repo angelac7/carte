@@ -4,6 +4,7 @@ import { dishesWithoutInsight, saveInsight } from "@/lib/db/insights";
 import { languageName, type LanguageCode } from "@/lib/languages";
 import { checkRateLimit } from "@/lib/rate-limit";
 import type { MenuItem } from "@/types/menu";
+import { reportError } from "@/lib/report-error";
 
 /** How many dishes are explained at the same time, so a long menu doesn't flood the AI. */
 const AT_ONCE = 4;
@@ -35,7 +36,7 @@ export async function prepareExplanations(
           await saveInsight(dish, language, insight);
           written++;
         } catch (err) {
-          console.error(`Preparing the explanation for "${dish.name}" failed:`, err);
+          reportError("Preparing a dish explanation failed", err, { dish: dish.name });
         }
       }),
     );

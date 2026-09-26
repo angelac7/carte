@@ -6,6 +6,7 @@ import { isLanguageCode, type LanguageCode } from "@/lib/languages";
 import { checkRateLimit, clientKey } from "@/lib/rate-limit";
 import { isValidSlug } from "@/lib/slug";
 import { createClient } from "@/lib/supabase/server";
+import { reportError } from "@/lib/report-error";
 
 export const dynamic = "force-dynamic";
 
@@ -29,7 +30,7 @@ export async function GET(req: Request) {
     const dishes = await getConfirmedDishes(supabase, restaurant.id);
     return NextResponse.json({ summaries: await getCachedSummaries(dishes, parsed.data.lang) });
   } catch (err) {
-    console.error("Loading dish summaries failed:", err);
+    reportError("Loading dish summaries failed", err);
     return NextResponse.json({ error: "Summaries aren't available." }, { status: 502 });
   }
 }

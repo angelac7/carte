@@ -3,6 +3,7 @@ import { createTasteProfile } from "@/lib/ai/taste";
 import { languageName } from "@/lib/languages";
 import { checkRateLimit, clientKey } from "@/lib/rate-limit";
 import { TasteRequestSchema } from "@/types/taste";
+import { reportError } from "@/lib/report-error";
 
 /** Creates a taste profile from data the diner sends from their own device. Nothing is stored. */
 export async function POST(req: Request) {
@@ -16,7 +17,7 @@ export async function POST(req: Request) {
     const profile = await createTasteProfile(parsed.data, languageName(parsed.data.language));
     return NextResponse.json({ profile });
   } catch (err) {
-    console.error("Taste profile failed:", err);
+    reportError("Taste profile failed", err);
     return NextResponse.json({ error: "unavailable" }, { status: 502 });
   }
 }

@@ -5,6 +5,7 @@ import { getRestaurantImages, setRestaurantImage } from "@/lib/db/restaurant-ima
 import { checkRateLimit } from "@/lib/rate-limit";
 import { readImageUpload } from "@/lib/read-image-upload";
 import { deleteStoredPhoto, storeRestaurantImage } from "@/lib/storage/dish-photos";
+import { reportError } from "@/lib/report-error";
 
 const Kind = z.enum(["logo", "cover"]);
 
@@ -44,7 +45,7 @@ export async function POST(req: Request) {
     await deleteStoredPhoto(previous, owner.restaurant.id).catch(() => {});
     return NextResponse.json({ url });
   } catch (err) {
-    console.error("Restaurant image upload failed:", err);
+    reportError("Restaurant image upload failed", err);
     return fail("The image couldn't be saved. Try again.", 502);
   }
 }
@@ -64,7 +65,7 @@ export async function DELETE(req: Request) {
     await deleteStoredPhoto(previous, owner.restaurant.id).catch(() => {});
     return NextResponse.json({ ok: true });
   } catch (err) {
-    console.error("Removing a restaurant image failed:", err);
+    reportError("Removing a restaurant image failed", err);
     return fail("The image couldn't be removed. Try again.", 502);
   }
 }

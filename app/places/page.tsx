@@ -28,6 +28,7 @@ import { geocode, searchPlaces } from "@/lib/places/osm";
 import { publicAsset } from "@/lib/public-asset";
 import { checkRateLimit, clientKeyFromHeaders } from "@/lib/rate-limit";
 import { createClient } from "@/lib/supabase/server";
+import { reportError } from "@/lib/report-error";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "Restaurants nearby | Carte" };
@@ -86,7 +87,7 @@ export default async function PlacesPage({ searchParams }: { searchParams: Promi
         status = "done";
       }
     } catch (err) {
-      console.error("Nearby search failed:", err);
+      reportError("Nearby search failed", err);
       status = "failed";
     }
   }
