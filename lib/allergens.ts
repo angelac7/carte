@@ -48,6 +48,26 @@ export const OWNER_ONLY_TAGS = ["halal", "kosher", "pregnancy-friendly", "kid-fr
 
 export const DIETARY_TAGS = [...AI_SUGGESTED_TAGS, ...OWNER_ONLY_TAGS] as const;
 
+/**
+ * Facts about the whole kitchen an owner can state. Each has a fixed translation, because
+ * allergy information is never written by AI.
+ */
+export const KITCHEN_PRACTICES = [
+  "shared-fryer",
+  "shared-grill",
+  "shared-surfaces",
+  "nuts-in-kitchen",
+  "peanut-oil",
+  "sesame-in-kitchen",
+  "flour-in-kitchen",
+  "shellfish-in-kitchen",
+] as const;
+export type KitchenPractice = (typeof KITCHEN_PRACTICES)[number];
+
+export function isKitchenPractice(value: string): value is KitchenPractice {
+  return (KITCHEN_PRACTICES as readonly string[]).includes(value);
+}
+
 export type Allergen = (typeof ALLERGENS)[number];
 export type DietaryTag = (typeof DIETARY_TAGS)[number];
 export type AiSuggestedTag = (typeof AI_SUGGESTED_TAGS)[number];
@@ -90,4 +110,33 @@ export function conflictingTags<T extends DietaryTag>(
   tags: readonly T[],
 ): T[] {
   return tags.filter((tag) => allergensConflictingWith(tag, allergens).length > 0);
+}
+
+/** The allergens each kitchen practice matters most for. Shared equipment matters for all. */
+const PRACTICE_ALLERGENS: Record<KitchenPractice, readonly Allergen[]> = {
+  "shared-fryer": [],
+  "shared-grill": [],
+  "shared-surfaces": [],
+  "nuts-in-kitchen": ["peanuts", "tree nuts"],
+  "peanut-oil": ["peanuts"],
+  "sesame-in-kitchen": ["sesame"],
+  "flour-in-kitchen": ["wheat"],
+  "shellfish-in-kitchen": ["shellfish", "mollusks"],
+};
+
+/**
+ * A kitchen's practices in the order a diner should read them: the ones about allergens they
+ * avoid first, marked so the menu can point them out. None are ever left out.
+ */
+export function practicesFor(
+  practices: readonly KitchenPractice[],
+  avoid: readonly string[],
+): { practice: KitchenPractice; yours: boolean }[] {
+  const marked = KITCHEN_PRACTICES.filter((practice) => practices.includes(practice)).map(
+    (practice) => ({
+      practice,
+      yours: PRACTICE_ALLERGENS[practice].some((allergen) => avoid.includes(allergen)),
+    }),
+  );
+  return [...marked.filter((p) => p.yours), ...marked.filter((p) => !p.yours)];
 }

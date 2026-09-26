@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { KITCHEN_PRACTICES } from "@/lib/allergens";
 
 export const WEEKDAYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"] as const;
 export type Weekday = (typeof WEEKDAYS)[number];
@@ -92,6 +93,7 @@ export const ProfileSchema = z.object({
   website: WebAddressSchema,
   reservation_url: WebAddressSchema,
   price_range: z.number().int().min(0).max(4),
+  kitchen_practices: z.array(z.enum(KITCHEN_PRACTICES)).max(KITCHEN_PRACTICES.length).default([]),
 });
 export type RestaurantProfile = z.infer<typeof ProfileSchema>;
 
@@ -109,6 +111,7 @@ export const DEFAULT_PROFILE: RestaurantProfile = {
   website: "",
   reservation_url: "",
   price_range: 0,
+  kitchen_practices: [],
 };
 
 export function isOccasion(value: string): value is Occasion {

@@ -1,4 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import type { KitchenPractice } from "@/lib/allergens";
 import type { ExtractedDish, MenuItem } from "@/types/menu";
 
 /** An owner runs the restaurant; an editor was invited to help keep its menu up to date. */
@@ -17,6 +18,8 @@ export type Restaurant = {
   price_range?: number;
   logo_url?: string | null;
   cover_url?: string | null;
+  /** Facts about the whole kitchen, like a shared fryer, from a fixed list. */
+  kitchen_practices?: KitchenPractice[];
   /** Set by Carte when a menu breaks the rules; diners can't see it. */
   suspended?: boolean;
   /** The signed-in person's part in this restaurant, when looked up for them. */
@@ -24,7 +27,7 @@ export type Restaurant = {
 };
 
 const RESTAURANT_COLUMNS =
-  "id, name, slug, cuisine, city, timezone, phone, website, reservation_url, price_range, logo_url, cover_url, suspended";
+  "id, name, slug, cuisine, city, timezone, phone, website, reservation_url, price_range, logo_url, cover_url, suspended, kitchen_practices";
 const DISH_COLUMNS =
   "id, name, description, price, allergens, dietary_tags, notes, confirmed, photo_url, revision, source_language, section, sort_order, sold_out_on, special, available_from, available_until, sizes, addons, allergen_list, removable, may_contain, spice";
 

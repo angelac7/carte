@@ -4,6 +4,8 @@ import { saveProfileAction, type ProfileState } from "@/app/dashboard/profile/ac
 import { Button } from "@/components/ui/button";
 import { fieldClass, labelClass } from "@/components/ui/field";
 import { Notice } from "@/components/ui/notice";
+import { KITCHEN_PRACTICES } from "@/lib/allergens";
+import { DINER_STRINGS } from "@/lib/i18n/diner-strings";
 import { DISCOVER_STRINGS } from "@/lib/i18n/discover-strings";
 import {
   OCCASIONS,
@@ -291,6 +293,36 @@ export function ProfileForm({ profile }: { profile: RestaurantProfile }) {
                 className="sr-only"
               />
               {DISCOVER_STRINGS.en.occasions[occasion]}
+            </label>
+          ))}
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend className="eyebrow text-muted">Kitchen practices</legend>
+        <p className="mt-2 text-sm text-muted">
+          Tick anything true of your whole kitchen. Diners see these at the top of your menu, in
+          their own language, with the ones about their allergies first.
+        </p>
+        <div className="mt-3 space-y-2.5">
+          {KITCHEN_PRACTICES.map((practice) => (
+            <label key={practice} className="flex cursor-pointer items-start gap-3 text-sm">
+              <input
+                type="checkbox"
+                name="kitchen_practice"
+                value={practice}
+                checked={draft.kitchen_practices.includes(practice)}
+                onChange={(event) =>
+                  setDraft({
+                    ...draft,
+                    kitchen_practices: event.target.checked
+                      ? [...draft.kitchen_practices, practice]
+                      : draft.kitchen_practices.filter((value) => value !== practice),
+                  })
+                }
+                className={`mt-0.5 ${checkboxClass}`}
+              />
+              {DINER_STRINGS.en.kitchenPractices[practice]}
             </label>
           ))}
         </div>

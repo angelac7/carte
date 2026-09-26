@@ -76,3 +76,26 @@ test("only menus on Discover describe themselves to Google", async ({ page }) =>
   ]);
   expect(JSON.stringify(data)).not.toMatch(/allergen|wheat/i);
 });
+
+test("the kitchen's practices show, with the ones about the diner's allergies first", async ({
+  page,
+}) => {
+  await rest(`restaurants?id=eq.${restaurantId}`, {
+    method: "PATCH",
+    body: JSON.stringify({ kitchen_practices: ["shared-fryer", "nuts-in-kitchen"] }),
+  });
+  await page.goto(`/r/${slug}`);
+  const kitchen = page.getByRole("note").filter({ hasText: "About this kitchen" });
+  await expect(kitchen).toContainText("Fried foods share one fryer.");
+  const order = async () => {
+    const text = (await kitchen.textContent()) ?? "";
+    return text.indexOf("Peanuts and tree nuts") < text.indexOf("Fried foods");
+  };
+  expect(await order()).toBe(false);
+
+  await page.getByRole("button", { name: "Allergies & diet" }).click();
+  const filters = page.getByRole("dialog");
+  await filters.getByRole("button", { name: "peanuts", exact: true }).click();
+  await filters.getByRole("button", { name: /^Show/ }).click();
+  await expect.poll(order).toBe(true);
+});

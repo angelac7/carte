@@ -28,7 +28,14 @@ import { PhotoLookup } from "@/components/PhotoLookup";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Notice } from "@/components/ui/notice";
-import { uncheckedAllergens, type Allergen, type DietaryTag } from "@/lib/allergens";
+import {
+  practicesFor,
+  uncheckedAllergens,
+  type Allergen,
+  type DietaryTag,
+  type KitchenPractice,
+} from "@/lib/allergens";
+import { cn } from "@/lib/cn";
 import {
   fetchSummaries,
   fetchTranslations,
@@ -89,6 +96,7 @@ type DinerMenuProps = {
     price_range?: number;
     logo_url?: string | null;
     cover_url?: string | null;
+    kitchen_practices?: KitchenPractice[];
   };
   dishes: MenuItem[];
   /** When the page was made, so the server and browser agree on what's available at first. */
@@ -127,6 +135,8 @@ export function DinerMenu({
   const [byLanguage, setByLanguage] = useState<TranslationState>({});
   const [prefs, setPrefs] = useDinerPrefs(initialPrefs);
   const { avoid, onlyTags } = prefs;
+  // Facts about the kitchen, with the ones about the diner's allergies first.
+  const kitchenPractices = practicesFor(restaurant.kitchen_practices ?? [], avoid);
   const table = useTableOrder(restaurant.slug, initialTableCode);
   const { order, setQuantity } = table;
   const [openDishId, setOpenDishId] = useState<string | null>(null);
@@ -495,6 +505,17 @@ export function DinerMenu({
         <div className="mt-6 grid gap-6 lg:grid-cols-[1.1fr_1fr]">
           <div className="space-y-3">
             <Notice>{t.safetyNotice}</Notice>
+            {kitchenPractices.length > 0 && (
+              <Notice>
+                <span className="block font-medium">{t.kitchenTitle}</span>
+                {kitchenPractices.map(({ practice, yours }) => (
+                  <span key={practice} className={cn("mt-1 flex gap-2", yours && "font-semibold")}>
+                    <span aria-hidden="true">{yours ? "⚠" : "•"}</span>
+                    {t.kitchenPractices[practice]}
+                  </span>
+                ))}
+              </Notice>
+            )}
             {uncheckedCount > 0 && (
               <Notice>
                 {t.uncheckedHidden(

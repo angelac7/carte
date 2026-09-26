@@ -129,6 +129,7 @@ export default async function RestaurantMenuPage({ params, searchParams }: Resta
           price_range: restaurant.price_range,
           logo_url: restaurant.logo_url,
           cover_url: restaurant.cover_url,
+          kitchen_practices: restaurant.kitchen_practices ?? [],
         }}
         dishes={dishes}
         initialNow={renderedAt.getTime()}

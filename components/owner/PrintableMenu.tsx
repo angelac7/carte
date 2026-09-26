@@ -1,4 +1,9 @@
-import { allergensChecked, type Allergen } from "@/lib/allergens";
+import {
+  allergensChecked,
+  KITCHEN_PRACTICES,
+  type Allergen,
+  type KitchenPractice,
+} from "@/lib/allergens";
 import { formatList } from "@/lib/format-list";
 import { DINER_STRINGS } from "@/lib/i18n/diner-strings";
 import { htmlLang, textDirection, type LanguageCode } from "@/lib/languages";
@@ -8,6 +13,7 @@ import type { MenuTranslations } from "@/types/translation";
 
 type PrintableMenuProps = {
   restaurantName: string;
+  kitchenPractices?: KitchenPractice[];
   dishes: MenuItem[];
   language: LanguageCode;
   translations: MenuTranslations;
@@ -22,6 +28,7 @@ type PrintableMenuProps = {
  */
 export function PrintableMenu({
   restaurantName,
+  kitchenPractices = [],
   dishes,
   language,
   translations,
@@ -58,6 +65,16 @@ export function PrintableMenu({
       <header className="border-b-4 border-ink pb-6">
         <h1 className="font-serif text-6xl leading-none tracking-tighter">{restaurantName}</h1>
         <p className="eyebrow mt-3 text-muted">{t.menuTitle}</p>
+        {kitchenPractices.length > 0 && (
+          <div className="mt-4 text-sm">
+            <p className="font-medium">{t.kitchenTitle}</p>
+            <ul className="mt-1 list-disc ps-5">
+              {KITCHEN_PRACTICES.filter((p) => kitchenPractices.includes(p)).map((practice) => (
+                <li key={practice}>{t.kitchenPractices[practice]}</li>
+              ))}
+            </ul>
+          </div>
+        )}
       </header>
 
       {groups.map((group) => (

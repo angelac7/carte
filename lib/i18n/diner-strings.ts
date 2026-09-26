@@ -1,4 +1,4 @@
-import type { Allergen, DietaryTag } from "@/lib/allergens";
+import type { Allergen, DietaryTag, KitchenPractice } from "@/lib/allergens";
 import type { LanguageCode } from "@/lib/languages";
 
 // Allergen names are safety-critical and are never AI-generated.
@@ -19,6 +19,9 @@ export type DinerStrings = {
   /** Dishes hidden because they weren't checked for an allergen the diner avoids. */
   uncheckedHidden: (count: number, allergens: string) => string;
   kitchenNote: string;
+  /** Heading for the owner's kitchen practices, which have fixed translations. */
+  kitchenTitle: string;
+  kitchenPractices: Record<KitchenPractice, string>;
   translating: string;
   translationFailed: string;
   offlineMenu: string;
@@ -140,6 +143,17 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
         ? `1 dish hasn't been checked for ${list} yet, so it's hidden. Ask your server about it.`
         : `${count} dishes haven't been checked for ${list} yet, so they're hidden. Ask your server about them.`,
     kitchenNote: "Kitchen note:",
+    kitchenTitle: "About this kitchen",
+    kitchenPractices: {
+      "shared-fryer": "Fried foods share one fryer.",
+      "shared-grill": "The grill, pans, and utensils are shared between dishes.",
+      "shared-surfaces": "All dishes are made in one kitchen with shared surfaces.",
+      "nuts-in-kitchen": "Peanuts and tree nuts are used in this kitchen.",
+      "peanut-oil": "Some dishes are cooked in peanut oil.",
+      "sesame-in-kitchen": "Sesame is used in this kitchen.",
+      "flour-in-kitchen": "Wheat flour is used in this kitchen.",
+      "shellfish-in-kitchen": "Shellfish is cooked in this kitchen.",
+    },
     translating: "Translating menu…",
     translationFailed:
       "Translation isn't available right now, so the menu is shown in its original language.",
@@ -239,6 +253,18 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
         ? `1 plato aún no se ha revisado para ${list}, así que está oculto. Pregunte a su mesero.`
         : `${count} platos aún no se han revisado para ${list}, así que están ocultos. Pregunte a su mesero.`,
     kitchenNote: "Nota de cocina:",
+    kitchenTitle: "Sobre esta cocina",
+    kitchenPractices: {
+      "shared-fryer": "Los alimentos fritos comparten la misma freidora.",
+      "shared-grill": "La plancha, las sartenes y los utensilios se comparten entre platos.",
+      "shared-surfaces":
+        "Todos los platos se preparan en una misma cocina con superficies compartidas.",
+      "nuts-in-kitchen": "En esta cocina se usan cacahuate (maní) y nueces de árbol.",
+      "peanut-oil": "Algunos platos se cocinan con aceite de cacahuate (maní).",
+      "sesame-in-kitchen": "En esta cocina se usa sésamo.",
+      "flour-in-kitchen": "En esta cocina se usa harina de trigo.",
+      "shellfish-in-kitchen": "En esta cocina se preparan mariscos.",
+    },
     translating: "Traduciendo el menú…",
     translationFailed:
       "La traducción no está disponible en este momento, así que el menú se muestra en su idioma original.",
@@ -330,6 +356,17 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     uncheckedHidden: (count, list) =>
       `${count} 道菜尚未检查是否含有${list}，因此已隐藏。请询问服务员。`,
     kitchenNote: "厨房备注：",
+    kitchenTitle: "关于本店厨房",
+    kitchenPractices: {
+      "shared-fryer": "所有油炸食品共用一个炸锅。",
+      "shared-grill": "烤架、锅具和厨具在不同菜品之间共用。",
+      "shared-surfaces": "所有菜品都在同一个厨房制作，共用操作台面。",
+      "nuts-in-kitchen": "本厨房使用花生和坚果。",
+      "peanut-oil": "部分菜品用花生油烹制。",
+      "sesame-in-kitchen": "本厨房使用芝麻。",
+      "flour-in-kitchen": "本厨房使用小麦面粉。",
+      "shellfish-in-kitchen": "本厨房烹制贝类海鲜。",
+    },
     translating: "正在翻译菜单…",
     translationFailed: "暂时无法翻译，菜单以原语言显示。",
     translatedNote: "菜品描述为自动翻译。如有不清楚之处，请询问服务员。",
@@ -424,6 +461,17 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     uncheckedHidden: (count, list) =>
       `요리 ${count}개는 아직 ${list} 확인이 되지 않아 숨겨졌습니다. 직원에게 문의하세요.`,
     kitchenNote: "주방 메모:",
+    kitchenTitle: "이 주방에 대해",
+    kitchenPractices: {
+      "shared-fryer": "튀김 요리는 모두 같은 튀김기를 사용합니다.",
+      "shared-grill": "그릴, 팬, 조리 도구를 여러 요리에 함께 사용합니다.",
+      "shared-surfaces": "모든 요리는 한 주방에서 같은 조리대를 사용해 만듭니다.",
+      "nuts-in-kitchen": "이 주방에서는 땅콩과 견과류를 사용합니다.",
+      "peanut-oil": "일부 요리는 땅콩기름으로 조리합니다.",
+      "sesame-in-kitchen": "이 주방에서는 참깨를 사용합니다.",
+      "flour-in-kitchen": "이 주방에서는 밀가루를 사용합니다.",
+      "shellfish-in-kitchen": "이 주방에서는 갑각류·조개류를 조리합니다.",
+    },
     translating: "메뉴 번역 중…",
     translationFailed: "지금은 번역을 사용할 수 없어 원래 언어로 메뉴를 표시합니다.",
     translatedNote: "요리 설명은 자동 번역되었습니다. 궁금한 점은 직원에게 문의해 주세요.",
@@ -518,6 +566,17 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     uncheckedHidden: (count, list) =>
       `${count}品は${list}の確認がまだのため非表示です。スタッフにお尋ねください。`,
     kitchenNote: "厨房メモ：",
+    kitchenTitle: "この厨房について",
+    kitchenPractices: {
+      "shared-fryer": "揚げ物はすべて同じフライヤーで調理しています。",
+      "shared-grill": "グリル、フライパン、調理器具は料理の間で共用しています。",
+      "shared-surfaces": "すべての料理を一つの厨房で、共用の調理台を使って作っています。",
+      "nuts-in-kitchen": "この厨房ではピーナッツとナッツ類を使用しています。",
+      "peanut-oil": "一部の料理はピーナッツ油で調理しています。",
+      "sesame-in-kitchen": "この厨房ではごまを使用しています。",
+      "flour-in-kitchen": "この厨房では小麦粉を使用しています。",
+      "shellfish-in-kitchen": "この厨房では甲殻類・貝類を調理しています。",
+    },
     translating: "メニューを翻訳中…",
     translationFailed: "現在翻訳を利用できないため、元の言語でメニューを表示しています。",
     translatedNote: "料理の説明は自動翻訳です。不明な点はスタッフにお尋ねください。",
@@ -617,6 +676,18 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
         ? `1 plat n’a pas encore été vérifié pour : ${list}. Il est masqué. Demandez au serveur.`
         : `${count} plats n’ont pas encore été vérifiés pour : ${list}. Ils sont masqués. Demandez au serveur.`,
     kitchenNote: "Note de la cuisine :",
+    kitchenTitle: "À propos de cette cuisine",
+    kitchenPractices: {
+      "shared-fryer": "Les fritures partagent la même friteuse.",
+      "shared-grill": "Le gril, les poêles et les ustensiles sont partagés entre les plats.",
+      "shared-surfaces":
+        "Tous les plats sont préparés dans une seule cuisine, sur des plans de travail partagés.",
+      "nuts-in-kitchen": "Des arachides et des fruits à coque sont utilisés dans cette cuisine.",
+      "peanut-oil": "Certains plats sont cuits à l’huile d’arachide.",
+      "sesame-in-kitchen": "Du sésame est utilisé dans cette cuisine.",
+      "flour-in-kitchen": "De la farine de blé est utilisée dans cette cuisine.",
+      "shellfish-in-kitchen": "Des fruits de mer sont cuisinés dans cette cuisine.",
+    },
     translating: "Traduction du menu…",
     translationFailed:
       "La traduction n'est pas disponible pour le moment ; le menu est affiché dans sa langue d'origine.",
@@ -713,6 +784,17 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     uncheckedHidden: (count, list) =>
       `${count} món chưa được kiểm tra về ${list} nên đã bị ẩn. Hãy hỏi nhân viên phục vụ.`,
     kitchenNote: "Ghi chú của bếp:",
+    kitchenTitle: "Về bếp này",
+    kitchenPractices: {
+      "shared-fryer": "Các món chiên dùng chung một nồi chiên.",
+      "shared-grill": "Vỉ nướng, chảo và dụng cụ nấu được dùng chung cho các món.",
+      "shared-surfaces": "Tất cả các món được làm trong cùng một bếp, dùng chung mặt bếp.",
+      "nuts-in-kitchen": "Bếp này có dùng đậu phộng và hạt cây.",
+      "peanut-oil": "Một số món được nấu bằng dầu đậu phộng.",
+      "sesame-in-kitchen": "Bếp này có dùng mè.",
+      "flour-in-kitchen": "Bếp này có dùng bột mì.",
+      "shellfish-in-kitchen": "Bếp này có nấu động vật có vỏ.",
+    },
     translating: "Đang dịch thực đơn…",
     translationFailed: "Hiện không thể dịch, nên thực đơn được hiển thị bằng ngôn ngữ gốc.",
     translatedNote: "Mô tả món ăn được dịch tự động. Hãy hỏi nhân viên phục vụ nếu có gì chưa rõ.",
@@ -811,6 +893,18 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
         ? `1 prato ainda não foi verificado para ${list}, por isso está oculto. Pergunte ao garçom.`
         : `${count} pratos ainda não foram verificados para ${list}, por isso estão ocultos. Pergunte ao garçom.`,
     kitchenNote: "Observação da cozinha:",
+    kitchenTitle: "Sobre esta cozinha",
+    kitchenPractices: {
+      "shared-fryer": "Os fritos compartilham a mesma fritadeira.",
+      "shared-grill": "A chapa, as panelas e os utensílios são compartilhados entre os pratos.",
+      "shared-surfaces":
+        "Todos os pratos são feitos em uma única cozinha, com bancadas compartilhadas.",
+      "nuts-in-kitchen": "Esta cozinha usa amendoim, castanhas e nozes.",
+      "peanut-oil": "Alguns pratos são preparados com óleo de amendoim.",
+      "sesame-in-kitchen": "Esta cozinha usa gergelim.",
+      "flour-in-kitchen": "Esta cozinha usa farinha de trigo.",
+      "shellfish-in-kitchen": "Esta cozinha prepara crustáceos.",
+    },
     translating: "Traduzindo o cardápio…",
     translationFailed:
       "A tradução não está disponível agora, então o cardápio aparece no idioma original.",
@@ -912,6 +1006,17 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
         ? `1 Gericht wurde noch nicht auf ${list} geprüft und ist daher ausgeblendet. Fragen Sie das Servicepersonal.`
         : `${count} Gerichte wurden noch nicht auf ${list} geprüft und sind daher ausgeblendet. Fragen Sie das Servicepersonal.`,
     kitchenNote: "Hinweis der Küche:",
+    kitchenTitle: "Über diese Küche",
+    kitchenPractices: {
+      "shared-fryer": "Frittiertes wird in derselben Fritteuse zubereitet.",
+      "shared-grill": "Grill, Pfannen und Küchengeräte werden für verschiedene Gerichte genutzt.",
+      "shared-surfaces": "Alle Gerichte entstehen in einer Küche mit gemeinsamen Arbeitsflächen.",
+      "nuts-in-kitchen": "In dieser Küche werden Erdnüsse und Schalenfrüchte verwendet.",
+      "peanut-oil": "Einige Gerichte werden in Erdnussöl zubereitet.",
+      "sesame-in-kitchen": "In dieser Küche wird Sesam verwendet.",
+      "flour-in-kitchen": "In dieser Küche wird Weizenmehl verwendet.",
+      "shellfish-in-kitchen": "In dieser Küche werden Krebstiere zubereitet.",
+    },
     translating: "Speisekarte wird übersetzt…",
     translationFailed:
       "Die Übersetzung ist gerade nicht verfügbar, daher wird die Karte in der Originalsprache gezeigt.",
@@ -1007,6 +1112,17 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     uncheckedHidden: (count, list) =>
       `لم يتم التحقق بعد من خلو ${count === 1 ? "طبق واحد" : `${count} أطباق`} من ${list}، لذا تم إخفاؤها. اسأل النادل.`,
     kitchenNote: "ملاحظة المطبخ:",
+    kitchenTitle: "عن هذا المطبخ",
+    kitchenPractices: {
+      "shared-fryer": "تُقلى جميع الأطعمة المقلية في المقلاة نفسها.",
+      "shared-grill": "تُستخدم الشواية والمقالي وأدوات الطهي لأطباق مختلفة.",
+      "shared-surfaces": "تُحضَّر جميع الأطباق في مطبخ واحد بأسطح عمل مشتركة.",
+      "nuts-in-kitchen": "يُستخدم الفول السوداني والمكسرات في هذا المطبخ.",
+      "peanut-oil": "تُطهى بعض الأطباق بزيت الفول السوداني.",
+      "sesame-in-kitchen": "يُستخدم السمسم في هذا المطبخ.",
+      "flour-in-kitchen": "يُستخدم دقيق القمح في هذا المطبخ.",
+      "shellfish-in-kitchen": "تُطهى القشريات في هذا المطبخ.",
+    },
     translating: "جارٍ ترجمة القائمة…",
     translationFailed: "الترجمة غير متاحة الآن، لذا تُعرض القائمة بلغتها الأصلية.",
     translatedNote: "تُرجمت أوصاف الأطباق تلقائيًا. اسأل النادل إن كان هناك شيء غير واضح.",
@@ -1100,6 +1216,17 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     uncheckedHidden: (count, list) =>
       `${count} व्यंजनों की ${list} के लिए अभी जाँच नहीं हुई है, इसलिए वे छिपे हैं। अपने वेटर से पूछें।`,
     kitchenNote: "रसोई का नोट:",
+    kitchenTitle: "इस रसोई के बारे में",
+    kitchenPractices: {
+      "shared-fryer": "सभी तली हुई चीज़ें एक ही फ्रायर में तली जाती हैं।",
+      "shared-grill": "ग्रिल, पैन और बर्तन अलग-अलग व्यंजनों में साझा होते हैं।",
+      "shared-surfaces": "सभी व्यंजन एक ही रसोई में साझा सतहों पर बनते हैं।",
+      "nuts-in-kitchen": "इस रसोई में मूँगफली और मेवे इस्तेमाल होते हैं।",
+      "peanut-oil": "कुछ व्यंजन मूँगफली के तेल में पकाए जाते हैं।",
+      "sesame-in-kitchen": "इस रसोई में तिल इस्तेमाल होता है।",
+      "flour-in-kitchen": "इस रसोई में गेहूँ का आटा इस्तेमाल होता है।",
+      "shellfish-in-kitchen": "इस रसोई में शेलफ़िश (झींगा, केकड़ा) पकाई जाती है।",
+    },
     translating: "मेन्यू का अनुवाद हो रहा है…",
     translationFailed: "अनुवाद अभी उपलब्ध नहीं है, इसलिए मेन्यू मूल भाषा में दिख रहा है।",
     translatedNote:
@@ -1192,6 +1319,17 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     uncheckedHidden: (count, list) =>
       `มี ${count} เมนูที่ยังไม่ได้ตรวจสอบเรื่อง${list} จึงถูกซ่อนไว้ โปรดสอบถามพนักงาน`,
     kitchenNote: "หมายเหตุจากครัว:",
+    kitchenTitle: "เกี่ยวกับครัวนี้",
+    kitchenPractices: {
+      "shared-fryer": "ของทอดทั้งหมดใช้หม้อทอดร่วมกัน",
+      "shared-grill": "เตาย่าง กระทะ และอุปกรณ์ครัวใช้ร่วมกันหลายเมนู",
+      "shared-surfaces": "ทุกเมนูทำในครัวเดียวกันและใช้พื้นที่เตรียมอาหารร่วมกัน",
+      "nuts-in-kitchen": "ครัวนี้ใช้ถั่วลิสงและถั่วเปลือกแข็ง",
+      "peanut-oil": "บางเมนูปรุงด้วยน้ำมันถั่วลิสง",
+      "sesame-in-kitchen": "ครัวนี้ใช้งา",
+      "flour-in-kitchen": "ครัวนี้ใช้แป้งสาลี",
+      "shellfish-in-kitchen": "ครัวนี้ปรุงสัตว์น้ำมีเปลือก (กุ้ง ปู)",
+    },
     translating: "กำลังแปลเมนู…",
     translationFailed: "ยังแปลไม่ได้ในตอนนี้ จึงแสดงเมนูเป็นภาษาต้นฉบับ",
     translatedNote: "คำอธิบายเมนูแปลโดยอัตโนมัติ หากมีอะไรไม่ชัดเจน โปรดถามพนักงาน",
@@ -1288,6 +1426,17 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     uncheckedHidden: (count, list) =>
       `${count} putahe ang hindi pa nasusuri para sa ${list}, kaya nakatago. Magtanong sa server.`,
     kitchenNote: "Tala ng kusina:",
+    kitchenTitle: "Tungkol sa kusinang ito",
+    kitchenPractices: {
+      "shared-fryer": "Iisang fryer ang ginagamit sa lahat ng pritong pagkain.",
+      "shared-grill": "Pinaghahatian ng mga putahe ang ihawan, kawali, at mga gamit sa pagluluto.",
+      "shared-surfaces": "Lahat ng putahe ay ginagawa sa iisang kusina na may pinaghahatiang mesa.",
+      "nuts-in-kitchen": "Gumagamit ng mani at tree nuts sa kusinang ito.",
+      "peanut-oil": "May mga putaheng niluluto sa mantika ng mani.",
+      "sesame-in-kitchen": "Gumagamit ng linga sa kusinang ito.",
+      "flour-in-kitchen": "Gumagamit ng harina ng trigo sa kusinang ito.",
+      "shellfish-in-kitchen": "Nagluluto ng shellfish (hipon, alimango) sa kusinang ito.",
+    },
     translating: "Isinasalin ang menu…",
     translationFailed:
       "Hindi available ang pagsasalin ngayon, kaya nasa orihinal na wika ang menu.",

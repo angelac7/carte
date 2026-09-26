@@ -93,6 +93,7 @@ export default async function PrintPage({
         <div className="mt-8 print:mt-0">
           <PrintableMenu
             restaurantName={restaurant.name}
+            kitchenPractices={restaurant.kitchen_practices}
             dishes={dishes}
             language={language}
             translations={translations}
