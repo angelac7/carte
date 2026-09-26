@@ -21,7 +21,13 @@ const dish = (overrides: Partial<MenuItem>): MenuItem => ({
 });
 
 const menu = [
-  dish({ id: "soup", name: "Tomato Soup", section: "Starters", allergens: ["milk"] }),
+  dish({
+    id: "soup",
+    name: "Tomato Soup",
+    section: "Starters",
+    notes: "Shared fryer: ask staff",
+    allergens: ["milk"],
+  }),
   dish({ id: "tea", name: "Iced Tea", section: "Drinks", special: true }),
   dish({
     id: "cake",
@@ -73,4 +79,14 @@ describe("printed menu", () => {
     expect(screen.getByText("Carrot Cake")).toBeTruthy();
     expect(screen.getByRole("heading", { name: "Entrantes" })).toBeTruthy();
   });
+});
+
+it("prints kitchen warnings, with original notes when a translation is blank", () => {
+  print("es", {
+    soup: { name: "Sopa", description: "", notes: "Freidora compartida: consulte al personal" },
+  });
+  expect(screen.getByText("Freidora compartida: consulte al personal")).toBeTruthy();
+  cleanup();
+  print("es", { soup: { name: "Sopa", description: "", notes: "   " } });
+  expect(screen.getByText("Shared fryer: ask staff")).toBeTruthy();
 });

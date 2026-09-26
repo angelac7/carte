@@ -109,6 +109,11 @@ export function PrintableMenu({
                       {translated?.description || dish.description}
                     </p>
                   )}
+                  {(translated?.notes?.trim() || dish.notes.trim()) && (
+                    <p className="mt-1 whitespace-pre-wrap text-sm font-medium">
+                      {translated?.notes?.trim() || dish.notes}
+                    </p>
+                  )}
                   {(dish.sizes?.length ?? 0) > 0 && (
                     <p className="mt-1 text-sm">
                       {dish
