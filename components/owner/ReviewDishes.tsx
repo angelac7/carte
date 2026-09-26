@@ -41,7 +41,13 @@ import { toggleValue } from "@/lib/toggle-value";
 import type { MenuItem } from "@/types/menu";
 
 type Filter = "all" | "review" | "confirmed";
-type DishDetails = { name: string; description: string; price: string; source_language?: string };
+type DishDetails = {
+  name: string;
+  description: string;
+  price: string;
+  calories?: number | null;
+  source_language?: string;
+};
 
 const inputClass = fieldClass("mt-1");
 
@@ -59,6 +65,9 @@ function DishDetailsForm({
   const [name, setName] = useState(initial.name);
   const [description, setDescription] = useState(initial.description);
   const [price, setPrice] = useState(initial.price);
+  const [calories, setCalories] = useState(
+    initial.calories === null || initial.calories === undefined ? "" : String(initial.calories),
+  );
   const [sourceLanguage, setSourceLanguage] = useState(initial.source_language ?? "und");
 
   return (
@@ -70,6 +79,7 @@ function DishDetailsForm({
           name: name.trim(),
           description: description.trim(),
           price: price.trim(),
+          calories: calories.trim() === "" ? null : Number(calories),
           source_language: sourceLanguage,
         });
       }}
@@ -104,6 +114,22 @@ function DishDetailsForm({
           placeholder="$14"
           className={cn(inputClass, "max-w-40")}
         />
+      </label>
+      <label className="block">
+        <span className={labelClass}>Calories (optional)</span>
+        <input
+          type="number"
+          inputMode="numeric"
+          min={0}
+          max={5000}
+          step={1}
+          value={calories}
+          onChange={(e) => setCalories(e.target.value)}
+          className={cn(inputClass, "max-w-40")}
+        />
+        <span className="text-xs text-muted">
+          Per serving, only if you know it. Chains with 20 or more US locations must show calories.
+        </span>
       </label>
       <label className="block">
         <span className={labelClass}>Language of the dish text</span>
@@ -382,9 +408,14 @@ export default function ReviewDishes({ timezone }: { timezone: string }) {
     mutationPending.current = true;
     setMutating(true);
     try {
-      const added = await saveDishes([{ ...details, likely_allergens: [], dietary_tags: [] }]);
+      const { calories, ...text } = details;
+      const added = await saveDishes([{ ...text, likely_allergens: [], dietary_tags: [] }]);
       for (const dish of added) persisted.current.set(dish.id, dish);
       setDishes((prev) => [...prev, ...added]);
+      // New dishes come in the menu-reading format, which has no calories, so add them after.
+      if (calories !== null && calories !== undefined) {
+        for (const dish of added) void save({ ...dish, calories });
+      }
       setAdding(false);
       setFilter("all");
       toast(`${details.name} added. Choose its allergens, then confirm it.`);
@@ -692,6 +723,7 @@ export default function ReviewDishes({ timezone }: { timezone: string }) {
                                   name: dish.name,
                                   description: dish.description,
                                   price: dish.price,
+                                  calories: dish.calories,
                                 }}
                                 submitLabel="Save details"
                                 onSave={(details) => saveDetails(dish, details)}

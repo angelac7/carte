@@ -8,6 +8,7 @@ import { formatList } from "@/lib/format-list";
 import { DINER_STRINGS } from "@/lib/i18n/diner-strings";
 import { htmlLang, textDirection, type LanguageCode } from "@/lib/languages";
 import { groupBySection } from "@/lib/menu-sections";
+import { formatCalories } from "@/lib/prices";
 import type { MenuItem } from "@/types/menu";
 import type { MenuTranslations } from "@/types/translation";
 
@@ -97,7 +98,11 @@ export function PrintableMenu({
                         <span className="ms-2 text-sm text-muted">{dish.name}</span>
                       )}
                     </h3>
-                    <span className="shrink-0 font-mono tabular-nums">{dish.price}</span>
+                    <span className="shrink-0 font-mono tabular-nums">
+                      {dish.price}
+                      {dish.calories != null &&
+                        ` · ${t.calories(formatCalories(dish.calories, htmlLang(language)))}`}
+                    </span>
                   </div>
                   {(translated?.description || dish.description) && (
                     <p className="mt-0.5 text-sm text-muted">
@@ -153,6 +158,9 @@ export function PrintableMenu({
         <img src={qrSrc} alt="" className="h-28 w-28 shrink-0" />
         <div className="text-sm">
           <p className="font-medium">{t.safetyNotice}</p>
+          {dishes.some((dish) => dish.calories != null) && (
+            <p className="mt-1 text-xs">{t.caloriesNote}</p>
+          )}
           <p className="mt-2 font-mono text-xs break-all text-muted">{menuUrl}</p>
           <p className="mt-1 text-xs text-muted">{printedOn}</p>
         </div>

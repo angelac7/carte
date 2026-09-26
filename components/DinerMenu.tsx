@@ -510,6 +510,9 @@ export function DinerMenu({
         <div className="mt-6 grid gap-6 lg:grid-cols-[1.1fr_1fr]">
           <div className="space-y-3">
             <Notice>{t.safetyNotice}</Notice>
+            {dishes.some((dish) => dish.calories != null) && (
+              <p className="text-xs text-muted">{t.caloriesNote}</p>
+            )}
             {kitchenPractices.length > 0 && (
               <Notice>
                 <span className="block font-medium">{t.kitchenTitle}</span>

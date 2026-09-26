@@ -28,7 +28,7 @@ export type StructuredMenu = {
   reservationUrl?: string;
   /** Only hours the owner actually saved; never defaults. */
   hours?: FullHours | null;
-  dishes: Pick<MenuItem, "name" | "description" | "section">[];
+  dishes: Pick<MenuItem, "name" | "description" | "section" | "calories">[];
 };
 
 /**
@@ -85,6 +85,14 @@ export function menuStructuredData(menu: StructuredMenu) {
           "@type": "MenuItem",
           name: dish.name,
           ...(dish.description?.trim() ? { description: dish.description.trim() } : {}),
+          ...(dish.calories != null
+            ? {
+                nutrition: {
+                  "@type": "NutritionInformation",
+                  calories: `${dish.calories} calories`,
+                },
+              }
+            : {}),
         })),
       })),
     },

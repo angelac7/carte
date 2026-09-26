@@ -16,6 +16,7 @@ function menuPrompt(dishes: MenuItem[]): string {
     may_contain: dish.may_contain ?? [],
     also_contains: dish.also_checked ? (dish.also_contains ?? []) : "not checked",
     dietary_tags: dish.dietary_tags,
+    calories: dish.calories ?? null,
     kitchen_notes: dish.notes,
   }));
 

@@ -127,3 +127,23 @@ test("diners can hide pork, and see which dishes haven't been checked for it", a
   );
   await expect(page.getByRole("button", { name: "Remove No pork" })).toBeVisible();
 });
+
+test("calories show on the dish, with the daily note", async ({ page }) => {
+  const [salad] = await rest<{ id: string }[]>(
+    `menu_items?restaurant_id=eq.${restaurantId}&name=eq.Green%20Salad&select=id`,
+  );
+  // Setting calories unconfirms the dish, like a price change, so confirm it again after.
+  await rest(`menu_items?id=eq.${salad.id}`, {
+    method: "PATCH",
+    body: JSON.stringify({ calories: 1250 }),
+  });
+  await rest(`menu_items?id=eq.${salad.id}`, {
+    method: "PATCH",
+    body: JSON.stringify({ confirmed: true }),
+  });
+  await page.goto(`/r/${slug}`);
+  await expect(dishCard(page, "Green Salad")).toContainText("1,250 cal");
+  await expect(
+    page.getByText("2,000 calories a day is used for general nutrition advice"),
+  ).toBeVisible();
+});

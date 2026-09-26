@@ -27,6 +27,9 @@ export type DinerStrings = {
   alsoAvoid: Record<OtherAvoid, string>;
   alsoContains: string;
   alsoUnchecked: (items: string) => string;
+  /** Calories for a dish, given an already formatted number. */
+  calories: (n: string) => string;
+  caloriesNote: string;
   translating: string;
   translationFailed: string;
   offlineMenu: string;
@@ -171,6 +174,9 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     alsoContains: "Also contains",
     alsoUnchecked: (items) =>
       `The restaurant hasn't said whether this has ${items}. Ask your server.`,
+    calories: (n) => `${n} cal`,
+    caloriesNote:
+      "2,000 calories a day is used for general nutrition advice, but calorie needs vary.",
     translating: "Translating menu…",
     translationFailed:
       "Translation isn't available right now, so the menu is shown in its original language.",
@@ -294,6 +300,9 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     alsoContains: "También contiene",
     alsoUnchecked: (items) =>
       `El restaurante no ha indicado si lleva ${items}. Pregunte a su mesero.`,
+    calories: (n) => `${n} kcal`,
+    caloriesNote:
+      "Se usan 2.000 calorías al día como recomendación nutricional general, pero las necesidades varían.",
     translating: "Traduciendo el menú…",
     translationFailed:
       "La traducción no está disponible en este momento, así que el menú se muestra en su idioma original.",
@@ -407,6 +416,8 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     },
     alsoContains: "还含有",
     alsoUnchecked: (items) => `餐厅尚未说明此菜是否含有${items}。请询问服务员。`,
+    calories: (n) => `${n} 千卡`,
+    caloriesNote: "一般营养建议以每天 2000 千卡为参考，但每个人的热量需求不同。",
     translating: "正在翻译菜单…",
     translationFailed: "暂时无法翻译，菜单以原语言显示。",
     translatedNote: "菜品描述为自动翻译。如有不清楚之处，请询问服务员。",
@@ -524,6 +535,9 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     alsoContains: "그 밖에 들어간 것",
     alsoUnchecked: (items) =>
       `식당에서 ${items} 포함 여부를 아직 알려 주지 않았습니다. 직원에게 물어보세요.`,
+    calories: (n) => `${n}kcal`,
+    caloriesNote:
+      "일반적인 영양 권장량은 하루 2,000kcal 기준이지만, 필요한 열량은 사람마다 다릅니다.",
     translating: "메뉴 번역 중…",
     translationFailed: "지금은 번역을 사용할 수 없어 원래 언어로 메뉴를 표시합니다.",
     translatedNote: "요리 설명은 자동 번역되었습니다. 궁금한 점은 직원에게 문의해 주세요.",
@@ -641,6 +655,8 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     alsoContains: "そのほか含むもの",
     alsoUnchecked: (items) =>
       `${items}が入っているかどうか、お店はまだ記載していません。スタッフにお尋ねください。`,
+    calories: (n) => `${n}kcal`,
+    caloriesNote: "一般的な栄養の目安は1日2,000kcalですが、必要なカロリーは人によって異なります。",
     translating: "メニューを翻訳中…",
     translationFailed: "現在翻訳を利用できないため、元の言語でメニューを表示しています。",
     translatedNote: "料理の説明は自動翻訳です。不明な点はスタッフにお尋ねください。",
@@ -764,6 +780,9 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     alsoContains: "Contient aussi",
     alsoUnchecked: (items) =>
       `Le restaurant n’a pas indiqué si ce plat contient : ${items}. Demandez au serveur.`,
+    calories: (n) => `${n} kcal`,
+    caloriesNote:
+      "Un apport de 2 000 calories par jour sert de repère nutritionnel général, mais les besoins varient.",
     translating: "Traduction du menu…",
     translationFailed:
       "La traduction n'est pas disponible pour le moment ; le menu est affiché dans sa langue d'origine.",
@@ -883,6 +902,9 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     alsoContains: "Cũng có",
     alsoUnchecked: (items) =>
       `Nhà hàng chưa cho biết món này có ${items} hay không. Hãy hỏi nhân viên phục vụ.`,
+    calories: (n) => `${n} kcal`,
+    caloriesNote:
+      "Mức 2.000 calo mỗi ngày được dùng làm khuyến nghị dinh dưỡng chung, nhưng nhu cầu của mỗi người khác nhau.",
     translating: "Đang dịch thực đơn…",
     translationFailed: "Hiện không thể dịch, nên thực đơn được hiển thị bằng ngôn ngữ gốc.",
     translatedNote: "Mô tả món ăn được dịch tự động. Hãy hỏi nhân viên phục vụ nếu có gì chưa rõ.",
@@ -1005,6 +1027,9 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     alsoContains: "Também contém",
     alsoUnchecked: (items) =>
       `O restaurante não informou se este prato tem ${items}. Pergunte ao garçom.`,
+    calories: (n) => `${n} kcal`,
+    caloriesNote:
+      "Uma dieta de 2.000 calorias por dia é usada como referência nutricional geral, mas as necessidades variam.",
     translating: "Traduzindo o cardápio…",
     translationFailed:
       "A tradução não está disponível agora, então o cardápio aparece no idioma original.",
@@ -1129,6 +1154,9 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     alsoContains: "Enthält außerdem",
     alsoUnchecked: (items) =>
       `Das Restaurant hat nicht angegeben, ob dieses Gericht ${items} enthält. Fragen Sie das Servicepersonal.`,
+    calories: (n) => `${n} kcal`,
+    caloriesNote:
+      "Als allgemeine Ernährungsempfehlung gelten 2.000 Kalorien pro Tag, der Bedarf ist jedoch individuell verschieden.",
     translating: "Speisekarte wird übersetzt…",
     translationFailed:
       "Die Übersetzung ist gerade nicht verfügbar, daher wird die Karte in der Originalsprache gezeigt.",
@@ -1247,6 +1275,9 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     alsoContains: "يحتوي أيضًا على",
     alsoUnchecked: (items) =>
       `لم يوضح المطعم ما إذا كان هذا الطبق يحتوي على ${items}. اسأل النادل.`,
+    calories: (n) => `${n} سعرة حرارية`,
+    caloriesNote:
+      "يُستخدم معدل 2,000 سعرة حرارية يوميًا كإرشاد غذائي عام، لكن الاحتياجات تختلف من شخص لآخر.",
     translating: "جارٍ ترجمة القائمة…",
     translationFailed: "الترجمة غير متاحة الآن، لذا تُعرض القائمة بلغتها الأصلية.",
     translatedNote: "تُرجمت أوصاف الأطباق تلقائيًا. اسأل النادل إن كان هناك شيء غير واضح.",
@@ -1363,6 +1394,9 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     alsoContains: "इसमें यह भी है",
     alsoUnchecked: (items) =>
       `रेस्तराँ ने नहीं बताया है कि इसमें ${items} है या नहीं। अपने वेटर से पूछें।`,
+    calories: (n) => `${n} कैलोरी`,
+    caloriesNote:
+      "सामान्य पोषण सलाह के लिए रोज़ 2,000 कैलोरी मानी जाती है, लेकिन हर व्यक्ति की ज़रूरत अलग होती है।",
     translating: "मेन्यू का अनुवाद हो रहा है…",
     translationFailed: "अनुवाद अभी उपलब्ध नहीं है, इसलिए मेन्यू मूल भाषा में दिख रहा है।",
     translatedNote:
@@ -1477,6 +1511,9 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     },
     alsoContains: "มีส่วนผสมของ",
     alsoUnchecked: (items) => `ร้านยังไม่ได้ระบุว่าเมนูนี้มี${items}หรือไม่ โปรดสอบถามพนักงาน`,
+    calories: (n) => `${n} กิโลแคลอรี`,
+    caloriesNote:
+      "คำแนะนำด้านโภชนาการทั่วไปอ้างอิงที่ 2,000 กิโลแคลอรีต่อวัน แต่ความต้องการพลังงานของแต่ละคนแตกต่างกัน",
     translating: "กำลังแปลเมนู…",
     translationFailed: "ยังแปลไม่ได้ในตอนนี้ จึงแสดงเมนูเป็นภาษาต้นฉบับ",
     translatedNote: "คำอธิบายเมนูแปลโดยอัตโนมัติ หากมีอะไรไม่ชัดเจน โปรดถามพนักงาน",
@@ -1596,6 +1633,9 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     alsoContains: "May kasama ring",
     alsoUnchecked: (items) =>
       `Hindi pa sinasabi ng restawran kung may ${items} ito. Magtanong sa server.`,
+    calories: (n) => `${n} calories`,
+    caloriesNote:
+      "Ginagamit ang 2,000 calories bawat araw bilang pangkalahatang payo sa nutrisyon, pero iba-iba ang pangangailangan ng bawat tao.",
     translating: "Isinasalin ang menu…",
     translationFailed:
       "Hindi available ang pagsasalin ngayon, kaya nasa orihinal na wika ang menu.",

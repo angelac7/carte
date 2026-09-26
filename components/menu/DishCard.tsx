@@ -10,7 +10,8 @@ import { QuantityStepper } from "@/components/QuantityStepper";
 import type { Availability } from "@/lib/availability";
 import { cn } from "@/lib/cn";
 import type { DinerStrings } from "@/lib/i18n/diner-strings";
-import type { LanguageCode } from "@/lib/languages";
+import { htmlLang, type LanguageCode } from "@/lib/languages";
+import { formatCalories } from "@/lib/prices";
 import { showOriginalName } from "@/lib/menu-search";
 import type { DishText, MenuItem } from "@/types/menu";
 
@@ -97,8 +98,17 @@ export function DishCard({
               {text.name}
             </button>
           </h3>
-          {dish.price && (
-            <span className="shrink-0 font-mono text-base tabular-nums">{dish.price}</span>
+          {(dish.price || dish.calories != null) && (
+            <span className="shrink-0 text-end">
+              {dish.price && (
+                <span className="block font-mono text-base tabular-nums">{dish.price}</span>
+              )}
+              {dish.calories != null && (
+                <span className="block text-xs text-muted tabular-nums">
+                  {t.calories(formatCalories(dish.calories, htmlLang(language)))}
+                </span>
+              )}
+            </span>
           )}
         </div>
         {(dish.special ||

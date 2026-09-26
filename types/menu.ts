@@ -107,6 +107,8 @@ export const MenuItemSchema = z.object({
   sold_out_on: z.string().nullable().optional(),
   /** Shown with the specials at the top of the menu. */
   special: z.boolean().optional(),
+  /** Calories per serving, typed by the owner, or null when not given. Never estimated. */
+  calories: z.number().int().min(0).max(5000).nullable().optional(),
   /** 0 not spicy to 3 hot, or null when not set. */
   spice: z.number().int().min(0).max(3).nullable().optional(),
   /** Allergens in the dish the kitchen can leave out on request. */

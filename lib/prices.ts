@@ -38,3 +38,8 @@ export function formatWhole(amount: number, symbol: string): string {
     ? `${symbol}${amount.toLocaleString("en-US")}`
     : formatMoney(amount, symbol);
 }
+
+/** A dish's calories as a whole number in the diner's language, like "1,250". */
+export function formatCalories(calories: number, locale: string): string {
+  return new Intl.NumberFormat(locale, { maximumFractionDigits: 0 }).format(calories);
+}

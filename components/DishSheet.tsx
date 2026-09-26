@@ -11,7 +11,8 @@ import { fetchInsight } from "@/lib/api-client";
 import { DINER_STRINGS } from "@/lib/i18n/diner-strings";
 import { DISH_STRINGS } from "@/lib/i18n/dish-strings";
 import { canSpeak, speak } from "@/lib/speak";
-import type { LanguageCode } from "@/lib/languages";
+import { htmlLang, type LanguageCode } from "@/lib/languages";
+import { formatCalories } from "@/lib/prices";
 import type { DishInsight } from "@/types/insight";
 import type { DishText, MenuItem } from "@/types/menu";
 
@@ -147,6 +148,11 @@ export function DishSheet({
     >
       <div className="mt-3 flex flex-wrap items-center gap-3">
         <span className="font-mono tabular-nums">{dish.price}</span>
+        {dish.calories != null && (
+          <span className="text-sm text-muted tabular-nums">
+            {d.calories(formatCalories(dish.calories, htmlLang(language)))}
+          </span>
+        )}
         {canSpeak() && (
           <button
             onClick={() => speak(insight?.nativeName || dish.name, insight?.nativeLang || "en-US")}

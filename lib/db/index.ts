@@ -29,7 +29,7 @@ export type Restaurant = {
 const RESTAURANT_COLUMNS =
   "id, name, slug, cuisine, city, timezone, phone, website, reservation_url, price_range, logo_url, cover_url, suspended, kitchen_practices";
 const DISH_COLUMNS =
-  "id, name, description, price, allergens, dietary_tags, notes, confirmed, photo_url, revision, source_language, section, sort_order, sold_out_on, special, available_from, available_until, sizes, addons, allergen_list, removable, may_contain, spice, also_contains, also_checked";
+  "id, name, description, price, allergens, dietary_tags, notes, confirmed, photo_url, revision, source_language, section, sort_order, sold_out_on, special, available_from, available_until, sizes, addons, allergen_list, removable, may_contain, spice, also_contains, also_checked, calories";
 
 /** Every restaurant a person can work on: the ones they own first, then ones they help edit. */
 export async function listMyRestaurants(
@@ -197,6 +197,7 @@ export async function updateDish(
       ...(dish.section !== undefined && { section: dish.section }),
       ...(dish.special !== undefined && { special: dish.special }),
       ...(dish.spice !== undefined && { spice: dish.spice }),
+      ...(dish.calories !== undefined && { calories: dish.calories }),
       ...(dish.sizes !== undefined && { sizes: dish.sizes }),
       // Kept consistent with the dish's own allergens, which the database also checks.
       ...(dish.removable !== undefined && {
