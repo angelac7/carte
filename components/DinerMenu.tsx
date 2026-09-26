@@ -138,7 +138,11 @@ export function DinerMenu({
   const alsoAvoid = prefs.alsoAvoid ?? [];
   // Facts about the kitchen, with the ones about the diner's allergies first.
   const kitchenPractices = practicesFor(restaurant.kitchen_practices ?? [], avoid);
-  const table = useTableOrder(restaurant.slug, initialTableCode);
+  const table = useTableOrder(restaurant.slug, initialTableCode, {
+    avoid,
+    alsoAvoid,
+    severity: prefs.severity ?? "allergy",
+  });
   const { order, setQuantity } = table;
   const [openDishId, setOpenDishId] = useState<string | null>(null);
   // Price limits suit one menu's prices, so unlike spice they aren't remembered across menus.
@@ -788,6 +792,9 @@ export function DinerMenu({
           tableEnded={table.ended}
           onStartTogether={table.startShared}
           onLeaveTogether={table.leaveShared}
+          tableAllergies={table.allergies}
+          myTableId={table.me}
+          onShareAllergies={table.shareAllergies}
           onClose={() => setPanel(null)}
         />
       )}

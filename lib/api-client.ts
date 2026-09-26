@@ -1,4 +1,5 @@
 import { prepareChatHistory } from "@/lib/chat-history";
+import type { TableAllergyEntry } from "@/lib/table-allergies";
 import type { DishSummaries } from "@/lib/dish-summaries";
 import type { DinerFilters } from "@/lib/menu-filters";
 import { createLineReader, parseJsonLine } from "@/lib/json-lines";
@@ -253,9 +254,29 @@ export const startTableOrder = (restaurantSlug: string, order: TableLines) =>
     body: JSON.stringify({ restaurant: restaurantSlug, order }),
   });
 
-export async function fetchTableOrder(restaurantSlug: string, code: string): Promise<TableLines> {
+/** Everyone's shared allergies at a table, by each phone's random id. */
+export type TableAllergies = Record<string, TableAllergyEntry>;
+
+export async function fetchTableOrder(
+  restaurantSlug: string,
+  code: string,
+): Promise<{ lines: TableLines; allergies: TableAllergies }> {
   const params = new URLSearchParams({ restaurant: restaurantSlug, code });
-  return (await tableRequest<{ lines: TableLines }>({ method: "GET" }, `?${params}`)).lines;
+  const data = await tableRequest<{ lines: TableLines; allergies?: TableAllergies }>(
+    { method: "GET" },
+    `?${params}`,
+  );
+  return { lines: data.lines, allergies: data.allergies ?? {} };
+}
+
+/** Shares this person's allergies with the table, or stops with null. Returns everyone's. */
+export async function setTableAllergies(
+  code: string,
+  person: string,
+  entry: TableAllergyEntry | null,
+) {
+  const body = JSON.stringify({ code, person, entry });
+  return (await tableRequest<{ allergies: TableAllergies }>({ method: "PATCH", body })).allergies;
 }
 
 export async function setTableLine(code: string, line: string, quantity: number) {

@@ -2,11 +2,13 @@
 import { useState } from "react";
 import { AllergyStatement } from "@/components/AllergyCard";
 import { OrderTogether } from "@/components/OrderTogether";
+import { TableAllergies } from "@/components/TableAllergies";
 import { QuantityStepper } from "@/components/QuantityStepper";
 import { Sheet } from "@/components/Sheet";
 import { Button } from "@/components/ui/button";
 import { fieldClass } from "@/components/ui/field";
 import type { Allergen, OtherAvoid } from "@/lib/allergens";
+import type { TableAllergyEntry } from "@/lib/table-allergies";
 import type { Severity } from "@/lib/diner-prefs";
 import { splitBill, type BillLine } from "@/lib/bill";
 import { TABLE_STRINGS } from "@/lib/i18n/table-strings";
@@ -34,6 +36,10 @@ type OrderSheetProps = {
   tableEnded?: boolean;
   onStartTogether?: () => Promise<string>;
   onLeaveTogether?: () => void;
+  /** Allergies people at the shared table chose to share, and this phone's id there. */
+  tableAllergies?: Record<string, TableAllergyEntry>;
+  myTableId?: string | null;
+  onShareAllergies?: (entry: TableAllergyEntry | null) => Promise<void>;
 };
 
 type Mode = "list" | "split" | "server";
@@ -72,6 +78,9 @@ export function OrderSheet({
   tableEnded = false,
   onStartTogether,
   onLeaveTogether,
+  tableAllergies = {},
+  myTableId = null,
+  onShareAllergies,
 }: OrderSheetProps) {
   const t = TABLE_STRINGS[language];
   const [mode, setMode] = useState<Mode>("list");
@@ -338,6 +347,16 @@ export function OrderSheet({
           ended={tableEnded}
           onStart={onStartTogether}
           onLeave={onLeaveTogether}
+        />
+      )}
+      {tableCode && onShareAllergies && (
+        <TableAllergies
+          language={language}
+          staffLanguage={staffLanguage}
+          mine={{ avoid, alsoAvoid, severity }}
+          allergies={tableAllergies}
+          me={myTableId}
+          onShare={onShareAllergies}
         />
       )}
     </Sheet>

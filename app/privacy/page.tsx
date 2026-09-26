@@ -48,6 +48,12 @@ export default function PrivacyPage() {
           after more than one visit looks for it.
         </li>
         <li>
+          <strong>Ordering together.</strong> A shared table order keeps its dishes and quantities
+          for up to 6 hours. If you choose to share your allergies with the table, they&apos;re kept
+          with it, with any name or seat you type, for anyone with the table&apos;s link to see.
+          They&apos;re deleted when you stop sharing, leave the table, or the order ends.
+        </li>
+        <li>
           <strong>Reports.</strong> If you report a problem with a dish, we keep the dish, the kind
           of problem, and any words you type, so the restaurant can fix it. We ask you not to
           include your name or contact details.

@@ -1,15 +1,30 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { getRestaurantBySlug } from "@/lib/db";
-import { createSharedOrder, getSharedOrder, setSharedLine } from "@/lib/db/shared-orders";
+import { ALLERGENS, OTHER_AVOIDS } from "@/lib/allergens";
+import { SEVERITIES } from "@/lib/diner-prefs";
+import {
+  createSharedOrder,
+  getSharedOrder,
+  setSharedAllergies,
+  setSharedLine,
+} from "@/lib/db/shared-orders";
 import { checkRateLimit, clientKey } from "@/lib/rate-limit";
 import { isValidSlug } from "@/lib/slug";
 import { createClient } from "@/lib/supabase/server";
 
-// Shared table orders hold dishes and quantities only, never anything about the diners.
+// Shared table orders hold dishes and quantities, plus the allergies of anyone who chose to share
+// theirs with the table. Nothing else about the diners.
 const Code = z.string().regex(/^[a-z2-9]{10}$/);
 const Slug = z.string().refine(isValidSlug);
 const LineKey = z.string().regex(/^[0-9a-f-]{36}(\|[0-9]*\|[0-9.]*)?$/);
+const Person = z.string().regex(/^[a-z2-9]{12}$/);
+const AllergyEntry = z.object({
+  label: z.string().trim().max(24),
+  avoid: z.array(z.enum(ALLERGENS)).max(ALLERGENS.length),
+  alsoAvoid: z.array(z.enum(OTHER_AVOIDS)).max(OTHER_AVOIDS.length),
+  severity: z.enum(SEVERITIES),
+});
 const Lines = z
   .record(LineKey, z.number().int().min(1).max(20))
   .refine((lines) => Object.keys(lines).length <= 60);
@@ -52,7 +67,10 @@ export async function GET(req: Request) {
   if (!order || !restaurant || order.restaurantId !== restaurant.id) {
     return fail("This shared order has ended.", 404);
   }
-  return NextResponse.json({ lines: order.lines }, { headers: { "Cache-Control": "no-store" } });
+  return NextResponse.json(
+    { lines: order.lines, allergies: order.allergies },
+    { headers: { "Cache-Control": "no-store" } },
+  );
 }
 
 /** Sets how many of one line the table wants. */
@@ -70,5 +88,24 @@ export async function PUT(req: Request) {
     return NextResponse.json({ lines });
   } catch {
     return fail("That dish can't be added to this order.", 400);
+  }
+}
+
+/** Shares this person's allergies with the table, or stops sharing them. */
+export async function PATCH(req: Request) {
+  const parsed = z
+    .object({ code: Code, person: Person, entry: AllergyEntry.nullable() })
+    .safeParse(await req.json().catch(() => null));
+  if (!parsed.success) return fail("Invalid allergies.", 400);
+  if (!(await checkRateLimit(`table-change:${clientKey(req)}`, 300, 10 * 60 * 1000))) {
+    return fail("Too many changes. Slow down a little.", 429);
+  }
+  try {
+    const { code, person, entry } = parsed.data;
+    const allergies = await setSharedAllergies(code, person, entry);
+    if (!allergies) return fail("This shared order has ended.", 404);
+    return NextResponse.json({ allergies });
+  } catch {
+    return fail("Your allergies couldn't be shared with this table.", 400);
   }
 }
