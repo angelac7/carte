@@ -1,4 +1,6 @@
 "use client";
+import { TableSyncNotice } from "@/components/TableSyncNotice";
+import type { TableSyncStatus } from "@/lib/table-sync";
 import { useState } from "react";
 import { AllergyStatement } from "@/components/AllergyCard";
 import { OrderTogether } from "@/components/OrderTogether";
@@ -32,6 +34,7 @@ type OrderSheetProps = {
   onClear: () => void;
   onClose: () => void;
   /** The table's shared order, when there is one. */
+  syncStatus?: TableSyncStatus;
   tableCode?: string | null;
   tableEnded?: boolean;
   onStartTogether?: () => Promise<string>;
@@ -76,6 +79,7 @@ export function OrderSheet({
   onQuantity,
   onClear,
   onClose,
+  syncStatus = "saving",
   tableCode = null,
   tableEnded = false,
   onStartTogether,
@@ -144,6 +148,7 @@ export function OrderSheet({
             />
           </div>
         )}
+        {tableCode && <TableSyncNotice status={syncStatus} language={staffLanguage} />}
       </Sheet>
     );
   }
@@ -295,6 +300,7 @@ export function OrderSheet({
 
         {bill.unpricedCount > 0 && <p className="mt-4 text-xs text-muted">{t.unpriced}</p>}
         <p className="mt-2 text-xs text-muted">{t.estimate}</p>
+        {tableCode && <TableSyncNotice status={syncStatus} language={language} />}
       </Sheet>
     );
   }
@@ -365,6 +371,7 @@ export function OrderSheet({
           onShare={onShareAllergies}
         />
       )}
+      {tableCode && <TableSyncNotice status={syncStatus} language={language} />}
     </Sheet>
   );
 }

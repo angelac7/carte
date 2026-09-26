@@ -1804,3 +1804,104 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     },
   },
 };
+
+/** Connection messages stay separate from allergy information and are never animated. */
+export const TABLE_SYNC_STRINGS: Record<
+  LanguageCode,
+  Record<"saving" | "synced" | "offline" | "failed", string>
+> = {
+  en: {
+    saving: "Saving table changes…",
+    synced: "Table is synced",
+    offline:
+      "Offline. Table changes are not shared yet; reconnect before showing the order or allergies to staff.",
+    failed:
+      "Table changes could not be saved. Retrying; confirm the order and allergies with staff.",
+  },
+  es: {
+    saving: "Guardando cambios…",
+    synced: "Mesa sincronizada",
+    offline:
+      "Sin conexión. Los cambios aún no se comparten; reconecta antes de mostrar el pedido o las alergias al personal.",
+    failed:
+      "No se guardaron los cambios. Reintentando; confirma el pedido y las alergias con el personal.",
+  },
+  zh: {
+    saving: "正在保存餐桌更改…",
+    synced: "餐桌已同步",
+    offline: "离线。更改尚未共享；向员工展示订单或过敏信息前请重新连接。",
+    failed: "更改保存失败，正在重试。请向员工确认订单和过敏信息。",
+  },
+  ko: {
+    saving: "테이블 변경 저장 중…",
+    synced: "테이블 동기화 완료",
+    offline:
+      "오프라인입니다. 변경 내용이 아직 공유되지 않았습니다. 직원에게 주문이나 알레르기를 보여주기 전에 다시 연결하세요.",
+    failed: "저장하지 못했습니다. 재시도 중입니다. 직원에게 주문과 알레르기를 확인하세요.",
+  },
+  ja: {
+    saving: "テーブルの変更を保存中…",
+    synced: "同期済み",
+    offline:
+      "オフラインです。変更は未共有です。注文やアレルギーをスタッフに見せる前に再接続してください。",
+    failed: "保存できませんでした。再試行中です。注文とアレルギーをスタッフに確認してください。",
+  },
+  fr: {
+    saving: "Enregistrement…",
+    synced: "Table synchronisée",
+    offline:
+      "Hors ligne. Les modifications ne sont pas partagées. Reconnectez-vous avant de montrer la commande ou les allergies au personnel.",
+    failed:
+      "Échec de l’enregistrement. Nouvelle tentative ; confirmez la commande et les allergies auprès du personnel.",
+  },
+  vi: {
+    saving: "Đang lưu thay đổi…",
+    synced: "Bàn đã đồng bộ",
+    offline:
+      "Ngoại tuyến. Thay đổi chưa được chia sẻ; kết nối lại trước khi đưa đơn món hoặc dị ứng cho nhân viên xem.",
+    failed: "Không thể lưu. Đang thử lại; xác nhận đơn món và dị ứng với nhân viên.",
+  },
+  pt: {
+    saving: "Salvando alterações…",
+    synced: "Mesa sincronizada",
+    offline:
+      "Sem conexão. Alterações ainda não compartilhadas; reconecte antes de mostrar o pedido ou as alergias à equipe.",
+    failed: "Falha ao salvar. Tentando novamente; confirme o pedido e as alergias com a equipe.",
+  },
+  de: {
+    saving: "Änderungen werden gespeichert…",
+    synced: "Tisch synchronisiert",
+    offline:
+      "Offline. Änderungen sind noch nicht geteilt. Vor dem Vorzeigen von Bestellung oder Allergien erneut verbinden.",
+    failed:
+      "Speichern fehlgeschlagen. Neuer Versuch; Bestellung und Allergien beim Personal bestätigen.",
+  },
+  ar: {
+    saving: "جارٍ حفظ تغييرات الطاولة…",
+    synced: "تمت مزامنة الطاولة",
+    offline:
+      "غير متصل. لم تُشارك التغييرات بعد؛ أعد الاتصال قبل عرض الطلب أو الحساسية على الموظفين.",
+    failed: "تعذر الحفظ. جارٍ إعادة المحاولة؛ أكد الطلب والحساسية مع الموظفين.",
+  },
+  hi: {
+    saving: "टेबल के बदलाव सहेजे जा रहे हैं…",
+    synced: "टेबल सिंक है",
+    offline:
+      "ऑफ़लाइन। बदलाव साझा नहीं हुए हैं; ऑर्डर या एलर्जी स्टाफ को दिखाने से पहले दोबारा जुड़ें।",
+    failed: "सहेजा नहीं जा सका। दोबारा कोशिश जारी है; स्टाफ से ऑर्डर और एलर्जी की पुष्टि करें।",
+  },
+  th: {
+    saving: "กำลังบันทึกการเปลี่ยนแปลง…",
+    synced: "ซิงค์โต๊ะแล้ว",
+    offline:
+      "ออฟไลน์ ยังไม่ได้แชร์การเปลี่ยนแปลง โปรดเชื่อมต่อก่อนแสดงคำสั่งซื้อหรือข้อมูลแพ้อาหารแก่พนักงาน",
+    failed: "บันทึกไม่สำเร็จ กำลังลองใหม่ โปรดยืนยันคำสั่งซื้อและข้อมูลแพ้อาหารกับพนักงาน",
+  },
+  tl: {
+    saving: "Sine-save ang mga pagbabago…",
+    synced: "Naka-sync ang mesa",
+    offline:
+      "Offline. Hindi pa naibabahagi ang mga pagbabago; kumonekta bago ipakita ang order o allergy sa staff.",
+    failed: "Hindi na-save. Sinusubukan muli; kumpirmahin ang order at allergy sa staff.",
+  },
+};

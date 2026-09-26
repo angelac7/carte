@@ -45,6 +45,7 @@ import {
 } from "@/lib/api-client";
 import { normalizeSearch } from "@/lib/diner-interest";
 import { useOffline } from "@/lib/use-offline";
+import { TableSyncNotice } from "@/components/TableSyncNotice";
 import { useTableOrder } from "@/lib/use-table-order";
 import { useDinerPrefs } from "@/lib/use-diner-prefs";
 import { type DinerPrefs } from "@/lib/diner-prefs";
@@ -508,6 +509,7 @@ export function DinerMenu({
       {hero}
 
       <main id="main" className="mx-auto max-w-5xl px-5 pb-36">
+        {table.code && <TableSyncNotice status={table.syncStatus} language={language} />}
         <MenuToolbar
           t={t}
           query={search}
@@ -827,6 +829,7 @@ export function DinerMenu({
           severity={prefs.severity}
           onQuantity={setQuantity}
           onClear={table.clear}
+          syncStatus={table.syncStatus}
           tableCode={table.code}
           tableEnded={table.ended}
           onStartTogether={table.startShared}
