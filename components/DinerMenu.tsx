@@ -74,7 +74,13 @@ import { formatList } from "@/lib/format-list";
 import { matchesSearch } from "@/lib/menu-search";
 import { blockedAddons, dishQuantity, hasChoices, lineKey, parseLineKey } from "@/lib/order-lines";
 import { priceSteps, startingPrice, withinComfort } from "@/lib/comfort-filters";
-import { detectCurrency, formatWhole } from "@/lib/prices";
+import {
+  approximatePrice,
+  detectCurrency,
+  formatWhole,
+  parsePrice,
+  type ExchangeRates,
+} from "@/lib/prices";
 import { groupBySection, hasSections } from "@/lib/menu-sections";
 import { dishAvailability, restaurantClock, shortTime } from "@/lib/availability";
 import { toggleValue } from "@/lib/toggle-value";
@@ -101,6 +107,9 @@ type DinerMenuProps = {
     features?: RestaurantFeature[];
   };
   dishes: MenuItem[];
+  /** The menu's currency, like "USD", and today's rates, to show prices in the diner's own. */
+  menuCurrency?: string | null;
+  exchangeRates?: ExchangeRates | null;
   /** When the page was made, so the server and browser agree on what's available at first. */
   initialNow?: number;
   initialLanguage: LanguageCode;
@@ -131,6 +140,8 @@ export function DinerMenu({
   initialTableCode = null,
   initialNow,
   onPreferencesChange,
+  menuCurrency = null,
+  exchangeRates = null,
 }: DinerMenuProps) {
   const offline = useOffline();
   const [language, setLanguage] = useState<LanguageCode>(initialLanguage);
@@ -155,6 +166,11 @@ export function DinerMenu({
   // Search only narrows the list on screen; the assistant and order still see every allowed dish.
   const [search, setSearch] = useState("");
   const [display, setDisplay] = useState<DisplayPrefs>(initialDisplay);
+  // Approximate prices in the diner's own currency, when they've chosen one and it converts.
+  const conversion =
+    menuCurrency && exchangeRates ? { menuCurrency, ratesDate: exchangeRates.date } : null;
+  const approximate = (amount: number | null) =>
+    approximatePrice(amount, menuCurrency, display.currency, exchangeRates, htmlLang(language));
   const requested = useRef(new Set<LanguageCode>());
   const [translationAttempt, setTranslationAttempt] = useState(0);
   const [summaries, setSummaries] = useState<Partial<Record<LanguageCode, DishSummaries>>>({
@@ -464,6 +480,7 @@ export function DinerMenu({
               writeDisplayCookie(next);
             }}
             onClose={() => setPanel(null)}
+            conversion={conversion}
           />
         )}
       </div>
@@ -678,6 +695,7 @@ export function DinerMenu({
                               )
                             : ""
                         }
+                        approxPrice={approximate(parsePrice(dish.price))}
                         t={t}
                         avoid={avoid}
                         alsoAvoid={alsoAvoid}
@@ -754,6 +772,7 @@ export function DinerMenu({
           key={openDish.id}
           dish={openDish}
           text={textFor(openDish)}
+          approxPrice={approximate(parsePrice(openDish.price))}
           avoid={avoid}
           alsoAvoid={alsoAvoid}
           language={language}
@@ -786,6 +805,7 @@ export function DinerMenu({
           order={filteredOrder}
           textFor={textFor}
           language={language}
+          approximate={approximate}
           avoid={avoid}
           alsoAvoid={alsoAvoid}
           severity={prefs.severity}
@@ -838,6 +858,7 @@ export function DinerMenu({
             writeDisplayCookie(next);
           }}
           onClose={() => setPanel(null)}
+          conversion={conversion}
         />
       )}
       {panel === "photo" && (

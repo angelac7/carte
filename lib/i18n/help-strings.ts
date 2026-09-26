@@ -23,6 +23,10 @@ export type HelpStrings = {
   display: string;
   largeText: string;
   highContrast: string;
+  /** Approximate prices in the diner's own currency. */
+  showPricesIn: string;
+  dontConvert: string;
+  ratesNote: (date: string) => string;
   voice: string;
   listening: string;
   listen: string;
@@ -51,6 +55,10 @@ export const HELP_STRINGS: Record<LanguageCode, HelpStrings> = {
     display: "Display",
     largeText: "Larger text",
     highContrast: "High contrast",
+    showPricesIn: "Also show prices in",
+    dontConvert: "Don't convert",
+    ratesNote: (date) =>
+      `Approximate, using European Central Bank rates from ${date}. You pay in the menu's currency.`,
     voice: "Speak your question",
     listening: "Listening…",
     listen: "Listen",
@@ -77,6 +85,10 @@ export const HELP_STRINGS: Record<LanguageCode, HelpStrings> = {
     display: "Pantalla",
     largeText: "Texto más grande",
     highContrast: "Alto contraste",
+    showPricesIn: "Mostrar también los precios en",
+    dontConvert: "No convertir",
+    ratesNote: (date) =>
+      `Aproximado, con tipos de cambio del Banco Central Europeo del ${date}. Se paga en la moneda del menú.`,
     voice: "Diga su pregunta",
     listening: "Escuchando…",
     listen: "Escuchar",
@@ -102,6 +114,9 @@ export const HELP_STRINGS: Record<LanguageCode, HelpStrings> = {
     display: "显示",
     largeText: "放大文字",
     highContrast: "高对比度",
+    showPricesIn: "同时以此货币显示价格",
+    dontConvert: "不换算",
+    ratesNote: (date) => `约数，按欧洲央行 ${date} 的汇率计算。实际以菜单货币付款。`,
     voice: "语音提问",
     listening: "正在聆听…",
     listen: "朗读",
@@ -127,6 +142,10 @@ export const HELP_STRINGS: Record<LanguageCode, HelpStrings> = {
     display: "화면 설정",
     largeText: "큰 글씨",
     highContrast: "고대비",
+    showPricesIn: "가격을 다음 통화로도 표시",
+    dontConvert: "변환 안 함",
+    ratesNote: (date) =>
+      `유럽중앙은행 ${date} 환율로 계산한 대략적인 금액입니다. 결제는 메뉴 통화로 합니다.`,
     voice: "음성으로 질문하기",
     listening: "듣는 중…",
     listen: "듣기",
@@ -153,6 +172,10 @@ export const HELP_STRINGS: Record<LanguageCode, HelpStrings> = {
     display: "表示",
     largeText: "文字を大きく",
     highContrast: "ハイコントラスト",
+    showPricesIn: "次の通貨でも価格を表示",
+    dontConvert: "換算しない",
+    ratesNote: (date) =>
+      `欧州中央銀行の${date}のレートによる概算です。支払いはメニューの通貨で行います。`,
     voice: "声で質問",
     listening: "聞き取り中…",
     listen: "読み上げ",
@@ -179,6 +202,10 @@ export const HELP_STRINGS: Record<LanguageCode, HelpStrings> = {
     display: "Affichage",
     largeText: "Texte plus grand",
     highContrast: "Contraste élevé",
+    showPricesIn: "Afficher aussi les prix en",
+    dontConvert: "Ne pas convertir",
+    ratesNote: (date) =>
+      `Approximatif, selon les taux de la Banque centrale européenne du ${date}. Vous payez dans la devise du menu.`,
     voice: "Poser la question à voix haute",
     listening: "Écoute…",
     listen: "Écouter",
@@ -204,6 +231,10 @@ export const HELP_STRINGS: Record<LanguageCode, HelpStrings> = {
     display: "Hiển thị",
     largeText: "Chữ lớn hơn",
     highContrast: "Độ tương phản cao",
+    showPricesIn: "Hiển thị thêm giá bằng",
+    dontConvert: "Không quy đổi",
+    ratesNote: (date) =>
+      `Ước tính theo tỷ giá của Ngân hàng Trung ương châu Âu ngày ${date}. Bạn thanh toán bằng đơn vị tiền của thực đơn.`,
     voice: "Hỏi bằng giọng nói",
     listening: "Đang nghe…",
     listen: "Nghe",
@@ -231,6 +262,10 @@ export const HELP_STRINGS: Record<LanguageCode, HelpStrings> = {
     display: "Exibição",
     largeText: "Texto maior",
     highContrast: "Alto contraste",
+    showPricesIn: "Mostrar também os preços em",
+    dontConvert: "Não converter",
+    ratesNote: (date) =>
+      `Aproximado, com taxas do Banco Central Europeu de ${date}. Você paga na moeda do cardápio.`,
     voice: "Fale sua pergunta",
     listening: "Ouvindo…",
     listen: "Ouvir",
@@ -257,6 +292,10 @@ export const HELP_STRINGS: Record<LanguageCode, HelpStrings> = {
     display: "Anzeige",
     largeText: "Größere Schrift",
     highContrast: "Hoher Kontrast",
+    showPricesIn: "Preise auch anzeigen in",
+    dontConvert: "Nicht umrechnen",
+    ratesNote: (date) =>
+      `Ungefähr, nach Kursen der Europäischen Zentralbank vom ${date}. Bezahlt wird in der Währung der Speisekarte.`,
     voice: "Frage sprechen",
     listening: "Hört zu…",
     listen: "Anhören",
@@ -283,6 +322,10 @@ export const HELP_STRINGS: Record<LanguageCode, HelpStrings> = {
     display: "العرض",
     largeText: "نص أكبر",
     highContrast: "تباين عالٍ",
+    showPricesIn: "اعرض الأسعار أيضًا بعملة",
+    dontConvert: "بدون تحويل",
+    ratesNote: (date) =>
+      `تقريبي، بأسعار البنك المركزي الأوروبي بتاريخ ${date}. تدفع بعملة القائمة.`,
     voice: "قل سؤالك",
     listening: "جارٍ الاستماع…",
     listen: "استمع",
@@ -308,6 +351,10 @@ export const HELP_STRINGS: Record<LanguageCode, HelpStrings> = {
     display: "डिस्प्ले",
     largeText: "बड़ा टेक्स्ट",
     highContrast: "हाई कंट्रास्ट",
+    showPricesIn: "कीमतें इस मुद्रा में भी दिखाएँ",
+    dontConvert: "बदलें नहीं",
+    ratesNote: (date) =>
+      `अनुमानित, यूरोपीय सेंट्रल बैंक की ${date} की दरों से। भुगतान मेनू की मुद्रा में होता है।`,
     voice: "अपना सवाल बोलें",
     listening: "सुन रहे हैं…",
     listen: "सुनें",
@@ -333,6 +380,10 @@ export const HELP_STRINGS: Record<LanguageCode, HelpStrings> = {
     display: "การแสดงผล",
     largeText: "ตัวอักษรใหญ่ขึ้น",
     highContrast: "คอนทราสต์สูง",
+    showPricesIn: "แสดงราคาเป็นสกุลเงินนี้ด้วย",
+    dontConvert: "ไม่ต้องแปลง",
+    ratesNote: (date) =>
+      `ราคาโดยประมาณ ตามอัตราของธนาคารกลางยุโรปวันที่ ${date} ชำระเงินเป็นสกุลเงินของเมนู`,
     voice: "พูดคำถามของคุณ",
     listening: "กำลังฟัง…",
     listen: "ฟังเสียง",
@@ -359,6 +410,10 @@ export const HELP_STRINGS: Record<LanguageCode, HelpStrings> = {
     display: "Display",
     largeText: "Mas malaking teksto",
     highContrast: "Mataas na contrast",
+    showPricesIn: "Ipakita rin ang presyo sa",
+    dontConvert: "Huwag i-convert",
+    ratesNote: (date) =>
+      `Tantiya, gamit ang palitan ng European Central Bank noong ${date}. Babayaran mo sa currency ng menu.`,
     voice: "Sabihin ang tanong mo",
     listening: "Nakikinig…",
     listen: "Pakinggan",

@@ -1,4 +1,5 @@
 import { groupBySection } from "@/lib/menu-sections";
+import { parsePrice } from "@/lib/prices";
 import { WEEKDAYS, type FullHours, type Weekday } from "@/lib/restaurant-profile";
 import type { MenuItem } from "@/types/menu";
 
@@ -30,7 +31,9 @@ export type StructuredMenu = {
   features?: string[];
   /** Only hours the owner actually saved; never defaults. */
   hours?: FullHours | null;
-  dishes: Pick<MenuItem, "name" | "description" | "section" | "calories">[];
+  /** The menu's currency, like "USD", so prices can be included. */
+  currency?: string;
+  dishes: (Pick<MenuItem, "name" | "description" | "section" | "calories"> & { price?: string })[];
 };
 
 /**
@@ -96,6 +99,7 @@ export function menuStructuredData(menu: StructuredMenu) {
           "@type": "MenuItem",
           name: dish.name,
           ...(dish.description?.trim() ? { description: dish.description.trim() } : {}),
+          ...offer(dish.price, menu.currency),
           ...(dish.calories != null
             ? {
                 nutrition: {
@@ -108,6 +112,14 @@ export function menuStructuredData(menu: StructuredMenu) {
       })),
     },
   };
+}
+
+/** A dish's price for search engines, when it's one clear amount in a known currency. */
+function offer(price: string | undefined, currency: string | undefined) {
+  const amount = price ? parsePrice(price) : null;
+  return amount !== null && currency
+    ? { offers: { "@type": "Offer", price: amount.toFixed(2), priceCurrency: currency } }
+    : {};
 }
 
 /** Structured data as script text, with "<" escaped so no value can end the script early. */

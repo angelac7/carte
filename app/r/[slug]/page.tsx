@@ -6,6 +6,7 @@ import { LiveDinerMenu } from "@/components/LiveDinerMenu";
 import { getConfirmedDishes, getRestaurantBySlug } from "@/lib/db";
 import { getCachedSummaries } from "@/lib/db/insights";
 import { getPublicDetails } from "@/lib/db/profile";
+import { getExchangeRates } from "@/lib/exchange-rates";
 import { getPopularDishIds } from "@/lib/db/popular";
 import { parsePrefs, PREFS_COOKIE } from "@/lib/diner-prefs";
 import { DINER_STRINGS } from "@/lib/i18n/diner-strings";
@@ -17,6 +18,7 @@ import {
   languageFromAcceptHeader,
 } from "@/lib/languages";
 import { confirmedOnly } from "@/lib/menu-filters";
+import { guessCurrency, isConvertible } from "@/lib/prices";
 import { siteUrl } from "@/lib/site-url";
 import { isValidSlug } from "@/lib/slug";
 import { jsonLdText, menuStructuredData } from "@/lib/structured-data";
@@ -86,11 +88,19 @@ export default async function RestaurantMenuPage({ params, searchParams }: Resta
   // This page renders once per visit; the browser keeps the clock current from here.
   const renderedAt = new Date();
   // Short explanations already written in the diner's language, shown under each dish name.
-  const [initialSummaries, popularIds, details] = await Promise.all([
+  const [initialSummaries, popularIds, details, exchangeRates] = await Promise.all([
     getCachedSummaries(dishes, initialLanguage).catch(() => ({})),
     getPopularDishIds(supabase, restaurant.id).catch(() => [] as string[]),
     findPublicDetails(restaurant.id),
+    getExchangeRates(),
   ]);
+  // The owner's choice, or worked out from the price symbols and time zone.
+  const menuCurrency =
+    restaurant.currency ||
+    guessCurrency(
+      dishes.map((dish) => dish.price),
+      restaurant.timezone,
+    );
   const structuredData = details?.listed
     ? menuStructuredData({
         name: restaurant.name,
@@ -104,6 +114,7 @@ export default async function RestaurantMenuPage({ params, searchParams }: Resta
         priceRange: restaurant.price_range,
         reservationUrl: restaurant.reservation_url,
         hours: details.hours,
+        currency: menuCurrency,
         features: (restaurant.features ?? []).map((feature) => DINER_STRINGS.en.features[feature]),
         dishes,
       })
@@ -142,6 +153,8 @@ export default async function RestaurantMenuPage({ params, searchParams }: Resta
         initialSummaries={initialSummaries}
         popularIds={popularIds}
         initialTableCode={tableCode}
+        menuCurrency={menuCurrency}
+        exchangeRates={isConvertible(menuCurrency) ? exchangeRates : null}
       />
     </>
   );

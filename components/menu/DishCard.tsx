@@ -33,6 +33,8 @@ type DishCardProps = {
   avoid?: Allergen[];
   /** Other things the diner avoids, like pork. */
   alsoAvoid?: OtherAvoid[];
+  /** The price in the diner's own currency, like "≈ ¥2,140", when they asked for it. */
+  approxPrice?: string | null;
   detailsLabel: string;
   explainLabel: string;
   stepperLabels: { add: string; increase: string; decrease: string };
@@ -61,6 +63,7 @@ export function DishCard({
   t,
   avoid = [],
   alsoAvoid = [],
+  approxPrice = null,
   detailsLabel,
   explainLabel,
   stepperLabels,
@@ -98,10 +101,13 @@ export function DishCard({
               {text.name}
             </button>
           </h3>
-          {(dish.price || dish.calories != null) && (
+          {(dish.price || dish.calories != null || approxPrice) && (
             <span className="shrink-0 text-end">
               {dish.price && (
                 <span className="block font-mono text-base tabular-nums">{dish.price}</span>
+              )}
+              {approxPrice && (
+                <span className="block text-xs text-muted tabular-nums">{approxPrice}</span>
               )}
               {dish.calories != null && (
                 <span className="block text-xs text-muted tabular-nums">

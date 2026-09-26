@@ -7,7 +7,7 @@ import {
 } from "@/lib/restaurant-profile";
 
 const PROFILE_COLUMNS =
-  "revision, name, listed, description, cuisine, city, address, timezone, hours, occasions, phone, website, reservation_url, price_range, kitchen_practices, features";
+  "revision, name, listed, description, cuisine, city, address, timezone, hours, occasions, phone, website, reservation_url, price_range, kitchen_practices, features, currency";
 
 export async function getRestaurantProfile(
   supabase: SupabaseClient,

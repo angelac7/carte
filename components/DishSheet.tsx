@@ -23,6 +23,8 @@ type DishSheetProps = {
   avoid?: Allergen[];
   /** Other things the diner avoids, like pork. */
   alsoAvoid?: OtherAvoid[];
+  /** The price in the diner's own currency, like "≈ ¥2,140", when they asked for it. */
+  approxPrice?: string | null;
   language: LanguageCode;
   restaurantSlug: string;
   /** Called once the explanation arrives, so the menu can show its summary too. */
@@ -78,6 +80,7 @@ export function DishSheet({
   text,
   avoid = [],
   alsoAvoid = [],
+  approxPrice = null,
   language,
   restaurantSlug,
   onExplained,
@@ -148,6 +151,7 @@ export function DishSheet({
     >
       <div className="mt-3 flex flex-wrap items-center gap-3">
         <span className="font-mono tabular-nums">{dish.price}</span>
+        {approxPrice && <span className="text-sm text-muted tabular-nums">{approxPrice}</span>}
         {dish.calories != null && (
           <span className="text-sm text-muted tabular-nums">
             {d.calories(formatCalories(dish.calories, htmlLang(language)))}

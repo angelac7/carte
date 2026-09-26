@@ -36,6 +36,8 @@ type OrderSheetProps = {
   tableEnded?: boolean;
   onStartTogether?: () => Promise<string>;
   onLeaveTogether?: () => void;
+  /** An amount in the diner's own currency, like "≈ ¥2,140", when they asked for it. */
+  approximate?: (amount: number) => string | null;
   /** Allergies people at the shared table chose to share, and this phone's id there. */
   tableAllergies?: Record<string, TableAllergyEntry>;
   myTableId?: string | null;
@@ -78,6 +80,7 @@ export function OrderSheet({
   tableEnded = false,
   onStartTogether,
   onLeaveTogether,
+  approximate = () => null,
   tableAllergies = {},
   myTableId = null,
   onShareAllergies,
@@ -274,6 +277,9 @@ export function OrderSheet({
           <Row label={`${t.tax} (${taxPercent}%)`} value={money(bill.tax)} />
           <Row label={`${t.tip} (${tipPercent}%)`} value={money(bill.tip)} />
           <Row label={t.total} value={money(bill.total)} strong />
+          {approximate(bill.total) && (
+            <p className="text-end text-xs text-muted tabular-nums">{approximate(bill.total)}</p>
+          )}
         </dl>
 
         {people.length > 0 && (

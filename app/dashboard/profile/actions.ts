@@ -44,6 +44,7 @@ export async function saveProfileAction(
     price_range: Number(formData.get("price_range") ?? 0),
     kitchen_practices: formData.getAll("kitchen_practice").map(String),
     features: formData.getAll("feature").map(String),
+    currency: String(formData.get("currency") ?? ""),
   });
   if (!parsed.success) {
     const field = String(parsed.error.issues[0]?.path[0] ?? "");

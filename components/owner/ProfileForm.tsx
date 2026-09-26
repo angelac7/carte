@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { fieldClass, labelClass } from "@/components/ui/field";
 import { Notice } from "@/components/ui/notice";
 import { KITCHEN_PRACTICES } from "@/lib/allergens";
+import { CONVERTIBLE_CURRENCIES } from "@/lib/prices";
 import { DINER_STRINGS } from "@/lib/i18n/diner-strings";
 import { DISCOVER_STRINGS } from "@/lib/i18n/discover-strings";
 import {
@@ -30,6 +31,9 @@ const DAY_LABELS: Record<Weekday, string> = {
 const inputClass = fieldClass("mt-1 text-base");
 const timeClass = fieldClass("w-auto bg-paper px-2 py-1.5");
 const checkboxClass = "h-5 w-5 accent-accent";
+const currencyNames = new Intl.DisplayNames("en", { type: "currency" });
+const currencyName = (code: string) => currencyNames.of(code) ?? code;
+
 const chipClass =
   "cursor-pointer rounded-full bg-paper px-4 py-2.5 text-sm font-medium text-muted shadow-raised-sm transition-[box-shadow,background-color,color] duration-200 hover:text-ink has-checked:bg-basil has-checked:text-white has-checked:shadow-pressed-color has-focus-visible:outline-2 has-focus-visible:outline-offset-3 has-focus-visible:outline-accent";
 
@@ -200,6 +204,27 @@ export function ProfileForm({ profile }: { profile: RestaurantProfile }) {
           ))}
         </div>
       </fieldset>
+
+      <label className="block">
+        <span className={labelClass}>Menu currency</span>
+        <select
+          name="currency"
+          value={draft.currency}
+          onChange={(event) => setDraft({ ...draft, currency: event.target.value })}
+          className={inputClass}
+        >
+          <option value="">Work it out from my prices</option>
+          {CONVERTIBLE_CURRENCIES.map((code) => (
+            <option key={code} value={code}>
+              {currencyName(code)} ({code})
+            </option>
+          ))}
+        </select>
+        <span className="mt-1 block text-xs text-muted">
+          Lets visitors see an approximate price in their own currency. Set it if your prices use
+          &ldquo;$&rdquo; but aren&apos;t US dollars.
+        </span>
+      </label>
 
       <label className="block">
         <span className={labelClass}>Time zone</span>

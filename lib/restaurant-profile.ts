@@ -110,6 +110,11 @@ export const ProfileSchema = z.object({
   price_range: z.number().int().min(0).max(4),
   kitchen_practices: z.array(z.enum(KITCHEN_PRACTICES)).max(KITCHEN_PRACTICES.length).default([]),
   features: z.array(z.enum(RESTAURANT_FEATURES)).max(RESTAURANT_FEATURES.length).default([]),
+  /** Like "USD", or empty to work it out from the menu's prices. */
+  currency: z
+    .string()
+    .regex(/^([A-Z]{3})?$/)
+    .default(""),
 });
 export type RestaurantProfile = z.infer<typeof ProfileSchema>;
 
@@ -129,6 +134,7 @@ export const DEFAULT_PROFILE: RestaurantProfile = {
   price_range: 0,
   kitchen_practices: [],
   features: [],
+  currency: "",
 };
 
 export function isOccasion(value: string): value is Occasion {

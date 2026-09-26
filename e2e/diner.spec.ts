@@ -161,3 +161,16 @@ test("accessibility info shows on the menu and filters Discover", async ({ page 
   await page.goto("/discover?type=restaurants&filters=1&feature=quiet");
   await expect(page.getByRole("heading", { name: "Test Kitchen", level: 3 })).toHaveCount(0);
 });
+
+test("diners can see approximate prices in their own currency", async ({ page }) => {
+  await page.goto(`/r/${slug}`);
+  await page.getByRole("button", { name: "Display" }).click();
+  await page.getByLabel("Also show prices in").selectOption("JPY");
+  await expect(page.getByText(/European Central Bank rates/)).toBeVisible();
+  await page.getByRole("dialog").getByRole("button", { name: "Close" }).click();
+  await expect(dishCard(page, "Green Salad")).toContainText(/≈ ￥[\d,]+/);
+
+  // Remembered on this device.
+  await page.reload();
+  await expect(dishCard(page, "Green Salad")).toContainText(/≈ ￥[\d,]+/);
+});
