@@ -107,6 +107,8 @@ type DinerMenuProps = {
     features?: RestaurantFeature[];
   };
   dishes: MenuItem[];
+  /** Shown inside a restaurant's own website: a compact header that links to the full menu. */
+  embedded?: boolean;
   /** The menu's currency, like "USD", and today's rates, to show prices in the diner's own. */
   menuCurrency?: string | null;
   exchangeRates?: ExchangeRates | null;
@@ -142,6 +144,7 @@ export function DinerMenu({
   onPreferencesChange,
   menuCurrency = null,
   exchangeRates = null,
+  embedded = false,
 }: DinerMenuProps) {
   const offline = useOffline();
   const [language, setLanguage] = useState<LanguageCode>(initialLanguage);
@@ -423,13 +426,26 @@ export function DinerMenu({
         </>
       }
       summary={`${t.menuTitle} · ${t.dishCount(dishes.length)}`}
+      compact={embedded}
       lead={
-        <OfflineLink href="/my" className={glassClass}>
-          <span aria-hidden="true" className="h-5 w-5">
-            <PersonIcon />
-          </span>
-          <span className="sr-only sm:not-sr-only">{myCarteText.myCarte}</span>
-        </OfflineLink>
+        embedded ? (
+          // Inside another website, the full menu opens on Carte in a new tab.
+          <a
+            href={`/r/${restaurant.slug}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={glassClass}
+          >
+            {t.openOnCarte} <span aria-hidden="true">↗</span>
+          </a>
+        ) : (
+          <OfflineLink href="/my" className={glassClass}>
+            <span aria-hidden="true" className="h-5 w-5">
+              <PersonIcon />
+            </span>
+            <span className="sr-only sm:not-sr-only">{myCarteText.myCarte}</span>
+          </OfflineLink>
+        )
       }
       controls={
         <>

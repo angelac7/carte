@@ -2,6 +2,7 @@
 import { motion } from "motion/react";
 import Image from "next/image";
 import type { ReactNode } from "react";
+import { cn } from "@/lib/cn";
 
 type MenuHeroProps = {
   name: string;
@@ -20,6 +21,8 @@ type MenuHeroProps = {
   actions?: ReactNode;
   /** Small facts shown as pills, like "Step-free entrance". */
   badges?: string[];
+  /** A shorter header, for menus shown inside a restaurant's own website. */
+  compact?: boolean;
 };
 
 /** The restaurant's name set large, over a slowly zooming dish photo or fine ink texture. */
@@ -33,6 +36,7 @@ export function MenuHero({
   logo,
   actions,
   badges = [],
+  compact = false,
 }: MenuHeroProps) {
   return (
     <header className="texture-ink relative isolate overflow-hidden text-white">
@@ -52,12 +56,12 @@ export function MenuHero({
           />
         </>
       )}
-      <div className="mx-auto max-w-5xl px-5 pt-5 pb-12 sm:pb-16">
+      <div className={cn("mx-auto max-w-5xl px-5 pt-5", compact ? "pb-6" : "pb-12 sm:pb-16")}>
         <div className="flex items-center justify-between gap-2">
           <div>{lead}</div>
           <div className="flex items-center gap-2">{controls}</div>
         </div>
-        <div className="mt-16 sm:mt-24">
+        <div className={compact ? "mt-6" : "mt-16 sm:mt-24"}>
           {logo && (
             <div className="relative mb-6 h-16 w-16 overflow-hidden rounded-full bg-white shadow-raised-sm ring-2 ring-white/40 sm:h-20 sm:w-20">
               <Image src={logo} alt="" fill sizes="80px" className="object-cover" />
@@ -67,7 +71,10 @@ export function MenuHero({
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: "easeOut" }}
-            className="font-serif text-[clamp(3.75rem,19vw,10rem)] leading-[0.85] tracking-tighter text-balance break-words"
+            className={cn(
+              "font-serif tracking-tighter text-balance break-words",
+              compact ? "text-5xl leading-none" : "text-[clamp(3.75rem,19vw,10rem)] leading-[0.85]",
+            )}
           >
             {name}
           </motion.h1>

@@ -32,6 +32,8 @@ export type DinerStrings = {
   calories: (n: string) => string;
   caloriesNote: string;
   /** Accessibility and family facts about the restaurant; fixed translations. */
+  /** On restaurants' own websites: opens the full menu on Carte. */
+  openOnCarte: string;
   featuresTitle: string;
   features: Record<RestaurantFeature, string>;
   translating: string;
@@ -181,6 +183,7 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     calories: (n) => `${n} cal`,
     caloriesNote:
       "2,000 calories a day is used for general nutrition advice, but calorie needs vary.",
+    openOnCarte: "Open on Carte",
     featuresTitle: "Accessibility & families",
     features: {
       "wheelchair-access": "Wheelchair accessible",
@@ -316,6 +319,7 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     calories: (n) => `${n} kcal`,
     caloriesNote:
       "Se usan 2.000 calorías al día como recomendación nutricional general, pero las necesidades varían.",
+    openOnCarte: "Abrir en Carte",
     featuresTitle: "Accesibilidad y familias",
     features: {
       "wheelchair-access": "Accesible en silla de ruedas",
@@ -440,6 +444,7 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     alsoUnchecked: (items) => `餐厅尚未说明此菜是否含有${items}。请询问服务员。`,
     calories: (n) => `${n} 千卡`,
     caloriesNote: "一般营养建议以每天 2000 千卡为参考，但每个人的热量需求不同。",
+    openOnCarte: "在 Carte 中打开",
     featuresTitle: "无障碍与家庭",
     features: {
       "wheelchair-access": "轮椅可通行",
@@ -569,6 +574,7 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     calories: (n) => `${n}kcal`,
     caloriesNote:
       "일반적인 영양 권장량은 하루 2,000kcal 기준이지만, 필요한 열량은 사람마다 다릅니다.",
+    openOnCarte: "Carte에서 열기",
     featuresTitle: "접근성 및 가족",
     features: {
       "wheelchair-access": "휠체어 이용 가능",
@@ -697,6 +703,7 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
       `${items}が入っているかどうか、お店はまだ記載していません。スタッフにお尋ねください。`,
     calories: (n) => `${n}kcal`,
     caloriesNote: "一般的な栄養の目安は1日2,000kcalですが、必要なカロリーは人によって異なります。",
+    openOnCarte: "Carteで開く",
     featuresTitle: "バリアフリー・家族向け",
     features: {
       "wheelchair-access": "車いす対応",
@@ -832,6 +839,7 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     calories: (n) => `${n} kcal`,
     caloriesNote:
       "Un apport de 2 000 calories par jour sert de repère nutritionnel général, mais les besoins varient.",
+    openOnCarte: "Ouvrir dans Carte",
     featuresTitle: "Accessibilité et familles",
     features: {
       "wheelchair-access": "Accessible en fauteuil roulant",
@@ -963,6 +971,7 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     calories: (n) => `${n} kcal`,
     caloriesNote:
       "Mức 2.000 calo mỗi ngày được dùng làm khuyến nghị dinh dưỡng chung, nhưng nhu cầu của mỗi người khác nhau.",
+    openOnCarte: "Mở trên Carte",
     featuresTitle: "Tiếp cận và gia đình",
     features: {
       "wheelchair-access": "Có lối đi cho xe lăn",
@@ -1097,6 +1106,7 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     calories: (n) => `${n} kcal`,
     caloriesNote:
       "Uma dieta de 2.000 calorias por dia é usada como referência nutricional geral, mas as necessidades variam.",
+    openOnCarte: "Abrir no Carte",
     featuresTitle: "Acessibilidade e famílias",
     features: {
       "wheelchair-access": "Acessível para cadeira de rodas",
@@ -1233,6 +1243,7 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     calories: (n) => `${n} kcal`,
     caloriesNote:
       "Als allgemeine Ernährungsempfehlung gelten 2.000 Kalorien pro Tag, der Bedarf ist jedoch individuell verschieden.",
+    openOnCarte: "In Carte öffnen",
     featuresTitle: "Barrierefreiheit & Familien",
     features: {
       "wheelchair-access": "Rollstuhlgerecht",
@@ -1363,6 +1374,7 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     calories: (n) => `${n} سعرة حرارية`,
     caloriesNote:
       "يُستخدم معدل 2,000 سعرة حرارية يوميًا كإرشاد غذائي عام، لكن الاحتياجات تختلف من شخص لآخر.",
+    openOnCarte: "افتح في Carte",
     featuresTitle: "إمكانية الوصول والعائلات",
     features: {
       "wheelchair-access": "مناسب للكراسي المتحركة",
@@ -1491,6 +1503,7 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     calories: (n) => `${n} कैलोरी`,
     caloriesNote:
       "सामान्य पोषण सलाह के लिए रोज़ 2,000 कैलोरी मानी जाती है, लेकिन हर व्यक्ति की ज़रूरत अलग होती है।",
+    openOnCarte: "Carte पर खोलें",
     featuresTitle: "पहुँच-योग्यता और परिवार",
     features: {
       "wheelchair-access": "व्हीलचेयर के लिए सुलभ",
@@ -1617,6 +1630,7 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     calories: (n) => `${n} กิโลแคลอรี`,
     caloriesNote:
       "คำแนะนำด้านโภชนาการทั่วไปอ้างอิงที่ 2,000 กิโลแคลอรีต่อวัน แต่ความต้องการพลังงานของแต่ละคนแตกต่างกัน",
+    openOnCarte: "เปิดใน Carte",
     featuresTitle: "การเข้าถึงและครอบครัว",
     features: {
       "wheelchair-access": "รองรับรถเข็น",
@@ -1748,6 +1762,7 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     calories: (n) => `${n} calories`,
     caloriesNote:
       "Ginagamit ang 2,000 calories bawat araw bilang pangkalahatang payo sa nutrisyon, pero iba-iba ang pangangailangan ng bawat tao.",
+    openOnCarte: "Buksan sa Carte",
     featuresTitle: "Accessibility at pamilya",
     features: {
       "wheelchair-access": "Puwede ang wheelchair",

@@ -2,7 +2,6 @@ import type { NextConfig } from "next";
 
 const securityHeaders = [
   { key: "X-Content-Type-Options", value: "nosniff" },
-  { key: "X-Frame-Options", value: "DENY" },
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
   // Camera, microphone, and location are only for Carte's own photo, voice, and nearby features.
   { key: "Permissions-Policy", value: "camera=(self), microphone=(self), geolocation=(self)" },
@@ -27,7 +26,20 @@ const nextConfig: NextConfig = {
       : [],
   },
   async headers() {
-    return [{ source: "/(.*)", headers: securityHeaders }];
+    return [
+      // Nothing may show Carte inside a frame, except the menus made for restaurants' websites.
+      {
+        source: "/((?!embed/).*)",
+        headers: [...securityHeaders, { key: "X-Frame-Options", value: "DENY" }],
+      },
+      {
+        source: "/embed/:slug",
+        headers: [
+          ...securityHeaders,
+          { key: "Content-Security-Policy", value: "frame-ancestors *" },
+        ],
+      },
+    ];
   },
 };
 

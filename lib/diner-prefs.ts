@@ -59,9 +59,30 @@ export function serializePrefs(prefs: DinerPrefs): string {
   return encodeURIComponent(JSON.stringify(prefs));
 }
 
+/**
+ * Filters saved this visit that the browser wouldn't keep as a cookie, like on a menu shown
+ * inside a restaurant's own website. They still work until the page closes.
+ */
+let unsavedPrefs: string | null = null;
+
+/** Browser only: the saved filters' cookie value, if there is one. */
+export function readPrefsCookie(): string | undefined {
+  return document.cookie
+    .split("; ")
+    .find((entry) => entry.startsWith(`${PREFS_COOKIE}=`))
+    ?.slice(PREFS_COOKIE.length + 1);
+}
+
+/** Browser only: the diner's current filters, as saved. */
+export function currentPrefsValue(): string {
+  return unsavedPrefs ?? readPrefsCookie() ?? serializePrefs(EMPTY_PREFS);
+}
+
 /** Browser only: saves filters on this device for a year. */
 export function writePrefsCookie(prefs: DinerPrefs): void {
-  document.cookie = `${PREFS_COOKIE}=${serializePrefs(prefs)}; path=/; max-age=31536000; samesite=lax`;
+  const value = serializePrefs(prefs);
+  document.cookie = `${PREFS_COOKIE}=${value}; path=/; max-age=31536000; samesite=lax`;
+  unsavedPrefs = readPrefsCookie() === value ? null : value;
   window.dispatchEvent(new Event("carte-prefs-change"));
   try {
     localStorage.setItem("carte-prefs-change", String(Date.now()));

@@ -1,22 +1,14 @@
 "use client";
 import { useMemo, useSyncExternalStore } from "react";
 import {
-  EMPTY_PREFS,
-  PREFS_COOKIE,
+  currentPrefsValue,
   parsePrefs,
   serializePrefs,
   writePrefsCookie,
   type DinerPrefs,
 } from "@/lib/diner-prefs";
 
-function snapshot(): string {
-  return (
-    document.cookie
-      .split("; ")
-      .find((entry) => entry.startsWith(`${PREFS_COOKIE}=`))
-      ?.slice(PREFS_COOKIE.length + 1) ?? serializePrefs(EMPTY_PREFS)
-  );
-}
+const snapshot = currentPrefsValue;
 function subscribe(listener: () => void) {
   window.addEventListener("carte-prefs-change", listener);
   window.addEventListener("storage", listener);

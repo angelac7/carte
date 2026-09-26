@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 import QRCode from "qrcode";
+import { EmbedCode } from "@/components/owner/EmbedCode";
 import { OwnerPageHeader } from "@/components/owner/OwnerPageHeader";
 import { PrintButton } from "@/components/PrintButton";
 import { ButtonLink } from "@/components/ui/button";
@@ -25,6 +26,8 @@ export default async function QrPage() {
   });
   const qrSrc = `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
   const isLocalOnly = host.startsWith("localhost") || host.startsWith("127.");
+  const embedPath = `/embed/${restaurant.slug}`;
+  const embedCode = `<iframe src="${protocol}://${host}${embedPath}" title="${restaurant.name.replace(/"/g, "&quot;")} menu" loading="lazy" style="width:100%;height:900px;border:0;border-radius:16px"></iframe>`;
 
   return (
     <main id="main" className="mx-auto max-w-3xl px-5 py-12">
@@ -58,6 +61,26 @@ export default async function QrPage() {
           Open diner menu
         </ButtonLink>
       </div>
+
+      <section className="mt-12 rounded-panel bg-paper p-6 shadow-raised sm:p-8 print:hidden">
+        <h2 className="font-serif text-3xl tracking-tight">On your website</h2>
+        <p className="mt-2 text-sm text-muted">
+          Paste this code into your website to show your Carte menu there, with the same allergen
+          filters and languages. It updates by itself whenever you confirm changes. Most website
+          builders have an &ldquo;Embed&rdquo; or &ldquo;HTML&rdquo; block for code like this.
+        </p>
+        <div className="mt-5">
+          <EmbedCode code={embedCode} />
+        </div>
+        <a
+          href={embedPath}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-4 inline-block text-sm font-medium underline underline-offset-4"
+        >
+          Preview how it looks <span aria-hidden="true">↗</span>
+        </a>
+      </section>
     </main>
   );
 }

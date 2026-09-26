@@ -30,6 +30,8 @@ test("a new owner sets up, adds and confirms a dish, and diners see it", async (
   const sheet = page.getByRole("dialog");
   await sheet.getByLabel("Dish name").fill("Butter Chicken");
   await sheet.getByLabel("Price").fill("$18");
+  // English, so the English-speaking test diner doesn't trigger AI translation.
+  await sheet.getByLabel("Language of the dish text").fill("en");
   await sheet.getByRole("button", { name: "Add dish" }).click();
   await expect(page.getByRole("heading", { name: "Butter Chicken" })).toBeVisible();
 

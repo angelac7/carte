@@ -70,6 +70,8 @@ export async function createRestaurant(
     body: JSON.stringify(
       dishes.map((dish, index) => ({
         restaurant_id: restaurant.id,
+        // Marked as English, so English-speaking test diners never trigger AI translation.
+        source_language: "en",
         name: dish.name,
         price: dish.price,
         description: "",
