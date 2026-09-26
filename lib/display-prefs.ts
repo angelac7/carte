@@ -6,6 +6,8 @@ export type DisplayPrefs = {
   highContrast: boolean;
   /** Also show approximate prices in this currency, like "JPY". */
   currency?: string;
+  /** Light or dark whatever the phone says; unset follows the phone. */
+  theme?: "light" | "dark";
 };
 
 export const DEFAULT_DISPLAY: DisplayPrefs = { largeText: false, highContrast: false };
@@ -14,10 +16,12 @@ export function parseDisplay(raw: string | undefined): DisplayPrefs {
   if (!raw) return DEFAULT_DISPLAY;
   const parts = raw.split(".");
   const currency = parts.find((part) => /^cur-[A-Z]{3}$/.test(part))?.slice(4);
+  const theme = parts.includes("dark") ? "dark" : parts.includes("light") ? "light" : undefined;
   return {
     largeText: parts.includes("large"),
     highContrast: parts.includes("contrast"),
     ...(currency ? { currency } : {}),
+    ...(theme ? { theme } : {}),
   };
 }
 
@@ -26,6 +30,8 @@ export function serializeDisplay(prefs: DisplayPrefs): string {
     prefs.largeText && "large",
     prefs.highContrast && "contrast",
     prefs.currency && /^[A-Z]{3}$/.test(prefs.currency) && `cur-${prefs.currency}`,
+    prefs.theme === "dark" && "dark",
+    prefs.theme === "light" && "light",
   ].filter(Boolean);
   return parts.length > 0 ? parts.join(".") : "default";
 }
@@ -40,4 +46,6 @@ export function applyDisplay(prefs: DisplayPrefs): void {
   const root = document.documentElement;
   root.classList.toggle("large-text", prefs.largeText);
   root.classList.toggle("high-contrast", prefs.highContrast);
+  root.classList.toggle("theme-dark", prefs.theme === "dark");
+  root.classList.toggle("theme-light", prefs.theme === "light");
 }

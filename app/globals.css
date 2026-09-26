@@ -102,12 +102,97 @@ html {
   color-scheme: light;
 }
 
+/*
+ * Dark: follows the phone's setting, unless the diner picked light or dark in display settings.
+ * Screen only, so printed menus and charts are always dark ink on white. The two blocks below
+ * must match.
+ */
+@media screen and (prefers-color-scheme: dark) {
+  html:not(.theme-light) {
+    color-scheme: dark;
+    --color-paper: #15181d;
+    --color-card: #15181d;
+    --color-ink: #e9edf2;
+    /* White and ink trade places, so inverted sections and filled buttons stay readable. */
+    --color-white: #0b0d11;
+    --color-muted: #a0aab7;
+    --color-line: #313843;
+    --color-accent: #8aa9ff;
+    --color-accent-glow: #b3c7ff;
+    --color-basil: #66cc92;
+    --color-basil-soft: #17291f;
+    --color-saffron: #e4ab3a;
+    --color-saffron-soft: #2b2311;
+    --color-saffron-ink: #f4c96f;
+    --color-tomato: #ff8b82;
+    --depth-light: rgb(255 255 255 / 0.05);
+    --depth-dark: rgb(0 0 0 / 0.55);
+    --depth-raised-lg: 12px 12px 22px rgb(0 0 0 / 0.6), -12px -12px 22px rgb(255 255 255 / 0.06);
+    --depth-well:
+      inset 10px 10px 20px rgb(0 0 0 / 0.6), inset -10px -10px 20px rgb(255 255 255 / 0.05);
+    --depth-pressed-color:
+      inset 3px 3px 7px rgb(0 0 0 / 0.3), inset -3px -3px 7px rgb(255 255 255 / 0.25);
+  }
+
+  /* Inverted sections, like the menu header and footer, stay dark with white text. */
+  html:not(.theme-light) .texture-ink {
+    --color-ink: #0a0c10;
+    --color-white: #ffffff;
+    --color-accent: #1a47e8;
+    --color-accent-glow: #5b8cff;
+  }
+}
+@media screen {
+  html.theme-dark {
+    color-scheme: dark;
+    --color-paper: #15181d;
+    --color-card: #15181d;
+    --color-ink: #e9edf2;
+    /* White and ink trade places, so inverted sections and filled buttons stay readable. */
+    --color-white: #0b0d11;
+    --color-muted: #a0aab7;
+    --color-line: #313843;
+    --color-accent: #8aa9ff;
+    --color-accent-glow: #b3c7ff;
+    --color-basil: #66cc92;
+    --color-basil-soft: #17291f;
+    --color-saffron: #e4ab3a;
+    --color-saffron-soft: #2b2311;
+    --color-saffron-ink: #f4c96f;
+    --color-tomato: #ff8b82;
+    --depth-light: rgb(255 255 255 / 0.05);
+    --depth-dark: rgb(0 0 0 / 0.55);
+    --depth-raised-lg: 12px 12px 22px rgb(0 0 0 / 0.6), -12px -12px 22px rgb(255 255 255 / 0.06);
+    --depth-well:
+      inset 10px 10px 20px rgb(0 0 0 / 0.6), inset -10px -10px 20px rgb(255 255 255 / 0.05);
+    --depth-pressed-color:
+      inset 3px 3px 7px rgb(0 0 0 / 0.3), inset -3px -3px 7px rgb(255 255 255 / 0.25);
+  }
+
+  /* Inverted sections, like the menu header and footer, stay dark with white text. */
+  html.theme-dark .texture-ink {
+    --color-ink: #0a0c10;
+    --color-white: #ffffff;
+    --color-accent: #1a47e8;
+    --color-accent-glow: #5b8cff;
+  }
+}
+
 html.large-text {
   font-size: 118.75%;
 }
 
-/* High contrast: white surfaces, and solid outlines instead of soft shadows. */
+/* High contrast: white surfaces, and solid outlines instead of soft shadows. Always light. */
 html.high-contrast {
+  color-scheme: light;
+  --color-ink: #0a0c10;
+  --color-white: #ffffff;
+  --color-accent: #1a47e8;
+  --color-accent-glow: #5b8cff;
+  --color-basil: #22683f;
+  --color-basil-soft: #e6f1ea;
+  --color-saffron: #c98a0c;
+  --color-tomato: #b3261e;
   --color-paper: #ffffff;
   --color-card: #ffffff;
   --color-muted: #2a3542;

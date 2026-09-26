@@ -1,4 +1,5 @@
 import "server-only";
+import { LANGUAGES } from "@/lib/languages";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { ImageResponse } from "next/og";
@@ -101,7 +102,7 @@ export async function shareImage({ title, subtitle, photo }: ShareCardProps) {
               color: dark ? "#fff" : ACCENT,
             }}
           >
-            Allergen filters · 7 languages
+            {`Allergen filters · ${LANGUAGES.length} languages`}
           </span>
         </div>
       </div>

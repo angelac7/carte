@@ -47,6 +47,26 @@ export function DisplaySettings({
           onToggle={() => onChange({ ...display, highContrast: !display.highContrast })}
         />
       </div>
+      <fieldset className="mt-6">
+        <legend className="text-sm font-medium">{t.colors}</legend>
+        <div className="mt-2 flex flex-wrap gap-2">
+          {(
+            [
+              [undefined, t.themeAuto],
+              ["light", t.themeLight],
+              ["dark", t.themeDark],
+            ] as const
+          ).map(([theme, label]) => (
+            <ToggleChip
+              key={label}
+              label={label}
+              tone="ink"
+              pressed={display.theme === theme}
+              onToggle={() => onChange({ ...display, theme })}
+            />
+          ))}
+        </div>
+      </fieldset>
       {conversion && (
         <label className="mt-6 block">
           <span className="text-sm font-medium">{t.showPricesIn}</span>

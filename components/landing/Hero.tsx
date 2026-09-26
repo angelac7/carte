@@ -3,6 +3,7 @@ import { MenuDemo } from "@/components/landing/MenuDemo";
 import { BlurFade } from "@/components/motion/BlurFade";
 import { WordRotate } from "@/components/motion/WordRotate";
 import { ButtonLink } from "@/components/ui/button";
+import { LANGUAGES } from "@/lib/languages";
 
 const LANGUAGE_PHRASES = [
   "in Korean.",
@@ -25,7 +26,9 @@ export function Hero() {
       <div className="mx-auto grid w-full max-w-6xl items-center gap-14 px-5 pt-14 pb-20 sm:pt-20 lg:grid-cols-[1.25fr_1fr] lg:pt-24 lg:pb-28">
         <div>
           <BlurFade>
-            <p className="eyebrow text-muted">Allergen-confirmed menus · 7 languages</p>
+            <p className="eyebrow text-muted">
+              Allergen-confirmed menus · {LANGUAGES.length} languages
+            </p>
           </BlurFade>
           <BlurFade delay={0.08}>
             <h1 className="mt-6 font-serif text-[clamp(3.5rem,15vw,9.5rem)] leading-[0.88] tracking-tighter">

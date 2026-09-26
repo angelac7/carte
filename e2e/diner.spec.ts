@@ -174,3 +174,20 @@ test("diners can see approximate prices in their own currency", async ({ page })
   await page.reload();
   await expect(dishCard(page, "Green Salad")).toContainText(/≈ [¥￥][\d,]+/);
 });
+
+test("diners can switch the menu to dark colors, or follow their phone", async ({ browser }) => {
+  const page = await (await browser.newContext({ colorScheme: "light" })).newPage();
+  const background = () => page.evaluate(() => getComputedStyle(document.body).backgroundColor);
+  await page.goto(`/r/${slug}`);
+  const light = await background();
+  await page.getByRole("button", { name: "Display" }).click();
+  await page.getByRole("dialog").getByRole("button", { name: "Dark", exact: true }).click();
+  await expect(page.locator("html")).toHaveClass(/theme-dark/);
+  expect(await background()).not.toBe(light);
+
+  const phone = await (await browser.newContext({ colorScheme: "dark" })).newPage();
+  await phone.goto(`/r/${slug}`);
+  expect(await phone.evaluate(() => getComputedStyle(document.body).backgroundColor)).not.toBe(
+    light,
+  );
+});

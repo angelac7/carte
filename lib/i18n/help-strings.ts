@@ -23,6 +23,11 @@ export type HelpStrings = {
   display: string;
   largeText: string;
   highContrast: string;
+  /** Light or dark colors, or following the phone. */
+  colors: string;
+  themeAuto: string;
+  themeLight: string;
+  themeDark: string;
   /** Approximate prices in the diner's own currency. */
   showPricesIn: string;
   dontConvert: string;
@@ -55,6 +60,10 @@ export const HELP_STRINGS: Record<LanguageCode, HelpStrings> = {
     display: "Display",
     largeText: "Larger text",
     highContrast: "High contrast",
+    colors: "Colors",
+    themeAuto: "Match my phone",
+    themeLight: "Light",
+    themeDark: "Dark",
     showPricesIn: "Also show prices in",
     dontConvert: "Don't convert",
     ratesNote: (date) =>
@@ -85,6 +94,10 @@ export const HELP_STRINGS: Record<LanguageCode, HelpStrings> = {
     display: "Pantalla",
     largeText: "Texto más grande",
     highContrast: "Alto contraste",
+    colors: "Colores",
+    themeAuto: "Como mi teléfono",
+    themeLight: "Claro",
+    themeDark: "Oscuro",
     showPricesIn: "Mostrar también los precios en",
     dontConvert: "No convertir",
     ratesNote: (date) =>
@@ -114,6 +127,10 @@ export const HELP_STRINGS: Record<LanguageCode, HelpStrings> = {
     display: "显示",
     largeText: "放大文字",
     highContrast: "高对比度",
+    colors: "颜色",
+    themeAuto: "跟随手机设置",
+    themeLight: "浅色",
+    themeDark: "深色",
     showPricesIn: "同时以此货币显示价格",
     dontConvert: "不换算",
     ratesNote: (date) => `约数，按欧洲央行 ${date} 的汇率计算。实际以菜单货币付款。`,
@@ -142,6 +159,10 @@ export const HELP_STRINGS: Record<LanguageCode, HelpStrings> = {
     display: "화면 설정",
     largeText: "큰 글씨",
     highContrast: "고대비",
+    colors: "색상",
+    themeAuto: "휴대폰 설정 따르기",
+    themeLight: "밝게",
+    themeDark: "어둡게",
     showPricesIn: "가격을 다음 통화로도 표시",
     dontConvert: "변환 안 함",
     ratesNote: (date) =>
@@ -172,6 +193,10 @@ export const HELP_STRINGS: Record<LanguageCode, HelpStrings> = {
     display: "表示",
     largeText: "文字を大きく",
     highContrast: "ハイコントラスト",
+    colors: "表示色",
+    themeAuto: "スマホの設定に合わせる",
+    themeLight: "ライト",
+    themeDark: "ダーク",
     showPricesIn: "次の通貨でも価格を表示",
     dontConvert: "換算しない",
     ratesNote: (date) =>
@@ -202,6 +227,10 @@ export const HELP_STRINGS: Record<LanguageCode, HelpStrings> = {
     display: "Affichage",
     largeText: "Texte plus grand",
     highContrast: "Contraste élevé",
+    colors: "Couleurs",
+    themeAuto: "Comme mon téléphone",
+    themeLight: "Clair",
+    themeDark: "Sombre",
     showPricesIn: "Afficher aussi les prix en",
     dontConvert: "Ne pas convertir",
     ratesNote: (date) =>
@@ -231,6 +260,10 @@ export const HELP_STRINGS: Record<LanguageCode, HelpStrings> = {
     display: "Hiển thị",
     largeText: "Chữ lớn hơn",
     highContrast: "Độ tương phản cao",
+    colors: "Màu",
+    themeAuto: "Theo điện thoại",
+    themeLight: "Sáng",
+    themeDark: "Tối",
     showPricesIn: "Hiển thị thêm giá bằng",
     dontConvert: "Không quy đổi",
     ratesNote: (date) =>
@@ -262,6 +295,10 @@ export const HELP_STRINGS: Record<LanguageCode, HelpStrings> = {
     display: "Exibição",
     largeText: "Texto maior",
     highContrast: "Alto contraste",
+    colors: "Cores",
+    themeAuto: "Igual ao meu celular",
+    themeLight: "Claro",
+    themeDark: "Escuro",
     showPricesIn: "Mostrar também os preços em",
     dontConvert: "Não converter",
     ratesNote: (date) =>
@@ -292,6 +329,10 @@ export const HELP_STRINGS: Record<LanguageCode, HelpStrings> = {
     display: "Anzeige",
     largeText: "Größere Schrift",
     highContrast: "Hoher Kontrast",
+    colors: "Farben",
+    themeAuto: "Wie mein Handy",
+    themeLight: "Hell",
+    themeDark: "Dunkel",
     showPricesIn: "Preise auch anzeigen in",
     dontConvert: "Nicht umrechnen",
     ratesNote: (date) =>
@@ -322,6 +363,10 @@ export const HELP_STRINGS: Record<LanguageCode, HelpStrings> = {
     display: "العرض",
     largeText: "نص أكبر",
     highContrast: "تباين عالٍ",
+    colors: "الألوان",
+    themeAuto: "حسب إعداد هاتفي",
+    themeLight: "فاتح",
+    themeDark: "داكن",
     showPricesIn: "اعرض الأسعار أيضًا بعملة",
     dontConvert: "بدون تحويل",
     ratesNote: (date) =>
@@ -351,6 +396,10 @@ export const HELP_STRINGS: Record<LanguageCode, HelpStrings> = {
     display: "डिस्प्ले",
     largeText: "बड़ा टेक्स्ट",
     highContrast: "हाई कंट्रास्ट",
+    colors: "रंग",
+    themeAuto: "फ़ोन की सेटिंग जैसा",
+    themeLight: "हल्का",
+    themeDark: "गहरा",
     showPricesIn: "कीमतें इस मुद्रा में भी दिखाएँ",
     dontConvert: "बदलें नहीं",
     ratesNote: (date) =>
@@ -380,6 +429,10 @@ export const HELP_STRINGS: Record<LanguageCode, HelpStrings> = {
     display: "การแสดงผล",
     largeText: "ตัวอักษรใหญ่ขึ้น",
     highContrast: "คอนทราสต์สูง",
+    colors: "สี",
+    themeAuto: "ตามโทรศัพท์",
+    themeLight: "สว่าง",
+    themeDark: "มืด",
     showPricesIn: "แสดงราคาเป็นสกุลเงินนี้ด้วย",
     dontConvert: "ไม่ต้องแปลง",
     ratesNote: (date) =>
@@ -410,6 +463,10 @@ export const HELP_STRINGS: Record<LanguageCode, HelpStrings> = {
     display: "Display",
     largeText: "Mas malaking teksto",
     highContrast: "Mataas na contrast",
+    colors: "Kulay",
+    themeAuto: "Katulad ng phone ko",
+    themeLight: "Maliwanag",
+    themeDark: "Madilim",
     showPricesIn: "Ipakita rin ang presyo sa",
     dontConvert: "Huwag i-convert",
     ratesNote: (date) =>

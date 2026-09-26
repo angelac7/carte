@@ -1,4 +1,5 @@
 import Link from "@/components/OfflineLink";
+import { LANGUAGES } from "@/lib/languages";
 import { FeatureShowcase, type Feature } from "@/components/landing/FeatureShowcase";
 import { Hero } from "@/components/landing/Hero";
 import { BlurFade } from "@/components/motion/BlurFade";
@@ -41,7 +42,7 @@ const STATS = [
 const OWNER_POINTS = [
   "Snap a photo of your menu, and your dishes start appearing within seconds.",
   "Confirm allergens dish by dish. Nothing reaches diners until you do.",
-  "Print a QR code. Diners read your menu in 7 languages and get answers to their questions.",
+  `Print a QR code. Diners read your menu in ${LANGUAGES.length} languages and get answers to their questions.`,
   "Show up on Carte Discover and the map, with your hours and occasions.",
 ];
 

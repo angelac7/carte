@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { DM_Sans, JetBrains_Mono, Playfair_Display } from "next/font/google";
 import { MotionProvider } from "@/components/motion/MotionProvider";
 import { ServiceWorkerRegistration } from "@/components/ServiceWorkerRegistration";
@@ -32,6 +32,14 @@ export const metadata: Metadata = {
   icons: { icon: "/icon.svg", apple: "/icon.svg" },
   openGraph: { siteName: "Carte", type: "website", title: "Carte", description: DESCRIPTION },
   twitter: { card: "summary_large_image" },
+};
+
+// The phone's top bar matches the page, in light and dark.
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#e0e5ec" },
+    { media: "(prefers-color-scheme: dark)", color: "#15181d" },
+  ],
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

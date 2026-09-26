@@ -61,7 +61,7 @@ export function Sheet({ title, closeLabel, onClose, children, media, subtitle }:
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="fixed inset-0 z-30 flex items-end justify-center bg-ink/45 backdrop-blur-sm sm:items-center print:hidden"
+      className="fixed inset-0 z-30 flex items-end justify-center bg-black/45 backdrop-blur-sm sm:items-center print:hidden"
       onClick={onClose}
     >
       <motion.section

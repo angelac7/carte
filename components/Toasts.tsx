@@ -9,7 +9,8 @@ export function Toasts() {
       toastOptions={{
         style: {
           background: "var(--color-ink)",
-          color: "#ffffff",
+          // The theme's white, which is dark ink in dark mode, like every inverted section.
+          color: "var(--color-white)",
           border: "none",
           borderRadius: "1rem",
           boxShadow: "var(--depth-raised)",
