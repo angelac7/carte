@@ -135,6 +135,7 @@ export function DinerMenu({
   const [byLanguage, setByLanguage] = useState<TranslationState>({});
   const [prefs, setPrefs] = useDinerPrefs(initialPrefs);
   const { avoid, onlyTags } = prefs;
+  const alsoAvoid = prefs.alsoAvoid ?? [];
   // Facts about the kitchen, with the ones about the diner's allergies first.
   const kitchenPractices = practicesFor(restaurant.kitchen_practices ?? [], avoid);
   const table = useTableOrder(restaurant.slug, initialTableCode);
@@ -250,7 +251,7 @@ export function DinerMenu({
 
   // Clears everything shown as a pill, in one save so no setting overwrites another.
   function clearAllFilters() {
-    setPrefs({ ...prefs, avoid: [], onlyTags: [], maxSpice: undefined });
+    setPrefs({ ...prefs, avoid: [], onlyTags: [], alsoAvoid: [], maxSpice: undefined });
     setMaxPrice(null);
   }
 
@@ -278,8 +279,8 @@ export function DinerMenu({
   // labels saying so. AI features never get those dishes.
   const shown = filterDishes(
     dishes,
-    { avoid, onlyTags },
-    { allowRemovable: true, allowTraces: !prefs.hideTraces },
+    { avoid, onlyTags, alsoAvoid },
+    { allowRemovable: true, allowTraces: !prefs.hideTraces, allowUncheckedAlso: true },
   );
   // Dishes hidden only because they were never checked for an allergen this diner avoids.
   const uncheckedDishes = dishes.filter(
@@ -292,7 +293,7 @@ export function DinerMenu({
     ...new Set(uncheckedDishes.flatMap((dish) => uncheckedAllergens(dish.allergen_list, avoid))),
   ];
   const hiddenCount = dishes.length - shown.length;
-  const filtering = avoid.length > 0 || onlyTags.length > 0;
+  const filtering = avoid.length > 0 || onlyTags.length > 0 || alsoAvoid.length > 0;
   const shownById = new Map(shown.map((dish) => [dish.id, dish]));
   // A line stays in the order only while its dish, and every add-on on it, passes the filters.
   const lineAllowed = (key: string) => {
@@ -478,6 +479,10 @@ export function DinerMenu({
           onRemoveTag={(tag) => updateFilters(avoid, toggleValue(onlyTags, tag))}
           onClearFilters={clearAllFilters}
           extraPills={[
+            ...alsoAvoid.map((item) => ({
+              label: t.avoidPill(t.alsoAvoid[item]),
+              onRemove: () => setPrefs({ ...prefs, alsoAvoid: toggleValue(alsoAvoid, item) }),
+            })),
             ...(prefs.maxSpice !== undefined
               ? [
                   {
@@ -665,6 +670,7 @@ export function DinerMenu({
                         }
                         t={t}
                         avoid={avoid}
+                        alsoAvoid={alsoAvoid}
                         detailsLabel={dishText.details}
                         explainLabel={dishText.explainLink}
                         stepperLabels={tableText}
@@ -717,6 +723,8 @@ export function DinerMenu({
           closeLabel={tableText.close}
           avoid={avoid}
           onlyTags={onlyTags}
+          alsoAvoid={alsoAvoid}
+          onAlsoAvoid={(next) => setPrefs({ ...prefs, alsoAvoid: next })}
           shownCount={comfortable.length}
           hideTraces={prefs.hideTraces}
           onHideTraces={(hideTraces) => setPrefs({ ...prefs, hideTraces })}
@@ -737,6 +745,7 @@ export function DinerMenu({
           dish={openDish}
           text={textFor(openDish)}
           avoid={avoid}
+          alsoAvoid={alsoAvoid}
           language={language}
           restaurantSlug={restaurant.slug}
           onExplained={(insight) => rememberSummary(openDish, insight.summary)}
@@ -768,6 +777,7 @@ export function DinerMenu({
           textFor={textFor}
           language={language}
           avoid={avoid}
+          alsoAvoid={alsoAvoid}
           severity={prefs.severity}
           onQuantity={setQuantity}
           onClear={table.clear}
@@ -783,6 +793,8 @@ export function DinerMenu({
           staffLanguage={staffLanguage}
           language={language}
           avoid={avoid}
+          alsoAvoid={alsoAvoid}
+          onToggleAlso={(item) => setPrefs({ ...prefs, alsoAvoid: toggleValue(alsoAvoid, item) })}
           severity={prefs.severity}
           onSeverity={(severity) => setPrefs({ ...prefs, severity })}
           onToggle={(allergen) => updateFilters(toggleValue(avoid, allergen), onlyTags)}
@@ -791,12 +803,13 @@ export function DinerMenu({
       )}
       {panel === "helper" && (
         <OrderHelper
-          key={JSON.stringify([language, avoid, onlyTags])}
+          key={JSON.stringify([language, avoid, onlyTags, alsoAvoid])}
           restaurantSlug={restaurant.slug}
           language={language}
           dishes={shown}
           avoid={avoid}
           onlyTags={onlyTags}
+          alsoAvoid={alsoAvoid}
           order={filteredOrder}
           textFor={textFor}
           onQuantity={setQuantity}
@@ -816,9 +829,10 @@ export function DinerMenu({
       )}
       {panel === "photo" && (
         <PhotoLookup
-          key={JSON.stringify([language, avoid, onlyTags])}
+          key={JSON.stringify([language, avoid, onlyTags, alsoAvoid])}
           avoid={avoid}
           onlyTags={onlyTags}
+          alsoAvoid={alsoAvoid}
           restaurantSlug={restaurant.slug}
           language={language}
           dishes={dishes}
@@ -829,9 +843,10 @@ export function DinerMenu({
         />
       )}
       <MenuChat
-        key={JSON.stringify([restaurant.slug, language, avoid, onlyTags])}
+        key={JSON.stringify([restaurant.slug, language, avoid, onlyTags, alsoAvoid])}
         avoid={avoid}
         onlyTags={onlyTags}
+        alsoAvoid={alsoAvoid}
         language={language}
         restaurantSlug={restaurant.slug}
         open={panel === "chat"}

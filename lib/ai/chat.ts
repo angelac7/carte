@@ -1,4 +1,4 @@
-import { ALLERGENS, NEWER_ALLERGENS } from "@/lib/allergens";
+import { ALLERGENS, NEWER_ALLERGENS, OTHER_AVOIDS } from "@/lib/allergens";
 import { streamText } from "@/lib/ai/client";
 import { MAX_HISTORY, type ChatMessage } from "@/types/chat";
 import type { MenuItem } from "@/types/menu";
@@ -14,6 +14,7 @@ function menuPrompt(dishes: MenuItem[]): string {
     allergens_checked: (dish.allergen_list ?? 1) >= 2 ? "all 14" : "original 9",
     can_be_made_without: dish.removable ?? [],
     may_contain: dish.may_contain ?? [],
+    also_contains: dish.also_checked ? (dish.also_contains ?? []) : "not checked",
     dietary_tags: dish.dietary_tags,
     kitchen_notes: dish.notes,
   }));
@@ -32,6 +33,7 @@ Rules:
 - If the menu is empty, say the menu isn't available yet and suggest asking their server.
 
 - may_contain lists allergens not in the recipe that may still get in, like through a shared fryer. Mention them when relevant. can_be_made_without lists allergens the kitchen can leave out on request; the diner must ask their server.
+- also_contains lists other things some diners avoid (${OTHER_AVOIDS.join(", ")}) that the restaurant marked. If it is "not checked", say the restaurant hasn't said and to ask their server. Never say a dish is free of them.
 - Dishes whose allergens_checked is "original 9" were not checked for ${NEWER_ALLERGENS.join(", ")}. If asked about those for such a dish, say it hasn't been checked and to ask their server.
 
 Menu data (JSON; allergens were confirmed by the restaurant from these ${ALLERGENS.length}: ${ALLERGENS.join(", ")}):

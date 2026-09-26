@@ -6,7 +6,7 @@ import { QuantityStepper } from "@/components/QuantityStepper";
 import { Sheet } from "@/components/Sheet";
 import { Button } from "@/components/ui/button";
 import { fieldClass } from "@/components/ui/field";
-import type { Allergen } from "@/lib/allergens";
+import type { Allergen, OtherAvoid } from "@/lib/allergens";
 import type { Severity } from "@/lib/diner-prefs";
 import { splitBill, type BillLine } from "@/lib/bill";
 import { TABLE_STRINGS } from "@/lib/i18n/table-strings";
@@ -23,6 +23,8 @@ type OrderSheetProps = {
   language: LanguageCode;
   staffLanguage?: LanguageCode;
   avoid: Allergen[];
+  /** Other things the diner doesn't eat, told to staff with the allergies. */
+  alsoAvoid?: OtherAvoid[];
   severity?: Severity;
   onQuantity: (lineKey: string, quantity: number) => void;
   onClear: () => void;
@@ -61,6 +63,7 @@ export function OrderSheet({
   language,
   staffLanguage = "en",
   avoid,
+  alsoAvoid = [],
   severity = "allergy",
   onQuantity,
   onClear,
@@ -118,11 +121,12 @@ export function OrderSheet({
             </li>
           ))}
         </ul>
-        {avoid.length > 0 && (
+        {(avoid.length > 0 || alsoAvoid.length > 0) && (
           <div className="mt-6 rounded-control border-2 border-tomato p-4">
             <AllergyStatement
               language={staffLanguage}
               avoid={avoid}
+              alsoAvoid={alsoAvoid}
               severity={severity}
               large={false}
             />

@@ -83,6 +83,7 @@ it("persists validated Discover filters before opening results", () => {
   expect(parsePrefs(response.cookies.get(PREFS_COOKIE)?.value)).toEqual({
     avoid: ["milk"],
     onlyTags: ["vegan"],
+    alsoAvoid: [],
     hideTraces: true,
     severity: "allergy",
   });

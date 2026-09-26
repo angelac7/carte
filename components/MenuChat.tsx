@@ -27,6 +27,7 @@ export function MenuChat({
   onClose,
   avoid,
   onlyTags,
+  alsoAvoid,
 }: MenuChatProps) {
   const t = CHAT_STRINGS[language];
   const help = HELP_STRINGS[language];
@@ -66,7 +67,7 @@ export function MenuChat({
         language,
         next,
         (answer) => setMessages([...next, { role: "assistant", content: answer }]),
-        { avoid, onlyTags },
+        { avoid, onlyTags, alsoAvoid },
       );
       setMessages([...next, { role: "assistant", content: reply }]);
     } catch (err) {

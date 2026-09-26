@@ -29,7 +29,7 @@ export type Restaurant = {
 const RESTAURANT_COLUMNS =
   "id, name, slug, cuisine, city, timezone, phone, website, reservation_url, price_range, logo_url, cover_url, suspended, kitchen_practices";
 const DISH_COLUMNS =
-  "id, name, description, price, allergens, dietary_tags, notes, confirmed, photo_url, revision, source_language, section, sort_order, sold_out_on, special, available_from, available_until, sizes, addons, allergen_list, removable, may_contain, spice";
+  "id, name, description, price, allergens, dietary_tags, notes, confirmed, photo_url, revision, source_language, section, sort_order, sold_out_on, special, available_from, available_until, sizes, addons, allergen_list, removable, may_contain, spice, also_contains, also_checked";
 
 /** Every restaurant a person can work on: the ones they own first, then ones they help edit. */
 export async function listMyRestaurants(
@@ -205,8 +205,10 @@ export async function updateDish(
       ...(dish.may_contain !== undefined && {
         may_contain: dish.may_contain.filter((allergen) => !dish.allergens.includes(allergen)),
       }),
+      ...(dish.also_contains !== undefined && { also_contains: dish.also_contains }),
       // Set only when the owner presses Confirm, never passed through from a request.
       ...(dish.allergen_list !== undefined && { allergen_list: dish.allergen_list }),
+      ...(dish.also_checked !== undefined && { also_checked: dish.also_checked }),
       ...(dish.addons !== undefined && { addons: dish.addons }),
       ...(dish.available_from !== undefined && {
         available_from: dish.available_from,

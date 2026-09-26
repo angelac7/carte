@@ -1,4 +1,4 @@
-import type { Allergen, DietaryTag, KitchenPractice } from "@/lib/allergens";
+import type { Allergen, DietaryTag, KitchenPractice, OtherAvoid } from "@/lib/allergens";
 import type { LanguageCode } from "@/lib/languages";
 
 // Allergen names are safety-critical and are never AI-generated.
@@ -22,6 +22,11 @@ export type DinerStrings = {
   /** Heading for the owner's kitchen practices, which have fixed translations. */
   kitchenTitle: string;
   kitchenPractices: Record<KitchenPractice, string>;
+  /** Other things diners avoid, like pork; fixed translations like allergen names. */
+  alsoAvoidTitle: string;
+  alsoAvoid: Record<OtherAvoid, string>;
+  alsoContains: string;
+  alsoUnchecked: (items: string) => string;
   translating: string;
   translationFailed: string;
   offlineMenu: string;
@@ -154,6 +159,18 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
       "flour-in-kitchen": "Wheat flour is used in this kitchen.",
       "shellfish-in-kitchen": "Shellfish is cooked in this kitchen.",
     },
+    alsoAvoidTitle: "Also hide dishes with",
+    alsoAvoid: {
+      pork: "pork",
+      beef: "beef",
+      alcohol: "alcohol",
+      onion: "onion",
+      garlic: "garlic",
+      cilantro: "cilantro",
+    },
+    alsoContains: "Also contains",
+    alsoUnchecked: (items) =>
+      `The restaurant hasn't said whether this has ${items}. Ask your server.`,
     translating: "Translating menu…",
     translationFailed:
       "Translation isn't available right now, so the menu is shown in its original language.",
@@ -265,6 +282,18 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
       "flour-in-kitchen": "En esta cocina se usa harina de trigo.",
       "shellfish-in-kitchen": "En esta cocina se preparan mariscos.",
     },
+    alsoAvoidTitle: "Ocultar también platos con",
+    alsoAvoid: {
+      pork: "cerdo",
+      beef: "res",
+      alcohol: "alcohol",
+      onion: "cebolla",
+      garlic: "ajo",
+      cilantro: "cilantro",
+    },
+    alsoContains: "También contiene",
+    alsoUnchecked: (items) =>
+      `El restaurante no ha indicado si lleva ${items}. Pregunte a su mesero.`,
     translating: "Traduciendo el menú…",
     translationFailed:
       "La traducción no está disponible en este momento, así que el menú se muestra en su idioma original.",
@@ -367,6 +396,17 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
       "flour-in-kitchen": "本厨房使用小麦面粉。",
       "shellfish-in-kitchen": "本厨房烹制贝类海鲜。",
     },
+    alsoAvoidTitle: "同时隐藏含有以下成分的菜品",
+    alsoAvoid: {
+      pork: "猪肉",
+      beef: "牛肉",
+      alcohol: "酒精",
+      onion: "洋葱",
+      garlic: "大蒜",
+      cilantro: "香菜",
+    },
+    alsoContains: "还含有",
+    alsoUnchecked: (items) => `餐厅尚未说明此菜是否含有${items}。请询问服务员。`,
     translating: "正在翻译菜单…",
     translationFailed: "暂时无法翻译，菜单以原语言显示。",
     translatedNote: "菜品描述为自动翻译。如有不清楚之处，请询问服务员。",
@@ -472,6 +512,18 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
       "flour-in-kitchen": "이 주방에서는 밀가루를 사용합니다.",
       "shellfish-in-kitchen": "이 주방에서는 갑각류·조개류를 조리합니다.",
     },
+    alsoAvoidTitle: "다음이 들어간 요리도 숨기기",
+    alsoAvoid: {
+      pork: "돼지고기",
+      beef: "소고기",
+      alcohol: "알코올",
+      onion: "양파",
+      garlic: "마늘",
+      cilantro: "고수",
+    },
+    alsoContains: "그 밖에 들어간 것",
+    alsoUnchecked: (items) =>
+      `식당에서 ${items} 포함 여부를 아직 알려 주지 않았습니다. 직원에게 물어보세요.`,
     translating: "메뉴 번역 중…",
     translationFailed: "지금은 번역을 사용할 수 없어 원래 언어로 메뉴를 표시합니다.",
     translatedNote: "요리 설명은 자동 번역되었습니다. 궁금한 점은 직원에게 문의해 주세요.",
@@ -577,6 +629,18 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
       "flour-in-kitchen": "この厨房では小麦粉を使用しています。",
       "shellfish-in-kitchen": "この厨房では甲殻類・貝類を調理しています。",
     },
+    alsoAvoidTitle: "次を含む料理も隠す",
+    alsoAvoid: {
+      pork: "豚肉",
+      beef: "牛肉",
+      alcohol: "アルコール",
+      onion: "玉ねぎ",
+      garlic: "にんにく",
+      cilantro: "パクチー",
+    },
+    alsoContains: "そのほか含むもの",
+    alsoUnchecked: (items) =>
+      `${items}が入っているかどうか、お店はまだ記載していません。スタッフにお尋ねください。`,
     translating: "メニューを翻訳中…",
     translationFailed: "現在翻訳を利用できないため、元の言語でメニューを表示しています。",
     translatedNote: "料理の説明は自動翻訳です。不明な点はスタッフにお尋ねください。",
@@ -688,6 +752,18 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
       "flour-in-kitchen": "De la farine de blé est utilisée dans cette cuisine.",
       "shellfish-in-kitchen": "Des fruits de mer sont cuisinés dans cette cuisine.",
     },
+    alsoAvoidTitle: "Masquer aussi les plats avec",
+    alsoAvoid: {
+      pork: "porc",
+      beef: "bœuf",
+      alcohol: "alcool",
+      onion: "oignon",
+      garlic: "ail",
+      cilantro: "coriandre",
+    },
+    alsoContains: "Contient aussi",
+    alsoUnchecked: (items) =>
+      `Le restaurant n’a pas indiqué si ce plat contient : ${items}. Demandez au serveur.`,
     translating: "Traduction du menu…",
     translationFailed:
       "La traduction n'est pas disponible pour le moment ; le menu est affiché dans sa langue d'origine.",
@@ -795,6 +871,18 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
       "flour-in-kitchen": "Bếp này có dùng bột mì.",
       "shellfish-in-kitchen": "Bếp này có nấu động vật có vỏ.",
     },
+    alsoAvoidTitle: "Ẩn cả các món có",
+    alsoAvoid: {
+      pork: "thịt heo",
+      beef: "thịt bò",
+      alcohol: "rượu",
+      onion: "hành",
+      garlic: "tỏi",
+      cilantro: "ngò (rau mùi)",
+    },
+    alsoContains: "Cũng có",
+    alsoUnchecked: (items) =>
+      `Nhà hàng chưa cho biết món này có ${items} hay không. Hãy hỏi nhân viên phục vụ.`,
     translating: "Đang dịch thực đơn…",
     translationFailed: "Hiện không thể dịch, nên thực đơn được hiển thị bằng ngôn ngữ gốc.",
     translatedNote: "Mô tả món ăn được dịch tự động. Hãy hỏi nhân viên phục vụ nếu có gì chưa rõ.",
@@ -905,6 +993,18 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
       "flour-in-kitchen": "Esta cozinha usa farinha de trigo.",
       "shellfish-in-kitchen": "Esta cozinha prepara crustáceos.",
     },
+    alsoAvoidTitle: "Ocultar também pratos com",
+    alsoAvoid: {
+      pork: "carne de porco",
+      beef: "carne bovina",
+      alcohol: "álcool",
+      onion: "cebola",
+      garlic: "alho",
+      cilantro: "coentro",
+    },
+    alsoContains: "Também contém",
+    alsoUnchecked: (items) =>
+      `O restaurante não informou se este prato tem ${items}. Pergunte ao garçom.`,
     translating: "Traduzindo o cardápio…",
     translationFailed:
       "A tradução não está disponível agora, então o cardápio aparece no idioma original.",
@@ -1017,6 +1117,18 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
       "flour-in-kitchen": "In dieser Küche wird Weizenmehl verwendet.",
       "shellfish-in-kitchen": "In dieser Küche werden Krebstiere zubereitet.",
     },
+    alsoAvoidTitle: "Auch Gerichte ausblenden mit",
+    alsoAvoid: {
+      pork: "Schweinefleisch",
+      beef: "Rindfleisch",
+      alcohol: "Alkohol",
+      onion: "Zwiebeln",
+      garlic: "Knoblauch",
+      cilantro: "Koriander",
+    },
+    alsoContains: "Enthält außerdem",
+    alsoUnchecked: (items) =>
+      `Das Restaurant hat nicht angegeben, ob dieses Gericht ${items} enthält. Fragen Sie das Servicepersonal.`,
     translating: "Speisekarte wird übersetzt…",
     translationFailed:
       "Die Übersetzung ist gerade nicht verfügbar, daher wird die Karte in der Originalsprache gezeigt.",
@@ -1123,6 +1235,18 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
       "flour-in-kitchen": "يُستخدم دقيق القمح في هذا المطبخ.",
       "shellfish-in-kitchen": "تُطهى القشريات في هذا المطبخ.",
     },
+    alsoAvoidTitle: "إخفاء الأطباق التي تحتوي أيضًا على",
+    alsoAvoid: {
+      pork: "لحم الخنزير",
+      beef: "لحم البقر",
+      alcohol: "الكحول",
+      onion: "البصل",
+      garlic: "الثوم",
+      cilantro: "الكزبرة",
+    },
+    alsoContains: "يحتوي أيضًا على",
+    alsoUnchecked: (items) =>
+      `لم يوضح المطعم ما إذا كان هذا الطبق يحتوي على ${items}. اسأل النادل.`,
     translating: "جارٍ ترجمة القائمة…",
     translationFailed: "الترجمة غير متاحة الآن، لذا تُعرض القائمة بلغتها الأصلية.",
     translatedNote: "تُرجمت أوصاف الأطباق تلقائيًا. اسأل النادل إن كان هناك شيء غير واضح.",
@@ -1227,6 +1351,18 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
       "flour-in-kitchen": "इस रसोई में गेहूँ का आटा इस्तेमाल होता है।",
       "shellfish-in-kitchen": "इस रसोई में शेलफ़िश (झींगा, केकड़ा) पकाई जाती है।",
     },
+    alsoAvoidTitle: "इनवाले व्यंजन भी छिपाएँ",
+    alsoAvoid: {
+      pork: "सूअर का मांस",
+      beef: "गोमांस",
+      alcohol: "शराब",
+      onion: "प्याज़",
+      garlic: "लहसुन",
+      cilantro: "हरा धनिया",
+    },
+    alsoContains: "इसमें यह भी है",
+    alsoUnchecked: (items) =>
+      `रेस्तराँ ने नहीं बताया है कि इसमें ${items} है या नहीं। अपने वेटर से पूछें।`,
     translating: "मेन्यू का अनुवाद हो रहा है…",
     translationFailed: "अनुवाद अभी उपलब्ध नहीं है, इसलिए मेन्यू मूल भाषा में दिख रहा है।",
     translatedNote:
@@ -1330,6 +1466,17 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
       "flour-in-kitchen": "ครัวนี้ใช้แป้งสาลี",
       "shellfish-in-kitchen": "ครัวนี้ปรุงสัตว์น้ำมีเปลือก (กุ้ง ปู)",
     },
+    alsoAvoidTitle: "ซ่อนเมนูที่มีสิ่งเหล่านี้ด้วย",
+    alsoAvoid: {
+      pork: "เนื้อหมู",
+      beef: "เนื้อวัว",
+      alcohol: "แอลกอฮอล์",
+      onion: "หัวหอม",
+      garlic: "กระเทียม",
+      cilantro: "ผักชี",
+    },
+    alsoContains: "มีส่วนผสมของ",
+    alsoUnchecked: (items) => `ร้านยังไม่ได้ระบุว่าเมนูนี้มี${items}หรือไม่ โปรดสอบถามพนักงาน`,
     translating: "กำลังแปลเมนู…",
     translationFailed: "ยังแปลไม่ได้ในตอนนี้ จึงแสดงเมนูเป็นภาษาต้นฉบับ",
     translatedNote: "คำอธิบายเมนูแปลโดยอัตโนมัติ หากมีอะไรไม่ชัดเจน โปรดถามพนักงาน",
@@ -1437,6 +1584,18 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
       "flour-in-kitchen": "Gumagamit ng harina ng trigo sa kusinang ito.",
       "shellfish-in-kitchen": "Nagluluto ng shellfish (hipon, alimango) sa kusinang ito.",
     },
+    alsoAvoidTitle: "Itago rin ang mga putaheng may",
+    alsoAvoid: {
+      pork: "baboy",
+      beef: "baka",
+      alcohol: "alak",
+      onion: "sibuyas",
+      garlic: "bawang",
+      cilantro: "wansoy",
+    },
+    alsoContains: "May kasama ring",
+    alsoUnchecked: (items) =>
+      `Hindi pa sinasabi ng restawran kung may ${items} ito. Magtanong sa server.`,
     translating: "Isinasalin ang menu…",
     translationFailed:
       "Hindi available ang pagsasalin ngayon, kaya nasa orihinal na wika ang menu.",

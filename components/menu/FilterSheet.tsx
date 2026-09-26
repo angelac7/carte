@@ -2,7 +2,14 @@
 import { Sheet } from "@/components/Sheet";
 import { ToggleChip } from "@/components/ToggleChip";
 import { Button } from "@/components/ui/button";
-import { ALLERGENS, DIETARY_TAGS, type Allergen, type DietaryTag } from "@/lib/allergens";
+import {
+  ALLERGENS,
+  DIETARY_TAGS,
+  OTHER_AVOIDS,
+  type Allergen,
+  type DietaryTag,
+  type OtherAvoid,
+} from "@/lib/allergens";
 import type { DinerStrings } from "@/lib/i18n/diner-strings";
 import { formatWhole } from "@/lib/prices";
 import { toggleValue } from "@/lib/toggle-value";
@@ -12,6 +19,9 @@ type FilterSheetProps = {
   closeLabel: string;
   avoid: Allergen[];
   onlyTags: DietaryTag[];
+  /** Other things to hide, like pork or alcohol. */
+  alsoAvoid: OtherAvoid[];
+  onAlsoAvoid: (alsoAvoid: OtherAvoid[]) => void;
   /** How many dishes the current filters leave, so the button can say so. */
   shownCount: number;
   /** Also hide dishes that may contain traces of an avoided allergen. */
@@ -37,6 +47,8 @@ export function FilterSheet({
   closeLabel,
   avoid,
   onlyTags,
+  alsoAvoid,
+  onAlsoAvoid,
   shownCount,
   hideTraces,
   onHideTraces,
@@ -79,6 +91,21 @@ export function FilterSheet({
           <span className="mt-0.5 block text-xs text-muted">{t.hideTracesHint}</span>
         </span>
       </label>
+
+      <fieldset className="mt-7">
+        <legend className="eyebrow text-muted">{t.alsoAvoidTitle}</legend>
+        <div className="mt-4 flex flex-wrap gap-2.5">
+          {OTHER_AVOIDS.map((item) => (
+            <ToggleChip
+              key={item}
+              label={t.alsoAvoid[item]}
+              tone="ink"
+              pressed={alsoAvoid.includes(item)}
+              onToggle={() => onAlsoAvoid(toggleValue(alsoAvoid, item))}
+            />
+          ))}
+        </div>
+      </fieldset>
 
       <fieldset className="mt-7">
         <legend className="eyebrow text-muted">{t.showOnly}</legend>

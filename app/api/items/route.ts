@@ -82,8 +82,10 @@ export async function PUT(req: Request) {
   const { confirm, ...dish } = parsed.data;
   const updated = await updateDish(owner.supabase, owner.restaurant.id, {
     ...dish,
-    // Only pressing Confirm vouches for the full allergen list; other saves leave it alone.
+    // Only pressing Confirm vouches for the full allergen list and the other things diners
+    // avoid; other saves leave both alone.
     allergen_list: confirm && dish.confirmed ? ALLERGEN_LIST_VERSION : undefined,
+    also_checked: confirm && dish.confirmed ? true : undefined,
   });
   if (!updated)
     return fail(

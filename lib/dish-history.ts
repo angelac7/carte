@@ -4,6 +4,8 @@ export type DishSafety = {
   may_contain: string[];
   removable: string[];
   dietary_tags: string[];
+  /** Missing from versions recorded before diners could avoid pork, alcohol, and the like. */
+  also_contains?: string[];
   allergen_list: number;
   addon_allergens: { label: string; allergens: string[] }[];
 };
@@ -33,6 +35,7 @@ const FIELDS = [
   ["may_contain", "May contain"],
   ["removable", "Can leave out"],
   ["dietary_tags", "Diet labels"],
+  ["also_contains", "Also contains"],
 ] as const;
 
 export type ChangeLine = { label: string; added: string[]; removed: string[]; now: string[] };

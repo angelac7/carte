@@ -134,6 +134,11 @@ export function PrintableMenu({
                       ` · ${t.mayContain}: ${names(dish.may_contain!)}`}
                     {(dish.removable?.length ?? 0) > 0 &&
                       ` · ${t.canBeWithout}: ${names(dish.removable!)}`}
+                    {(dish.also_contains?.length ?? 0) > 0 &&
+                      ` · ${t.alsoContains}: ${formatList(
+                        dish.also_contains!.map((item) => t.alsoAvoid[item]),
+                        language,
+                      )}`}
                   </p>
                 </li>
               );

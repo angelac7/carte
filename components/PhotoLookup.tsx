@@ -32,6 +32,7 @@ export function PhotoLookup({
   language,
   avoid,
   onlyTags,
+  alsoAvoid,
   dishes,
   visibleIds,
   textFor,
@@ -64,7 +65,9 @@ export function PhotoLookup({
       const image = await shrinkImage(file);
       if (!active.current) return;
       setPreview(URL.createObjectURL(image));
-      setMatches(await askPhotoMatch(restaurantSlug, language, image, { avoid, onlyTags }));
+      setMatches(
+        await askPhotoMatch(restaurantSlug, language, image, { avoid, onlyTags, alsoAvoid }),
+      );
       setStatus("done");
     } catch (err) {
       setStatus(err instanceof PhotoLimitError ? "limit" : "failed");

@@ -5,6 +5,7 @@ import {
   DIETARY_TAGS,
   isAiSuggestedTag,
   isAllergen,
+  OTHER_AVOIDS,
 } from "@/lib/allergens";
 
 export const SourceLanguageSchema = z
@@ -112,6 +113,10 @@ export const MenuItemSchema = z.object({
   removable: z.array(z.enum(ALLERGENS)).max(ALLERGENS.length).optional(),
   /** Allergens not in the recipe that may get in, like through a shared fryer. */
   may_contain: z.array(z.enum(ALLERGENS)).max(ALLERGENS.length).optional(),
+  /** Other things diners avoid, like pork or alcohol, marked by the owner. */
+  also_contains: z.array(z.enum(OTHER_AVOIDS)).max(OTHER_AVOIDS.length).optional(),
+  /** True once the owner confirmed the dish with those marked. Set only by pressing Confirm. */
+  also_checked: z.boolean().optional(),
   /** Which allergen list the owner checked when confirming: 1 was the original 9, 2 is all 14. */
   allergen_list: z.number().int().min(1).max(2).optional(),
   sizes: z.array(DishSizeSchema).max(8).optional(),

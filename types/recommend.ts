@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { ALLERGENS, DIETARY_TAGS } from "@/lib/allergens";
+import { ALLERGENS, DIETARY_TAGS, OTHER_AVOIDS } from "@/lib/allergens";
 import { isLanguageCode, type LanguageCode } from "@/lib/languages";
 import { isValidSlug } from "@/lib/slug";
 
@@ -11,6 +11,7 @@ export const RecommendRequestSchema = z.object({
   language: z.custom<LanguageCode>((value) => typeof value === "string" && isLanguageCode(value)),
   avoid: z.array(z.enum(ALLERGENS)).max(ALLERGENS.length),
   onlyTags: z.array(z.enum(DIETARY_TAGS)).max(DIETARY_TAGS.length),
+  alsoAvoid: z.array(z.enum(OTHER_AVOIDS)).max(OTHER_AVOIDS.length).default([]),
   hunger: z.enum(HUNGER_LEVELS),
   spice: z.number().int().min(0).max(3),
   people: z.number().int().min(1).max(12),

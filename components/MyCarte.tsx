@@ -377,6 +377,10 @@ export function MyCarte({ language, initialPrefs }: MyCarteProps) {
         <AllergyCard
           language={language}
           avoid={avoid}
+          alsoAvoid={prefs.alsoAvoid ?? []}
+          onToggleAlso={(item) =>
+            setPrefs({ ...prefs, alsoAvoid: toggleValue(prefs.alsoAvoid ?? [], item) })
+          }
           severity={prefs.severity}
           onSeverity={(severity) => setPrefs({ ...prefs, severity })}
           onToggle={toggleAllergy}

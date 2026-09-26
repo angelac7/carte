@@ -49,6 +49,17 @@ export const OWNER_ONLY_TAGS = ["halal", "kosher", "pregnancy-friendly", "kid-fr
 export const DIETARY_TAGS = [...AI_SUGGESTED_TAGS, ...OWNER_ONLY_TAGS] as const;
 
 /**
+ * Other things diners often avoid for religion, health, or taste. They aren't allergens, but
+ * owners mark them the same way, and diners can hide them. Only owners set them, never AI.
+ */
+export const OTHER_AVOIDS = ["pork", "beef", "alcohol", "onion", "garlic", "cilantro"] as const;
+export type OtherAvoid = (typeof OTHER_AVOIDS)[number];
+
+export function isOtherAvoid(value: string): value is OtherAvoid {
+  return (OTHER_AVOIDS as readonly string[]).includes(value);
+}
+
+/**
  * Facts about the whole kitchen an owner can state. Each has a fixed translation, because
  * allergy information is never written by AI.
  */

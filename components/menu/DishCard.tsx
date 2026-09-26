@@ -1,9 +1,9 @@
 "use client";
 import Image from "next/image";
 import { Chip } from "@/components/Chip";
-import { allergensChecked, type Allergen } from "@/lib/allergens";
+import { allergensChecked, type Allergen, type OtherAvoid } from "@/lib/allergens";
 import { formatList } from "@/lib/format-list";
-import { mustLeaveOut, tracesOf } from "@/lib/menu-filters";
+import { alsoUnchecked, mustLeaveOut, tracesOf } from "@/lib/menu-filters";
 import { DishActions } from "@/components/DishActions";
 import { SparkleIcon } from "@/components/icons";
 import { QuantityStepper } from "@/components/QuantityStepper";
@@ -30,6 +30,8 @@ type DishCardProps = {
   t: DinerStrings;
   /** The diner's avoided allergens, to say what to leave out or watch for. */
   avoid?: Allergen[];
+  /** Other things the diner avoids, like pork. */
+  alsoAvoid?: OtherAvoid[];
   detailsLabel: string;
   explainLabel: string;
   stepperLabels: { add: string; increase: string; decrease: string };
@@ -57,6 +59,7 @@ export function DishCard({
   popular = false,
   t,
   avoid = [],
+  alsoAvoid = [],
   detailsLabel,
   explainLabel,
   stepperLabels,
@@ -178,6 +181,24 @@ export function DishCard({
               <Chip key={allergen} label={t.allergens[allergen]} tone="allergen" />
             ))}
           </div>
+        )}
+        {(dish.also_contains?.length ?? 0) > 0 && (
+          <div className="mt-2 flex flex-wrap items-center gap-2 text-xs">
+            <span className="eyebrow text-muted">{t.alsoContains}</span>
+            {dish.also_contains!.map((item) => (
+              <Chip key={item} label={t.alsoAvoid[item]} tone="allergen" />
+            ))}
+          </div>
+        )}
+        {alsoUnchecked(dish, alsoAvoid).length > 0 && (
+          <p className="mt-3 rounded-control border border-saffron/40 bg-saffron-soft px-3 py-2 text-sm font-medium text-saffron-ink">
+            {t.alsoUnchecked(
+              formatList(
+                alsoUnchecked(dish, alsoAvoid).map((item) => t.alsoAvoid[item]),
+                language,
+              ),
+            )}
+          </p>
         )}
         {mustLeaveOut(dish, avoid).length > 0 && (
           <p className="mt-3 rounded-control border border-saffron/40 bg-saffron-soft px-3 py-2 text-sm font-medium text-saffron-ink">

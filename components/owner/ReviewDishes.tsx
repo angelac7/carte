@@ -18,9 +18,11 @@ import {
   ALLERGENS,
   DIETARY_TAGS,
   NEWER_ALLERGENS,
+  OTHER_AVOIDS,
   US_ALLERGENS,
   type Allergen,
   type DietaryTag,
+  type OtherAvoid,
 } from "@/lib/allergens";
 import {
   deleteAllDishes,
@@ -357,6 +359,9 @@ export default function ReviewDishes({ timezone }: { timezone: string }) {
   const toggleMayContain = (dish: MenuItem, allergen: Allergen) =>
     save({ ...dish, may_contain: toggleValue(dish.may_contain ?? [], allergen), confirmed: false });
 
+  const toggleAlso = (dish: MenuItem, item: OtherAvoid) =>
+    save({ ...dish, also_contains: toggleValue(dish.also_contains ?? [], item), confirmed: false });
+
   const toggleTag = (dish: MenuItem, tag: DietaryTag) =>
     save({ ...dish, dietary_tags: toggleValue(dish.dietary_tags, tag), confirmed: false });
 
@@ -494,6 +499,9 @@ export default function ReviewDishes({ timezone }: { timezone: string }) {
   const total = dishes.length;
   const done = dishes.filter((dish) => dish.confirmed && checkedForAll(dish)).length;
   const olderList = dishes.filter((dish) => dish.confirmed && !checkedForAll(dish)).length;
+  const alsoUnchecked = dishes.filter(
+    (dish) => dish.confirmed && checkedForAll(dish) && !dish.also_checked,
+  ).length;
   const needle = search.trim().toLowerCase();
   const shown = dishes.filter(
     (dish) =>
@@ -546,6 +554,17 @@ export default function ReviewDishes({ timezone }: { timezone: string }) {
           {NEWER_ALLERGENS.join(", ")} were added. Check those and press &ldquo;Confirm all{" "}
           {ALLERGENS.length} allergens&rdquo; so diners who avoid them can see{" "}
           {olderList === 1 ? "it" : "them"}.
+        </Notice>
+      )}
+
+      {alsoUnchecked > 0 && (
+        <Notice className="mt-6">
+          Diners can now hide dishes with {OTHER_AVOIDS.join(", ")}.{" "}
+          {alsoUnchecked === 1
+            ? "1 confirmed dish hasn't"
+            : `${alsoUnchecked} confirmed dishes haven't`}{" "}
+          been checked for them yet, so those diners see a note to ask your staff. Mark any under
+          &ldquo;Also contains&rdquo; and press &ldquo;Confirm also contains&rdquo;.
         </Notice>
       )}
 
@@ -877,6 +896,26 @@ export default function ReviewDishes({ timezone }: { timezone: string }) {
                             </fieldset>
 
                             <fieldset className="mt-4">
+                              <legend className="eyebrow text-muted">Also contains</legend>
+                              <p className="mt-1 text-xs text-muted">
+                                Things some diners avoid for religion, health, or taste. Confirming
+                                the dish tells them it&apos;s been checked.
+                              </p>
+                              <div className="mt-2 flex flex-wrap gap-2">
+                                {OTHER_AVOIDS.map((item) => (
+                                  <ToggleChip
+                                    key={item}
+                                    label={item}
+                                    tone="ink"
+                                    ariaLabel={`Also contains ${item}`}
+                                    pressed={(dish.also_contains ?? []).includes(item)}
+                                    onToggle={() => toggleAlso(dish, item)}
+                                  />
+                                ))}
+                              </div>
+                            </fieldset>
+
+                            <fieldset className="mt-4">
                               <legend className="eyebrow text-muted">Suitable for</legend>
                               <div className="mt-2 flex flex-wrap gap-2">
                                 {DIETARY_TAGS.map((tag) => (
@@ -916,8 +955,20 @@ export default function ReviewDishes({ timezone }: { timezone: string }) {
                             </label>
 
                             <div className="mt-6 flex items-center justify-between border-t border-ink/10 pt-5">
-                              {dish.confirmed && checkedForAll(dish) ? (
+                              {dish.confirmed && checkedForAll(dish) && dish.also_checked ? (
                                 <p className="text-sm font-medium text-basil">✓ Confirmed</p>
+                              ) : dish.confirmed && checkedForAll(dish) ? (
+                                <div className="flex flex-wrap items-center gap-3">
+                                  <p className="text-sm font-medium text-basil">✓ Confirmed</p>
+                                  <Button
+                                    variant="secondary"
+                                    size="sm"
+                                    onClick={() => confirmDish(dish)}
+                                    disabled={conflicts.length > 0}
+                                  >
+                                    Confirm also contains
+                                  </Button>
+                                </div>
                               ) : dish.confirmed ? (
                                 <div className="flex flex-wrap items-center gap-3">
                                   <Button

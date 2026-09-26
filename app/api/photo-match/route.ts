@@ -21,6 +21,7 @@ export async function POST(req: Request) {
     language: form?.get("lang"),
     avoid: form?.getAll("avoid") ?? [],
     onlyTags: form?.getAll("onlyTags") ?? [],
+    alsoAvoid: form?.getAll("alsoAvoid") ?? [],
   });
   if (!parsed.success) return NextResponse.json({ error: "invalid" }, { status: 400 });
   const { restaurant: slug, language } = parsed.data;

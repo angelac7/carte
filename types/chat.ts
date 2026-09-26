@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { ALLERGENS, DIETARY_TAGS } from "@/lib/allergens";
+import { ALLERGENS, DIETARY_TAGS, OTHER_AVOIDS } from "@/lib/allergens";
 import { isLanguageCode, type LanguageCode } from "@/lib/languages";
 
 export const MAX_QUESTION_LENGTH = 500;
@@ -13,6 +13,7 @@ export const ChatMessageSchema = z.object({
 export const ChatRequestSchema = z.object({
   avoid: z.array(z.enum(ALLERGENS)).default([]),
   onlyTags: z.array(z.enum(DIETARY_TAGS)).default([]),
+  alsoAvoid: z.array(z.enum(OTHER_AVOIDS)).max(OTHER_AVOIDS.length).default([]),
   language: z.custom<LanguageCode>((value) => typeof value === "string" && isLanguageCode(value)),
   messages: z
     .array(ChatMessageSchema)

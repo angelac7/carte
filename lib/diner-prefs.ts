@@ -1,5 +1,12 @@
 import { z } from "zod";
-import { ALLERGENS, DIETARY_TAGS, type Allergen, type DietaryTag } from "@/lib/allergens";
+import {
+  ALLERGENS,
+  DIETARY_TAGS,
+  OTHER_AVOIDS,
+  type Allergen,
+  type DietaryTag,
+  type OtherAvoid,
+} from "@/lib/allergens";
 
 // Saved on the diner's own device as a cookie, so filters follow them to every Carte menu
 // without an account, and the server can show filtered results on the very first load.
@@ -12,6 +19,8 @@ export type Severity = (typeof SEVERITIES)[number];
 export type DinerPrefs = {
   avoid: Allergen[];
   onlyTags: DietaryTag[];
+  /** Other things to avoid, like pork or alcohol. */
+  alsoAvoid?: OtherAvoid[];
   /** Also hide dishes that may contain traces of an avoided allergen. */
   hideTraces: boolean;
   severity?: Severity;
@@ -22,6 +31,7 @@ export type DinerPrefs = {
 export const EMPTY_PREFS: DinerPrefs = {
   avoid: [],
   onlyTags: [],
+  alsoAvoid: [],
   hideTraces: false,
   severity: "allergy",
 };
@@ -29,6 +39,7 @@ export const EMPTY_PREFS: DinerPrefs = {
 const PrefsSchema = z.object({
   avoid: z.array(z.enum(ALLERGENS)).catch([]),
   onlyTags: z.array(z.enum(DIETARY_TAGS)).catch([]),
+  alsoAvoid: z.array(z.enum(OTHER_AVOIDS)).catch([]),
   hideTraces: z.boolean().catch(false),
   severity: z.enum(SEVERITIES).catch("allergy"),
   maxSpice: z.number().int().min(0).max(2).optional().catch(undefined),

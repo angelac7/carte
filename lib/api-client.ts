@@ -314,6 +314,7 @@ export async function askPhotoMatch(
   form.append("image", image);
   for (const allergen of filters.avoid) form.append("avoid", allergen);
   for (const tag of filters.onlyTags) form.append("onlyTags", tag);
+  for (const item of filters.alsoAvoid ?? []) form.append("alsoAvoid", item);
   const res = await fetch("/api/photo-match", { method: "POST", body: form });
   if (res.status === 429) throw new PhotoLimitError();
   const data = await res.json().catch(() => ({}));

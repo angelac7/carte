@@ -6,6 +6,7 @@ describe("diner preferences", () => {
     const prefs = {
       avoid: ["peanuts" as const, "wheat" as const],
       onlyTags: ["vegan" as const],
+      alsoAvoid: ["pork" as const],
       hideTraces: true,
       severity: "severe" as const,
     };

@@ -46,6 +46,8 @@ export async function restoreDishVersion(
       may_contain: safety.may_contain,
       removable: safety.removable,
       dietary_tags: safety.dietary_tags,
+      // Versions from before diners could avoid pork and the like leave those marks alone.
+      ...(safety.also_contains ? { also_contains: safety.also_contains } : {}),
       allergen_list: safety.allergen_list,
     })
     .eq("id", entry.menu_item_id)

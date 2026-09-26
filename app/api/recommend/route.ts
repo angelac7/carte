@@ -23,11 +23,12 @@ export async function POST(req: Request) {
     if (!restaurant) return NextResponse.json({ error: "not found" }, { status: 404 });
 
     // Filter first, so the AI never sees dishes the diner has ruled out or can't order now.
-    const { avoid, onlyTags, language } = parsed.data;
+    const { avoid, onlyTags, alsoAvoid, language } = parsed.data;
     const clock = restaurantClock(restaurant.timezone ?? "America/New_York");
     const dishes = filterDishes(await getConfirmedDishes(supabase, restaurant.id), {
       avoid,
       onlyTags,
+      alsoAvoid,
     }).filter((dish) => dishAvailability(dish, clock) === "available");
     if (dishes.length === 0) {
       return NextResponse.json({ recommendation: { picks: [], note: "" } });

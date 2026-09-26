@@ -99,3 +99,31 @@ test("the kitchen's practices show, with the ones about the diner's allergies fi
   await filters.getByRole("button", { name: /^Show/ }).click();
   await expect.poll(order).toBe(true);
 });
+
+test("diners can hide pork, and see which dishes haven't been checked for it", async ({ page }) => {
+  const [noodles, salad] = await rest<{ id: string; name: string }[]>(
+    `menu_items?restaurant_id=eq.${restaurantId}&select=id,name&order=sort_order`,
+  );
+  // Marking it unconfirms the dish, like any allergen change, so confirm it again after.
+  await rest(`menu_items?id=eq.${noodles.id}`, {
+    method: "PATCH",
+    body: JSON.stringify({ also_contains: ["pork"] }),
+  });
+  await rest(`menu_items?id=eq.${noodles.id}`, {
+    method: "PATCH",
+    body: JSON.stringify({ also_checked: true, confirmed: true }),
+  });
+  expect(salad.name).toBe("Green Salad");
+
+  await page.goto(`/r/${slug}`);
+  await expect(dishCard(page, "Peanut Noodles").getByText("Also contains")).toBeVisible();
+  await page.getByRole("button", { name: "Allergies & diet" }).click();
+  const filters = page.getByRole("dialog");
+  await filters.getByRole("button", { name: "pork", exact: true }).click();
+  await filters.getByRole("button", { name: /^Show/ }).click();
+  await expect(dishCard(page, "Peanut Noodles")).toHaveCount(0);
+  await expect(dishCard(page, "Green Salad")).toContainText(
+    "The restaurant hasn't said whether this has pork. Ask your server.",
+  );
+  await expect(page.getByRole("button", { name: "Remove No pork" })).toBeVisible();
+});

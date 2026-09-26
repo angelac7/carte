@@ -60,6 +60,7 @@ it("uses current device preferences instead of cached menu HTML", () => {
   expect(result.current[0]).toEqual({
     avoid: ["milk"],
     onlyTags: ["vegan"],
+    alsoAvoid: [],
     hideTraces: true,
     severity: "allergy",
   });

@@ -5,7 +5,7 @@ import { Sheet } from "@/components/Sheet";
 import { ToggleChip } from "@/components/ToggleChip";
 import { Button } from "@/components/ui/button";
 import { fieldClass } from "@/components/ui/field";
-import type { Allergen, DietaryTag } from "@/lib/allergens";
+import type { Allergen, DietaryTag, OtherAvoid } from "@/lib/allergens";
 import { askForPicks } from "@/lib/api-client";
 import { HELP_STRINGS } from "@/lib/i18n/help-strings";
 import { TABLE_STRINGS } from "@/lib/i18n/table-strings";
@@ -20,6 +20,7 @@ type OrderHelperProps = {
   dishes: MenuItem[];
   avoid: Allergen[];
   onlyTags: DietaryTag[];
+  alsoAvoid: OtherAvoid[];
   order: Record<string, number>;
   textFor: (dish: MenuItem) => DishText;
   onQuantity: (dishId: string, quantity: number) => void;
@@ -64,6 +65,7 @@ export function OrderHelper({
   dishes,
   avoid,
   onlyTags,
+  alsoAvoid,
   order,
   textFor,
   onQuantity,
@@ -89,6 +91,7 @@ export function OrderHelper({
         language,
         avoid,
         onlyTags,
+        alsoAvoid,
         hunger,
         spice,
         people,

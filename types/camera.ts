@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { ALLERGENS, DIETARY_TAGS, isAllergen } from "@/lib/allergens";
+import { ALLERGENS, DIETARY_TAGS, isAllergen, OTHER_AVOIDS } from "@/lib/allergens";
 
 import { isLanguageCode, type LanguageCode } from "@/lib/languages";
 import { isValidSlug } from "@/lib/slug";
@@ -9,6 +9,7 @@ export const PhotoMatchRequestSchema = z.object({
   language: z.custom<LanguageCode>((value) => typeof value === "string" && isLanguageCode(value)),
   avoid: z.array(z.enum(ALLERGENS)).max(ALLERGENS.length),
   onlyTags: z.array(z.enum(DIETARY_TAGS)).max(DIETARY_TAGS.length),
+  alsoAvoid: z.array(z.enum(OTHER_AVOIDS)).max(OTHER_AVOIDS.length).default([]),
 });
 
 const text = z
