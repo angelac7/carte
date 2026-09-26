@@ -14,6 +14,21 @@ export const OCCASIONS = [
 ] as const;
 export type Occasion = (typeof OCCASIONS)[number];
 
+/** Accessibility and family facts an owner can state, each with a fixed translation. */
+export const RESTAURANT_FEATURES = [
+  "wheelchair-access",
+  "step-free-entry",
+  "accessible-restroom",
+  "high-chairs",
+  "changing-table",
+  "quiet",
+] as const;
+export type RestaurantFeature = (typeof RESTAURANT_FEATURES)[number];
+
+export function isRestaurantFeature(value: string): value is RestaurantFeature {
+  return (RESTAURANT_FEATURES as readonly string[]).includes(value);
+}
+
 export const TIMEZONES = [
   "America/New_York",
   "America/Chicago",
@@ -94,6 +109,7 @@ export const ProfileSchema = z.object({
   reservation_url: WebAddressSchema,
   price_range: z.number().int().min(0).max(4),
   kitchen_practices: z.array(z.enum(KITCHEN_PRACTICES)).max(KITCHEN_PRACTICES.length).default([]),
+  features: z.array(z.enum(RESTAURANT_FEATURES)).max(RESTAURANT_FEATURES.length).default([]),
 });
 export type RestaurantProfile = z.infer<typeof ProfileSchema>;
 
@@ -112,6 +128,7 @@ export const DEFAULT_PROFILE: RestaurantProfile = {
   reservation_url: "",
   price_range: 0,
   kitchen_practices: [],
+  features: [],
 };
 
 export function isOccasion(value: string): value is Occasion {

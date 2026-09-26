@@ -147,3 +147,17 @@ test("calories show on the dish, with the daily note", async ({ page }) => {
     page.getByText("2,000 calories a day is used for general nutrition advice"),
   ).toBeVisible();
 });
+
+test("accessibility info shows on the menu and filters Discover", async ({ page }) => {
+  await rest(`restaurants?id=eq.${restaurantId}`, {
+    method: "PATCH",
+    body: JSON.stringify({ listed: true, features: ["step-free-entry", "high-chairs"] }),
+  });
+  await page.goto(`/r/${slug}`);
+  await expect(page.locator("header li").filter({ hasText: "Step-free entrance" })).toBeVisible();
+
+  await page.goto("/discover?type=restaurants&filters=1&feature=step-free-entry");
+  await expect(page.getByRole("heading", { name: "Test Kitchen", level: 3 })).toBeVisible();
+  await page.goto("/discover?type=restaurants&filters=1&feature=quiet");
+  await expect(page.getByRole("heading", { name: "Test Kitchen", level: 3 })).toHaveCount(0);
+});

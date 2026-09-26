@@ -18,6 +18,8 @@ type MenuHeroProps = {
   logo?: string | null;
   /** Buttons under the name, like Call and Reserve. */
   actions?: ReactNode;
+  /** Small facts shown as pills, like "Step-free entrance". */
+  badges?: string[];
 };
 
 /** The restaurant's name set large, over a slowly zooming dish photo or fine ink texture. */
@@ -30,6 +32,7 @@ export function MenuHero({
   lead,
   logo,
   actions,
+  badges = [],
 }: MenuHeroProps) {
   return (
     <header className="texture-ink relative isolate overflow-hidden text-white">
@@ -72,6 +75,18 @@ export function MenuHero({
             <p className="mt-5 text-2xl leading-snug text-white/85 sm:text-3xl">
               {details.join(" · ")}
             </p>
+          )}
+          {badges.length > 0 && (
+            <ul className="mt-4 flex flex-wrap gap-2">
+              {badges.map((badge) => (
+                <li
+                  key={badge}
+                  className="rounded-full border border-white/30 bg-white/10 px-3 py-1 text-sm text-white"
+                >
+                  {badge}
+                </li>
+              ))}
+            </ul>
           )}
           <div aria-hidden="true" className="mt-7 h-1 w-20 bg-white" />
           <p className="eyebrow mt-5 text-white/60">{summary}</p>

@@ -42,7 +42,14 @@ import {
 } from "@/lib/languages";
 import { publicAsset } from "@/lib/public-asset";
 import { checkRateLimit, clientKeyFromHeaders } from "@/lib/rate-limit";
-import { directionsUrl, isOccasion, isOpenNow, OCCASIONS } from "@/lib/restaurant-profile";
+import {
+  directionsUrl,
+  isOccasion,
+  isOpenNow,
+  isRestaurantFeature,
+  OCCASIONS,
+  RESTAURANT_FEATURES,
+} from "@/lib/restaurant-profile";
 import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -132,9 +139,11 @@ function DishGrid({
 function RestaurantGrid({
   restaurants,
   t,
+  d,
 }: {
   restaurants: RestaurantResult[];
   t: DiscoverStrings;
+  d: DinerStrings;
 }) {
   return (
     <ul className="mt-8 grid gap-6 sm:grid-cols-2">
@@ -177,10 +186,13 @@ function RestaurantGrid({
                       {restaurant.description}
                     </p>
                   )}
-                  {restaurant.occasions.length > 0 && (
+                  {(restaurant.occasions.length > 0 || (restaurant.features?.length ?? 0) > 0) && (
                     <div className="mt-3 flex flex-wrap gap-2">
                       {restaurant.occasions.map((occasion) => (
                         <Chip key={occasion} label={t.occasions[occasion]} tone="tag" />
+                      ))}
+                      {restaurant.features?.map((feature) => (
+                        <Chip key={feature} label={d.features[feature]} tone="tag" />
                       ))}
                     </div>
                   )}
@@ -237,13 +249,19 @@ export default async function DiscoverPage({ searchParams }: DiscoverProps) {
   const occasion = isOccasion(occasionParam) ? occasionParam : "";
   const openOnly = one(params.open) === "1";
   const city = one(params.city).slice(0, 80);
+  const features = [...new Set(many(params.feature).filter(isRestaurantFeature))];
   const activeFilters =
-    avoid.length + onlyTags.length + (openOnly ? 1 : 0) + (occasion ? 1 : 0) + (city ? 1 : 0);
+    avoid.length +
+    onlyTags.length +
+    features.length +
+    (openOnly ? 1 : 0) +
+    (occasion ? 1 : 0) +
+    (city ? 1 : 0);
 
   const supabase = await createClient();
   const cities = await listCities(supabase);
 
-  const filters = { avoid, onlyTags, city, occasion, openOnly } as const;
+  const filters = { avoid, onlyTags, city, occasion, openOnly, features } as const;
 
   let dishes: DishResult[] = [];
   let restaurants: RestaurantResult[] = [];
@@ -382,6 +400,23 @@ export default async function DiscoverPage({ searchParams }: DiscoverProps) {
                   ))}
                 </div>
               </fieldset>
+              <fieldset>
+                <legend className="eyebrow text-muted">{d.featuresTitle}</legend>
+                <div className="mt-3 flex flex-wrap gap-2.5">
+                  {RESTAURANT_FEATURES.map((feature) => (
+                    <label key={feature} className={chipClass}>
+                      <input
+                        type="checkbox"
+                        name="feature"
+                        value={feature}
+                        defaultChecked={features.includes(feature)}
+                        className="sr-only"
+                      />
+                      {d.features[feature]}
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
               <div className="grid items-center gap-4 border-t border-ink/10 pt-5 sm:grid-cols-3">
                 <label className="flex items-center gap-2 text-sm">
                   <input
@@ -451,7 +486,7 @@ export default async function DiscoverPage({ searchParams }: DiscoverProps) {
             {restaurants.length === 0 ? (
               <EmptyState>{t.noResults}</EmptyState>
             ) : (
-              <RestaurantGrid restaurants={restaurants} t={t} />
+              <RestaurantGrid restaurants={restaurants} t={t} d={d} />
             )}
           </section>
         )}

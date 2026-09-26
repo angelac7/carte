@@ -36,6 +36,7 @@ import {
   type KitchenPractice,
 } from "@/lib/allergens";
 import { cn } from "@/lib/cn";
+import type { RestaurantFeature } from "@/lib/restaurant-profile";
 import {
   fetchSummaries,
   fetchTranslations,
@@ -97,6 +98,7 @@ type DinerMenuProps = {
     logo_url?: string | null;
     cover_url?: string | null;
     kitchen_practices?: KitchenPractice[];
+    features?: RestaurantFeature[];
   };
   dishes: MenuItem[];
   /** When the page was made, so the server and browser agree on what's available at first. */
@@ -372,6 +374,7 @@ export function DinerMenu({
     <MenuHero
       name={restaurant.name}
       details={details}
+      badges={(restaurant.features ?? []).map((feature) => t.features[feature])}
       cover={cover}
       logo={restaurant.logo_url ?? null}
       actions={

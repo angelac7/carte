@@ -1,5 +1,6 @@
 import type { Allergen, DietaryTag, KitchenPractice, OtherAvoid } from "@/lib/allergens";
 import type { LanguageCode } from "@/lib/languages";
+import type { RestaurantFeature } from "@/lib/restaurant-profile";
 
 // Allergen names are safety-critical and are never AI-generated.
 // TODO: have a native speaker review each language before launch.
@@ -30,6 +31,9 @@ export type DinerStrings = {
   /** Calories for a dish, given an already formatted number. */
   calories: (n: string) => string;
   caloriesNote: string;
+  /** Accessibility and family facts about the restaurant; fixed translations. */
+  featuresTitle: string;
+  features: Record<RestaurantFeature, string>;
   translating: string;
   translationFailed: string;
   offlineMenu: string;
@@ -177,6 +181,15 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     calories: (n) => `${n} cal`,
     caloriesNote:
       "2,000 calories a day is used for general nutrition advice, but calorie needs vary.",
+    featuresTitle: "Accessibility & families",
+    features: {
+      "wheelchair-access": "Wheelchair accessible",
+      "step-free-entry": "Step-free entrance",
+      "accessible-restroom": "Accessible restroom",
+      "high-chairs": "High chairs",
+      "changing-table": "Baby changing table",
+      quiet: "Quiet space",
+    },
     translating: "Translating menu…",
     translationFailed:
       "Translation isn't available right now, so the menu is shown in its original language.",
@@ -303,6 +316,15 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     calories: (n) => `${n} kcal`,
     caloriesNote:
       "Se usan 2.000 calorías al día como recomendación nutricional general, pero las necesidades varían.",
+    featuresTitle: "Accesibilidad y familias",
+    features: {
+      "wheelchair-access": "Accesible en silla de ruedas",
+      "step-free-entry": "Entrada sin escalones",
+      "accessible-restroom": "Baño accesible",
+      "high-chairs": "Sillas altas para bebés",
+      "changing-table": "Cambiador de bebés",
+      quiet: "Ambiente tranquilo",
+    },
     translating: "Traduciendo el menú…",
     translationFailed:
       "La traducción no está disponible en este momento, así que el menú se muestra en su idioma original.",
@@ -418,6 +440,15 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     alsoUnchecked: (items) => `餐厅尚未说明此菜是否含有${items}。请询问服务员。`,
     calories: (n) => `${n} 千卡`,
     caloriesNote: "一般营养建议以每天 2000 千卡为参考，但每个人的热量需求不同。",
+    featuresTitle: "无障碍与家庭",
+    features: {
+      "wheelchair-access": "轮椅可通行",
+      "step-free-entry": "入口无台阶",
+      "accessible-restroom": "无障碍卫生间",
+      "high-chairs": "儿童高脚椅",
+      "changing-table": "婴儿换尿布台",
+      quiet: "环境安静",
+    },
     translating: "正在翻译菜单…",
     translationFailed: "暂时无法翻译，菜单以原语言显示。",
     translatedNote: "菜品描述为自动翻译。如有不清楚之处，请询问服务员。",
@@ -538,6 +569,15 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     calories: (n) => `${n}kcal`,
     caloriesNote:
       "일반적인 영양 권장량은 하루 2,000kcal 기준이지만, 필요한 열량은 사람마다 다릅니다.",
+    featuresTitle: "접근성 및 가족",
+    features: {
+      "wheelchair-access": "휠체어 이용 가능",
+      "step-free-entry": "계단 없는 입구",
+      "accessible-restroom": "장애인 화장실",
+      "high-chairs": "유아용 의자",
+      "changing-table": "기저귀 교환대",
+      quiet: "조용한 공간",
+    },
     translating: "메뉴 번역 중…",
     translationFailed: "지금은 번역을 사용할 수 없어 원래 언어로 메뉴를 표시합니다.",
     translatedNote: "요리 설명은 자동 번역되었습니다. 궁금한 점은 직원에게 문의해 주세요.",
@@ -657,6 +697,15 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
       `${items}が入っているかどうか、お店はまだ記載していません。スタッフにお尋ねください。`,
     calories: (n) => `${n}kcal`,
     caloriesNote: "一般的な栄養の目安は1日2,000kcalですが、必要なカロリーは人によって異なります。",
+    featuresTitle: "バリアフリー・家族向け",
+    features: {
+      "wheelchair-access": "車いす対応",
+      "step-free-entry": "段差のない入口",
+      "accessible-restroom": "多目的トイレ",
+      "high-chairs": "子ども用椅子",
+      "changing-table": "おむつ交換台",
+      quiet: "静かな席",
+    },
     translating: "メニューを翻訳中…",
     translationFailed: "現在翻訳を利用できないため、元の言語でメニューを表示しています。",
     translatedNote: "料理の説明は自動翻訳です。不明な点はスタッフにお尋ねください。",
@@ -783,6 +832,15 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     calories: (n) => `${n} kcal`,
     caloriesNote:
       "Un apport de 2 000 calories par jour sert de repère nutritionnel général, mais les besoins varient.",
+    featuresTitle: "Accessibilité et familles",
+    features: {
+      "wheelchair-access": "Accessible en fauteuil roulant",
+      "step-free-entry": "Entrée de plain-pied",
+      "accessible-restroom": "Toilettes accessibles",
+      "high-chairs": "Chaises hautes",
+      "changing-table": "Table à langer",
+      quiet: "Espace calme",
+    },
     translating: "Traduction du menu…",
     translationFailed:
       "La traduction n'est pas disponible pour le moment ; le menu est affiché dans sa langue d'origine.",
@@ -905,6 +963,15 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     calories: (n) => `${n} kcal`,
     caloriesNote:
       "Mức 2.000 calo mỗi ngày được dùng làm khuyến nghị dinh dưỡng chung, nhưng nhu cầu của mỗi người khác nhau.",
+    featuresTitle: "Tiếp cận và gia đình",
+    features: {
+      "wheelchair-access": "Có lối đi cho xe lăn",
+      "step-free-entry": "Lối vào không bậc thềm",
+      "accessible-restroom": "Nhà vệ sinh cho người khuyết tật",
+      "high-chairs": "Ghế ăn cho trẻ em",
+      "changing-table": "Bàn thay tã",
+      quiet: "Không gian yên tĩnh",
+    },
     translating: "Đang dịch thực đơn…",
     translationFailed: "Hiện không thể dịch, nên thực đơn được hiển thị bằng ngôn ngữ gốc.",
     translatedNote: "Mô tả món ăn được dịch tự động. Hãy hỏi nhân viên phục vụ nếu có gì chưa rõ.",
@@ -1030,6 +1097,15 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     calories: (n) => `${n} kcal`,
     caloriesNote:
       "Uma dieta de 2.000 calorias por dia é usada como referência nutricional geral, mas as necessidades variam.",
+    featuresTitle: "Acessibilidade e famílias",
+    features: {
+      "wheelchair-access": "Acessível para cadeira de rodas",
+      "step-free-entry": "Entrada sem degraus",
+      "accessible-restroom": "Banheiro acessível",
+      "high-chairs": "Cadeirões para bebês",
+      "changing-table": "Trocador de fraldas",
+      quiet: "Ambiente tranquilo",
+    },
     translating: "Traduzindo o cardápio…",
     translationFailed:
       "A tradução não está disponível agora, então o cardápio aparece no idioma original.",
@@ -1157,6 +1233,15 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     calories: (n) => `${n} kcal`,
     caloriesNote:
       "Als allgemeine Ernährungsempfehlung gelten 2.000 Kalorien pro Tag, der Bedarf ist jedoch individuell verschieden.",
+    featuresTitle: "Barrierefreiheit & Familien",
+    features: {
+      "wheelchair-access": "Rollstuhlgerecht",
+      "step-free-entry": "Stufenloser Eingang",
+      "accessible-restroom": "Barrierefreie Toilette",
+      "high-chairs": "Hochstühle",
+      "changing-table": "Wickeltisch",
+      quiet: "Ruhiger Bereich",
+    },
     translating: "Speisekarte wird übersetzt…",
     translationFailed:
       "Die Übersetzung ist gerade nicht verfügbar, daher wird die Karte in der Originalsprache gezeigt.",
@@ -1278,6 +1363,15 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     calories: (n) => `${n} سعرة حرارية`,
     caloriesNote:
       "يُستخدم معدل 2,000 سعرة حرارية يوميًا كإرشاد غذائي عام، لكن الاحتياجات تختلف من شخص لآخر.",
+    featuresTitle: "إمكانية الوصول والعائلات",
+    features: {
+      "wheelchair-access": "مناسب للكراسي المتحركة",
+      "step-free-entry": "مدخل بلا درج",
+      "accessible-restroom": "دورة مياه مهيأة",
+      "high-chairs": "كراسي مرتفعة للأطفال",
+      "changing-table": "طاولة لتغيير الحفاضات",
+      quiet: "مكان هادئ",
+    },
     translating: "جارٍ ترجمة القائمة…",
     translationFailed: "الترجمة غير متاحة الآن، لذا تُعرض القائمة بلغتها الأصلية.",
     translatedNote: "تُرجمت أوصاف الأطباق تلقائيًا. اسأل النادل إن كان هناك شيء غير واضح.",
@@ -1397,6 +1491,15 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     calories: (n) => `${n} कैलोरी`,
     caloriesNote:
       "सामान्य पोषण सलाह के लिए रोज़ 2,000 कैलोरी मानी जाती है, लेकिन हर व्यक्ति की ज़रूरत अलग होती है।",
+    featuresTitle: "पहुँच-योग्यता और परिवार",
+    features: {
+      "wheelchair-access": "व्हीलचेयर के लिए सुलभ",
+      "step-free-entry": "बिना सीढ़ी का प्रवेश",
+      "accessible-restroom": "सुलभ शौचालय",
+      "high-chairs": "बच्चों की ऊँची कुर्सियाँ",
+      "changing-table": "डायपर बदलने की जगह",
+      quiet: "शांत जगह",
+    },
     translating: "मेन्यू का अनुवाद हो रहा है…",
     translationFailed: "अनुवाद अभी उपलब्ध नहीं है, इसलिए मेन्यू मूल भाषा में दिख रहा है।",
     translatedNote:
@@ -1514,6 +1617,15 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     calories: (n) => `${n} กิโลแคลอรี`,
     caloriesNote:
       "คำแนะนำด้านโภชนาการทั่วไปอ้างอิงที่ 2,000 กิโลแคลอรีต่อวัน แต่ความต้องการพลังงานของแต่ละคนแตกต่างกัน",
+    featuresTitle: "การเข้าถึงและครอบครัว",
+    features: {
+      "wheelchair-access": "รองรับรถเข็น",
+      "step-free-entry": "ทางเข้าไม่มีขั้นบันได",
+      "accessible-restroom": "ห้องน้ำสำหรับผู้พิการ",
+      "high-chairs": "เก้าอี้เด็กสูง",
+      "changing-table": "ที่เปลี่ยนผ้าอ้อม",
+      quiet: "มุมเงียบสงบ",
+    },
     translating: "กำลังแปลเมนู…",
     translationFailed: "ยังแปลไม่ได้ในตอนนี้ จึงแสดงเมนูเป็นภาษาต้นฉบับ",
     translatedNote: "คำอธิบายเมนูแปลโดยอัตโนมัติ หากมีอะไรไม่ชัดเจน โปรดถามพนักงาน",
@@ -1636,6 +1748,15 @@ export const DINER_STRINGS: Record<LanguageCode, DinerStrings> = {
     calories: (n) => `${n} calories`,
     caloriesNote:
       "Ginagamit ang 2,000 calories bawat araw bilang pangkalahatang payo sa nutrisyon, pero iba-iba ang pangangailangan ng bawat tao.",
+    featuresTitle: "Accessibility at pamilya",
+    features: {
+      "wheelchair-access": "Puwede ang wheelchair",
+      "step-free-entry": "Pasukang walang hagdan",
+      "accessible-restroom": "Accessible na banyo",
+      "high-chairs": "May high chair",
+      "changing-table": "May palitan ng diaper",
+      quiet: "Tahimik na lugar",
+    },
     translating: "Isinasalin ang menu…",
     translationFailed:
       "Hindi available ang pagsasalin ngayon, kaya nasa orihinal na wika ang menu.",

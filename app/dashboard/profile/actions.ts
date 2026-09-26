@@ -43,6 +43,7 @@ export async function saveProfileAction(
     reservation_url: withWebScheme(String(formData.get("reservation_url") ?? "")),
     price_range: Number(formData.get("price_range") ?? 0),
     kitchen_practices: formData.getAll("kitchen_practice").map(String),
+    features: formData.getAll("feature").map(String),
   });
   if (!parsed.success) {
     const field = String(parsed.error.issues[0]?.path[0] ?? "");

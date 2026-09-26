@@ -26,6 +26,8 @@ export type StructuredMenu = {
   city?: string | null;
   priceRange?: number;
   reservationUrl?: string;
+  /** Accessibility and family facts, named in English for search engines. */
+  features?: string[];
   /** Only hours the owner actually saved; never defaults. */
   hours?: FullHours | null;
   dishes: Pick<MenuItem, "name" | "description" | "section" | "calories">[];
@@ -75,6 +77,15 @@ export function menuStructuredData(menu: StructuredMenu) {
     ...(menu.priceRange ? { priceRange: "$".repeat(menu.priceRange) } : {}),
     ...(menu.reservationUrl?.trim() ? { acceptsReservations: menu.reservationUrl.trim() } : {}),
     ...(hours.length ? { openingHoursSpecification: hours } : {}),
+    ...(menu.features?.length
+      ? {
+          amenityFeature: menu.features.map((name) => ({
+            "@type": "LocationFeatureSpecification",
+            name,
+            value: true,
+          })),
+        }
+      : {}),
     hasMenu: {
       "@type": "Menu",
       url: menu.url,

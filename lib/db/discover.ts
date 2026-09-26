@@ -1,6 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Allergen, DietaryTag } from "@/lib/allergens";
-import type { Occasion, WeeklyHours } from "@/lib/restaurant-profile";
+import type { Occasion, RestaurantFeature, WeeklyHours } from "@/lib/restaurant-profile";
 
 export type DishResult = {
   dish_id: string;
@@ -32,6 +32,7 @@ export type RestaurantResult = {
   hours: WeeklyHours;
   occasions: Occasion[];
   cover_url: string | null;
+  features?: RestaurantFeature[];
 };
 
 export type TrendingDish = {
@@ -54,6 +55,8 @@ export type DiscoverFilters = {
   city?: string;
   occasion?: Occasion | "";
   openOnly?: boolean;
+  /** Only restaurants with every one of these, like step-free entry. */
+  features?: RestaurantFeature[];
 };
 
 function filterParams(filters: DiscoverFilters) {
@@ -63,6 +66,7 @@ function filterParams(filters: DiscoverFilters) {
     filter_city: filters.city ?? "",
     filter_occasion: filters.occasion ?? "",
     open_only: filters.openOnly ?? false,
+    with_features: filters.features ?? [],
   };
 }
 

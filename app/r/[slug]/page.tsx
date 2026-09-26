@@ -8,6 +8,7 @@ import { getCachedSummaries } from "@/lib/db/insights";
 import { getPublicDetails } from "@/lib/db/profile";
 import { getPopularDishIds } from "@/lib/db/popular";
 import { parsePrefs, PREFS_COOKIE } from "@/lib/diner-prefs";
+import { DINER_STRINGS } from "@/lib/i18n/diner-strings";
 import { DISPLAY_COOKIE, parseDisplay } from "@/lib/display-prefs";
 import {
   isLanguageCode,
@@ -103,6 +104,7 @@ export default async function RestaurantMenuPage({ params, searchParams }: Resta
         priceRange: restaurant.price_range,
         reservationUrl: restaurant.reservation_url,
         hours: details.hours,
+        features: (restaurant.features ?? []).map((feature) => DINER_STRINGS.en.features[feature]),
         dishes,
       })
     : null;
@@ -130,6 +132,7 @@ export default async function RestaurantMenuPage({ params, searchParams }: Resta
           logo_url: restaurant.logo_url,
           cover_url: restaurant.cover_url,
           kitchen_practices: restaurant.kitchen_practices ?? [],
+          features: restaurant.features ?? [],
         }}
         dishes={dishes}
         initialNow={renderedAt.getTime()}

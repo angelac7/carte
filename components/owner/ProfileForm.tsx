@@ -9,6 +9,7 @@ import { DINER_STRINGS } from "@/lib/i18n/diner-strings";
 import { DISCOVER_STRINGS } from "@/lib/i18n/discover-strings";
 import {
   OCCASIONS,
+  RESTAURANT_FEATURES,
   PRICE_RANGES,
   TIMEZONES,
   WEEKDAYS,
@@ -293,6 +294,32 @@ export function ProfileForm({ profile }: { profile: RestaurantProfile }) {
                 className="sr-only"
               />
               {DISCOVER_STRINGS.en.occasions[occasion]}
+            </label>
+          ))}
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend className="eyebrow text-muted">Accessibility and families</legend>
+        <div className="mt-3 flex flex-wrap gap-2.5">
+          {RESTAURANT_FEATURES.map((feature) => (
+            <label key={feature} className={chipClass}>
+              <input
+                type="checkbox"
+                name="feature"
+                value={feature}
+                checked={draft.features.includes(feature)}
+                onChange={(event) =>
+                  setDraft({
+                    ...draft,
+                    features: event.target.checked
+                      ? [...draft.features, feature]
+                      : draft.features.filter((value) => value !== feature),
+                  })
+                }
+                className="sr-only"
+              />
+              {DINER_STRINGS.en.features[feature]}
             </label>
           ))}
         </div>
