@@ -1,9 +1,9 @@
-import type { Breadcrumb, ErrorEvent } from "@sentry/nextjs";
+import type { Breadcrumb, ErrorEvent, init } from "@sentry/nextjs";
 
 /**
  * Error alerts go to Sentry, only when NEXT_PUBLIC_SENTRY_DSN is set. Reports carry what broke
  * and where, never who: no cookies, request bodies (which can hold a diner's allergies), query
- * strings (table codes, searches), network addresses, or clicks and typing.
+ * strings (table codes, searches), network addresses, variable values, or clicks and typing.
  */
 export function sentryOptions({
   // Written out in full so Next fills them in for the browser too.
@@ -17,10 +17,23 @@ export function sentryOptions({
     // Development errors show on screen already, so only the live site sends alerts.
     enabled: Boolean(dsn) && nodeEnv === "production",
     environment: vercelEnv || "production",
-    sendDefaultPii: false,
+    // Sentry collects all of this by default. userInfo off also stops Sentry recording the
+    // visitor's network address.
+    dataCollection: {
+      userInfo: false,
+      cookies: false,
+      httpHeaders: false,
+      httpBodies: [],
+      urlQueryParams: false,
+      graphQL: { document: false, variables: false },
+      genAI: { inputs: false, outputs: false },
+      databaseQueryData: false,
+      queues: false,
+      stackFrameVariables: false,
+    },
     beforeSend: scrubEvent,
     beforeBreadcrumb: scrubBreadcrumb,
-  };
+  } satisfies Parameters<typeof init>[0];
 }
 
 /** Cuts the query string and fragment off a URL or path. */
@@ -44,6 +57,10 @@ export function scrubEvent<E extends ErrorEvent>(event: E): E {
   const nextjs = event.contexts?.nextjs;
   if (nextjs && typeof nextjs.request_path === "string") {
     nextjs.request_path = withoutQuery(nextjs.request_path);
+  }
+  // Values of variables in the code that failed could hold anything a visitor sent.
+  for (const exception of event.exception?.values ?? []) {
+    for (const frame of exception.stacktrace?.frames ?? []) delete frame.vars;
   }
   if (event.breadcrumbs) {
     event.breadcrumbs = event.breadcrumbs

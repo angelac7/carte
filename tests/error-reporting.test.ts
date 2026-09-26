@@ -19,7 +19,14 @@ describe("sentryOptions", () => {
     });
     expect(options.enabled).toBe(true);
     expect(options.environment).toBe("preview");
-    expect(options.sendDefaultPii).toBe(false);
+    expect(options.dataCollection).toMatchObject({
+      userInfo: false,
+      cookies: false,
+      httpHeaders: false,
+      httpBodies: [],
+      urlQueryParams: false,
+      stackFrameVariables: false,
+    });
   });
 });
 
@@ -59,6 +66,22 @@ describe("scrubEvent", () => {
       headers: { "user-agent": "Safari" },
     });
     expect(event.contexts?.nextjs).toEqual({ request_path: "/r/cart", route_type: "render" });
+  });
+
+  it("drops the values of variables in the failing code", () => {
+    const event = scrubEvent({
+      type: undefined,
+      exception: {
+        values: [
+          {
+            type: "Error",
+            value: "AI failed",
+            stacktrace: { frames: [{ function: "recommend", vars: { avoid: ["peanuts"] } }] },
+          },
+        ],
+      },
+    } as ErrorEvent);
+    expect(event.exception?.values?.[0].stacktrace?.frames?.[0]).toEqual({ function: "recommend" });
   });
 
   it("scrubs breadcrumbs already on the report", () => {
