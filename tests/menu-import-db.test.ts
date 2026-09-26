@@ -79,3 +79,25 @@ it("rejects another user's receipt and expired previews", async () => {
   await db.query("update menu_imports set expires_at=now()-interval '1 minute' where id=$1", [id]);
   await expect(apply(id)).rejects.toThrow(/expired/);
 });
+it("allows editor-owned previews but prevents clients from forging applied receipts", async () => {
+  await db.exec("set role authenticated");
+  try {
+    const id = await preview([{ name: "Authenticated import" }]);
+    await apply(id);
+    await apply(id);
+    expect(
+      (await db.query("select id from menu_items where name='Authenticated import'")).rows,
+    ).toHaveLength(1);
+    await expect(
+      db.query("update menu_imports set applied_at=now() where id=$1", [id]),
+    ).rejects.toThrow(/permission denied/);
+    await expect(
+      db.query(
+        "insert into menu_imports(restaurant_id,snapshot,payload,applied_at) values($1,'[]','{}',now())",
+        [restaurant],
+      ),
+    ).rejects.toThrow(/permission denied/);
+  } finally {
+    await db.exec("reset role");
+  }
+});

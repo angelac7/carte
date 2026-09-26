@@ -64,3 +64,25 @@ actual email arrived or that a specific phone granted camera/microphone permissi
 Human verification of ownership, real email delivery, physical camera/microphone permissions,
 printing hardware, and mobile installation are operational checks; they cannot be replaced by
 server/unit tests. These changes do not add checkout, reservations, staff roles, or automatic cloud sync.
+
+## Spreadsheet import and menu review update
+
+For an existing project already migrated through `20261026000000_menu_currency.sql`, run
+[REVIEW_FIXES_UPDATE.sql](./REVIEW_FIXES_UPDATE.sql) **once** in Supabase SQL Editor before using
+spreadsheet imports or the new `/dashboard/checklist` page. Alternatively, apply migrations
+`20261027000000_atomic_menu_import.sql` and `20261028000000_review_reminders.sql` through your
+normal migration workflow; do not apply both methods. No new environment variables are needed.
+
+The checklist links from Dashboard and Review. It flags unconfirmed dishes, missing optional
+kitchen notes, contradictory tags, incomplete translations for the selected language, and
+reviews older than 90 days or with no recorded date. The interval is an owner maintenance
+reminder; recipe/preparation changes still need immediate review. A new review records a dated
+entry in History without changing the dish's contents. Existing dates come only from recorded
+confirmations, so older dishes can correctly show an unknown date.
+
+To verify on the deployed site: preview a spreadsheet, edit one dish in another tab, then apply
+it (expect a conflict and no imported rows). Select the file again for a fresh preview. Open a
+shared table on two phones, disconnect one, change quantities or shared allergies, and reconnect;
+the connection notice should report pending/failed changes and return to synced after a save.
+Retry persistence lasts while that page remains open. Print a dish with kitchen notes and check
+that the notes appear, including when its translated notes are unavailable.

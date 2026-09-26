@@ -1,4 +1,5 @@
 "use client";
+import { REVIEW_STRINGS } from "@/lib/i18n/review-strings";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useEffectEvent, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -568,6 +569,9 @@ export default function ReviewDishes({ timezone }: { timezone: string }) {
           </ButtonLink>
           <ButtonLink href="/dashboard/spreadsheet" variant="ghost">
             {t.review.spreadsheet}
+          </ButtonLink>
+          <ButtonLink href="/dashboard/checklist" variant="ghost">
+            {REVIEW_STRINGS[language].title}
           </ButtonLink>
         </OwnerPageHeader>
       </div>

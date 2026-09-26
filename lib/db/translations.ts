@@ -1,6 +1,7 @@
 import "server-only";
 import type { LanguageCode } from "@/lib/languages";
 import { translationHash } from "@/lib/source-hash";
+import { translationComplete } from "@/lib/publish-checklist";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { MenuItem } from "@/types/menu";
 import type { DishTranslation, MenuTranslations } from "@/types/translation";
@@ -37,7 +38,7 @@ export async function getCachedTranslations(
   const missing: MenuItem[] = [];
   for (const dish of dishes) {
     const row = saved.get(dish.id);
-    if (row && row.source_hash === translationHash(dish)) {
+    if (row && translationComplete(dish, { ...row, options: row.options ?? [] })) {
       found[dish.id] = {
         name: row.name,
         description: row.description,

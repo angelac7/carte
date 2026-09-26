@@ -1,3 +1,4 @@
+import { REVIEW_STRINGS } from "@/lib/i18n/review-strings";
 import type { Metadata } from "next";
 import { after } from "next/server";
 import Link from "@/components/OfflineLink";
@@ -80,6 +81,9 @@ export default async function DashboardHome() {
         </ButtonLink>
         <ButtonLink href="/dashboard/qr" variant="secondary">
           {t.dashboard.printQr}
+        </ButtonLink>
+        <ButtonLink href="/dashboard/checklist" variant="ghost">
+          {REVIEW_STRINGS[language].title}
         </ButtonLink>
       </OwnerPageHeader>
 

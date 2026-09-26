@@ -44,7 +44,7 @@ it("retries failed allergy writes rather than treating them as saved", async () 
 });
 it("does not apply a read that started before a local edit", async () => {
   const { sync, io } = setup();
-  let resolve!: (v: { lines: {}; allergies: {} }) => void;
+  let resolve!: (v: { lines: Record<string, never>; allergies: Record<string, never> }) => void;
   io.read.mockImplementationOnce(
     () =>
       new Promise((r) => {

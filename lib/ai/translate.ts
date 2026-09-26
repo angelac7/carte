@@ -62,7 +62,8 @@ export async function translateDishes(
       (["name", "description", "notes", "section"] as const).some(
         (key) => (dish[key] ?? "").trim() && !translated[key].trim(),
       ) ||
-      translated.options.length !== optionLabels(dish).length
+      translated.options.length !== optionLabels(dish).length ||
+      translated.options.some((label) => !label.trim())
     )
       throw new Error("The translation is incomplete. Please retry.");
     return translated;
