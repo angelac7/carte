@@ -12,15 +12,21 @@ type Summary = {
   unchanged: number;
   problems: { line: number; message: string }[];
   applied?: boolean;
+  previewId?: string;
   conflicts?: string[];
   error?: string;
 };
 
-async function sendSpreadsheet(csv: string, apply: boolean, fallback: string): Promise<Summary> {
+async function sendSpreadsheet(
+  csv: string,
+  apply: boolean,
+  fallback: string,
+  previewId?: string,
+): Promise<Summary> {
   const res = await fetch("/api/menu-spreadsheet", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ csv, apply }),
+    body: JSON.stringify({ csv, apply, previewId }),
   });
   const data = (await res.json().catch(() => ({}))) as Summary;
   if (!res.ok) throw new Error(data.error ?? fallback);
@@ -58,11 +64,11 @@ export function SpreadsheetImport() {
   }
 
   async function importIt() {
-    if (!csv) return;
+    if (!csv || !summary?.previewId || busy) return;
     setBusy(true);
     setError("");
     try {
-      setSummary(await sendSpreadsheet(csv, true, s.importFailed));
+      setSummary(await sendSpreadsheet(csv, true, s.importFailed, summary.previewId));
     } catch (err) {
       setError(err instanceof Error ? err.message : s.importFailed);
     } finally {
@@ -80,7 +86,11 @@ export function SpreadsheetImport() {
           type="file"
           accept=".csv,text/csv"
           disabled={busy}
-          onChange={(event) => preview(event.target.files?.[0])}
+          onChange={(event) => {
+            const file = event.target.files?.[0];
+            event.target.value = "";
+            void preview(file);
+          }}
           className="block w-full text-sm file:me-4 file:rounded-full file:border-0 file:bg-ink file:px-5 file:py-2.5 file:font-medium file:text-white"
         />
       </label>

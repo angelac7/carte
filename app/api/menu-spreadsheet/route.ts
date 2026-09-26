@@ -1,7 +1,10 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { getOwnerContext } from "@/lib/auth";
-import { addImportedDishes, listDishes, updateDish } from "@/lib/db";
+import { listDishes } from "@/lib/db";
+import { applyImportPreview, saveImportPreview } from "@/lib/db/menu-import";
+import { checkRateLimit } from "@/lib/rate-limit";
+import { IMPORT_STRINGS } from "@/lib/i18n/import-strings";
 import { menuToCsv, planImport, readImport } from "@/lib/menu-csv";
 import { ownerStrings } from "@/lib/owner-language";
 import { reportError } from "@/lib/report-error";
@@ -30,6 +33,7 @@ const ImportRequest = z.object({
   csv: z.string().max(1_000_000),
   /** False shows what would change; true makes the changes. */
   apply: z.boolean(),
+  previewId: z.uuid().optional(),
 });
 
 /**
@@ -38,10 +42,29 @@ const ImportRequest = z.object({
  */
 export async function POST(req: Request) {
   const owner = await getOwnerContext();
-  const { t } = await ownerStrings();
+  const { t, language } = await ownerStrings();
   if (!owner) return fail(t.api.loginMenu, 401);
   const parsed = ImportRequest.safeParse(await req.json().catch(() => null));
   if (!parsed.success) return fail(t.api.badFile);
+  const messages = IMPORT_STRINGS[language];
+  if (!(await checkRateLimit(`menu-import:${owner.user.id}`, 120, 60 * 60 * 1000)))
+    return fail(messages.limited, 429);
+  if (parsed.data.apply) {
+    if (!parsed.data.previewId) return fail(messages.stale, 409);
+    try {
+      const summary = await applyImportPreview(
+        owner.supabase,
+        owner.restaurant.id,
+        parsed.data.previewId,
+      );
+      return NextResponse.json({ ...summary, applied: true, conflicts: [] });
+    } catch (error) {
+      const code = (error as { code?: string }).code;
+      if (code === "40001" || code === "22023") return fail(messages.stale, 409);
+      reportError("Spreadsheet import failed", error);
+      return fail(t.api.importStopped, 500);
+    }
+  }
   const { rows, problems } = readImport(parsed.data.csv, t.spreadsheet.problems);
   const existing = await listDishes(owner.supabase, owner.restaurant.id);
   const plan = planImport(rows, existing);
@@ -51,19 +74,14 @@ export async function POST(req: Request) {
     unchanged: plan.unchanged,
     problems,
   };
-  // Nothing is imported while any row has a problem, so a half-read file can't change the menu.
-  if (!parsed.data.apply || problems.length > 0) return NextResponse.json(summary);
-
-  try {
-    await addImportedDishes(owner.supabase, owner.restaurant.id, plan.add);
-    const conflicts: string[] = [];
-    for (const { updated } of plan.change) {
-      const saved = await updateDish(owner.supabase, owner.restaurant.id, updated);
-      if (!saved) conflicts.push(updated.name);
-    }
-    return NextResponse.json({ ...summary, applied: true, conflicts });
-  } catch (err) {
-    reportError("Spreadsheet import failed", err);
-    return fail(t.api.importStopped, 500);
-  }
+  if (problems.length || (!plan.add.length && !plan.change.length))
+    return NextResponse.json(summary);
+  const previewId = await saveImportPreview(
+    owner.supabase,
+    owner.restaurant.id,
+    existing,
+    plan,
+    summary,
+  );
+  return NextResponse.json({ ...summary, previewId });
 }
