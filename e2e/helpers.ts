@@ -53,11 +53,15 @@ export async function deleteOwner(owner: TempOwner | undefined) {
 export type TestDish = { name: string; price: string; allergens?: string[]; section?: string };
 
 /** A restaurant with confirmed dishes and placeholder explanations, so no AI is called. */
-export async function createRestaurant(owner: TempOwner, dishes: TestDish[]) {
+export async function createRestaurant(
+  owner: TempOwner,
+  dishes: TestDish[],
+  name = "Test Kitchen",
+) {
   const slug = `e2e-${randomBytes(4).toString("hex")}`;
   const [restaurant] = await rest<{ id: string }[]>("restaurants", {
     method: "POST",
-    body: JSON.stringify({ owner_id: owner.id, name: "Test Kitchen", slug }),
+    body: JSON.stringify({ owner_id: owner.id, name, slug }),
   });
   const rows = await rest<
     { id: string; name: string; description: string; notes: string; source_language: string }[]
