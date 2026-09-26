@@ -411,7 +411,9 @@ export default function ReviewDishes({ timezone }: { timezone: string }) {
       const { calories, ...text } = details;
       const added = await saveDishes([{ ...text, likely_allergens: [], dietary_tags: [] }]);
       for (const dish of added) persisted.current.set(dish.id, dish);
-      setDishes((prev) => [...prev, ...added]);
+      // The first load may already include it, if the owner added it while the page loaded.
+      const addedIds = new Set(added.map((dish) => dish.id));
+      setDishes((prev) => [...prev.filter((dish) => !addedIds.has(dish.id)), ...added]);
       // New dishes come in the menu-reading format, which has no calories, so add them after.
       if (calories !== null && calories !== undefined) {
         for (const dish of added) void save({ ...dish, calories });

@@ -168,9 +168,9 @@ test("diners can see approximate prices in their own currency", async ({ page })
   await page.getByLabel("Also show prices in").selectOption("JPY");
   await expect(page.getByText(/European Central Bank rates/)).toBeVisible();
   await page.getByRole("dialog").getByRole("button", { name: "Close" }).click();
-  await expect(dishCard(page, "Green Salad")).toContainText(/≈ ￥[\d,]+/);
+  await expect(dishCard(page, "Green Salad")).toContainText(/≈ [¥￥][\d,]+/);
 
   // Remembered on this device.
   await page.reload();
-  await expect(dishCard(page, "Green Salad")).toContainText(/≈ ￥[\d,]+/);
+  await expect(dishCard(page, "Green Salad")).toContainText(/≈ [¥￥][\d,]+/);
 });
