@@ -8,6 +8,7 @@ describe("site navigation", () => {
       "Dashboard",
       "Upload",
       "Review dishes",
+      "Allergen history",
       "QR code",
       "Printed menu",
       "Profile",

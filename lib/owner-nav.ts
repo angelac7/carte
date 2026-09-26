@@ -23,6 +23,7 @@ export function ownerLinks(
         { href: "/dashboard", label: "Dashboard" },
         { href: "/dashboard/upload", label: "Upload" },
         { href: "/dashboard/review", label: "Review dishes" },
+        { href: "/dashboard/history", label: "Allergen history" },
         { href: "/dashboard/qr", label: "QR code" },
         { href: "/dashboard/print", label: "Printed menu" },
         { href: "/dashboard/profile", label: "Profile" },

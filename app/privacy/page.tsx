@@ -66,6 +66,10 @@ export default function PrivacyPage() {
           upload are sent to our AI provider to read the dishes.
         </li>
         <li>
+          <strong>Allergen history.</strong> Carte records who changed or confirmed each dish&apos;s
+          allergens, and when. Only the restaurant&apos;s owner and editors can see it.
+        </li>
+        <li>
           <strong>Deleting your account.</strong> You can delete your account at any time from the
           Account page. That permanently removes your login, restaurant, menu, photos, and diner
           reports.

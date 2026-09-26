@@ -52,4 +52,21 @@ test("a new owner sets up, adds and confirms a dish, and diners see it", async (
   await page.goto(`/r/${slug}`);
   await expect(dishCard(page, "Butter Chicken")).toBeVisible();
   await expect(dishCard(page, "Butter Chicken").getByText("milk")).toBeVisible();
+
+  // The allergen history shows who did what, and can go back to the version without milk.
+  await page.goto("/dashboard/history");
+  const entries = page.locator("main ol > li");
+  await expect(entries.filter({ hasText: "Butter Chicken · Confirmed by you" })).toBeVisible();
+  await expect(entries.filter({ hasText: /Contains:\s*\+ milk/ }).first()).toBeVisible();
+  await entries
+    .filter({ hasText: "Butter Chicken · Added by you" })
+    .getByRole("button", { name: "Go back to this version" })
+    .click();
+  await expect(page.getByText("The earlier allergens are back.")).toBeVisible();
+  await expect(entries.first()).toContainText("Changed by you");
+  await expect(entries.first()).toContainText(/Contains:\s*− milk/);
+
+  // Unconfirmed again, so diners don't see it until it's checked.
+  await page.goto(`/r/${slug}`);
+  await expect(dishCard(page, "Butter Chicken")).toHaveCount(0);
 });
