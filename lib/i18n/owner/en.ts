@@ -547,7 +547,7 @@ export const en = {
     evidencePlaceholder:
       "Your role, a business website, and how Carte can independently verify ownership. Do not include passwords or identity documents.",
     submit: "This is my restaurant",
-    findBefore: "Find your restaurant on the",
+    findBefore: "Find your restaurant on the ",
     nearbyPage: "Nearby page",
     findAfter: ", open it, and choose “Put your menu on Carte.”",
   },

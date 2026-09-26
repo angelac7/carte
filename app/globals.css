@@ -80,6 +80,12 @@
   line-height: 1rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
+  /* Spacing splits Arabic's joined letters and breaks the line across Hindi and Thai words. */
+  &:lang(ar),
+  &:lang(hi),
+  &:lang(th) {
+    letter-spacing: normal;
+  }
 }
 
 /* Faint graph-paper grid for editorial sections. */

@@ -153,7 +153,7 @@ export default async function ClaimPage({ searchParams }: { searchParams: Promis
 
       {!place && !claim.placeId && (
         <EmptyState className="mt-6 text-sm">
-          {t.claim.findBefore}{" "}
+          {t.claim.findBefore}
           <Link href="/places" className="underline underline-offset-4 hover:text-ink">
             {t.claim.nearbyPage}
           </Link>

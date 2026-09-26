@@ -87,3 +87,18 @@ test("the allergen chart marks each dish's allergens for staff", async ({ page }
   await page.goto("/dashboard/allergen-chart?lang=es");
   await expect(page.getByText("Tabla de alérgenos")).toBeVisible();
 });
+
+test("the dashboard switches language, and Arabic reads right to left", async ({ page }) => {
+  await logIn(page, owner);
+  await page.goto("/dashboard");
+  await page.getByLabel("Dashboard language").selectOption("es");
+  await expect(page.getByText("Bienvenido de nuevo")).toBeVisible();
+
+  await page.goto("/dashboard/review");
+  await expect(page.getByRole("heading", { level: 1, name: "Revisar platos" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Historial de alérgenos" })).toBeVisible();
+
+  await page.getByLabel("Idioma del panel").selectOption("ar");
+  await expect(page.getByRole("heading", { level: 1, name: "مراجعة الأطباق" })).toBeVisible();
+  await expect(page.locator('div[lang="ar"][dir="rtl"]')).toBeVisible();
+});

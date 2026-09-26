@@ -1,6 +1,6 @@
 "use client";
 import { AnimatePresence, motion } from "motion/react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useEffectEvent, useRef, useState } from "react";
 import { toast } from "sonner";
 import { DishHeader } from "@/components/DishHeader";
 import { DishOptionsEditor } from "@/components/owner/DishOptionsEditor";
@@ -327,13 +327,15 @@ export default function ReviewDishes({ timezone }: { timezone: string }) {
     setBusy(new Set(pending.current));
   }
 
+  // Dishes load once; the error reads in whatever language the dashboard is in by then.
+  const onLoadFailed = useEffectEvent(() => setProblem(t.review.loadFailed));
   useEffect(() => {
     fetchDishes()
       .then((loaded) => {
         persisted.current = new Map(loaded.map((dish) => [dish.id, dish]));
         setDishes(loaded);
       })
-      .catch(() => setProblem(t.review.loadFailed))
+      .catch(() => onLoadFailed())
       .finally(() => setLoaded(true));
   }, []);
 
