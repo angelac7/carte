@@ -568,6 +568,9 @@ export default function ReviewDishes({ timezone }: { timezone: string }) {
           <ButtonLink href="/dashboard/upload" variant="secondary">
             Upload a menu photo
           </ButtonLink>
+          <ButtonLink href="/dashboard/spreadsheet" variant="ghost">
+            Spreadsheet
+          </ButtonLink>
         </OwnerPageHeader>
       </div>
 

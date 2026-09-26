@@ -1,6 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { KitchenPractice } from "@/lib/allergens";
 import type { RestaurantFeature } from "@/lib/restaurant-profile";
+import type { ImportRow } from "@/lib/menu-csv";
 import type { ExtractedDish, MenuItem } from "@/types/menu";
 
 /** An owner runs the restaurant; an editor was invited to help keep its menu up to date. */
@@ -181,6 +182,49 @@ export async function addDishes(
   const { data, error } = await supabase.from("menu_items").insert(rows).select(DISH_COLUMNS);
   if (error) throw error;
   return (data ?? []) as unknown as MenuItem[];
+}
+
+/** Adds dishes from a spreadsheet, after the existing ones. Like every new dish, unconfirmed. */
+export async function addImportedDishes(
+  supabase: SupabaseClient,
+  restaurantId: string,
+  rows: ImportRow[],
+): Promise<number> {
+  if (rows.length === 0) return 0;
+  const { data: last, error: lastError } = await supabase
+    .from("menu_items")
+    .select("sort_order")
+    .eq("restaurant_id", restaurantId)
+    .order("sort_order", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (lastError) throw lastError;
+  const start = ((last as { sort_order: number } | null)?.sort_order ?? 0) + 1;
+  const inserts = rows.map((row, index) => {
+    const allergens = row.allergens ?? [];
+    return {
+      restaurant_id: restaurantId,
+      source_language: "und",
+      name: row.name,
+      description: row.description ?? "",
+      price: row.price ?? "",
+      section: row.section ?? "",
+      calories: row.calories ?? null,
+      spice: row.spice ?? null,
+      sort_order: start + index,
+      allergens,
+      removable: (row.removable ?? []).filter((a) => allergens.includes(a)),
+      may_contain: (row.may_contain ?? []).filter((a) => !allergens.includes(a)),
+      also_contains: row.also_contains ?? [],
+      dietary_tags: row.dietary_tags ?? [],
+      notes: row.notes ?? "",
+      special: row.special ?? false,
+      confirmed: false,
+    };
+  });
+  const { error } = await supabase.from("menu_items").insert(inserts);
+  if (error) throw error;
+  return inserts.length;
 }
 
 export async function updateDish(
