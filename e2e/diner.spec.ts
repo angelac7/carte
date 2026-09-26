@@ -33,6 +33,16 @@ test("public pages load without errors", async ({ page }) => {
   expect(errors).toEqual([]);
 });
 
+test("the home page scrolls freely down to the footer", async ({ page }) => {
+  await page.goto("/", { waitUntil: "domcontentloaded" });
+  // Safari's scroll snapping pulled visitors back up from the footer, so the page doesn't snap.
+  expect(await page.evaluate(() => getComputedStyle(document.documentElement).scrollSnapType)).toBe(
+    "none",
+  );
+  await page.evaluate(() => scrollTo(0, document.documentElement.scrollHeight));
+  await expect(page.locator("footer").getByRole("link").first()).toBeInViewport();
+});
+
 test("a diner's allergy filter hides dishes that contain it", async ({ page }) => {
   await page.goto(`/r/${slug}`);
   await expect(dishCard(page, "Peanut Noodles")).toBeVisible();

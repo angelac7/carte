@@ -639,7 +639,10 @@ export default function ReviewDishes({ timezone }: { timezone: string }) {
                         transition={{ type: "spring", bounce: 0.2, duration: 0.4 }}
                       />
                     )}
-                    {f.label} <span className="tabular-nums opacity-70">{f.count}</span>
+                    {f.label}{" "}
+                    <span className={cn("tabular-nums", filter === f.key && "opacity-70")}>
+                      {f.count}
+                    </span>
                   </button>
                 ))}
               </div>

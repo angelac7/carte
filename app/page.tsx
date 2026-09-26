@@ -95,11 +95,11 @@ export default async function LandingPage() {
     <>
       <ScrollProgress />
       <PublicHeader />
-      <main id="main" className="landing-snap">
+      <main id="main">
         <Hero />
 
         {/* Inverted ink band: what's on Carte, then the numbers. */}
-        <section aria-label="Carte in numbers" className="texture-ink snap-start text-white">
+        <section aria-label="Carte in numbers" className="texture-ink text-white">
           <div aria-label="Restaurants and cuisines on Carte" className="space-y-4 py-8">
             <Marquee duration={50}>
               {restaurants.length >= 3
@@ -162,7 +162,7 @@ export default async function LandingPage() {
           </div>
         </section>
 
-        <section className="snap-start px-5 py-24 sm:py-32">
+        <section className="px-5 py-24 sm:py-32">
           <div className="mx-auto max-w-6xl">
             <div className="flex items-center justify-between border-t-4 border-ink pt-5">
               <p className="eyebrow">01 — For diners</p>
@@ -179,7 +179,7 @@ export default async function LandingPage() {
           </div>
         </section>
 
-        <section className="snap-start px-5 py-24 sm:py-32">
+        <section className="px-5 py-24 sm:py-32">
           <div className="mx-auto grid max-w-6xl gap-16 lg:grid-cols-2">
             <div>
               <div className="border-t-4 border-ink pt-5">
@@ -218,7 +218,7 @@ export default async function LandingPage() {
           </div>
         </section>
 
-        <section className="texture-ink relative isolate snap-start overflow-hidden border-b border-white/10 px-5 py-28 text-white sm:py-40">
+        <section className="texture-ink relative isolate overflow-hidden border-b border-white/10 px-5 py-28 text-white sm:py-40">
           <Particles className="-z-10 opacity-40" color="#ffffff" />
           <div className="mx-auto max-w-4xl text-center">
             <p className="eyebrow text-white/60">03 — Tonight</p>

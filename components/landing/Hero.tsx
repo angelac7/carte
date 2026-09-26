@@ -18,7 +18,7 @@ const LANGUAGE_PHRASES = [
 /** Opening section: oversized editorial type beside the live menu card, raised from the clay. */
 export function Hero() {
   return (
-    <section className="relative isolate snap-start overflow-hidden">
+    <section className="relative isolate overflow-hidden">
       <div
         aria-hidden="true"
         className="texture-grid absolute inset-0 -z-10 [mask-image:linear-gradient(to_bottom,black,transparent_85%)]"

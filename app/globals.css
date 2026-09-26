@@ -343,12 +343,6 @@ html {
 
 /* ---------- Landing page ---------- */
 
-/* Gentle snapping between full-screen landing sections. */
-html:has(.landing-snap) {
-  scroll-snap-type: y proximity;
-  scroll-padding-top: 3.5rem;
-}
-
 /* A slow cinematic zoom on hero photos and video. */
 @keyframes ken-burns {
   from {
