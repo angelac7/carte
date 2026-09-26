@@ -11,6 +11,7 @@ describe("site navigation", () => {
       "Allergen history",
       "QR code",
       "Printed menu",
+      "Allergen chart",
       "Profile",
       "Map listing",
       "Team",

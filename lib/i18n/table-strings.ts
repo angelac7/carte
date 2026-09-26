@@ -46,6 +46,14 @@ export type TableStrings = {
   guest: (n: number) => string;
   you: string;
   shareFailed: string;
+  /** The printable allergen chart for staff. */
+  chartTitle: string;
+  chartIntro: string;
+  chartDish: string;
+  legendContains: string;
+  legendRemovable: string;
+  legendMayContain: string;
+  legendUnchecked: string;
   chooseAllergies: string;
   noAllergies: string;
   statement: string;
@@ -108,6 +116,14 @@ export const TABLE_STRINGS: Record<LanguageCode, TableStrings> = {
     guest: (n) => `Guest ${n}`,
     you: "you",
     shareFailed: "Your allergies couldn't be shared. Show your own allergy card instead.",
+    chartTitle: "Allergen chart",
+    chartIntro:
+      "For staff. From the allergens this restaurant confirmed. If you're unsure, ask the kitchen before serving.",
+    chartDish: "Dish",
+    legendContains: "Contains",
+    legendRemovable: "Contains, can be left out on request",
+    legendMayContain: "May contain traces",
+    legendUnchecked: "Not checked, ask the kitchen",
     chooseAllergies: "Choose your allergies",
     noAllergies: "No allergies selected yet.",
     statement: "I have a food allergy to:",
@@ -171,6 +187,14 @@ export const TABLE_STRINGS: Record<LanguageCode, TableStrings> = {
     guest: (n) => `Invitado ${n}`,
     you: "usted",
     shareFailed: "No se pudieron compartir sus alergias. Muestre su propia tarjeta de alergias.",
+    chartTitle: "Tabla de alérgenos",
+    chartIntro:
+      "Para el personal. Según los alérgenos que confirmó el restaurante. Si tiene dudas, consulte con la cocina antes de servir.",
+    chartDish: "Plato",
+    legendContains: "Contiene",
+    legendRemovable: "Contiene, se puede quitar a pedido",
+    legendMayContain: "Puede contener trazas",
+    legendUnchecked: "Sin revisar, consulte con la cocina",
     chooseAllergies: "Elija sus alergias",
     noAllergies: "Aún no ha elegido ninguna alergia.",
     statement: "Tengo alergia alimentaria a:",
@@ -234,6 +258,13 @@ export const TABLE_STRINGS: Record<LanguageCode, TableStrings> = {
     guest: (n) => `客人 ${n}`,
     you: "您",
     shareFailed: "未能分享您的过敏信息。请出示您自己的过敏卡。",
+    chartTitle: "过敏原对照表",
+    chartIntro: "供员工使用。依据本餐厅确认的过敏原信息。如有疑问，上菜前请先询问厨房。",
+    chartDish: "菜品",
+    legendContains: "含有",
+    legendRemovable: "含有，可应要求去除",
+    legendMayContain: "可能含有微量",
+    legendUnchecked: "未核实，请询问厨房",
     chooseAllergies: "选择您的过敏原",
     noAllergies: "尚未选择过敏原。",
     statement: "我对以下食物过敏：",
@@ -296,6 +327,14 @@ export const TABLE_STRINGS: Record<LanguageCode, TableStrings> = {
     guest: (n) => `손님 ${n}`,
     you: "나",
     shareFailed: "알레르기 정보를 공유하지 못했습니다. 본인의 알레르기 카드를 보여 주세요.",
+    chartTitle: "알레르기 성분표",
+    chartIntro:
+      "직원용입니다. 식당에서 확인한 알레르기 정보를 기준으로 합니다. 확실하지 않으면 서빙 전에 주방에 물어보세요.",
+    chartDish: "요리",
+    legendContains: "포함",
+    legendRemovable: "포함, 요청 시 뺄 수 있음",
+    legendMayContain: "미량 포함 가능",
+    legendUnchecked: "확인 안 됨, 주방에 문의",
     chooseAllergies: "알레르기를 선택하세요",
     noAllergies: "아직 선택한 알레르기가 없습니다.",
     statement: "저는 다음 식품에 알레르기가 있습니다:",
@@ -359,6 +398,14 @@ export const TABLE_STRINGS: Record<LanguageCode, TableStrings> = {
     guest: (n) => `ゲスト ${n}`,
     you: "あなた",
     shareFailed: "アレルギーを共有できませんでした。ご自身のアレルギーカードを見せてください。",
+    chartTitle: "アレルゲン一覧表",
+    chartIntro:
+      "スタッフ用です。店が確認したアレルゲン情報に基づいています。不明な場合は、提供前に厨房に確認してください。",
+    chartDish: "料理",
+    legendContains: "含む",
+    legendRemovable: "含む（ご要望で抜けます）",
+    legendMayContain: "微量に含む可能性あり",
+    legendUnchecked: "未確認、厨房に確認",
     chooseAllergies: "アレルギーを選択",
     noAllergies: "アレルギーがまだ選択されていません。",
     statement: "私は次の食品にアレルギーがあります：",
@@ -423,6 +470,14 @@ export const TABLE_STRINGS: Record<LanguageCode, TableStrings> = {
     you: "vous",
     shareFailed:
       "Vos allergies n’ont pas pu être partagées. Montrez plutôt votre propre carte d’allergies.",
+    chartTitle: "Tableau des allergènes",
+    chartIntro:
+      "Pour le personnel. D’après les allergènes confirmés par le restaurant. En cas de doute, demandez à la cuisine avant de servir.",
+    chartDish: "Plat",
+    legendContains: "Contient",
+    legendRemovable: "Contient, peut être retiré sur demande",
+    legendMayContain: "Peut contenir des traces",
+    legendUnchecked: "Non vérifié, demandez à la cuisine",
     chooseAllergies: "Choisissez vos allergies",
     noAllergies: "Aucune allergie sélectionnée pour l'instant.",
     statement: "J'ai une allergie alimentaire à :",
@@ -487,6 +542,14 @@ export const TABLE_STRINGS: Record<LanguageCode, TableStrings> = {
     guest: (n) => `Khách ${n}`,
     you: "bạn",
     shareFailed: "Không chia sẻ được dị ứng của bạn. Hãy đưa thẻ dị ứng của riêng bạn.",
+    chartTitle: "Bảng chất gây dị ứng",
+    chartIntro:
+      "Dành cho nhân viên. Theo thông tin chất gây dị ứng nhà hàng đã xác nhận. Nếu không chắc, hãy hỏi bếp trước khi phục vụ.",
+    chartDish: "Món",
+    legendContains: "Có chứa",
+    legendRemovable: "Có chứa, có thể bỏ ra theo yêu cầu",
+    legendMayContain: "Có thể lẫn vết",
+    legendUnchecked: "Chưa kiểm tra, hãy hỏi bếp",
     chooseAllergies: "Chọn chất bạn bị dị ứng",
     noAllergies: "Chưa chọn chất gây dị ứng nào.",
     statement: "Tôi bị dị ứng thực phẩm với:",
@@ -552,6 +615,14 @@ export const TABLE_STRINGS: Record<LanguageCode, TableStrings> = {
     you: "você",
     shareFailed:
       "Não foi possível compartilhar suas alergias. Mostre seu próprio cartão de alergias.",
+    chartTitle: "Tabela de alérgenos",
+    chartIntro:
+      "Para a equipe. Com base nos alérgenos que o restaurante confirmou. Em caso de dúvida, pergunte à cozinha antes de servir.",
+    chartDish: "Prato",
+    legendContains: "Contém",
+    legendRemovable: "Contém, pode ser retirado a pedido",
+    legendMayContain: "Pode conter traços",
+    legendUnchecked: "Não verificado, pergunte à cozinha",
     chooseAllergies: "Escolha suas alergias",
     noAllergies: "Nenhuma alergia escolhida ainda.",
     statement: "Tenho alergia alimentar a:",
@@ -616,6 +687,14 @@ export const TABLE_STRINGS: Record<LanguageCode, TableStrings> = {
     you: "Sie",
     shareFailed:
       "Ihre Allergien konnten nicht geteilt werden. Zeigen Sie stattdessen Ihre eigene Allergiekarte.",
+    chartTitle: "Allergentabelle",
+    chartIntro:
+      "Für das Personal. Nach den vom Restaurant bestätigten Allergenen. Im Zweifel vor dem Servieren in der Küche nachfragen.",
+    chartDish: "Gericht",
+    legendContains: "Enthält",
+    legendRemovable: "Enthält, kann auf Wunsch weggelassen werden",
+    legendMayContain: "Kann Spuren enthalten",
+    legendUnchecked: "Nicht geprüft, in der Küche nachfragen",
     chooseAllergies: "Wählen Sie Ihre Allergien",
     noAllergies: "Noch keine Allergien ausgewählt.",
     statement: "Ich habe eine Lebensmittelallergie gegen:",
@@ -685,6 +764,14 @@ export const TABLE_STRINGS: Record<LanguageCode, TableStrings> = {
     guest: (n) => `ضيف ${n}`,
     you: "أنت",
     shareFailed: "تعذّرت مشاركة حساسيتك. اعرض بطاقة الحساسية الخاصة بك بدلًا من ذلك.",
+    chartTitle: "جدول مسببات الحساسية",
+    chartIntro:
+      "للموظفين. بحسب مسببات الحساسية التي أكدها المطعم. إذا لم تكن متأكدًا، فاسأل المطبخ قبل التقديم.",
+    chartDish: "الطبق",
+    legendContains: "يحتوي على",
+    legendRemovable: "يحتوي على، ويمكن إزالته عند الطلب",
+    legendMayContain: "قد يحتوي على آثار",
+    legendUnchecked: "لم يُتحقق منه، اسأل المطبخ",
     chooseAllergies: "اختر أنواع الحساسية لديك",
     noAllergies: "لم يتم اختيار أي حساسية بعد.",
     statement: "لدي حساسية غذائية من:",
@@ -747,6 +834,14 @@ export const TABLE_STRINGS: Record<LanguageCode, TableStrings> = {
     guest: (n) => `मेहमान ${n}`,
     you: "आप",
     shareFailed: "आपकी एलर्जी साझा नहीं हो सकी। इसके बजाय अपना एलर्जी कार्ड दिखाएँ।",
+    chartTitle: "एलर्जेन चार्ट",
+    chartIntro:
+      "स्टाफ़ के लिए। रेस्तराँ द्वारा पुष्टि किए गए एलर्जेन के आधार पर। संदेह हो तो परोसने से पहले रसोई से पूछें।",
+    chartDish: "व्यंजन",
+    legendContains: "शामिल है",
+    legendRemovable: "शामिल है, कहने पर हटाया जा सकता है",
+    legendMayContain: "अंश हो सकते हैं",
+    legendUnchecked: "जाँचा नहीं गया, रसोई से पूछें",
     chooseAllergies: "अपनी एलर्जी चुनें",
     noAllergies: "अभी कोई एलर्जी नहीं चुनी गई है।",
     statement: "मुझे इन खाद्य पदार्थों से एलर्जी है:",
@@ -810,6 +905,14 @@ export const TABLE_STRINGS: Record<LanguageCode, TableStrings> = {
     guest: (n) => `แขก ${n}`,
     you: "คุณ",
     shareFailed: "แชร์อาการแพ้ของคุณไม่สำเร็จ โปรดแสดงบัตรอาการแพ้ของคุณเองแทน",
+    chartTitle: "ตารางสารก่อภูมิแพ้",
+    chartIntro:
+      "สำหรับพนักงาน อ้างอิงข้อมูลสารก่อภูมิแพ้ที่ร้านยืนยันแล้ว หากไม่แน่ใจ ให้สอบถามครัวก่อนเสิร์ฟ",
+    chartDish: "เมนู",
+    legendContains: "มี",
+    legendRemovable: "มี แต่เอาออกได้ตามคำขอ",
+    legendMayContain: "อาจมีปนเปื้อน",
+    legendUnchecked: "ยังไม่ได้ตรวจสอบ โปรดถามครัว",
     chooseAllergies: "เลือกอาการแพ้ของคุณ",
     noAllergies: "ยังไม่ได้เลือกอาการแพ้",
     statement: "ฉันแพ้อาหารต่อไปนี้:",
@@ -874,6 +977,14 @@ export const TABLE_STRINGS: Record<LanguageCode, TableStrings> = {
     guest: (n) => `Bisita ${n}`,
     you: "ikaw",
     shareFailed: "Hindi naibahagi ang allergy mo. Ipakita na lang ang sarili mong allergy card.",
+    chartTitle: "Talaan ng allergen",
+    chartIntro:
+      "Para sa staff. Batay sa mga allergen na kinumpirma ng restawran. Kung hindi sigurado, magtanong muna sa kusina bago magserve.",
+    chartDish: "Putahe",
+    legendContains: "Mayroon",
+    legendRemovable: "Mayroon, puwedeng tanggalin kapag hiniling",
+    legendMayContain: "Maaaring may bakas",
+    legendUnchecked: "Hindi pa natsek, magtanong sa kusina",
     chooseAllergies: "Piliin ang mga allergy mo",
     noAllergies: "Wala pang napiling allergy.",
     statement: "May allergy ako sa pagkaing ito:",

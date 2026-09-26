@@ -74,3 +74,16 @@ test("an invited editor can work on the menu but not the team", async ({ browser
   await ownerPage.reload();
   await expect(ownerPage.getByText(editor.email)).toBeVisible();
 });
+
+test("the allergen chart marks each dish's allergens for staff", async ({ page }) => {
+  await logIn(page, owner);
+  await page.goto("/dashboard");
+  await page.getByLabel("Location").selectOption({ label: "North Kitchen" });
+  await expect(page.getByRole("heading", { level: 1, name: "North Kitchen" })).toBeVisible();
+  await page.goto("/dashboard/allergen-chart");
+  const row = page.getByRole("row", { name: /Peanut Noodles/ });
+  await expect(row).toContainText("●");
+  await expect(row).toContainText("Contains");
+  await page.goto("/dashboard/allergen-chart?lang=es");
+  await expect(page.getByText("Tabla de alérgenos")).toBeVisible();
+});

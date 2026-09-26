@@ -26,6 +26,7 @@ export function ownerLinks(
         { href: "/dashboard/history", label: "Allergen history" },
         { href: "/dashboard/qr", label: "QR code" },
         { href: "/dashboard/print", label: "Printed menu" },
+        { href: "/dashboard/allergen-chart", label: "Allergen chart" },
         { href: "/dashboard/profile", label: "Profile" },
         ...(owner
           ? [
