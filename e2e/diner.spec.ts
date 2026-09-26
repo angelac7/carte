@@ -1,12 +1,20 @@
 import { expect, test } from "@playwright/test";
-import { createOwner, createRestaurant, deleteOwner, dishCard, type TempOwner } from "./helpers";
+import {
+  createOwner,
+  createRestaurant,
+  deleteOwner,
+  dishCard,
+  rest,
+  type TempOwner,
+} from "./helpers";
 
 let owner: TempOwner;
 let slug: string;
+let restaurantId: string;
 
 test.beforeAll(async () => {
   owner = await createOwner();
-  ({ slug } = await createRestaurant(owner, [
+  ({ slug, id: restaurantId } = await createRestaurant(owner, [
     { name: "Peanut Noodles", price: "$14", allergens: ["peanuts", "wheat"], section: "Noodles" },
     { name: "Green Salad", price: "$9", section: "Starters" },
   ]));
@@ -46,4 +54,25 @@ test("the allergy card tells staff about a severe allergy", async ({ page }) => 
   await card.getByRole("button", { name: "Severe allergy" }).click();
   await expect(card.getByText("I have a food allergy to:").first()).toBeVisible();
   await expect(card.getByText(/even a trace can make me very ill/).first()).toBeVisible();
+});
+
+test("only menus on Discover describe themselves to Google", async ({ page }) => {
+  const structuredData = page.locator('script[type="application/ld+json"]');
+  await page.goto(`/r/${slug}`);
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", /noindex/);
+  await expect(structuredData).toHaveCount(0);
+
+  await rest(`restaurants?id=eq.${restaurantId}`, {
+    method: "PATCH",
+    body: JSON.stringify({ listed: true }),
+  });
+  await page.goto(`/r/${slug}`);
+  await expect(page.locator('meta[name="robots"]')).toHaveCount(0);
+  const data = JSON.parse((await structuredData.textContent()) ?? "{}");
+  expect(data["@type"]).toBe("Restaurant");
+  expect(data.hasMenu.hasMenuSection.map((section: { name: string }) => section.name)).toEqual([
+    "Noodles",
+    "Starters",
+  ]);
+  expect(JSON.stringify(data)).not.toMatch(/allergen|wheat/i);
 });

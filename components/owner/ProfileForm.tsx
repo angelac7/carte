@@ -65,7 +65,8 @@ export function ProfileForm({ profile }: { profile: RestaurantProfile }) {
         <span>
           <span className="font-medium">Show my restaurant on Carte Discover</span>
           <span className="mt-1 block text-sm text-muted">
-            Diners can find your restaurant and confirmed dishes in search. Turn this off anytime.
+            Diners can find your restaurant and confirmed dishes in Carte&apos;s search and on
+            Google. When it&apos;s off, only people with your menu link or QR code see it.
           </span>
         </span>
       </label>
