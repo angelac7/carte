@@ -16,6 +16,7 @@ import { prepareExplanations } from "@/lib/prepare-explanations";
 import { deleteStoredPhoto } from "@/lib/storage/dish-photos";
 import { tagConflictMessages } from "@/lib/tag-conflicts";
 import { ExtractedDishSchema, MenuItemSchema } from "@/types/menu";
+import { ownerStrings } from "@/lib/owner-language";
 
 const SaveRequest = z.object({
   items: z.array(ExtractedDishSchema).max(300),
@@ -31,7 +32,6 @@ const DeleteRequest = z.union([
   }),
 ]);
 const ReorderRequest = z.object({ order: z.array(z.uuid()).min(1).max(10000) });
-const LOGIN_REQUIRED = "Log in to manage your menu.";
 
 function fail(message: string, status = 400) {
   return NextResponse.json({ error: message }, { status });
@@ -40,7 +40,8 @@ function fail(message: string, status = 400) {
 /** Every dish for the signed-in owner's restaurant. */
 export async function GET() {
   const owner = await getOwnerContext();
-  if (!owner) return fail(LOGIN_REQUIRED, 401);
+  const { t } = await ownerStrings();
+  if (!owner) return fail(t.api.loginMenu, 401);
   return NextResponse.json(await listDishes(owner.supabase, owner.restaurant.id));
 }
 
@@ -50,9 +51,10 @@ export async function GET() {
  */
 export async function POST(req: Request) {
   const owner = await getOwnerContext();
-  if (!owner) return fail(LOGIN_REQUIRED, 401);
+  const { t } = await ownerStrings();
+  if (!owner) return fail(t.api.loginMenu, 401);
   const parsed = SaveRequest.safeParse(await req.json().catch(() => null));
-  if (!parsed.success) return fail("The dishes to save were not in the expected format.");
+  if (!parsed.success) return fail(t.api.badDishes);
   const { items, skipExisting } = parsed.data;
   const toAdd = skipExisting
     ? withoutDuplicates(
@@ -66,18 +68,25 @@ export async function POST(req: Request) {
 /** Updates one dish's details, allergens, tags, notes, or confirmation. */
 export async function PUT(req: Request) {
   const owner = await getOwnerContext();
-  if (!owner) return fail(LOGIN_REQUIRED, 401);
+  const { t } = await ownerStrings();
+  if (!owner) return fail(t.api.loginMenu, 401);
   const parsed = MenuItemSchema.extend({
     revision: Version,
     // True only when the owner pressed Confirm, after seeing every allergen on the list.
     confirm: z.boolean().optional(),
   }).safeParse(await req.json().catch(() => null));
-  if (!parsed.success) return fail("That dish was not in the expected format.");
+  if (!parsed.success) return fail(t.api.badDish);
   if (!parsed.data.available_from !== !parsed.data.available_until) {
-    return fail("Set both serving times, or neither.");
+    return fail(t.api.servingTimes);
   }
   // A contradicted diet tag (like vegan with eggs) would mislead diners, so it can't be confirmed.
-  const conflicts = tagConflictMessages(parsed.data.allergens, parsed.data.dietary_tags);
+  const { language } = await ownerStrings();
+  const conflicts = tagConflictMessages(
+    parsed.data.allergens,
+    parsed.data.dietary_tags,
+    language,
+    t.review.tagConflict,
+  );
   if (parsed.data.confirmed && conflicts.length > 0) return fail(conflicts.join(" "));
   const { confirm, ...dish } = parsed.data;
   const updated = await updateDish(owner.supabase, owner.restaurant.id, {
@@ -87,11 +96,7 @@ export async function PUT(req: Request) {
     allergen_list: confirm && dish.confirmed ? ALLERGEN_LIST_VERSION : undefined,
     also_checked: confirm && dish.confirmed ? true : undefined,
   });
-  if (!updated)
-    return fail(
-      "This dish changed in another tab or was deleted. Reload to review the latest version.",
-      409,
-    );
+  if (!updated) return fail(t.api.dishConflict, 409);
   // Explain a newly confirmed dish right away, so the first diner to open it doesn't wait.
   if (updated.confirmed) after(() => prepareExplanations([updated], owner.restaurant.name));
   return NextResponse.json(updated);
@@ -100,9 +105,10 @@ export async function PUT(req: Request) {
 /** Saves the owner's dish order. Returns each moved dish's new version. */
 export async function PATCH(req: Request) {
   const owner = await getOwnerContext();
-  if (!owner) return fail(LOGIN_REQUIRED, 401);
+  const { t } = await ownerStrings();
+  if (!owner) return fail(t.api.loginMenu, 401);
   const parsed = ReorderRequest.safeParse(await req.json().catch(() => null));
-  if (!parsed.success) return fail("The new order was not in the expected format.");
+  if (!parsed.success) return fail(t.api.badOrder);
   return NextResponse.json(
     await reorderDishes(owner.supabase, owner.restaurant.id, parsed.data.order),
   );
@@ -111,17 +117,17 @@ export async function PATCH(req: Request) {
 /** Deletes one dish, or every dish, along with their photos. */
 export async function DELETE(req: Request) {
   const owner = await getOwnerContext();
-  if (!owner) return fail(LOGIN_REQUIRED, 401);
+  const { t } = await ownerStrings();
+  if (!owner) return fail(t.api.loginMenu, 401);
   const parsed = DeleteRequest.safeParse(await req.json().catch(() => null));
-  if (!parsed.success) return fail("No dish was specified.");
+  if (!parsed.success) return fail(t.api.noDish);
 
   if ("all" in parsed.data) {
     let photos: string[];
     try {
       photos = await deleteAllDishes(owner.supabase, owner.restaurant.id, parsed.data.expected);
     } catch (error) {
-      if ((error as { code?: string }).code === "40001")
-        return fail("The menu changed. Reload before deleting.", 409);
+      if ((error as { code?: string }).code === "40001") return fail(t.api.menuChanged, 409);
       throw error;
     }
     await Promise.all(
@@ -134,7 +140,7 @@ export async function DELETE(req: Request) {
   if (
     !(await deleteDish(owner.supabase, owner.restaurant.id, parsed.data.id, parsed.data.revision))
   )
-    return fail("This dish changed. Reload before deleting.", 409);
+    return fail(t.api.dishChanged, 409);
   await deleteStoredPhoto(photoUrl, owner.restaurant.id).catch(() => {});
   return NextResponse.json({ ok: true });
 }

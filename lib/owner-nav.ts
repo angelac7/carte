@@ -1,12 +1,19 @@
+import { en } from "@/lib/i18n/owner/en";
+import type { OwnerStrings } from "@/lib/i18n/owner-strings";
+
 export type NavLink = { href: string; label: string };
 
 /** Links everyone sees, signed in or not. */
-export const DINER_LINKS: NavLink[] = [
-  { href: "/discover", label: "Discover" },
-  { href: "/places", label: "Nearby" },
-  { href: "/scan", label: "Scan a menu" },
-  { href: "/my", label: "My Carte" },
-];
+export function dinerLinks(labels: OwnerStrings["header"] = en.header): NavLink[] {
+  return [
+    { href: "/discover", label: labels.discover },
+    { href: "/places", label: labels.nearby },
+    { href: "/scan", label: labels.scanMenu },
+    { href: "/my", label: labels.myCarte },
+  ];
+}
+
+export const DINER_LINKS: NavLink[] = dinerLinks();
 
 /**
  * The extra pages a signed-in owner sees, in one place so the header menu and the dashboard
@@ -15,32 +22,33 @@ export const DINER_LINKS: NavLink[] = [
 export function ownerLinks(
   restaurant: { slug: string; role?: "owner" | "editor" } | null,
   admin: boolean,
+  labels: OwnerStrings["nav"] = en.nav,
 ): NavLink[] {
   // Editors help with the menu; the map listing and the team are the owner's.
   const owner = restaurant?.role !== "editor";
   const links: NavLink[] = restaurant
     ? [
-        { href: "/dashboard", label: "Dashboard" },
-        { href: "/dashboard/upload", label: "Upload" },
-        { href: "/dashboard/review", label: "Review dishes" },
-        { href: "/dashboard/history", label: "Allergen history" },
-        { href: "/dashboard/qr", label: "QR code" },
-        { href: "/dashboard/print", label: "Printed menu" },
-        { href: "/dashboard/allergen-chart", label: "Allergen chart" },
-        { href: "/dashboard/profile", label: "Profile" },
+        { href: "/dashboard", label: labels.dashboard },
+        { href: "/dashboard/upload", label: labels.upload },
+        { href: "/dashboard/review", label: labels.review },
+        { href: "/dashboard/history", label: labels.history },
+        { href: "/dashboard/qr", label: labels.qr },
+        { href: "/dashboard/print", label: labels.print },
+        { href: "/dashboard/allergen-chart", label: labels.chart },
+        { href: "/dashboard/profile", label: labels.profile },
         ...(owner
           ? [
-              { href: "/dashboard/claim", label: "Map listing" },
-              { href: "/dashboard/team", label: "Team" },
+              { href: "/dashboard/claim", label: labels.claim },
+              { href: "/dashboard/team", label: labels.team },
             ]
           : []),
-        { href: "/dashboard/account", label: "Account" },
-        { href: `/r/${restaurant.slug}`, label: "Diner menu" },
+        { href: "/dashboard/account", label: labels.account },
+        { href: `/r/${restaurant.slug}`, label: labels.dinerMenu },
       ]
     : [
-        { href: "/dashboard/setup", label: "Set up your restaurant" },
-        { href: "/dashboard/account", label: "Account" },
+        { href: "/dashboard/setup", label: labels.setup },
+        { href: "/dashboard/account", label: labels.account },
       ];
-  if (admin) links.push({ href: "/admin", label: "Admin" });
+  if (admin) links.push({ href: "/admin", label: labels.admin });
   return links;
 }

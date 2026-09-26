@@ -10,10 +10,17 @@ type NavBarProps = {
   homeHref: string;
   links: NavLink[];
   trailing?: ReactNode;
+  /** Names for the phone menu button. */
+  menuLabels?: { open: string; close: string };
 };
 
 /** A sticky header: links with a sliding highlight on larger screens, a menu button on phones. */
-export function NavBar({ homeHref, links, trailing }: NavBarProps) {
+export function NavBar({
+  homeHref,
+  links,
+  trailing,
+  menuLabels = { open: "Open menu", close: "Close menu" },
+}: NavBarProps) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   // Lift the header off the page once the visitor starts scrolling.
@@ -69,7 +76,7 @@ export function NavBar({ homeHref, links, trailing }: NavBarProps) {
           className="rounded-full bg-paper p-2.5 shadow-raised-sm transition-shadow active:shadow-pressed-sm md:hidden"
           aria-expanded={open}
           aria-controls="mobile-nav"
-          aria-label={open ? "Close menu" : "Open menu"}
+          aria-label={open ? menuLabels.close : menuLabels.open}
           onClick={() => setOpen((current) => !current)}
         >
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">

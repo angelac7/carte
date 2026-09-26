@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { DishHeader } from "@/components/DishHeader";
 import { DishOptionsEditor } from "@/components/owner/DishOptionsEditor";
 import { DishPhotoEditor } from "@/components/owner/DishPhotoEditor";
+import { useOwnerText } from "@/components/owner/OwnerLanguage";
 import { OwnerPageHeader } from "@/components/owner/OwnerPageHeader";
 import { ProgressBar } from "@/components/ProgressBar";
 import { Sheet } from "@/components/Sheet";
@@ -35,6 +36,9 @@ import {
 } from "@/lib/api-client";
 import { restaurantClock, shortTime } from "@/lib/availability";
 import { cn } from "@/lib/cn";
+import { formatList } from "@/lib/format-list";
+import { DINER_STRINGS } from "@/lib/i18n/diner-strings";
+import { fmt, plural } from "@/lib/i18n/owner/format";
 import { groupBySection, hasSections, moveDish, moveSection } from "@/lib/menu-sections";
 import { tagConflictMessages } from "@/lib/tag-conflicts";
 import { toggleValue } from "@/lib/toggle-value";
@@ -69,6 +73,7 @@ function DishDetailsForm({
     initial.calories === null || initial.calories === undefined ? "" : String(initial.calories),
   );
   const [sourceLanguage, setSourceLanguage] = useState(initial.source_language ?? "und");
+  const { t } = useOwnerText();
 
   return (
     <form
@@ -86,7 +91,7 @@ function DishDetailsForm({
       className="space-y-3"
     >
       <label className="block">
-        <span className={labelClass}>Dish name</span>
+        <span className={labelClass}>{t.review.dishName}</span>
         <input
           required
           maxLength={120}
@@ -96,7 +101,7 @@ function DishDetailsForm({
         />
       </label>
       <label className="block">
-        <span className={labelClass}>Description</span>
+        <span className={labelClass}>{t.review.description}</span>
         <textarea
           rows={3}
           maxLength={500}
@@ -106,7 +111,7 @@ function DishDetailsForm({
         />
       </label>
       <label className="block">
-        <span className={labelClass}>Price</span>
+        <span className={labelClass}>{t.review.price}</span>
         <input
           maxLength={20}
           value={price}
@@ -116,7 +121,7 @@ function DishDetailsForm({
         />
       </label>
       <label className="block">
-        <span className={labelClass}>Calories (optional)</span>
+        <span className={labelClass}>{t.review.calories}</span>
         <input
           type="number"
           inputMode="numeric"
@@ -127,12 +132,10 @@ function DishDetailsForm({
           onChange={(e) => setCalories(e.target.value)}
           className={cn(inputClass, "max-w-40")}
         />
-        <span className="text-xs text-muted">
-          Per serving, only if you know it. Chains with 20 or more US locations must show calories.
-        </span>
+        <span className="text-xs text-muted">{t.review.caloriesHint}</span>
       </label>
       <label className="block">
-        <span className={labelClass}>Language of the dish text</span>
+        <span className={labelClass}>{t.review.language}</span>
         <input
           required
           maxLength={35}
@@ -141,17 +144,14 @@ function DishDetailsForm({
           onChange={(event) => setSourceLanguage(event.target.value)}
           className={inputClass}
         />
-        <span className="text-xs text-muted">
-          Use a language code such as en, es, ja, ar, or th. Use und for automatic detection or
-          mixed languages. Include kitchen notes in this language.
-        </span>
+        <span className="text-xs text-muted">{t.review.languageHint}</span>
       </label>
       <div className="flex gap-2 pt-1">
         <Button type="submit" size="sm">
           {submitLabel}
         </Button>
         <Button type="button" size="sm" variant="ghost" onClick={onCancel}>
-          Cancel
+          {t.review.cancel}
         </Button>
       </div>
     </form>
@@ -172,13 +172,14 @@ function MoveButtons({
   disabled: boolean;
   onMove: (direction: -1 | 1) => void;
 }) {
+  const { t } = useOwnerText();
   const arrowClass =
     "flex h-11 w-11 items-center justify-center rounded-full bg-paper text-lg shadow-raised-sm transition-[box-shadow,color] hover:text-accent active:shadow-pressed-sm disabled:opacity-40 disabled:shadow-none";
   return (
     <div className="flex shrink-0 gap-1.5">
       <button
         type="button"
-        aria-label={`Move ${label} up`}
+        aria-label={fmt(t.review.moveUp, { label })}
         disabled={disabled || !canUp}
         onClick={() => onMove(-1)}
         className={arrowClass}
@@ -187,7 +188,7 @@ function MoveButtons({
       </button>
       <button
         type="button"
-        aria-label={`Move ${label} down`}
+        aria-label={fmt(t.review.moveDown, { label })}
         disabled={disabled || !canDown}
         onClick={() => onMove(1)}
         className={arrowClass}
@@ -212,6 +213,7 @@ function AvailabilityControls({
   onSpecial: (special: boolean) => void;
   onServingTimes: (from: string | null, until: string | null) => void;
 }) {
+  const { t } = useOwnerText();
   const [from, setFrom] = useState(shortTime(dish.available_from));
   const [until, setUntil] = useState(shortTime(dish.available_until));
   const saved = [shortTime(dish.available_from), shortTime(dish.available_until)];
@@ -227,7 +229,7 @@ function AvailabilityControls({
 
   return (
     <fieldset className="mt-5">
-      <legend className="eyebrow text-muted">Availability</legend>
+      <legend className="eyebrow text-muted">{t.review.availability}</legend>
       <div className="mt-2 flex flex-wrap gap-2">
         <button
           type="button"
@@ -235,7 +237,7 @@ function AvailabilityControls({
           onClick={() => onSoldOut(!soldOut)}
           className={cn(pillClass(soldOut), soldOut && "bg-tomato")}
         >
-          Sold out today
+          {t.review.soldOutToday}
         </button>
         <button
           type="button"
@@ -243,12 +245,12 @@ function AvailabilityControls({
           onClick={() => onSpecial(!dish.special)}
           className={pillClass(Boolean(dish.special))}
         >
-          Special
+          {t.review.special}
         </button>
       </div>
       <div className="mt-3 flex flex-wrap items-end gap-3">
         <label className="block">
-          <span className={labelClass}>Served from</span>
+          <span className={labelClass}>{t.review.servedFrom}</span>
           <input
             type="time"
             value={from}
@@ -257,7 +259,7 @@ function AvailabilityControls({
           />
         </label>
         <label className="block">
-          <span className={labelClass}>until</span>
+          <span className={labelClass}>{t.review.until}</span>
           <input
             type="time"
             value={until}
@@ -273,7 +275,7 @@ function AvailabilityControls({
             disabled={!complete}
             onClick={() => onServingTimes(from || null, until || null)}
           >
-            Save times
+            {t.review.saveTimes}
           </Button>
         )}
         {(saved[0] || from) && (
@@ -287,14 +289,11 @@ function AvailabilityControls({
               onServingTimes(null, null);
             }}
           >
-            Served all day
+            {t.review.allDay}
           </Button>
         )}
       </div>
-      <p className="mt-1 text-xs text-muted">
-        Leave both empty if it&apos;s served whenever you&apos;re open. Sold out resets on its own
-        tomorrow.
-      </p>
+      <p className="mt-1 text-xs text-muted">{t.review.timesHint}</p>
     </fieldset>
   );
 }
@@ -303,6 +302,8 @@ function AvailabilityControls({
 const checkedForAll = (dish: MenuItem) => (dish.allergen_list ?? 1) >= ALLERGEN_LIST_VERSION;
 
 export default function ReviewDishes({ timezone }: { timezone: string }) {
+  const { t, language } = useOwnerText();
+  const d = DINER_STRINGS[language];
   const [dishes, setDishes] = useState<MenuItem[]>([]);
   const [loaded, setLoaded] = useState(false);
   const [filter, setFilter] = useState<Filter>("all");
@@ -332,9 +333,7 @@ export default function ReviewDishes({ timezone }: { timezone: string }) {
         persisted.current = new Map(loaded.map((dish) => [dish.id, dish]));
         setDishes(loaded);
       })
-      .catch(() =>
-        setProblem("Your dishes couldn't be loaded. Check that Carte is running, then refresh."),
-      )
+      .catch(() => setProblem(t.review.loadFailed))
       .finally(() => setLoaded(true));
   }, []);
 
@@ -358,7 +357,9 @@ export default function ReviewDishes({ timezone }: { timezone: string }) {
       const previous = persisted.current.get(updated.id);
       if (previous) showLocally(previous);
       setProblem(
-        `Your last loaded details have been restored. ${error instanceof Error ? error.message : "Reload to review the latest details."}`,
+        fmt(t.review.restored, {
+          reason: error instanceof Error ? error.message : t.review.reloadToReview,
+        }),
       );
       return null;
     } finally {
@@ -393,13 +394,13 @@ export default function ReviewDishes({ timezone }: { timezone: string }) {
 
   async function confirmDish(dish: MenuItem) {
     const saved = await save({ ...dish, confirmed: true }, { confirm: true });
-    if (saved?.confirmed) toast(`✓ ${saved.name} confirmed`);
+    if (saved?.confirmed) toast(fmt(t.review.toastConfirmed, { name: saved.name }));
   }
 
   async function saveDetails(dish: MenuItem, details: DishDetails) {
     if (await save({ ...dish, ...details, confirmed: false })) {
       setEditingId(null);
-      toast("Details saved. Check the allergens and confirm again.");
+      toast(t.review.toastDetails);
     }
   }
 
@@ -420,9 +421,9 @@ export default function ReviewDishes({ timezone }: { timezone: string }) {
       }
       setAdding(false);
       setFilter("all");
-      toast(`${details.name} added. Choose its allergens, then confirm it.`);
+      toast(fmt(t.review.toastAdded, { name: details.name }));
     } catch {
-      setProblem("That dish wasn't added. Check that Carte is running, then try again.");
+      setProblem(t.review.addFailed);
     } finally {
       mutationPending.current = false;
       setMutating(false);
@@ -450,7 +451,7 @@ export default function ReviewDishes({ timezone }: { timezone: string }) {
       setDishes(next.map(withVersions));
     } catch (error) {
       setDishes(previous);
-      setProblem(error instanceof Error ? error.message : "The new order couldn't be saved.");
+      setProblem(error instanceof Error ? error.message : t.review.orderFailed);
     } finally {
       mutationPending.current = false;
       setMutating(false);
@@ -467,9 +468,9 @@ export default function ReviewDishes({ timezone }: { timezone: string }) {
       const saved = await setDishSoldOut(dish.id, soldOut);
       persisted.current.set(saved.id, saved);
       showLocally(saved);
-      toast(soldOut ? `${dish.name} is sold out for today` : `${dish.name} is available again`);
+      toast(fmt(soldOut ? t.review.toastSoldOut : t.review.toastAvailable, { name: dish.name }));
     } catch (error) {
-      setProblem(error instanceof Error ? error.message : "That dish couldn't be updated.");
+      setProblem(error instanceof Error ? error.message : t.review.updateFailed);
     } finally {
       setPending(dish.id, false);
     }
@@ -479,7 +480,12 @@ export default function ReviewDishes({ timezone }: { timezone: string }) {
   async function saveSection(dish: MenuItem, typed: string) {
     const section = typed.trim();
     if (section !== (dish.section ?? "") && (await save({ ...dish, section }))) {
-      toast(section ? `${dish.name} moved to ${section}` : `${dish.name} has no section now`);
+      toast(
+        fmt(section ? t.review.toastSection : t.review.toastNoSection, {
+          name: dish.name,
+          section,
+        }),
+      );
     }
     setSectionDrafts((prev) => {
       const next = { ...prev };
@@ -490,15 +496,15 @@ export default function ReviewDishes({ timezone }: { timezone: string }) {
 
   async function removeDish(dish: MenuItem) {
     if (mutationPending.current || pending.current.has(dish.id)) return;
-    if (!window.confirm(`Delete ${dish.name} from your menu?`)) return;
+    if (!window.confirm(fmt(t.review.confirmDelete, { name: dish.name }))) return;
     setPending(dish.id, true);
     try {
       await deleteDish(dish.id, dish.revision);
       setDishes((prev) => prev.filter((d) => d.id !== dish.id));
       persisted.current.delete(dish.id);
-      toast(`${dish.name} deleted`);
+      toast(fmt(t.review.toastDeleted, { name: dish.name }));
     } catch (error) {
-      setProblem(error instanceof Error ? error.message : "That dish could not be deleted.");
+      setProblem(error instanceof Error ? error.message : t.review.deleteFailed);
     } finally {
       setPending(dish.id, false);
     }
@@ -506,23 +512,16 @@ export default function ReviewDishes({ timezone }: { timezone: string }) {
 
   async function clearMenu() {
     if (mutationPending.current || pending.current.size > 0) return;
-    if (
-      !window.confirm(
-        dishes.length === 1
-          ? "Delete the 1 dish and its photo? This can’t be undone."
-          : `Delete all ${dishes.length} dishes and their photos? This can’t be undone.`,
-      )
-    )
-      return;
+    if (!window.confirm(plural(t.review.confirmDeleteAll, dishes.length, language))) return;
     mutationPending.current = true;
     setMutating(true);
     try {
       await deleteAllDishes(dishes);
       persisted.current.clear();
       setDishes([]);
-      toast("All dishes deleted");
+      toast(t.review.toastAllDeleted);
     } catch (error) {
-      setProblem(error instanceof Error ? error.message : "Your dishes could not be deleted.");
+      setProblem(error instanceof Error ? error.message : t.review.deleteAllFailed);
     } finally {
       mutationPending.current = false;
       setMutating(false);
@@ -550,26 +549,23 @@ export default function ReviewDishes({ timezone }: { timezone: string }) {
   const sectioned = hasSections(groups);
   const sectionNames = [...new Set(dishes.map((dish) => dish.section ?? "").filter(Boolean))];
   const filters: { key: Filter; label: string; count: number }[] = [
-    { key: "all", label: "All", count: total },
-    { key: "review", label: "Needs review", count: total - done },
-    { key: "confirmed", label: "Confirmed", count: done },
+    { key: "all", label: t.review.filterAll, count: total },
+    { key: "review", label: t.review.filterReview, count: total - done },
+    { key: "confirmed", label: t.review.filterConfirmed, count: done },
   ];
 
   return (
     <main id="main" className="mx-auto max-w-3xl px-5 pb-20">
       <div className="pt-12">
-        <OwnerPageHeader
-          title="Review dishes"
-          intro="Check each dish’s details and allergens, then confirm it. Diners only see dishes you’ve confirmed."
-        >
+        <OwnerPageHeader title={t.review.title} intro={t.review.intro}>
           <Button disabled={mutating} onClick={() => setAdding(true)} shine>
-            Add a dish
+            {t.review.addDish}
           </Button>
           <ButtonLink href="/dashboard/upload" variant="secondary">
-            Upload a menu photo
+            {t.review.uploadPhoto}
           </ButtonLink>
           <ButtonLink href="/dashboard/spreadsheet" variant="ghost">
-            Spreadsheet
+            {t.review.spreadsheet}
           </ButtonLink>
         </OwnerPageHeader>
       </div>
@@ -577,47 +573,51 @@ export default function ReviewDishes({ timezone }: { timezone: string }) {
       {problem && (
         <Notice tone="warning" role="alert" className="mt-6">
           {problem}
-          <Button type="button" onClick={() => window.location.reload()} className="ml-3">
-            Reload latest menu
+          <Button type="button" onClick={() => window.location.reload()} className="ms-3">
+            {t.review.reload}
           </Button>
         </Notice>
       )}
 
       {olderList > 0 && (
         <Notice className="mt-6">
-          Carte now covers {ALLERGENS.length} allergens.{" "}
-          {olderList === 1 ? "1 dish was" : `${olderList} dishes were`} confirmed before{" "}
-          {NEWER_ALLERGENS.join(", ")} were added. Check those and press &ldquo;Confirm all{" "}
-          {ALLERGENS.length} allergens&rdquo; so diners who avoid them can see{" "}
-          {olderList === 1 ? "it" : "them"}.
+          {plural(t.review.olderList, olderList, language, {
+            total: ALLERGENS.length,
+            newer: formatList(
+              NEWER_ALLERGENS.map((allergen) => d.allergens[allergen]),
+              language,
+            ),
+          })}
         </Notice>
       )}
 
       {alsoUnchecked > 0 && (
         <Notice className="mt-6">
-          Diners can now hide dishes with {OTHER_AVOIDS.join(", ")}.{" "}
-          {alsoUnchecked === 1
-            ? "1 confirmed dish hasn't"
-            : `${alsoUnchecked} confirmed dishes haven't`}{" "}
-          been checked for them yet, so those diners see a note to ask your staff. Mark any under
-          &ldquo;Also contains&rdquo; and press &ldquo;Confirm also contains&rdquo;.
+          {plural(t.review.alsoUnchecked, alsoUnchecked, language, {
+            items: formatList(
+              OTHER_AVOIDS.map((item) => d.alsoAvoid[item]),
+              language,
+            ),
+          })}
         </Notice>
       )}
 
       {loaded && total === 0 && !problem && (
         <EmptyState className="mt-10 py-14">
-          <h2 className="font-serif text-3xl text-ink">No dishes yet</h2>
-          <p className="mx-auto mt-2 max-w-sm">
-            Upload a photo of your menu and Carte lists every dish here, or add dishes one at a
-            time.
-          </p>
+          <h2 className="font-serif text-3xl text-ink">{t.review.emptyTitle}</h2>
+          <p className="mx-auto mt-2 max-w-sm">{t.review.emptyText}</p>
         </EmptyState>
       )}
 
       {total > 0 && (
         <>
           <div className="sticky top-16 z-10 -mx-5 mt-10 border-b border-ink/10 bg-paper/95 px-5 py-5 backdrop-blur">
-            <ProgressBar done={done} total={total} />
+            <ProgressBar
+              done={done}
+              total={total}
+              text={fmt(t.review.progress, { done, total })}
+              label={t.review.progressLabel}
+            />
             <div className="mt-4 flex flex-wrap items-center gap-3">
               <div className="flex gap-1 rounded-full bg-paper p-1.5 shadow-raised-sm">
                 {filters.map((f) => (
@@ -645,9 +645,9 @@ export default function ReviewDishes({ timezone }: { timezone: string }) {
                 type="search"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search dishes"
-                aria-label="Search dishes"
-                className={fieldClass("py-2.5 sm:ml-auto sm:w-56")}
+                placeholder={t.review.search}
+                aria-label={t.review.search}
+                className={fieldClass("py-2.5 sm:ms-auto sm:w-56")}
               />
             </div>
           </div>
@@ -655,10 +655,10 @@ export default function ReviewDishes({ timezone }: { timezone: string }) {
           {shown.length === 0 && (
             <EmptyState className="mt-8">
               {needle
-                ? "No dishes match that search."
+                ? t.review.noMatch
                 : filter === "review"
-                  ? "Every dish is confirmed."
-                  : "No dishes confirmed yet."}
+                  ? t.review.allConfirmed
+                  : t.review.noneConfirmed}
             </EmptyState>
           )}
 
@@ -672,19 +672,21 @@ export default function ReviewDishes({ timezone }: { timezone: string }) {
             {groups.map((group, groupIndex) => (
               <section
                 key={group.section || "none"}
-                aria-label={sectioned ? group.section || "No section" : undefined}
+                aria-label={sectioned ? group.section || t.review.noSection : undefined}
               >
                 {sectioned && (
                   <div className="mb-5 flex items-center justify-between gap-3">
                     <h2 className="font-serif text-3xl tracking-tight">
-                      {group.section || "No section"}{" "}
+                      {group.section || t.review.noSection}{" "}
                       <span className="text-base text-muted tabular-nums">
                         {group.dishes.length}
                       </span>
                     </h2>
                     {ordering && (
                       <MoveButtons
-                        label={`the ${group.section || "No section"} section`}
+                        label={fmt(t.review.moveSection, {
+                          section: group.section || t.review.noSection,
+                        })}
                         canUp={groupIndex > 0}
                         canDown={groupIndex < groups.length - 1}
                         disabled={mutating || busy.size > 0}
@@ -698,7 +700,12 @@ export default function ReviewDishes({ timezone }: { timezone: string }) {
                 <div className="space-y-8">
                   <AnimatePresence initial={false} mode="popLayout">
                     {group.dishes.map((dish, dishIndex) => {
-                      const conflicts = tagConflictMessages(dish.allergens, dish.dietary_tags);
+                      const conflicts = tagConflictMessages(
+                        dish.allergens,
+                        dish.dietary_tags,
+                        language,
+                        t.review.tagConflict,
+                      );
                       return (
                         <motion.article
                           key={dish.id}
@@ -718,7 +725,7 @@ export default function ReviewDishes({ timezone }: { timezone: string }) {
                             <span
                               aria-hidden="true"
                               className={cn(
-                                "absolute inset-y-8 left-0 w-1.5 rounded-r-full",
+                                "absolute inset-y-8 start-0 w-1.5 rounded-e-full",
                                 dish.confirmed ? "bg-basil" : "bg-saffron",
                               )}
                             />
@@ -730,7 +737,7 @@ export default function ReviewDishes({ timezone }: { timezone: string }) {
                                   price: dish.price,
                                   calories: dish.calories,
                                 }}
-                                submitLabel="Save details"
+                                submitLabel={t.review.saveDetails}
                                 onSave={(details) => saveDetails(dish, details)}
                                 onCancel={() => setEditingId(null)}
                               />
@@ -749,7 +756,7 @@ export default function ReviewDishes({ timezone }: { timezone: string }) {
                                     onClick={() => setEditingId(dish.id)}
                                     className="text-sm font-semibold underline underline-offset-4 hover:text-accent"
                                   >
-                                    Edit details
+                                    {t.review.editDetails}
                                   </button>
                                   {ordering && group.dishes.length > 1 && (
                                     <MoveButtons
@@ -778,11 +785,11 @@ export default function ReviewDishes({ timezone }: { timezone: string }) {
 
                             <div className="mt-5 flex flex-wrap gap-4">
                               <label className="block w-full max-w-xs">
-                                <span className={labelClass}>Menu section</span>
+                                <span className={labelClass}>{t.review.menuSection}</span>
                                 <input
                                   list="menu-section-names"
                                   maxLength={80}
-                                  placeholder="For example: Starters"
+                                  placeholder={t.review.sectionPlaceholder}
                                   value={sectionDrafts[dish.id] ?? dish.section ?? ""}
                                   onChange={(e) =>
                                     setSectionDrafts((prev) => ({
@@ -798,7 +805,7 @@ export default function ReviewDishes({ timezone }: { timezone: string }) {
                               </label>
 
                               <label className="block">
-                                <span className={labelClass}>Spice level</span>
+                                <span className={labelClass}>{t.review.spice}</span>
 
                                 <select
                                   value={dish.spice ?? ""}
@@ -812,15 +819,11 @@ export default function ReviewDishes({ timezone }: { timezone: string }) {
 
                                   className={inputClass}
                                 >
-                                  <option value="">Not set</option>
-
-                                  <option value="0">Not spicy</option>
-
-                                  <option value="1">Mild</option>
-
-                                  <option value="2">Medium</option>
-
-                                  <option value="3">Hot</option>
+                                  <option value="">{t.review.spiceNotSet}</option>
+                                  <option value="0">{t.review.spiceNone}</option>
+                                  <option value="1">{t.review.spiceMild}</option>
+                                  <option value="2">{t.review.spiceMedium}</option>
+                                  <option value="3">{t.review.spiceHot}</option>
                                 </select>
                               </label>
                             </div>
@@ -830,22 +833,22 @@ export default function ReviewDishes({ timezone }: { timezone: string }) {
                                 {dish.sizes?.length || dish.addons?.length
                                   ? [
                                       dish.sizes?.length
-                                        ? `${dish.sizes.length} ${dish.sizes.length === 1 ? "size" : "sizes"}`
+                                        ? plural(t.review.sizes, dish.sizes.length, language)
                                         : "",
                                       dish.addons?.length
-                                        ? `${dish.addons.length} ${dish.addons.length === 1 ? "add-on" : "add-ons"}`
+                                        ? plural(t.review.addons, dish.addons.length, language)
                                         : "",
                                     ]
                                       .filter(Boolean)
                                       .join(" · ")
-                                  : "No sizes or add-ons"}
+                                  : t.review.noOptions}
                               </span>
                               <button
                                 type="button"
                                 onClick={() => setOptionsId(dish.id)}
                                 className="font-semibold underline underline-offset-4 hover:text-accent"
                               >
-                                Edit sizes and add-ons
+                                {t.review.editOptions}
                               </button>
                             </div>
 
@@ -860,12 +863,12 @@ export default function ReviewDishes({ timezone }: { timezone: string }) {
                             />
 
                             <fieldset className="mt-5">
-                              <legend className="eyebrow text-muted">Contains</legend>
+                              <legend className="eyebrow text-muted">{t.review.contains}</legend>
                               <div className="mt-2 flex flex-wrap gap-2">
                                 {ALLERGENS.map((allergen) => (
                                   <ToggleChip
                                     key={allergen}
-                                    label={allergen}
+                                    label={d.allergens[allergen]}
                                     tone="ink"
                                     pressed={dish.allergens.includes(allergen)}
                                     onToggle={() => toggleAllergen(dish, allergen)}
@@ -876,12 +879,12 @@ export default function ReviewDishes({ timezone }: { timezone: string }) {
 
                             {dish.allergens.length > 0 && (
                               <fieldset className="mt-4">
-                                <legend className="eyebrow text-muted">Can be made without</legend>
+                                <legend className="eyebrow text-muted">
+                                  {t.review.canLeaveOut}
+                                </legend>
 
                                 <p className="mt-1 text-xs text-muted">
-                                  Allergens the kitchen can leave out on request. Diners avoiding
-                                  only these still see the dish, with &ldquo;Ask for it
-                                  without…&rdquo;.
+                                  {t.review.canLeaveOutHint}
                                 </p>
 
                                 <div className="mt-2 flex flex-wrap gap-2">
@@ -889,11 +892,11 @@ export default function ReviewDishes({ timezone }: { timezone: string }) {
                                     <ToggleChip
                                       key={allergen}
 
-                                      label={allergen}
-
+                                      label={d.allergens[allergen]}
                                       tone="ink"
-
-                                      ariaLabel={`Can leave out ${allergen}`}
+                                      ariaLabel={fmt(t.review.canLeaveOutLabel, {
+                                        allergen: d.allergens[allergen],
+                                      })}
 
                                       pressed={(dish.removable ?? []).includes(allergen)}
 
@@ -905,11 +908,9 @@ export default function ReviewDishes({ timezone }: { timezone: string }) {
                             )}
 
                             <fieldset className="mt-4">
-                              <legend className="eyebrow text-muted">May contain</legend>
+                              <legend className="eyebrow text-muted">{t.review.mayContain}</legend>
 
-                              <p className="mt-1 text-xs text-muted">
-                                Not in the recipe, but could get in, like through a shared fryer.
-                              </p>
+                              <p className="mt-1 text-xs text-muted">{t.review.mayContainHint}</p>
 
                               <div className="mt-2 flex flex-wrap gap-2">
                                 {ALLERGENS.filter(
@@ -918,11 +919,11 @@ export default function ReviewDishes({ timezone }: { timezone: string }) {
                                   <ToggleChip
                                     key={allergen}
 
-                                    label={allergen}
-
+                                    label={d.allergens[allergen]}
                                     tone="ink"
-
-                                    ariaLabel={`May contain ${allergen}`}
+                                    ariaLabel={fmt(t.review.mayContainLabel, {
+                                      allergen: d.allergens[allergen],
+                                    })}
 
                                     pressed={(dish.may_contain ?? []).includes(allergen)}
 
@@ -933,18 +934,19 @@ export default function ReviewDishes({ timezone }: { timezone: string }) {
                             </fieldset>
 
                             <fieldset className="mt-4">
-                              <legend className="eyebrow text-muted">Also contains</legend>
-                              <p className="mt-1 text-xs text-muted">
-                                Things some diners avoid for religion, health, or taste. Confirming
-                                the dish tells them it&apos;s been checked.
-                              </p>
+                              <legend className="eyebrow text-muted">
+                                {t.review.alsoContains}
+                              </legend>
+                              <p className="mt-1 text-xs text-muted">{t.review.alsoContainsHint}</p>
                               <div className="mt-2 flex flex-wrap gap-2">
                                 {OTHER_AVOIDS.map((item) => (
                                   <ToggleChip
                                     key={item}
-                                    label={item}
+                                    label={d.alsoAvoid[item]}
                                     tone="ink"
-                                    ariaLabel={`Also contains ${item}`}
+                                    ariaLabel={fmt(t.review.alsoContainsLabel, {
+                                      item: d.alsoAvoid[item],
+                                    })}
                                     pressed={(dish.also_contains ?? []).includes(item)}
                                     onToggle={() => toggleAlso(dish, item)}
                                   />
@@ -953,12 +955,12 @@ export default function ReviewDishes({ timezone }: { timezone: string }) {
                             </fieldset>
 
                             <fieldset className="mt-4">
-                              <legend className="eyebrow text-muted">Suitable for</legend>
+                              <legend className="eyebrow text-muted">{t.review.suitableFor}</legend>
                               <div className="mt-2 flex flex-wrap gap-2">
                                 {DIETARY_TAGS.map((tag) => (
                                   <ToggleChip
                                     key={tag}
-                                    label={tag}
+                                    label={d.tags[tag]}
                                     tone="basil"
                                     pressed={dish.dietary_tags.includes(tag)}
                                     onToggle={() => toggleTag(dish, tag)}
@@ -974,12 +976,12 @@ export default function ReviewDishes({ timezone }: { timezone: string }) {
                             )}
 
                             <label className="mt-4 block">
-                              <span className={labelClass}>Kitchen notes</span>
+                              <span className={labelClass}>{t.review.kitchenNotes}</span>
                               <textarea
                                 rows={2}
                                 maxLength={2000}
                                 className={inputClass}
-                                placeholder="For example: fried in a shared fryer, sauce can be left off"
+                                placeholder={t.review.notesPlaceholder}
                                 value={dish.notes}
                                 onChange={(e) =>
                                   showLocally({ ...dish, notes: e.target.value, confirmed: false })
@@ -993,17 +995,21 @@ export default function ReviewDishes({ timezone }: { timezone: string }) {
 
                             <div className="mt-6 flex items-center justify-between border-t border-ink/10 pt-5">
                               {dish.confirmed && checkedForAll(dish) && dish.also_checked ? (
-                                <p className="text-sm font-medium text-basil">✓ Confirmed</p>
+                                <p className="text-sm font-medium text-basil">
+                                  {t.review.confirmed}
+                                </p>
                               ) : dish.confirmed && checkedForAll(dish) ? (
                                 <div className="flex flex-wrap items-center gap-3">
-                                  <p className="text-sm font-medium text-basil">✓ Confirmed</p>
+                                  <p className="text-sm font-medium text-basil">
+                                    {t.review.confirmed}
+                                  </p>
                                   <Button
                                     variant="secondary"
                                     size="sm"
                                     onClick={() => confirmDish(dish)}
                                     disabled={conflicts.length > 0}
                                   >
-                                    Confirm also contains
+                                    {t.review.confirmAlso}
                                   </Button>
                                 </div>
                               ) : dish.confirmed ? (
@@ -1014,10 +1020,12 @@ export default function ReviewDishes({ timezone }: { timezone: string }) {
                                     onClick={() => confirmDish(dish)}
                                     disabled={conflicts.length > 0}
                                   >
-                                    Confirm all {ALLERGENS.length} allergens
+                                    {fmt(t.review.confirmAll, { total: ALLERGENS.length })}
                                   </Button>
                                   <span className="text-xs text-muted">
-                                    Confirmed for the original {US_ALLERGENS.length}
+                                    {fmt(t.review.confirmedOriginal, {
+                                      count: US_ALLERGENS.length,
+                                    })}
                                   </span>
                                 </div>
                               ) : (
@@ -1031,11 +1039,11 @@ export default function ReviewDishes({ timezone }: { timezone: string }) {
                                     conflicts.length > 0 ? `conflict-${dish.id}` : undefined
                                   }
                                 >
-                                  Confirm dish
+                                  {t.review.confirm}
                                 </Button>
                               )}
                               <Button variant="danger" size="sm" onClick={() => removeDish(dish)}>
-                                Delete
+                                {t.review.delete}
                               </Button>
                             </div>
                           </fieldset>
@@ -1049,11 +1057,8 @@ export default function ReviewDishes({ timezone }: { timezone: string }) {
           </div>
 
           <section className="mt-20 border-t-4 border-ink pt-6">
-            <h2 className="eyebrow">Replace your menu</h2>
-            <p className="mt-1 max-w-md text-sm text-muted">
-              Delete every dish and its photo, for example before uploading a new menu. This can’t
-              be undone.
-            </p>
+            <h2 className="eyebrow">{t.review.replaceTitle}</h2>
+            <p className="mt-1 max-w-md text-sm text-muted">{t.review.replaceText}</p>
             <Button
               variant="secondary"
               size="sm"
@@ -1061,7 +1066,7 @@ export default function ReviewDishes({ timezone }: { timezone: string }) {
               onClick={clearMenu}
               className="mt-3 text-tomato hover:border-tomato"
             >
-              Delete all dishes
+              {t.review.deleteAll}
             </Button>
           </section>
         </>
@@ -1077,25 +1082,27 @@ export default function ReviewDishes({ timezone }: { timezone: string }) {
               onSave={async (sizes, addons) => {
                 if (await save({ ...dish, sizes, addons, confirmed: false })) {
                   setOptionsId(null);
-                  toast("Sizes and add-ons saved. Check the allergens and confirm again.");
+                  toast(t.review.toastOptions);
                 }
               }}
             />
           ) : null;
         })()}
       {adding && (
-        <Sheet title="Add a dish" closeLabel="Close" onClose={() => setAdding(false)}>
+        <Sheet
+          title={t.review.addTitle}
+          closeLabel={t.review.close}
+          onClose={() => setAdding(false)}
+        >
           <fieldset disabled={mutating} className="mt-4">
             <DishDetailsForm
               initial={{ name: "", description: "", price: "" }}
-              submitLabel="Add dish"
+              submitLabel={t.review.addSubmit}
               onSave={addDish}
               onCancel={() => setAdding(false)}
             />
           </fieldset>
-          <p className="mt-4 text-xs text-muted">
-            New dishes start unconfirmed. Choose their allergens, then confirm them.
-          </p>
+          <p className="mt-4 text-xs text-muted">{t.review.addHint}</p>
         </Sheet>
       )}
     </main>

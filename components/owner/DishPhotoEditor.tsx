@@ -3,6 +3,7 @@ import Image from "next/image";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { removeDishPhoto, uploadDishPhoto } from "@/lib/api-client";
+import { useOwnerText } from "@/components/owner/OwnerLanguage";
 import { shrinkImage } from "@/lib/image";
 import type { MenuItem } from "@/types/menu";
 
@@ -14,6 +15,7 @@ type DishPhotoEditorProps = {
 
 /** Add, replace, or remove a dish's photo. Photo edits require fresh confirmation. */
 export function DishPhotoEditor({ dish, onChange, onBusy }: DishPhotoEditorProps) {
+  const { t } = useOwnerText();
   const [status, setStatus] = useState<"idle" | "uploading" | "failed">("idle");
 
   const pending = useRef(false);
@@ -28,13 +30,9 @@ export function DishPhotoEditor({ dish, onChange, onBusy }: DishPhotoEditorProps
       const result = await uploadDishPhoto(dish.id, await shrinkImage(file, 1600), dish.revision);
       onChange(result.photoUrl, result.revision);
       setStatus("idle");
-      toast("Photo added");
+      toast(t.photo.added);
     } catch (error) {
-      setProblem(
-        error instanceof Error
-          ? error.message
-          : "The photo could not be saved. Reload and try again.",
-      );
+      setProblem(error instanceof Error ? error.message : t.photo.failed);
       setStatus("failed");
     } finally {
       pending.current = false;
@@ -51,13 +49,9 @@ export function DishPhotoEditor({ dish, onChange, onBusy }: DishPhotoEditorProps
       const result = await removeDishPhoto(dish.id, dish.revision);
       onChange(null, result.revision);
       setStatus("idle");
-      toast("Photo removed");
+      toast(t.photo.removed);
     } catch (error) {
-      setProblem(
-        error instanceof Error
-          ? error.message
-          : "The photo could not be saved. Reload and try again.",
-      );
+      setProblem(error instanceof Error ? error.message : t.photo.failed);
       setStatus("failed");
     } finally {
       pending.current = false;
@@ -73,7 +67,7 @@ export function DishPhotoEditor({ dish, onChange, onBusy }: DishPhotoEditorProps
         </div>
       ) : (
         <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-[1.25rem] text-xs text-muted shadow-pressed">
-          No photo
+          {t.photo.none}
         </div>
       )}
       <div className="flex flex-col items-start gap-1">
@@ -89,11 +83,15 @@ export function DishPhotoEditor({ dish, onChange, onBusy }: DishPhotoEditorProps
               e.target.value = "";
             }}
           />
-          {status === "uploading" ? "Uploading…" : dish.photo_url ? "Replace photo" : "Add photo"}
+          {status === "uploading"
+            ? t.photo.uploading
+            : dish.photo_url
+              ? t.photo.replace
+              : t.photo.add}
         </label>
         {dish.photo_url && (
           <button type="button" onClick={remove} className="text-sm text-muted hover:text-tomato">
-            Remove photo
+            {t.photo.remove}
           </button>
         )}
         {status === "failed" && (

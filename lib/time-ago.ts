@@ -4,12 +4,12 @@ const UNITS: [Intl.RelativeTimeFormatUnit, number][] = [
   ["minute", 60 * 1000],
 ];
 
-/** "3 hours ago" or "just now", for owner-facing lists. */
-export function timeAgo(date: Date, now: Date): string {
+/** "3 hours ago" or "just now", in the owner's language, for owner-facing lists. */
+export function timeAgo(date: Date, now: Date, locale = "en", justNow = "just now"): string {
   const elapsed = now.getTime() - date.getTime();
-  const format = new Intl.RelativeTimeFormat("en", { numeric: "auto" });
+  const format = new Intl.RelativeTimeFormat(locale, { numeric: "auto" });
   for (const [unit, size] of UNITS) {
     if (elapsed >= size) return format.format(-Math.floor(elapsed / size), unit);
   }
-  return "just now";
+  return justNow;
 }

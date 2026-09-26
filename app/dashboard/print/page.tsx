@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import QRCode from "qrcode";
 import { OwnerPageHeader } from "@/components/owner/OwnerPageHeader";
 import { PrintableMenu } from "@/components/owner/PrintableMenu";
@@ -11,11 +10,13 @@ import { requireRestaurant } from "@/lib/auth";
 import { getConfirmedDishes } from "@/lib/db";
 import { getCachedTranslations } from "@/lib/db/translations";
 import { htmlLang, isLanguageCode, LANGUAGES, type LanguageCode } from "@/lib/languages";
+import { plural } from "@/lib/i18n/owner/format";
+import { ownerStrings, ownerTitle } from "@/lib/owner-language";
 import { siteUrl } from "@/lib/site-url";
 import type { MenuTranslations } from "@/types/translation";
 
 export const dynamic = "force-dynamic";
-export const metadata: Metadata = { title: "Printed menu | Carte" };
+export const generateMetadata = () => ownerTitle((t) => t.print.title);
 
 export default async function PrintPage({
   searchParams,
@@ -24,6 +25,8 @@ export default async function PrintPage({
 }) {
   const { supabase, restaurant } = await requireRestaurant("/dashboard/print");
   const dishes = await getConfirmedDishes(supabase, restaurant.id);
+  // The dashboard's language, apart from the language the menu is printed in.
+  const { t, language: dashboardLanguage } = await ownerStrings();
   const source = dishes.find((dish) => dish.source_language && isLanguageCode(dish.source_language))
     ?.source_language as LanguageCode | undefined;
   const requested = (await searchParams).lang ?? "";
@@ -53,13 +56,10 @@ export default async function PrintPage({
   return (
     <main id="main" className="mx-auto max-w-3xl px-5 py-12 print:max-w-none print:p-0">
       <div className="print:hidden">
-        <OwnerPageHeader
-          title="Printed menu"
-          intro="A paper menu of your confirmed dishes with their allergens, in any of Carte's languages. Print it or save it as a PDF."
-        />
+        <OwnerPageHeader title={t.print.title} intro={t.print.intro} />
         <form className="mt-8 flex flex-wrap items-end gap-3">
           <label className="block">
-            <span className="eyebrow text-muted">Language</span>
+            <span className="eyebrow text-muted">{t.print.language}</span>
             <select name="lang" defaultValue={language} className={fieldClass("mt-1 w-auto")}>
               {LANGUAGES.map((option) => (
                 <option key={option.code} value={option.code}>
@@ -69,19 +69,14 @@ export default async function PrintPage({
             </select>
           </label>
           <Button type="submit" variant="secondary">
-            Show
+            {t.print.show}
           </Button>
-          <PrintButton label="Print or save as PDF" />
+          <PrintButton label={t.print.printButton} />
         </form>
-        {dishes.length === 0 && (
-          <Notice className="mt-6">
-            Confirm some dishes first. Only confirmed dishes are printed.
-          </Notice>
-        )}
+        {dishes.length === 0 && <Notice className="mt-6">{t.print.confirmFirst}</Notice>}
         {missing > 0 && (
           <Notice className="mt-6">
-            {missing === 1 ? "1 dish isn't" : `${missing} dishes aren't`} translated yet, so{" "}
-            {missing === 1 ? "it prints" : "they print"} in the original language.
+            {plural(t.print.untranslated, missing, dashboardLanguage)}
             <span className="mt-3 block">
               <TranslateForPrint slug={restaurant.slug} language={language} />
             </span>

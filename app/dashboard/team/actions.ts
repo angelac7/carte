@@ -4,21 +4,23 @@ import { z } from "zod";
 import { requireOwnedRestaurant } from "@/lib/auth";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { cancelInvite, createInvite, isInviteCode, removeMember } from "@/lib/db/team";
+import { ownerStrings } from "@/lib/owner-language";
 
 export type InviteState = { code?: string; error?: string };
 
 /** Makes a one-time invite link that lets someone help edit this restaurant's menu. */
 export async function createInviteAction(): Promise<InviteState> {
   const { supabase, user, restaurant } = await requireOwnedRestaurant("/dashboard/team");
+  const { t } = await ownerStrings();
   if (!(await checkRateLimit(`invite:${user.id}`, 20, 24 * 60 * 60 * 1000))) {
-    return { error: "You've made a lot of invites today. Try again tomorrow." };
+    return { error: t.team.errorLimit };
   }
   try {
     const code = await createInvite(supabase, restaurant.id);
     revalidatePath("/dashboard/team");
     return { code };
   } catch {
-    return { error: "The invite couldn't be created. Try again." };
+    return { error: t.team.errorCreate };
   }
 }
 

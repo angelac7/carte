@@ -1,10 +1,10 @@
-import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { PasswordForm } from "@/components/PasswordForm";
-import { PublicHeader } from "@/components/PublicHeader";
+import { OwnerTextPage } from "@/components/OwnerTextPage";
+import { ownerTitle } from "@/lib/owner-language";
 import { createClient } from "@/lib/supabase/server";
 
-export const metadata: Metadata = { title: "Choose a new password | Carte" };
+export const generateMetadata = () => ownerTitle((t) => t.auth.chooseTitle);
 
 export default async function ResetPasswordPage() {
   const supabase = await createClient();
@@ -13,9 +13,8 @@ export default async function ResetPasswordPage() {
   } = await supabase.auth.getUser();
   if (!user) redirect("/forgot-password?error=expired");
   return (
-    <>
-      <PublicHeader />
+    <OwnerTextPage>
       <PasswordForm mode="reset" />
-    </>
+    </OwnerTextPage>
   );
 }

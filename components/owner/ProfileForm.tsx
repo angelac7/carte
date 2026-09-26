@@ -4,6 +4,9 @@ import { saveProfileAction, type ProfileState } from "@/app/dashboard/profile/ac
 import { Button } from "@/components/ui/button";
 import { fieldClass, labelClass } from "@/components/ui/field";
 import { Notice } from "@/components/ui/notice";
+import { useOwnerText } from "@/components/owner/OwnerLanguage";
+import { fmt } from "@/lib/i18n/owner/format";
+import { htmlLang } from "@/lib/languages";
 import { KITCHEN_PRACTICES } from "@/lib/allergens";
 import { CONVERTIBLE_CURRENCIES } from "@/lib/prices";
 import { DINER_STRINGS } from "@/lib/i18n/diner-strings";
@@ -18,26 +21,26 @@ import {
   type Weekday,
 } from "@/lib/restaurant-profile";
 
-const DAY_LABELS: Record<Weekday, string> = {
-  mon: "Monday",
-  tue: "Tuesday",
-  wed: "Wednesday",
-  thu: "Thursday",
-  fri: "Friday",
-  sat: "Saturday",
-  sun: "Sunday",
-};
+/** A weekday's name in the owner's language, from a week that starts on a Monday. */
+function dayName(day: Weekday, locale: string): string {
+  const date = new Date(Date.UTC(2024, 0, 1 + WEEKDAYS.indexOf(day), 12));
+  return new Intl.DateTimeFormat(locale, { weekday: "long", timeZone: "UTC" }).format(date);
+}
 
 const inputClass = fieldClass("mt-1 text-base");
 const timeClass = fieldClass("w-auto bg-paper px-2 py-1.5");
 const checkboxClass = "h-5 w-5 accent-accent";
-const currencyNames = new Intl.DisplayNames("en", { type: "currency" });
-const currencyName = (code: string) => currencyNames.of(code) ?? code;
 
 const chipClass =
   "cursor-pointer rounded-full bg-paper px-4 py-2.5 text-sm font-medium text-muted shadow-raised-sm transition-[box-shadow,background-color,color] duration-200 hover:text-ink has-checked:bg-basil has-checked:text-white has-checked:shadow-pressed-color has-focus-visible:outline-2 has-focus-visible:outline-offset-3 has-focus-visible:outline-accent";
 
 export function ProfileForm({ profile }: { profile: RestaurantProfile }) {
+  const { t, language } = useOwnerText();
+  const p = t.profile;
+  const locale = htmlLang(language);
+  const d = DINER_STRINGS[language];
+  const currencyNames = new Intl.DisplayNames(locale, { type: "currency" });
+  const currencyName = (code: string) => currencyNames.of(code) ?? code;
   const [draft, setDraft] = useState(profile);
   const [state, formAction, pending] = useActionState<ProfileState, FormData>(
     saveProfileAction,
@@ -48,7 +51,7 @@ export function ProfileForm({ profile }: { profile: RestaurantProfile }) {
     <form action={formAction} className="mt-10 space-y-8">
       <input type="hidden" name="revision" value={state.revision ?? draft.revision ?? ""} />
       <label className="block">
-        <span className={labelClass}>Restaurant name</span>
+        <span className={labelClass}>{p.name}</span>
         <input
           name="name"
           required
@@ -57,9 +60,7 @@ export function ProfileForm({ profile }: { profile: RestaurantProfile }) {
           onChange={(event) => setDraft({ ...draft, name: event.target.value })}
           className={inputClass}
         />
-        <span className="mt-1 block text-xs text-muted">
-          Shown in large type at the top of your diner menu.
-        </span>
+        <span className="mt-1 block text-xs text-muted">{p.nameHint}</span>
       </label>
       <label className="flex cursor-pointer items-start gap-4 rounded-panel bg-paper p-6 shadow-raised transition-[outline-color] has-checked:outline-2 has-checked:outline-offset-2 has-checked:outline-basil">
         <input
@@ -70,16 +71,13 @@ export function ProfileForm({ profile }: { profile: RestaurantProfile }) {
           className={`mt-1 ${checkboxClass}`}
         />
         <span>
-          <span className="font-medium">Show my restaurant on Carte Discover</span>
-          <span className="mt-1 block text-sm text-muted">
-            Diners can find your restaurant and confirmed dishes in Carte&apos;s search and on
-            Google. When it&apos;s off, only people with your menu link or QR code see it.
-          </span>
+          <span className="font-medium">{p.listed}</span>
+          <span className="mt-1 block text-sm text-muted">{p.listedHint}</span>
         </span>
       </label>
 
       <label className="block">
-        <span className={labelClass}>Short description</span>
+        <span className={labelClass}>{p.description}</span>
         <textarea
           name="description"
           rows={3}
@@ -91,14 +89,14 @@ export function ProfileForm({ profile }: { profile: RestaurantProfile }) {
               description: event.target.value as RestaurantProfile["description"],
             })
           }
-          placeholder="For example: Modern Korean noodles and small plates in a cozy room."
+          placeholder={p.descriptionPlaceholder}
           className={inputClass}
         />
       </label>
 
       <div className="grid gap-4 sm:grid-cols-2">
         <label className="block">
-          <span className={labelClass}>Cuisine</span>
+          <span className={labelClass}>{p.cuisine}</span>
           <input
             name="cuisine"
             maxLength={60}
@@ -106,12 +104,12 @@ export function ProfileForm({ profile }: { profile: RestaurantProfile }) {
             onChange={(event) =>
               setDraft({ ...draft, cuisine: event.target.value as RestaurantProfile["cuisine"] })
             }
-            placeholder="Korean"
+            placeholder={p.cuisinePlaceholder}
             className={inputClass}
           />
         </label>
         <label className="block">
-          <span className={labelClass}>City</span>
+          <span className={labelClass}>{p.city}</span>
           <input
             name="city"
             maxLength={80}
@@ -119,14 +117,14 @@ export function ProfileForm({ profile }: { profile: RestaurantProfile }) {
             onChange={(event) =>
               setDraft({ ...draft, city: event.target.value as RestaurantProfile["city"] })
             }
-            placeholder="Ithaca"
+            placeholder={p.cityPlaceholder}
             className={inputClass}
           />
         </label>
       </div>
 
       <label className="block">
-        <span className={labelClass}>Address</span>
+        <span className={labelClass}>{p.address}</span>
         <input
           name="address"
           maxLength={200}
@@ -134,16 +132,16 @@ export function ProfileForm({ profile }: { profile: RestaurantProfile }) {
           onChange={(event) =>
             setDraft({ ...draft, address: event.target.value as RestaurantProfile["address"] })
           }
-          placeholder="123 Main Street"
+          placeholder={p.addressPlaceholder}
           className={inputClass}
         />
       </label>
 
       <fieldset>
-        <legend className="eyebrow text-muted">Contact and booking</legend>
+        <legend className="eyebrow text-muted">{p.contact}</legend>
         <div className="mt-3 grid gap-4 sm:grid-cols-2">
           <label className="block">
-            <span className={labelClass}>Phone</span>
+            <span className={labelClass}>{p.phone}</span>
             <input
               name="phone"
               type="tel"
@@ -156,7 +154,7 @@ export function ProfileForm({ profile }: { profile: RestaurantProfile }) {
             />
           </label>
           <label className="block">
-            <span className={labelClass}>Website</span>
+            <span className={labelClass}>{p.website}</span>
             <input
               name="website"
               inputMode="url"
@@ -169,25 +167,22 @@ export function ProfileForm({ profile }: { profile: RestaurantProfile }) {
           </label>
         </div>
         <label className="mt-4 block">
-          <span className={labelClass}>Reservation link</span>
+          <span className={labelClass}>{p.reservation}</span>
           <input
             name="reservation_url"
             inputMode="url"
             maxLength={300}
             value={draft.reservation_url}
             onChange={(event) => setDraft({ ...draft, reservation_url: event.target.value })}
-            placeholder="Your booking page, like resy.com/…"
+            placeholder={p.reservationPlaceholder}
             className={inputClass}
           />
-          <span className="mt-1 block text-xs text-muted">
-            Diners see Call, Website, and Reserve buttons at the top of your menu for anything you
-            fill in.
-          </span>
+          <span className="mt-1 block text-xs text-muted">{p.contactHint}</span>
         </label>
       </fieldset>
 
       <fieldset>
-        <legend className="eyebrow text-muted">Price range</legend>
+        <legend className="eyebrow text-muted">{p.priceRange}</legend>
         <div className="mt-3 flex flex-wrap gap-2.5">
           {[0, ...PRICE_RANGES].map((level) => (
             <label key={level} className={chipClass}>
@@ -199,35 +194,32 @@ export function ProfileForm({ profile }: { profile: RestaurantProfile }) {
                 onChange={() => setDraft({ ...draft, price_range: level })}
                 className="sr-only"
               />
-              {level === 0 ? "Not set" : "$".repeat(level)}
+              {level === 0 ? p.notSet : "$".repeat(level)}
             </label>
           ))}
         </div>
       </fieldset>
 
       <label className="block">
-        <span className={labelClass}>Menu currency</span>
+        <span className={labelClass}>{p.currency}</span>
         <select
           name="currency"
           value={draft.currency}
           onChange={(event) => setDraft({ ...draft, currency: event.target.value })}
           className={inputClass}
         >
-          <option value="">Work it out from my prices</option>
+          <option value="">{p.currencyAuto}</option>
           {CONVERTIBLE_CURRENCIES.map((code) => (
             <option key={code} value={code}>
               {currencyName(code)} ({code})
             </option>
           ))}
         </select>
-        <span className="mt-1 block text-xs text-muted">
-          Lets visitors see an approximate price in their own currency. Set it if your prices use
-          &ldquo;$&rdquo; but aren&apos;t US dollars.
-        </span>
+        <span className="mt-1 block text-xs text-muted">{p.currencyHint}</span>
       </label>
 
       <label className="block">
-        <span className={labelClass}>Time zone</span>
+        <span className={labelClass}>{p.timezone}</span>
         <select
           name="timezone"
           value={draft.timezone}
@@ -245,10 +237,8 @@ export function ProfileForm({ profile }: { profile: RestaurantProfile }) {
       </label>
 
       <fieldset>
-        <legend className="eyebrow text-muted">Opening hours</legend>
-        <p className="mt-1 text-xs text-muted">
-          If you close after midnight, set a closing time earlier than the opening time.
-        </p>
+        <legend className="eyebrow text-muted">{p.hours}</legend>
+        <p className="mt-1 text-xs text-muted">{p.hoursHint}</p>
         <div className="mt-3 divide-y divide-ink/10 rounded-panel bg-paper px-5 shadow-raised sm:px-6">
           {WEEKDAYS.map((day) => {
             const hours = draft.hours[day];
@@ -256,7 +246,7 @@ export function ProfileForm({ profile }: { profile: RestaurantProfile }) {
               setDraft((current) => ({ ...current, hours: { ...current.hours, [day]: value } }));
             return (
               <div key={day} className="flex flex-wrap items-center gap-3 py-3">
-                <span className="w-24 text-sm font-medium">{DAY_LABELS[day]}</span>
+                <span className="w-28 text-sm font-medium">{dayName(day, locale)}</span>
                 <input
                   type="time"
                   name={`${day}-open`}
@@ -265,10 +255,10 @@ export function ProfileForm({ profile }: { profile: RestaurantProfile }) {
                   onChange={(event) =>
                     setHours({ open: event.target.value, close: hours?.close ?? "21:00" })
                   }
-                  aria-label={`${DAY_LABELS[day]} opening time`}
+                  aria-label={fmt(p.opens, { day: dayName(day, locale) })}
                   className={timeClass}
                 />
-                <span className="text-sm text-muted">to</span>
+                <span className="text-sm text-muted">{p.to}</span>
                 <input
                   type="time"
                   name={`${day}-close`}
@@ -277,7 +267,7 @@ export function ProfileForm({ profile }: { profile: RestaurantProfile }) {
                   onChange={(event) =>
                     setHours({ open: hours?.open ?? "11:00", close: event.target.value })
                   }
-                  aria-label={`${DAY_LABELS[day]} closing time`}
+                  aria-label={fmt(p.closes, { day: dayName(day, locale) })}
                   className={timeClass}
                 />
                 <label className="flex items-center gap-2 text-sm">
@@ -290,7 +280,7 @@ export function ProfileForm({ profile }: { profile: RestaurantProfile }) {
                     }
                     className={checkboxClass}
                   />
-                  Closed
+                  {p.closed}
                 </label>
               </div>
             );
@@ -299,7 +289,7 @@ export function ProfileForm({ profile }: { profile: RestaurantProfile }) {
       </fieldset>
 
       <fieldset>
-        <legend className="eyebrow text-muted">Good for</legend>
+        <legend className="eyebrow text-muted">{p.goodFor}</legend>
         <div className="mt-3 flex flex-wrap gap-2.5">
           {OCCASIONS.map((occasion) => (
             <label key={occasion} className={chipClass}>
@@ -318,14 +308,14 @@ export function ProfileForm({ profile }: { profile: RestaurantProfile }) {
                 }
                 className="sr-only"
               />
-              {DISCOVER_STRINGS.en.occasions[occasion]}
+              {DISCOVER_STRINGS[language].occasions[occasion]}
             </label>
           ))}
         </div>
       </fieldset>
 
       <fieldset>
-        <legend className="eyebrow text-muted">Accessibility and families</legend>
+        <legend className="eyebrow text-muted">{p.features}</legend>
         <div className="mt-3 flex flex-wrap gap-2.5">
           {RESTAURANT_FEATURES.map((feature) => (
             <label key={feature} className={chipClass}>
@@ -344,18 +334,15 @@ export function ProfileForm({ profile }: { profile: RestaurantProfile }) {
                 }
                 className="sr-only"
               />
-              {DINER_STRINGS.en.features[feature]}
+              {d.features[feature]}
             </label>
           ))}
         </div>
       </fieldset>
 
       <fieldset>
-        <legend className="eyebrow text-muted">Kitchen practices</legend>
-        <p className="mt-2 text-sm text-muted">
-          Tick anything true of your whole kitchen. Diners see these at the top of your menu, in
-          their own language, with the ones about their allergies first.
-        </p>
+        <legend className="eyebrow text-muted">{p.kitchen}</legend>
+        <p className="mt-2 text-sm text-muted">{p.kitchenHint}</p>
         <div className="mt-3 space-y-2.5">
           {KITCHEN_PRACTICES.map((practice) => (
             <label key={practice} className="flex cursor-pointer items-start gap-3 text-sm">
@@ -374,7 +361,7 @@ export function ProfileForm({ profile }: { profile: RestaurantProfile }) {
                 }
                 className={`mt-0.5 ${checkboxClass}`}
               />
-              {DINER_STRINGS.en.kitchenPractices[practice]}
+              {d.kitchenPractices[practice]}
             </label>
           ))}
         </div>
@@ -383,19 +370,19 @@ export function ProfileForm({ profile }: { profile: RestaurantProfile }) {
       {state.error && (
         <Notice tone="warning" role="alert">
           {state.error}
-          <Button type="button" onClick={() => window.location.reload()} className="ml-3">
-            Reload latest profile
+          <Button type="button" onClick={() => window.location.reload()} className="ms-3">
+            {p.reload}
           </Button>
         </Notice>
       )}
       {state.saved && (
         <Notice tone="success" role="status">
-          Profile saved.
+          {p.saved}
         </Notice>
       )}
 
       <Button type="submit" disabled={pending} shine>
-        {pending ? "Saving…" : "Save profile"}
+        {pending ? p.saving : p.save}
       </Button>
     </form>
   );

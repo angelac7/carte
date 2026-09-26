@@ -3,9 +3,8 @@ import { z } from "zod";
 import { getOwnerContext } from "@/lib/auth";
 import { addImportedDishes, listDishes, updateDish } from "@/lib/db";
 import { menuToCsv, planImport, readImport } from "@/lib/menu-csv";
+import { ownerStrings } from "@/lib/owner-language";
 import { reportError } from "@/lib/report-error";
-
-const LOGIN_REQUIRED = "Log in to manage your menu.";
 
 function fail(error: string, status = 400) {
   return NextResponse.json({ error }, { status });
@@ -14,7 +13,8 @@ function fail(error: string, status = 400) {
 /** The whole menu as a spreadsheet file. */
 export async function GET() {
   const owner = await getOwnerContext();
-  if (!owner) return fail(LOGIN_REQUIRED, 401);
+  const { t } = await ownerStrings();
+  if (!owner) return fail(t.api.loginMenu, 401);
   const csv = menuToCsv(await listDishes(owner.supabase, owner.restaurant.id));
   const name = `${owner.restaurant.slug}-menu.csv`;
   return new NextResponse(csv, {
@@ -38,10 +38,11 @@ const ImportRequest = z.object({
  */
 export async function POST(req: Request) {
   const owner = await getOwnerContext();
-  if (!owner) return fail(LOGIN_REQUIRED, 401);
+  const { t } = await ownerStrings();
+  if (!owner) return fail(t.api.loginMenu, 401);
   const parsed = ImportRequest.safeParse(await req.json().catch(() => null));
-  if (!parsed.success) return fail("That file couldn't be read. Upload a CSV file under 1 MB.");
-  const { rows, problems } = readImport(parsed.data.csv);
+  if (!parsed.success) return fail(t.api.badFile);
+  const { rows, problems } = readImport(parsed.data.csv, t.spreadsheet.problems);
   const existing = await listDishes(owner.supabase, owner.restaurant.id);
   const plan = planImport(rows, existing);
   const summary = {
@@ -63,9 +64,6 @@ export async function POST(req: Request) {
     return NextResponse.json({ ...summary, applied: true, conflicts });
   } catch (err) {
     reportError("Spreadsheet import failed", err);
-    return fail(
-      "The import stopped partway. Some dishes may have changed, so check Review dishes.",
-      500,
-    );
+    return fail(t.api.importStopped, 500);
   }
 }

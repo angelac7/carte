@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import { AllergenChart } from "@/components/owner/AllergenChart";
 import { OwnerPageHeader } from "@/components/owner/OwnerPageHeader";
 import { PrintButton } from "@/components/PrintButton";
@@ -8,9 +7,10 @@ import { Notice } from "@/components/ui/notice";
 import { requireRestaurant } from "@/lib/auth";
 import { getConfirmedDishes } from "@/lib/db";
 import { htmlLang, isLanguageCode, LANGUAGES, type LanguageCode } from "@/lib/languages";
+import { ownerStrings, ownerTitle } from "@/lib/owner-language";
 
 export const dynamic = "force-dynamic";
-export const metadata: Metadata = { title: "Allergen chart | Carte" };
+export const generateMetadata = () => ownerTitle((t) => t.chart.title);
 
 export default async function AllergenChartPage({
   searchParams,
@@ -19,6 +19,7 @@ export default async function AllergenChartPage({
 }) {
   const { supabase, restaurant } = await requireRestaurant("/dashboard/allergen-chart");
   const dishes = await getConfirmedDishes(supabase, restaurant.id);
+  const { t } = await ownerStrings();
   const source = dishes.find((dish) => dish.source_language && isLanguageCode(dish.source_language))
     ?.source_language as LanguageCode | undefined;
   const requested = (await searchParams).lang ?? "";
@@ -32,13 +33,10 @@ export default async function AllergenChartPage({
       {/* Wide enough for all 14 allergens on one page. */}
       <style>{"@page { size: landscape; margin: 10mm; }"}</style>
       <div className="print:hidden">
-        <OwnerPageHeader
-          title="Allergen chart"
-          intro="Every confirmed dish against the 14 allergens, for your kitchen and front of house. Print it, or save it as a PDF. Reprint it whenever you confirm changes."
-        />
+        <OwnerPageHeader title={t.chart.title} intro={t.chart.intro} />
         <form className="mt-8 flex flex-wrap items-end gap-3">
           <label className="block">
-            <span className="eyebrow text-muted">Language</span>
+            <span className="eyebrow text-muted">{t.print.language}</span>
             <select name="lang" defaultValue={language} className={fieldClass("mt-1 w-auto")}>
               {LANGUAGES.map((option) => (
                 <option key={option.code} value={option.code}>
@@ -48,15 +46,11 @@ export default async function AllergenChartPage({
             </select>
           </label>
           <Button type="submit" variant="secondary">
-            Show
+            {t.print.show}
           </Button>
-          <PrintButton label="Print or save as PDF" />
+          <PrintButton label={t.print.printButton} />
         </form>
-        {dishes.length === 0 && (
-          <Notice className="mt-6">
-            Confirm some dishes first. Only confirmed dishes are on the chart.
-          </Notice>
-        )}
+        {dishes.length === 0 && <Notice className="mt-6">{t.chart.confirmFirst}</Notice>}
       </div>
 
       {dishes.length > 0 && (

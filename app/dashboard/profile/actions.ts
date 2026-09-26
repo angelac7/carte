@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { requireRestaurant } from "@/lib/auth";
 import { updateRestaurantProfile } from "@/lib/db/profile";
 import { ProfileSchema, WEEKDAYS, withWebScheme } from "@/lib/restaurant-profile";
+import { ownerStrings } from "@/lib/owner-language";
 
 export type ProfileState = { error?: string; saved?: boolean; revision?: number };
 
@@ -27,6 +28,7 @@ export async function saveProfileAction(
   formData: FormData,
 ): Promise<ProfileState> {
   const { supabase, restaurant } = await requireRestaurant();
+  const { t } = await ownerStrings();
   const parsed = ProfileSchema.extend({ revision: z.number().int().positive() }).safeParse({
     revision: Number(formData.get("revision")),
     name: String(formData.get("name") ?? ""),
@@ -51,15 +53,17 @@ export async function saveProfileAction(
     return {
       revision: _prev.revision,
       error:
-        field === "website" || field === "reservation_url"
-          ? `Check your ${field === "website" ? "website" : "reservation link"}: enter a full web address, like https://example.com.`
-          : field === "hours"
-            ? "Check your hours: each open day needs an opening and closing time, or mark it closed."
-            : "Some details couldn't be saved. Check the form and try again.",
+        field === "website"
+          ? t.profile.errorWebsite
+          : field === "reservation_url"
+            ? t.profile.errorReservation
+            : field === "hours"
+              ? t.profile.errorHours
+              : t.profile.errorForm,
     };
   }
   if (!parsed.data.name) {
-    return { revision: parsed.data.revision, error: "Add your restaurant's name." };
+    return { revision: parsed.data.revision, error: t.profile.errorName };
   }
   let revision: number | null;
   try {
@@ -67,12 +71,12 @@ export async function saveProfileAction(
     if (!revision)
       return {
         revision: parsed.data.revision,
-        error: "Your profile changed in another tab. Reload and review it before saving again.",
+        error: t.profile.errorConflict,
       };
   } catch {
     return {
       revision: parsed.data.revision,
-      error: "Your profile could not be saved. Please try again.",
+      error: t.profile.errorSave,
     };
   }
   revalidatePath("/dashboard", "layout");

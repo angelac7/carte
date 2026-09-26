@@ -4,10 +4,12 @@ import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { RESTAURANT_COOKIE, requireUser } from "@/lib/auth";
 import { createRestaurant, listMyRestaurants } from "@/lib/db";
+import { fmt } from "@/lib/i18n/owner/format";
+import { ownerStrings } from "@/lib/owner-language";
+import { isValidSlug, slugify } from "@/lib/slug";
 
 /** Enough for a small group of restaurants, while stopping runaway sign-ups. */
 const MAX_LOCATIONS = 10;
-import { isValidSlug, slugify } from "@/lib/slug";
 
 export type SetupState = { error?: string };
 
@@ -16,29 +18,27 @@ export async function createRestaurantAction(
   formData: FormData,
 ): Promise<SetupState> {
   const { supabase, user } = await requireUser();
+  const { t } = await ownerStrings();
   const name = String(formData.get("name") ?? "").trim();
   const slug =
     String(formData.get("slug") ?? "")
       .trim()
       .toLowerCase() || slugify(name);
 
-  if (!name || name.length > 120) return { error: "Enter your restaurant's name." };
+  if (!name || name.length > 120) return { error: t.setup.errorName };
   if (!isValidSlug(slug)) {
-    return { error: "Menu links use 3 to 40 lowercase letters, numbers, and single dashes." };
+    return { error: t.setup.errorLink };
   }
 
   const owned = (await listMyRestaurants(supabase, user.id)).filter((r) => r.role === "owner");
   if (owned.length >= MAX_LOCATIONS) {
-    return { error: `You can have up to ${MAX_LOCATIONS} locations. Contact Carte for more.` };
+    return { error: fmt(t.setup.errorLimit, { max: MAX_LOCATIONS }) };
   }
 
   const result = await createRestaurant(supabase, user.id, name, slug);
   if (!result.ok) {
     return {
-      error:
-        result.reason === "taken"
-          ? "That menu link is already taken. Try another one."
-          : "Your restaurant couldn't be saved. Try again.",
+      error: result.reason === "taken" ? t.setup.errorTaken : t.setup.errorSave,
     };
   }
   // Work on the new location straight away.

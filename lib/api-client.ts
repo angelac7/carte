@@ -92,7 +92,12 @@ async function readJsonLines(res: Response, onLine: (value: unknown) => void): P
   }
 }
 
-const MENU_STOPPED = "Carte stopped before reading the whole menu. Try again.";
+/** The menu reading ended before Carte said it was finished; the page says so in its language. */
+export class MenuStoppedError extends Error {
+  constructor() {
+    super("Carte stopped before reading the whole menu. Try again.");
+  }
+}
 
 /**
  * Sends a menu photo to be read by AI, calling `onDish` as each dish is read.
@@ -118,7 +123,7 @@ export async function streamMenuImage(
     else if (event.data.type === "error") throw new Error(event.data.message);
     else finished = true;
   });
-  if (!finished) throw new Error(MENU_STOPPED);
+  if (!finished) throw new MenuStoppedError();
 }
 
 /** Gets translated dish text for a restaurant's diner menu. */

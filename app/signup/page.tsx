@@ -1,10 +1,10 @@
 import { requestedNextPath } from "@/lib/safe-redirect";
-import type { Metadata } from "next";
 import { AuthForm } from "@/components/AuthForm";
-import { PublicHeader } from "@/components/PublicHeader";
+import { OwnerTextPage } from "@/components/OwnerTextPage";
 import { redirectIfSignedIn } from "@/lib/auth";
+import { ownerTitle } from "@/lib/owner-language";
 
-export const metadata: Metadata = { title: "Sign up | Carte" };
+export const generateMetadata = () => ownerTitle((t) => t.auth.signupPageTitle);
 
 export default async function SignupPage({
   searchParams,
@@ -14,9 +14,8 @@ export default async function SignupPage({
   const next = requestedNextPath((await searchParams).next);
   await redirectIfSignedIn(next);
   return (
-    <>
-      <PublicHeader />
+    <OwnerTextPage>
       <AuthForm mode="signup" next={next} />
-    </>
+    </OwnerTextPage>
   );
 }

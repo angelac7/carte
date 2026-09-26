@@ -10,6 +10,8 @@ import { Button } from "@/components/ui/button";
 import { fieldClass } from "@/components/ui/field";
 import { Notice } from "@/components/ui/notice";
 import { cn } from "@/lib/cn";
+import { useOwnerText } from "@/components/owner/OwnerLanguage";
+import { fmt } from "@/lib/i18n/owner/format";
 
 const panelClass = "mt-8 rounded-panel bg-paper p-6 shadow-raised sm:p-8";
 const inputClass = fieldClass("mt-2");
@@ -24,8 +26,9 @@ function Field({ label, children }: { label: string; children: ReactNode }) {
 }
 
 function CurrentPassword() {
+  const { t } = useOwnerText();
   return (
-    <Field label="Current password">
+    <Field label={t.account.currentPassword}>
       <input
         name="currentPassword"
         type="password"
@@ -55,6 +58,8 @@ function Result({ state }: { state: AccountState }) {
 
 /** Email, password, and account deletion. Each change asks for the current password. */
 export function AccountSettings({ email }: { email: string }) {
+  const { t } = useOwnerText();
+  const a = t.account;
   const [emailState, emailAction, emailPending] = useActionState(changeEmailAction, {});
   const [passwordState, passwordAction, passwordPending] = useActionState(changePasswordAction, {});
   const [deleteState, deleteAction, deletePending] = useActionState(deleteAccountAction, {});
@@ -62,27 +67,25 @@ export function AccountSettings({ email }: { email: string }) {
   return (
     <>
       <section className={panelClass}>
-        <h2 className="font-serif text-3xl tracking-tight">Email</h2>
-        <p className="mt-1 text-sm text-muted">
-          You log in as <span className="font-medium text-ink">{email}</span>.
-        </p>
+        <h2 className="font-serif text-3xl tracking-tight">{a.email}</h2>
+        <p className="mt-1 text-sm text-muted">{fmt(a.loggedInAs, { email })}</p>
         <form action={emailAction} className="mt-6 space-y-5">
-          <Field label="New email">
+          <Field label={a.newEmail}>
             <input name="email" type="email" required autoComplete="email" className={inputClass} />
           </Field>
           <CurrentPassword />
           <Result state={emailState} />
           <Button type="submit" disabled={emailPending}>
-            {emailPending ? "One moment…" : "Change email"}
+            {emailPending ? a.oneMoment : a.changeEmail}
           </Button>
         </form>
       </section>
 
       <section className={panelClass}>
-        <h2 className="font-serif text-3xl tracking-tight">Password</h2>
+        <h2 className="font-serif text-3xl tracking-tight">{a.password}</h2>
         <form action={passwordAction} className="mt-6 space-y-5">
           <CurrentPassword />
-          <Field label="New password">
+          <Field label={a.newPassword}>
             <input
               name="newPassword"
               type="password"
@@ -92,9 +95,9 @@ export function AccountSettings({ email }: { email: string }) {
               autoComplete="new-password"
               className={inputClass}
             />
-            <span className="mt-1 block text-xs text-muted">At least 8 characters.</span>
+            <span className="mt-1 block text-xs text-muted">{a.passwordHint}</span>
           </Field>
-          <Field label="New password again">
+          <Field label={a.newPasswordAgain}>
             <input
               name="confirmPassword"
               type="password"
@@ -107,20 +110,16 @@ export function AccountSettings({ email }: { email: string }) {
           </Field>
           <Result state={passwordState} />
           <Button type="submit" disabled={passwordPending}>
-            {passwordPending ? "One moment…" : "Change password"}
+            {passwordPending ? a.oneMoment : a.changePassword}
           </Button>
         </form>
       </section>
 
       <section className={cn(panelClass, "border border-tomato/40")}>
-        <h2 className="font-serif text-3xl tracking-tight">Delete account</h2>
-        <p className="mt-2 text-sm leading-relaxed text-muted">
-          This permanently deletes your login, your restaurant, its menu, dish photos, dish
-          explanations, and diner reports. Your menu link and QR code will stop working. This
-          can&apos;t be undone.
-        </p>
+        <h2 className="font-serif text-3xl tracking-tight">{a.deleteTitle}</h2>
+        <p className="mt-2 text-sm leading-relaxed text-muted">{a.deleteText}</p>
         <form action={deleteAction} className="mt-6 space-y-5">
-          <Field label="Type DELETE to confirm">
+          <Field label={a.typeDelete}>
             <input
               name="confirm"
               required
@@ -132,7 +131,7 @@ export function AccountSettings({ email }: { email: string }) {
           <CurrentPassword />
           <Result state={deleteState} />
           <Button type="submit" className="bg-tomato" disabled={deletePending}>
-            {deletePending ? "Deleting…" : "Delete my account"}
+            {deletePending ? a.deleting : a.deleteButton}
           </Button>
         </form>
       </section>

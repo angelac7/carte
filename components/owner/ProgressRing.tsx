@@ -1,14 +1,17 @@
 "use client";
 import { motion } from "motion/react";
+import { useOwnerText } from "@/components/owner/OwnerLanguage";
+import { fmt } from "@/lib/i18n/owner/format";
 
 /** A ring that fills as setup steps are completed. */
 export function ProgressRing({ done, total }: { done: number; total: number }) {
   const progress = total ? done / total : 0;
+  const { t } = useOwnerText();
   return (
     <div
       className="relative h-24 w-24 shrink-0 rounded-full shadow-raised-sm"
       role="img"
-      aria-label={`${done} of ${total} steps done`}
+      aria-label={fmt(t.progress.label, { done, total })}
     >
       <svg viewBox="0 0 100 100" className="h-full w-full -rotate-90">
         <circle cx="50" cy="50" r="42" fill="none" stroke="var(--color-line)" strokeWidth="10" />

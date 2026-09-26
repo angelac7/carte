@@ -5,6 +5,7 @@ import { requestPasswordReset, resetPassword, type AuthState } from "@/app/auth/
 import { Button } from "@/components/ui/button";
 import { fieldClass } from "@/components/ui/field";
 import { Notice } from "@/components/ui/notice";
+import { useOwnerText } from "@/components/owner/OwnerLanguage";
 
 export function PasswordForm({
   mode,
@@ -13,25 +14,24 @@ export function PasswordForm({
   mode: "request" | "reset";
   expired?: boolean;
 }) {
+  const { t } = useOwnerText();
+  const a = t.auth;
   const [state, action, pending] = useActionState<AuthState, FormData>(
     mode === "request" ? requestPasswordReset : resetPassword,
     {},
   );
   return (
     <main id="main" className="mx-auto max-w-md px-5 py-16">
-      <h1 className="font-serif text-4xl">
-        {mode === "request" ? "Reset your password" : "Choose a new password"}
-      </h1>
+      <h1 className="font-serif text-4xl">{mode === "request" ? a.resetTitle : a.chooseTitle}</h1>
       {expired && (
         <Notice tone="warning" className="mt-4">
-          That reset link has expired or could not be verified. Request a new one and open it in
-          this browser.
+          {a.expired}
         </Notice>
       )}
       <form action={action} className="mt-8 space-y-5">
         {mode === "request" ? (
           <label className="block">
-            Email
+            {a.email}
             <input
               name="email"
               type="email"
@@ -43,7 +43,7 @@ export function PasswordForm({
         ) : (
           <>
             <label className="block">
-              New password
+              {a.newPassword}
               <input
                 name="password"
                 type="password"
@@ -55,7 +55,7 @@ export function PasswordForm({
               />
             </label>
             <label className="block">
-              Confirm new password
+              {a.confirmPassword}
               <input
                 name="confirmPassword"
                 type="password"
@@ -79,14 +79,14 @@ export function PasswordForm({
           </Notice>
         )}
         <Button type="submit" disabled={pending}>
-          {pending ? "One moment…" : mode === "request" ? "Send reset link" : "Save new password"}
+          {pending ? a.oneMoment : mode === "request" ? a.sendLink : a.saveNew}
         </Button>
       </form>
       <Link
         className="mt-6 inline-block text-sm underline"
         href={mode === "request" ? "/login" : "/forgot-password"}
       >
-        {mode === "request" ? "Back to login" : "Request another reset link"}
+        {mode === "request" ? a.backToLogin : a.requestAnother}
       </Link>
     </main>
   );

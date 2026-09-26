@@ -5,9 +5,12 @@ import { PublicHeader } from "@/components/PublicHeader";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { RESTAURANT_COOKIE, requireUser } from "@/lib/auth";
 import { acceptInvite, isInviteCode, peekInvite } from "@/lib/db/team";
+import { fmt } from "@/lib/i18n/owner/format";
+import { htmlLang, textDirection } from "@/lib/languages";
+import { ownerStrings, ownerTitle } from "@/lib/owner-language";
 
 export const dynamic = "force-dynamic";
-export const metadata: Metadata = { title: "Join a restaurant | Carte" };
+export const generateMetadata = (): Promise<Metadata> => ownerTitle((t) => t.join.pageTitle);
 
 async function join(code: string) {
   "use server";
@@ -27,37 +30,37 @@ export default async function JoinPage({ params }: { params: Promise<{ code: str
   const { code } = await params;
   const { supabase } = await requireUser(`/join/${code}`);
   const name = isInviteCode(code) ? await peekInvite(supabase, code) : null;
+  const { t, language } = await ownerStrings();
 
   return (
     <>
-      <PublicHeader signedIn />
-      <main id="main" className="mx-auto max-w-xl px-5 py-24 pb-32 md:pb-24">
+      <PublicHeader signedIn language={language} />
+      <main
+        id="main"
+        lang={htmlLang(language)}
+        dir={textDirection(language)}
+        className="mx-auto max-w-xl px-5 py-24 pb-32 md:pb-24"
+      >
         {name ? (
           <>
             <h1 className="font-serif text-5xl leading-[0.95] tracking-tighter sm:text-6xl">
-              Join {name}
+              {fmt(t.join.title, { name })}
             </h1>
-            <p className="mt-6 text-lg leading-relaxed text-muted">
-              You&apos;ll be able to change and confirm {name}&apos;s menu and profile. Only confirm
-              allergens you&apos;ve checked with the kitchen.
-            </p>
+            <p className="mt-6 text-lg leading-relaxed text-muted">{fmt(t.join.text, { name })}</p>
             <form action={join.bind(null, code)} className="mt-10">
               <Button type="submit" size="lg" shine>
-                Join as an editor
+                {t.join.join}
               </Button>
             </form>
           </>
         ) : (
           <>
             <h1 className="font-serif text-5xl leading-[0.95] tracking-tighter sm:text-6xl">
-              This invite can&apos;t be used
+              {t.join.unusableTitle}
             </h1>
-            <p className="mt-6 text-lg leading-relaxed text-muted">
-              It may have expired or already been used. Ask the restaurant&apos;s owner for a new
-              link.
-            </p>
+            <p className="mt-6 text-lg leading-relaxed text-muted">{t.join.unusableText}</p>
             <ButtonLink href="/dashboard" className="mt-10">
-              Go to your dashboard
+              {t.join.dashboard}
             </ButtonLink>
           </>
         )}

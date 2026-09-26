@@ -7,22 +7,23 @@ import { requireUser } from "@/lib/auth";
 import { listMyRestaurants } from "@/lib/db";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { reportError } from "@/lib/report-error";
+import { fmt } from "@/lib/i18n/owner/format";
+import { ownerStrings } from "@/lib/owner-language";
 
 export type AccountState = { error?: string; message?: string };
 
 const Password = z.string().min(8).max(72);
-const WRONG_PASSWORD = "Your current password isn't right.";
-const TOO_MANY = "Too many attempts. Try again in 15 minutes.";
 
 /** Confirms the signed-in owner's current password, a few tries at a time. */
 async function confirmOwner(formData: FormData) {
   const { supabase, user } = await requireUser("/dashboard/account");
   const current = String(formData.get("currentPassword") ?? "");
+  const { t } = await ownerStrings();
   if (!(await checkRateLimit(`account-password:${user.id}`, 5, 15 * 60 * 1000))) {
-    return { error: TOO_MANY } as const;
+    return { error: t.account.tooMany } as const;
   }
   if (!user.email || !(await passwordMatches(user.email, current))) {
-    return { error: WRONG_PASSWORD } as const;
+    return { error: t.account.wrongPassword } as const;
   }
   return { supabase, user } as const;
 }
@@ -31,12 +32,13 @@ export async function changeEmailAction(
   _prev: AccountState,
   formData: FormData,
 ): Promise<AccountState> {
+  const { t } = await ownerStrings();
   const email = z.email().safeParse(String(formData.get("email") ?? "").trim());
-  if (!email.success) return { error: "Enter a valid email address." };
+  if (!email.success) return { error: t.account.invalidEmail };
   const owner = await confirmOwner(formData);
   if ("error" in owner) return { error: owner.error };
   if (email.data.toLowerCase() === owner.user.email?.toLowerCase()) {
-    return { error: "That's already your email." };
+    return { error: t.account.sameEmail };
   }
 
   const origin =
@@ -45,9 +47,9 @@ export async function changeEmailAction(
     { email: email.data },
     { emailRedirectTo: `${origin}/auth/callback?next=/dashboard/account` },
   );
-  if (error) return { error: "Your email couldn't be changed. Try again later." };
+  if (error) return { error: t.account.emailFailed };
   return {
-    message: `We sent a confirmation link to ${email.data}. Your email changes once you open it. If one arrives at your current address too, open that as well.`,
+    message: fmt(t.account.emailSent, { email: email.data }),
   };
 }
 
@@ -55,17 +57,18 @@ export async function changePasswordAction(
   _prev: AccountState,
   formData: FormData,
 ): Promise<AccountState> {
+  const { t } = await ownerStrings();
   const password = Password.safeParse(formData.get("newPassword"));
-  if (!password.success) return { error: "Use a new password between 8 and 72 characters." };
+  if (!password.success) return { error: t.account.passwordLength };
   if (password.data !== formData.get("confirmPassword")) {
-    return { error: "The new passwords don't match." };
+    return { error: t.account.passwordMismatch };
   }
   const owner = await confirmOwner(formData);
   if ("error" in owner) return { error: owner.error };
 
   const { error } = await owner.supabase.auth.updateUser({ password: password.data });
-  if (error) return { error: "Your password couldn't be changed. Try a different one." };
-  return { message: "Your password has been changed." };
+  if (error) return { error: t.account.passwordFailed };
+  return { message: t.account.passwordChanged };
 }
 
 export async function deleteAccountAction(
@@ -73,7 +76,7 @@ export async function deleteAccountAction(
   formData: FormData,
 ): Promise<AccountState> {
   if (String(formData.get("confirm") ?? "").trim() !== "DELETE") {
-    return { error: "Type DELETE to confirm." };
+    return { error: (await ownerStrings()).t.account.confirmDelete };
   }
   const owner = await confirmOwner(formData);
   if ("error" in owner) return { error: owner.error };
@@ -88,7 +91,7 @@ export async function deleteAccountAction(
     );
   } catch (err) {
     reportError("Account deletion failed", err);
-    return { error: "Your account couldn't be deleted. Please try again." };
+    return { error: (await ownerStrings()).t.account.deleteFailed };
   }
   // The login no longer exists; clear this browser's session cookies too.
   await owner.supabase.auth.signOut().catch(() => {});

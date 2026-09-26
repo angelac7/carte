@@ -1,8 +1,8 @@
-import type { Metadata } from "next";
 import { PasswordForm } from "@/components/PasswordForm";
-import { PublicHeader } from "@/components/PublicHeader";
+import { OwnerTextPage } from "@/components/OwnerTextPage";
+import { ownerTitle } from "@/lib/owner-language";
 
-export const metadata: Metadata = { title: "Reset your password | Carte" };
+export const generateMetadata = () => ownerTitle((t) => t.auth.resetTitle);
 
 export default async function ForgotPasswordPage({
   searchParams,
@@ -10,9 +10,8 @@ export default async function ForgotPasswordPage({
   searchParams: Promise<{ error?: string }>;
 }) {
   return (
-    <>
-      <PublicHeader />
+    <OwnerTextPage>
       <PasswordForm mode="request" expired={(await searchParams).error === "expired"} />
-    </>
+    </OwnerTextPage>
   );
 }

@@ -16,16 +16,22 @@ import { getDailyViews, getDinerInterest, getDishViews } from "@/lib/db/owner-st
 import { getClaim } from "@/lib/db/places";
 import { getRestaurantProfile } from "@/lib/db/profile";
 import { listOpenReports } from "@/lib/db/reports";
+import { plural } from "@/lib/i18n/owner/format";
+import { ownerStrings } from "@/lib/owner-language";
 import { buildChecklist } from "@/lib/owner-checklist";
 import { prepareExplanations } from "@/lib/prepare-explanations";
 
 export const dynamic = "force-dynamic";
-export const metadata: Metadata = { title: "Dashboard | Carte" };
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await ownerStrings();
+  return { title: `${t.nav.dashboard} | Carte` };
+}
 
 const panelClass = "rounded-panel bg-paper p-6 shadow-raised sm:p-8";
 
 export default async function DashboardHome() {
   const { supabase, restaurant } = await requireRestaurant();
+  const { t, language } = await ownerStrings();
   const [dishes, profile, claim, dishViews, daily, reports, interest] = await Promise.all([
     listDishes(supabase, restaurant.id),
     getRestaurantProfile(supabase, restaurant.id),
@@ -46,37 +52,40 @@ export default async function DashboardHome() {
   const topDishes = dishViews.filter((dish) => dish.views > 0).slice(0, 5);
   const topMax = Math.max(1, ...topDishes.map((dish) => dish.views));
 
-  const checklist = buildChecklist({
-    dishCount: dishes.length,
-    needReview,
-    withPhotos,
-    hasProfile: Boolean(profile.cuisine && profile.city),
-    listed: profile.listed,
-    claim,
-  });
+  const checklist = buildChecklist(
+    {
+      dishCount: dishes.length,
+      needReview,
+      withPhotos,
+      hasProfile: Boolean(profile.cuisine && profile.city),
+      listed: profile.listed,
+      claim,
+    },
+    t.checklist,
+  );
   const stepsDone = checklist.filter((item) => item.done).length;
 
   const stats = [
-    { label: "Dishes on your menu", value: dishes.length },
-    { label: "Confirmed for diners", value: confirmed },
-    { label: "Need review", value: needReview, alert: needReview > 0 },
-    { label: "Dish views this week", value: weekViews },
+    { label: t.dashboard.statDishes, value: dishes.length },
+    { label: t.dashboard.statConfirmed, value: confirmed },
+    { label: t.dashboard.statReview, value: needReview, alert: needReview > 0 },
+    { label: t.dashboard.statViews, value: weekViews },
   ];
 
   return (
     <main id="main" className="mx-auto max-w-5xl px-5 py-12">
-      <OwnerPageHeader eyebrow="Welcome back" title={restaurant.name}>
+      <OwnerPageHeader eyebrow={t.dashboard.welcome} title={restaurant.name}>
         <ButtonLink href={`/r/${restaurant.slug}`} shine>
-          View your diner menu
+          {t.dashboard.viewMenu}
         </ButtonLink>
         <ButtonLink href="/dashboard/qr" variant="secondary">
-          Print your QR code
+          {t.dashboard.printQr}
         </ButtonLink>
       </OwnerPageHeader>
 
       {reports.length > 0 && (
         <div className="mt-12">
-          <DinerReports reports={reports} now={new Date()} />
+          <DinerReports reports={reports} now={new Date()} t={t} language={language} />
         </div>
       )}
 
@@ -102,7 +111,7 @@ export default async function DashboardHome() {
                   href="/dashboard/review"
                   className="mt-2 inline-block text-sm font-medium text-saffron-ink underline underline-offset-4"
                 >
-                  Review now
+                  {t.dashboard.reviewNow}
                 </Link>
               )}
             </div>
@@ -114,10 +123,8 @@ export default async function DashboardHome() {
         <div className="space-y-8 lg:col-span-2">
           <BlurFade>
             <section className={panelClass}>
-              <h2 className="font-serif text-3xl tracking-tight">Diner views</h2>
-              <p className="mt-1 text-sm text-muted">
-                How often diners opened your dishes’ details each day.
-              </p>
+              <h2 className="font-serif text-3xl tracking-tight">{t.dashboard.viewsTitle}</h2>
+              <p className="mt-1 text-sm text-muted">{t.dashboard.viewsIntro}</p>
               <div className="mt-8">
                 <ViewsChart days={daily} />
               </div>
@@ -125,16 +132,15 @@ export default async function DashboardHome() {
           </BlurFade>
 
           <BlurFade>
-            <DinerInterestPanel interest={interest} />
+            <DinerInterestPanel interest={interest} t={t} language={language} />
           </BlurFade>
 
           <BlurFade>
             <section className={panelClass}>
-              <h2 className="font-serif text-3xl tracking-tight">Most viewed this week</h2>
+              <h2 className="font-serif text-3xl tracking-tight">{t.dashboard.topTitle}</h2>
               {topDishes.length === 0 ? (
                 <p className="mt-5 rounded-control px-4 py-8 text-center text-sm leading-relaxed text-muted shadow-pressed">
-                  No views yet. Put your QR code on tables, and you’ll see which dishes diners open
-                  most.
+                  {t.dashboard.topEmpty}
                 </p>
               ) : (
                 <ul className="mt-5 space-y-4">
@@ -164,14 +170,12 @@ export default async function DashboardHome() {
               <ProgressRing done={stepsDone} total={checklist.length} />
               <div>
                 <h2 className="font-serif text-3xl leading-tight tracking-tight">
-                  {stepsDone === checklist.length ? "You’re all set" : "Finish setting up"}
+                  {stepsDone === checklist.length ? t.dashboard.allSet : t.dashboard.finishSetup}
                 </h2>
                 <p className="mt-1 text-sm text-muted">
                   {stepsDone === checklist.length
-                    ? "Every step is done."
-                    : checklist.length - stepsDone === 1
-                      ? "1 step to go."
-                      : `${checklist.length - stepsDone} steps to go.`}
+                    ? t.dashboard.everyStepDone
+                    : plural(t.dashboard.stepsToGo, checklist.length - stepsDone, language)}
                 </p>
               </div>
             </div>
@@ -201,7 +205,7 @@ export default async function DashboardHome() {
                         <span className="block text-xs text-saffron-ink">{item.note}</span>
                       )}
                     </span>
-                    <span className="sr-only">{item.done ? "Done" : "Not done yet"}</span>
+                    <span className="sr-only">{item.done ? t.common.done : t.common.notDone}</span>
                   </Link>
                 </li>
               ))}

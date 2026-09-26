@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import Link from "@/components/OfflineLink";
 import { claimPlaceAction } from "@/app/dashboard/claim/actions";
 import { OwnerPageHeader } from "@/components/owner/OwnerPageHeader";
@@ -14,28 +13,51 @@ import { PLACES_STRINGS } from "@/lib/i18n/places-strings";
 import { isValidPlaceId, type OsmPlace } from "@/lib/places/normalize";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { getPlace } from "@/lib/places/osm";
+import { fmt } from "@/lib/i18n/owner/format";
+import type { OwnerStrings } from "@/lib/i18n/owner-strings";
+import { ownerStrings, ownerTitle } from "@/lib/owner-language";
 
-export const metadata: Metadata = { title: "Link your map listing | Carte" };
+export const generateMetadata = () => ownerTitle((t) => t.claim.title);
 
 type Params = Record<string, string | string[] | undefined>;
 const one = (value: Params[string]) => (Array.isArray(value) ? value[0] : value) ?? "";
 const panelClass = "mt-8 rounded-panel bg-paper p-6 shadow-raised sm:p-8";
 
-const ERRORS: Record<string, string> = {
-  evidence: "Describe how Carte can verify your ownership (20–2000 characters).",
-  limited: "Too many map lookups. Please try again later.",
-  taken: "Another Carte restaurant has already claimed this listing. Contact Carte if it's yours.",
-  missing: "That map listing couldn't be found. Try finding your restaurant again.",
-  failed: "The claim couldn't be saved. Try again.",
-};
+/** A claim's latest status, with a link to try again if it was turned down. */
+function LatestClaim({
+  claim,
+  t,
+}: {
+  claim: { status: string; place_id: string; review_note: string | null };
+  t: OwnerStrings;
+}) {
+  const status = t.claim.statuses[claim.status as keyof OwnerStrings["claim"]["statuses"]];
+  return (
+    <>
+      <p>{fmt(t.claim.latest, { status: status ?? claim.status, place: claim.place_id })}</p>
+      {claim.review_note && <p className="mt-2 whitespace-pre-wrap">{claim.review_note}</p>}
+      {(claim.status === "rejected" || claim.status === "transferred") && (
+        <Link
+          href={`/dashboard/claim?place=${claim.place_id}`}
+          className="mt-3 inline-block underline"
+        >
+          {t.claim.newEvidence}
+        </Link>
+      )}
+    </>
+  );
+}
 
 export default async function ClaimPage({ searchParams }: { searchParams: Promise<Params> }) {
   const params = await searchParams;
   const { supabase, restaurant } = await requireOwnedRestaurant(
     `/dashboard/claim?place=${encodeURIComponent(one(params.place))}`,
   );
+  const { t, language } = await ownerStrings();
   const placeId = one(params.place);
-  const error = ERRORS[one(params.error)];
+  const errorKey = one(params.error);
+  const error =
+    errorKey in t.claim.errors ? t.claim.errors[errorKey as keyof typeof t.claim.errors] : "";
   const justClaimed = one(params.claimed) === "1";
 
   const claim = await getClaim(supabase, restaurant.id);
@@ -50,14 +72,13 @@ export default async function ClaimPage({ searchParams }: { searchParams: Promis
   return (
     <main id="main" className="mx-auto max-w-2xl px-5 py-12">
       <OwnerPageHeader
-        title="Link your map listing"
-        intro={`Link ${restaurant.name} to its listing on the map, so diners who find your restaurant nearby can open your confirmed Carte menu.`}
+        title={t.claim.title}
+        intro={fmt(t.claim.intro, { name: restaurant.name })}
       />
 
       {justClaimed && (
         <Notice tone="success" role="status" className="mt-6">
-          Claim sent. We filled in any empty profile details from the map; check them on your
-          Profile page.
+          {t.claim.sent}
         </Notice>
       )}
       {error && (
@@ -68,18 +89,7 @@ export default async function ClaimPage({ searchParams }: { searchParams: Promis
 
       {latest && (
         <Notice tone={latest.status === "approved" ? "success" : "warning"} className="mt-6">
-          <p>
-            Latest claim: {latest.status} · {latest.place_id}
-          </p>
-          {latest.review_note && <p className="mt-2 whitespace-pre-wrap">{latest.review_note}</p>}
-          {(latest.status === "rejected" || latest.status === "transferred") && (
-            <Link
-              href={`/dashboard/claim?place=${latest.place_id}`}
-              className="mt-3 inline-block underline"
-            >
-              Submit new ownership evidence
-            </Link>
-          )}
+          <LatestClaim claim={latest} t={t} />
         </Notice>
       )}
 
@@ -92,21 +102,19 @@ export default async function ClaimPage({ searchParams }: { searchParams: Promis
             )}
           >
             {claim.verified
-              ? "Verified"
+              ? t.claim.verified
               : latest?.status === "pending"
-                ? "Waiting for verification"
-                : "Not verified"}
+                ? t.claim.waiting
+                : t.claim.notVerified}
           </p>
           <p className="mt-3 text-sm leading-relaxed text-muted">
-            {claim.verified
-              ? "Diners who find your restaurant on the map can open your Carte menu."
-              : "Carte will confirm you own this restaurant before linking it for diners. Check this page for the decision and any follow-up request."}
+            {claim.verified ? t.claim.verifiedText : t.claim.waitingText}
           </p>
           <Link
             href={`/place/${claim.placeId}`}
             className="mt-3 inline-block text-sm underline underline-offset-4 hover:text-muted"
           >
-            View your map listing
+            {t.claim.viewListing}
           </Link>
         </div>
       )}
@@ -120,31 +128,13 @@ export default async function ClaimPage({ searchParams }: { searchParams: Promis
           </p>
           {latest && (
             <Notice tone={latest.status === "approved" ? "success" : "warning"} className="mt-6">
-              <p>
-                Latest claim: {latest.status} · {latest.place_id}
-              </p>
-              {latest.review_note && (
-                <p className="mt-2 whitespace-pre-wrap">{latest.review_note}</p>
-              )}
-              {(latest.status === "rejected" || latest.status === "transferred") && (
-                <Link
-                  href={`/dashboard/claim?place=${latest.place_id}`}
-                  className="mt-3 inline-block underline"
-                >
-                  Submit new ownership evidence
-                </Link>
-              )}
+              <LatestClaim claim={latest} t={t} />
             </Notice>
           )}
 
-          {claim.placeId && (
-            <p className="mt-3 text-sm text-tomato">
-              Changing your listing needs verification again. Claims to an existing listing are
-              reviewed as disputes.
-            </p>
-          )}
+          {claim.placeId && <p className="mt-3 text-sm text-tomato">{t.claim.changing}</p>}
           <label className="mt-5 block text-sm font-medium">
-            Ownership evidence
+            {t.claim.evidence}
             <textarea
               name="evidence"
               required
@@ -152,35 +142,35 @@ export default async function ClaimPage({ searchParams }: { searchParams: Promis
               maxLength={2000}
               rows={4}
               className={fieldClass("mt-2")}
-              placeholder="Your role, a business website, and how Carte can independently verify ownership. Do not include passwords or identity documents."
+              placeholder={t.claim.evidencePlaceholder}
             />
           </label>
           <Button type="submit" shine className="mt-5">
-            This is my restaurant
+            {t.claim.submit}
           </Button>
         </form>
       )}
 
       {!place && !claim.placeId && (
         <EmptyState className="mt-6 text-sm">
-          Find your restaurant on the{" "}
+          {t.claim.findBefore}{" "}
           <Link href="/places" className="underline underline-offset-4 hover:text-ink">
-            Nearby page
+            {t.claim.nearbyPage}
           </Link>
-          , open it, and choose &ldquo;Put your menu on Carte.&rdquo;
+          {t.claim.findAfter}
         </EmptyState>
       )}
 
       {(place || claim.placeId) && (
         <p className="mt-10 border-t border-ink/15 pt-5 text-xs leading-relaxed text-muted">
-          {PLACES_STRINGS.en.sourceNote}{" "}
+          {PLACES_STRINGS[language].sourceNote}{" "}
           <a
             href="https://www.openstreetmap.org/copyright"
             target="_blank"
             rel="noopener noreferrer"
             className="underline underline-offset-2 hover:text-ink"
           >
-            {PLACES_STRINGS.en.credit}
+            {PLACES_STRINGS[language].credit}
           </a>
         </p>
       )}

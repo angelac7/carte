@@ -1,18 +1,21 @@
 "use client";
 import { motion } from "motion/react";
+import { useOwnerText } from "@/components/owner/OwnerLanguage";
 import type { DailyViews } from "@/lib/db/owner-stats";
+import { fmt } from "@/lib/i18n/owner/format";
 
 /** Daily dish views as bars that grow into place. Hover a bar to see its count. */
 export function ViewsChart({ days }: { days: DailyViews[] }) {
   const max = Math.max(1, ...days.map((day) => day.views));
   const total = days.reduce((sum, day) => sum + day.views, 0);
+  const { t } = useOwnerText();
 
   return (
     <div>
       <div
         className="flex h-36 items-end gap-1.5"
         role="img"
-        aria-label={`Dish views over the last ${days.length} days: ${total} in total`}
+        aria-label={fmt(t.views.chartLabel, { days: days.length, total })}
       >
         {days.map((day, index) => (
           <div
@@ -34,8 +37,8 @@ export function ViewsChart({ days }: { days: DailyViews[] }) {
         ))}
       </div>
       <div className="eyebrow mt-3 flex justify-between text-muted">
-        <span>{days.length} days ago</span>
-        <span>Today</span>
+        <span>{fmt(t.views.daysAgo, { days: days.length })}</span>
+        <span>{t.views.today}</span>
       </div>
     </div>
   );

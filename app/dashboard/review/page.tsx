@@ -1,8 +1,8 @@
-import type { Metadata } from "next";
 import ReviewDishes from "@/components/owner/ReviewDishes";
 import { requireRestaurant } from "@/lib/auth";
+import { ownerTitle } from "@/lib/owner-language";
 
-export const metadata: Metadata = { title: "Review dishes | Carte" };
+export const generateMetadata = () => ownerTitle((t) => t.nav.review);
 
 export default async function ReviewPage() {
   const { restaurant } = await requireRestaurant("/dashboard/review");

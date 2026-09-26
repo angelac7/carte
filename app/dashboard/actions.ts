@@ -6,6 +6,8 @@ import { redirect } from "next/navigation";
 import { currentRestaurant, RESTAURANT_COOKIE, requireRestaurant, requireUser } from "@/lib/auth";
 import { resolveReport } from "@/lib/db/reports";
 import { removeMember } from "@/lib/db/team";
+import { isLanguageCode } from "@/lib/languages";
+import { DASHBOARD_LANGUAGE_COOKIE } from "@/lib/owner-language";
 
 /** Marks a diner's report as dealt with, so it leaves the dashboard. */
 export async function resolveReportAction(formData: FormData): Promise<void> {
@@ -29,6 +31,20 @@ export async function switchRestaurantAction(formData: FormData): Promise<void> 
     });
   }
   redirect("/dashboard");
+}
+
+/** Sets the dashboard's language on this device, apart from the language menus are read in. */
+export async function setDashboardLanguageAction(formData: FormData): Promise<void> {
+  await requireUser();
+  const language = String(formData.get("language") ?? "");
+  if (isLanguageCode(language)) {
+    (await cookies()).set(DASHBOARD_LANGUAGE_COOKIE, language, {
+      path: "/",
+      maxAge: 60 * 60 * 24 * 365,
+      sameSite: "lax",
+    });
+  }
+  revalidatePath("/", "layout");
 }
 
 /** An editor stops helping with the restaurant they're working on. Owners can't leave their own. */

@@ -8,24 +8,21 @@ import { removeRestaurantImage, uploadRestaurantImage } from "@/lib/api-client";
 import { cn } from "@/lib/cn";
 import type { RestaurantImages as Images } from "@/lib/db/restaurant-images";
 import { shrinkImage } from "@/lib/image";
+import { useOwnerText } from "@/components/owner/OwnerLanguage";
+import { fmt } from "@/lib/i18n/owner/format";
 
 const KINDS = {
-  logo: {
-    title: "Logo",
-    hint: "Square works best. Shown beside your name on your menu.",
-    frame: "aspect-square w-28",
-    maxSide: 600,
-  },
-  cover: {
-    title: "Cover photo",
-    hint: "A wide photo of your food or room. Shown behind your name and on Discover.",
-    frame: "aspect-[16/9] w-full max-w-sm",
-    maxSide: 2000,
-  },
+  logo: { frame: "aspect-square w-28", maxSide: 600 },
+  cover: { frame: "aspect-[16/9] w-full max-w-sm", maxSide: 2000 },
 } as const;
 
 /** Upload, replace, or remove the restaurant's logo and cover photo. Saved right away. */
 export function RestaurantImages({ initial }: { initial: Images }) {
+  const { t } = useOwnerText();
+  const text = {
+    logo: { title: t.images.logo, hint: t.images.logoHint },
+    cover: { title: t.images.cover, hint: t.images.coverHint },
+  };
   const [images, setImages] = useState(initial);
   const [busy, setBusy] = useState<keyof typeof KINDS | null>(null);
   const [problem, setProblem] = useState("");
@@ -38,14 +35,14 @@ export function RestaurantImages({ initial }: { initial: Images }) {
       if (file) {
         const url = await uploadRestaurantImage(kind, await shrinkImage(file, KINDS[kind].maxSide));
         setImages((prev) => ({ ...prev, [`${kind}_url`]: url }));
-        toast(`${KINDS[kind].title} saved`);
+        toast(fmt(t.images.saved, { kind: text[kind].title }));
       } else {
         await removeRestaurantImage(kind);
         setImages((prev) => ({ ...prev, [`${kind}_url`]: null }));
-        toast(`${KINDS[kind].title} removed`);
+        toast(fmt(t.images.removed, { kind: text[kind].title }));
       }
     } catch (error) {
-      setProblem(error instanceof Error ? error.message : "The image couldn't be saved.");
+      setProblem(error instanceof Error ? error.message : t.images.failed);
     } finally {
       setBusy(null);
     }
@@ -53,13 +50,13 @@ export function RestaurantImages({ initial }: { initial: Images }) {
 
   return (
     <section className="mt-10 rounded-panel bg-paper p-6 shadow-raised sm:p-8">
-      <h2 className="font-serif text-3xl tracking-tight">Logo and cover photo</h2>
+      <h2 className="font-serif text-3xl tracking-tight">{t.images.title}</h2>
       <div className="mt-6 grid gap-8 sm:grid-cols-[auto_1fr]">
         {(Object.keys(KINDS) as (keyof typeof KINDS)[]).map((kind) => {
           const url = images[`${kind}_url`];
           return (
             <div key={kind}>
-              <p className="eyebrow text-muted">{KINDS[kind].title}</p>
+              <p className="eyebrow text-muted">{text[kind].title}</p>
               <div
                 className={cn(
                   "relative mt-2 overflow-hidden rounded-[1.25rem]",
@@ -71,11 +68,11 @@ export function RestaurantImages({ initial }: { initial: Images }) {
                   <Image src={url} alt="" fill sizes="384px" className="object-cover" />
                 ) : (
                   <span className="flex h-full items-center justify-center text-xs text-muted">
-                    None yet
+                    {t.images.none}
                   </span>
                 )}
               </div>
-              <p className="mt-2 max-w-xs text-xs text-muted">{KINDS[kind].hint}</p>
+              <p className="mt-2 max-w-xs text-xs text-muted">{text[kind].hint}</p>
               <div className="mt-2 flex flex-wrap items-center gap-3">
                 <label
                   className={cn(
@@ -83,7 +80,7 @@ export function RestaurantImages({ initial }: { initial: Images }) {
                     busy && "pointer-events-none opacity-50",
                   )}
                 >
-                  {busy === kind ? "Saving…" : url ? "Replace" : "Upload"}
+                  {busy === kind ? t.images.saving : url ? t.images.replace : t.images.upload}
                   <input
                     type="file"
                     accept="image/*"
@@ -104,7 +101,7 @@ export function RestaurantImages({ initial }: { initial: Images }) {
                     disabled={busy !== null}
                     onClick={() => change(kind, null)}
                   >
-                    Remove
+                    {t.images.remove}
                   </Button>
                 )}
               </div>

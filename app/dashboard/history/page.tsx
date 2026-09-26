@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import { restoreVersionAction } from "@/app/dashboard/history/actions";
 import { OwnerPageHeader } from "@/components/owner/OwnerPageHeader";
 import { Button, ButtonLink } from "@/components/ui/button";
@@ -6,26 +5,48 @@ import { Notice } from "@/components/ui/notice";
 import { emailsFor } from "@/lib/account";
 import { requireRestaurant } from "@/lib/auth";
 import { listDishHistory } from "@/lib/db/dish-history";
-import {
-  ACTION_LABELS,
-  describeChange,
-  latestEntryIds,
-  withPrevious,
-  type DishSafety,
-} from "@/lib/dish-history";
+import { isAllergen, isDietaryTag, isOtherAvoid } from "@/lib/allergens";
+import { describeChange, latestEntryIds, withPrevious, type DishSafety } from "@/lib/dish-history";
+import { formatList } from "@/lib/format-list";
+import { DINER_STRINGS } from "@/lib/i18n/diner-strings";
+import { fmt } from "@/lib/i18n/owner/format";
+import type { OwnerStrings } from "@/lib/i18n/owner-strings";
+import { htmlLang, type LanguageCode } from "@/lib/languages";
+import { ownerStrings, ownerTitle } from "@/lib/owner-language";
 
 export const dynamic = "force-dynamic";
-export const metadata: Metadata = { title: "Allergen history | Carte" };
+export const generateMetadata = () => ownerTitle((t) => t.history.title);
 
-const list = (values: string[]) => values.join(", ") || "none";
+/** List codes, like "tree nuts" or "pork", named in the owner's language. */
+function namer(language: LanguageCode, none: string) {
+  const d = DINER_STRINGS[language];
+  const name = (value: string) =>
+    isAllergen(value)
+      ? d.allergens[value]
+      : isDietaryTag(value)
+        ? d.tags[value]
+        : isOtherAvoid(value)
+          ? d.alsoAvoid[value]
+          : value;
+  return (values: string[]) => (values.length ? formatList(values.map(name), language) : none);
+}
 
 /** Where a dish's allergen information stands, for entries with nothing earlier to compare to. */
-function Summary({ safety }: { safety: DishSafety }) {
+function Summary({
+  safety,
+  t,
+  list,
+}: {
+  safety: DishSafety;
+  t: OwnerStrings;
+  list: (values: string[]) => string;
+}) {
+  const f = t.history.fields;
   return (
     <p className="mt-1 text-sm text-muted">
-      Contains: {list(safety.allergens)}
-      {safety.may_contain.length > 0 && ` · May contain: ${list(safety.may_contain)}`}
-      {safety.removable.length > 0 && ` · Can leave out: ${list(safety.removable)}`}
+      {f.allergens}: {list(safety.allergens)}
+      {safety.may_contain.length > 0 && ` · ${f.may_contain}: ${list(safety.may_contain)}`}
+      {safety.removable.length > 0 && ` · ${f.removable}: ${list(safety.removable)}`}
     </p>
   );
 }
@@ -37,6 +58,8 @@ export default async function HistoryPage({
 }) {
   const { supabase, user, restaurant } = await requireRestaurant("/dashboard/history");
   const params = await searchParams;
+  const { t, language } = await ownerStrings();
+  const list = namer(language, t.history.none);
   const entries = await listDishHistory(supabase, restaurant.id);
   const people = [...new Set(entries.map((e) => e.changed_by).filter((id): id is string => !!id))];
   const emails = await emailsFor(people.filter((id) => id !== user.id)).catch(
@@ -46,39 +69,35 @@ export default async function HistoryPage({
   const deletedDishes = new Set(
     entries.filter((e) => latest.has(e.id) && e.action === "deleted").map((e) => e.menu_item_id),
   );
-  const when = new Intl.DateTimeFormat("en-US", {
+  const when = new Intl.DateTimeFormat(htmlLang(language), {
     dateStyle: "medium",
     timeStyle: "short",
     timeZone: restaurant.timezone,
   });
   const who = (id: string | null) =>
-    id === null ? "" : id === user.id ? "you" : emails.get(id) || "someone on your team";
+    id === null ? "" : id === user.id ? t.history.you : emails.get(id) || t.history.someone;
 
   return (
     <main id="main" className="mx-auto max-w-3xl px-5 py-12">
-      <OwnerPageHeader
-        title="Allergen history"
-        intro="Every change to a dish's allergens, and every confirmation, with who made it and when. Carte keeps this record itself, so it can't be edited."
-      >
+      <OwnerPageHeader title={t.history.title} intro={t.history.intro}>
         <ButtonLink href="/dashboard/review" variant="secondary">
-          Review dishes
+          {t.history.review}
         </ButtonLink>
       </OwnerPageHeader>
 
       {params.restored && (
         <Notice tone="success" className="mt-8">
-          The earlier allergens are back. The dish is unconfirmed now, so diners won&apos;t see it
-          until you check and confirm it in Review dishes.
+          {t.history.restored}
         </Notice>
       )}
       {params.failed && (
         <Notice tone="warning" role="alert" className="mt-8">
-          That version couldn&apos;t be restored. The dish may have been deleted.
+          {t.history.failed}
         </Notice>
       )}
 
       {entries.length === 0 ? (
-        <p className="mt-10 text-muted">No changes yet.</p>
+        <p className="mt-10 text-muted">{t.history.empty}</p>
       ) : (
         <ol className="mt-10 divide-y divide-ink/10 rounded-panel bg-paper shadow-raised">
           {withPrevious(entries).map(({ entry, previous }) => {
@@ -93,8 +112,9 @@ export default async function HistoryPage({
                   <p>
                     <span className="font-medium">{entry.dish_name}</span>{" "}
                     <span className="text-muted">
-                      · {ACTION_LABELS[entry.action]}
-                      {who(entry.changed_by) && ` by ${who(entry.changed_by)}`}
+                      · {t.history.actions[entry.action]}
+                      {who(entry.changed_by) &&
+                        ` ${fmt(t.history.by, { who: who(entry.changed_by) })}`}
                     </span>
                   </p>
                   <time dateTime={entry.changed_at} className="text-sm text-muted tabular-nums">
@@ -104,26 +124,31 @@ export default async function HistoryPage({
                 {changes.length > 0 ? (
                   <ul className="mt-1 space-y-0.5 text-sm">
                     {changes.map((line) => (
-                      <li key={line.label}>
-                        <span className="text-muted">{line.label}:</span>{" "}
+                      <li key={`${line.field}-${line.addon ?? ""}`}>
+                        <span className="text-muted">
+                          {line.field === "addon"
+                            ? fmt(t.history.addonContains, { addon: line.addon ?? "" })
+                            : t.history.fields[line.field]}
+                          :
+                        </span>{" "}
                         {line.added.length > 0 && (
-                          <span className="font-medium text-tomato">+ {line.added.join(", ")}</span>
+                          <span className="font-medium text-tomato">+ {list(line.added)}</span>
                         )}
                         {line.added.length > 0 && line.removed.length > 0 && " "}
                         {line.removed.length > 0 && (
-                          <span className="font-medium">− {line.removed.join(", ")}</span>
+                          <span className="font-medium">− {list(line.removed)}</span>
                         )}
                       </li>
                     ))}
                   </ul>
                 ) : (
-                  <Summary safety={entry.safety} />
+                  <Summary safety={entry.safety} t={t} list={list} />
                 )}
                 {canRestore && (
                   <form action={restoreVersionAction} className="mt-2">
                     <input type="hidden" name="entry" value={entry.id} />
                     <Button type="submit" variant="ghost" size="sm">
-                      Go back to this version
+                      {t.history.goBack}
                     </Button>
                   </form>
                 )}
@@ -132,9 +157,7 @@ export default async function HistoryPage({
           })}
         </ol>
       )}
-      {entries.length === 200 && (
-        <p className="mt-4 text-sm text-muted">Showing the latest 200 changes.</p>
-      )}
+      {entries.length === 200 && <p className="mt-4 text-sm text-muted">{t.history.latest200}</p>}
     </main>
   );
 }

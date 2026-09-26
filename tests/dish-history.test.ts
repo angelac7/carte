@@ -36,9 +36,9 @@ describe("describeChange", () => {
       safety({ allergens: ["wheat", "peanuts"], may_contain: ["sesame"] }),
     );
     expect(lines).toEqual([
-      { label: "Contains", added: ["peanuts"], removed: ["sesame"], now: ["wheat", "peanuts"] },
-      { label: "May contain", added: ["sesame"], removed: [], now: ["sesame"] },
-      { label: "Diet labels", added: [], removed: ["vegan"], now: [] },
+      { field: "allergens", added: ["peanuts"], removed: ["sesame"], now: ["wheat", "peanuts"] },
+      { field: "may_contain", added: ["sesame"], removed: [], now: ["sesame"] },
+      { field: "dietary_tags", added: [], removed: ["vegan"], now: [] },
     ]);
   });
 
@@ -56,11 +56,11 @@ describe("describeChange", () => {
       ],
     });
     expect(
-      describeChange(before, after).map((line) => [line.label, line.added, line.removed]),
+      describeChange(before, after).map((line) => [line.addon, line.added, line.removed]),
     ).toEqual([
-      ["Add-on “Sauce” contains", ["soy, peanuts"], ["soy"]],
-      ["Add-on “Cheese” contains", ["milk"], []],
-      ["Add-on “Egg” contains", [], ["eggs"]],
+      ["Sauce", ["peanuts"], []],
+      ["Cheese", ["milk"], []],
+      ["Egg", [], ["eggs"]],
     ]);
   });
 

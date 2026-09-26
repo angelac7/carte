@@ -3,11 +3,13 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { fetchTranslations } from "@/lib/api-client";
+import { useOwnerText } from "@/components/owner/OwnerLanguage";
 import type { LanguageCode } from "@/lib/languages";
 
 /** Translates the dishes that don't have a saved translation yet, then refreshes the page. */
 export function TranslateForPrint({ slug, language }: { slug: string; language: LanguageCode }) {
   const router = useRouter();
+  const { t } = useOwnerText();
   const [state, setState] = useState<"idle" | "working" | "failed">("idle");
   return (
     <div className="flex flex-wrap items-center gap-3">
@@ -26,11 +28,9 @@ export function TranslateForPrint({ slug, language }: { slug: string; language: 
           }
         }}
       >
-        {state === "working" ? "Translating…" : "Translate them now"}
+        {state === "working" ? t.print.translating : t.print.translateNow}
       </Button>
-      {state === "failed" && (
-        <span className="text-sm text-tomato">Translation failed. Try again.</span>
-      )}
+      {state === "failed" && <span className="text-sm text-tomato">{t.print.translateFailed}</span>}
     </div>
   );
 }

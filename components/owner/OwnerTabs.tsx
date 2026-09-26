@@ -4,10 +4,10 @@ import Link from "@/components/OfflineLink";
 import type { NavLink } from "@/lib/owner-nav";
 
 /** The owner's restaurant pages as a row of tabs under the header, on dashboard pages. */
-export function OwnerTabs({ links }: { links: NavLink[] }) {
+export function OwnerTabs({ links, label }: { links: NavLink[]; label: string }) {
   const pathname = usePathname();
   return (
-    <nav aria-label="My restaurant" className="border-b border-ink/10 print:hidden">
+    <nav aria-label={label} className="border-b border-ink/10 print:hidden">
       {/* Scrolls sideways on narrow phones instead of wrapping onto several rows. */}
       <div className="mx-auto max-w-6xl overflow-x-auto px-5">
         <ul className="flex w-max gap-1 py-2">

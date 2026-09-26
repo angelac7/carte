@@ -5,20 +5,35 @@ import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 import { CompassIcon, HeartIcon, PinIcon, ScanIcon } from "@/components/icons";
 
-const TABS: { href: string; label: string; icon: ReactNode }[] = [
-  { href: "/discover", label: "Discover", icon: <CompassIcon /> },
-  { href: "/places", label: "Nearby", icon: <PinIcon /> },
-  { href: "/scan", label: "Scan", icon: <ScanIcon /> },
-  { href: "/my", label: "My Carte", icon: <HeartIcon /> },
-];
+type TabLabels = {
+  discover: string;
+  nearby: string;
+  scanShort: string;
+  myCarte: string;
+  mainNav: string;
+};
+
+const ENGLISH: TabLabels = {
+  discover: "Discover",
+  nearby: "Nearby",
+  scanShort: "Scan",
+  myCarte: "My Carte",
+  mainNav: "Main",
+};
 
 /** A thumb-reach tab bar for diners on phones. Larger screens use the header links instead. */
-export function PublicTabBar() {
+export function PublicTabBar({ labels = ENGLISH }: { labels?: TabLabels }) {
   const pathname = usePathname();
+  const TABS: { href: string; label: string; icon: ReactNode }[] = [
+    { href: "/discover", label: labels.discover, icon: <CompassIcon /> },
+    { href: "/places", label: labels.nearby, icon: <PinIcon /> },
+    { href: "/scan", label: labels.scanShort, icon: <ScanIcon /> },
+    { href: "/my", label: labels.myCarte, icon: <HeartIcon /> },
+  ];
 
   return (
     <nav
-      aria-label="Main"
+      aria-label={labels.mainNav}
       className="fixed inset-x-3 bottom-3 z-20 rounded-panel bg-paper/95 p-1.5 shadow-raised-lg backdrop-blur md:hidden print:hidden"
     >
       <ul className="grid grid-cols-4">

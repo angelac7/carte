@@ -4,7 +4,10 @@ import { Sheet } from "@/components/Sheet";
 import { ToggleChip } from "@/components/ToggleChip";
 import { Button } from "@/components/ui/button";
 import { fieldClass, labelClass } from "@/components/ui/field";
+import { useOwnerText } from "@/components/owner/OwnerLanguage";
 import { ALLERGENS } from "@/lib/allergens";
+import { DINER_STRINGS } from "@/lib/i18n/diner-strings";
+import { fmt } from "@/lib/i18n/owner/format";
 import { toggleValue } from "@/lib/toggle-value";
 import type { DishAddon, DishSize, MenuItem } from "@/types/menu";
 
@@ -22,6 +25,8 @@ export function DishOptionsEditor({
   onSave: (sizes: DishSize[], addons: DishAddon[]) => void;
   onClose: () => void;
 }) {
+  const { t, language } = useOwnerText();
+  const d = DINER_STRINGS[language];
   const [sizes, setSizes] = useState<DishSize[]>(dish.sizes ?? []);
   const [addons, setAddons] = useState<DishAddon[]>(dish.addons ?? []);
   const updateSize = (index: number, change: Partial<DishSize>) =>
@@ -38,31 +43,31 @@ export function DishOptionsEditor({
   }
 
   return (
-    <Sheet title={`Sizes and add-ons: ${dish.name}`} closeLabel="Close" onClose={onClose}>
-      <p className="mt-2 text-sm text-muted">
-        Add-ons can bring their own allergens, so saving asks you to confirm the dish again.
-      </p>
+    <Sheet
+      title={fmt(t.options.title, { name: dish.name })}
+      closeLabel={t.options.close}
+      onClose={onClose}
+    >
+      <p className="mt-2 text-sm text-muted">{t.options.intro}</p>
 
       <fieldset className="mt-6">
-        <legend className="eyebrow text-muted">Sizes</legend>
-        <p className="mt-1 text-xs text-muted">
-          Each size has its own price, like Regular $14 and Large $17.
-        </p>
+        <legend className="eyebrow text-muted">{t.options.sizes}</legend>
+        <p className="mt-1 text-xs text-muted">{t.options.sizesHint}</p>
         <div className="mt-3 space-y-3">
           {sizes.map((size, index) => (
             <div key={index} className="flex items-end gap-2">
               <label className="block flex-1">
-                <span className={labelClass}>Size</span>
+                <span className={labelClass}>{t.options.size}</span>
                 <input
                   value={size.label}
                   maxLength={60}
-                  placeholder="Large"
+                  placeholder={t.options.sizePlaceholder}
                   onChange={(e) => updateSize(index, { label: e.target.value })}
                   className={inputClass}
                 />
               </label>
               <label className="block w-28">
-                <span className={labelClass}>Price</span>
+                <span className={labelClass}>{t.options.price}</span>
                 <input
                   value={size.price}
                   maxLength={20}
@@ -73,7 +78,7 @@ export function DishOptionsEditor({
               </label>
               <button
                 type="button"
-                aria-label={`Remove size ${size.label || index + 1}`}
+                aria-label={fmt(t.options.removeSize, { label: size.label || index + 1 })}
                 onClick={() => setSizes((rows) => rows.filter((_, i) => i !== index))}
                 className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-lg text-muted hover:text-tomato"
               >
@@ -90,33 +95,30 @@ export function DishOptionsEditor({
             className="mt-3"
             onClick={() => setSizes((rows) => [...rows, { label: "", price: "" }])}
           >
-            Add a size
+            {t.options.addSize}
           </Button>
         )}
       </fieldset>
 
       <fieldset className="mt-8">
-        <legend className="eyebrow text-muted">Add-ons</legend>
-        <p className="mt-1 text-xs text-muted">
-          Extras diners can add, like an egg or extra noodles. Leave the price empty if it&apos;s
-          free.
-        </p>
+        <legend className="eyebrow text-muted">{t.options.addons}</legend>
+        <p className="mt-1 text-xs text-muted">{t.options.addonsHint}</p>
         <div className="mt-3 space-y-5">
           {addons.map((addon, index) => (
             <div key={index} className="rounded-control p-4 shadow-pressed-sm">
               <div className="flex items-end gap-2">
                 <label className="block flex-1">
-                  <span className={labelClass}>Add-on</span>
+                  <span className={labelClass}>{t.options.addon}</span>
                   <input
                     value={addon.label}
                     maxLength={60}
-                    placeholder="Add egg"
+                    placeholder={t.options.addonPlaceholder}
                     onChange={(e) => updateAddon(index, { label: e.target.value })}
                     className={inputClass}
                   />
                 </label>
                 <label className="block w-28">
-                  <span className={labelClass}>Price</span>
+                  <span className={labelClass}>{t.options.price}</span>
                   <input
                     value={addon.price}
                     maxLength={20}
@@ -127,20 +129,23 @@ export function DishOptionsEditor({
                 </label>
                 <button
                   type="button"
-                  aria-label={`Remove add-on ${addon.label || index + 1}`}
+                  aria-label={fmt(t.options.removeAddon, { label: addon.label || index + 1 })}
                   onClick={() => setAddons((rows) => rows.filter((_, i) => i !== index))}
                   className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-lg text-muted hover:text-tomato"
                 >
                   ×
                 </button>
               </div>
-              <p className="mt-3 text-xs font-medium text-muted">This add-on contains</p>
+              <p className="mt-3 text-xs font-medium text-muted">{t.options.addonContains}</p>
               <div className="mt-2 flex flex-wrap gap-2">
                 {ALLERGENS.map((allergen) => (
                   <ToggleChip
                     key={allergen}
-                    label={allergen}
-                    ariaLabel={`${addon.label || "Add-on"} contains ${allergen}`}
+                    label={d.allergens[allergen]}
+                    ariaLabel={fmt(t.options.addonAllergen, {
+                      addon: addon.label || t.options.addon,
+                      allergen: d.allergens[allergen],
+                    })}
                     tone="ink"
                     pressed={addon.allergens.includes(allergen)}
                     onToggle={() =>
@@ -160,15 +165,15 @@ export function DishOptionsEditor({
             className="mt-3"
             onClick={() => setAddons((rows) => [...rows, { label: "", price: "", allergens: [] }])}
           >
-            Add an add-on
+            {t.options.addAddon}
           </Button>
         )}
       </fieldset>
 
       <div className="mt-8 flex flex-wrap gap-3 border-t border-ink/10 pt-6">
-        <Button onClick={save}>Save sizes and add-ons</Button>
+        <Button onClick={save}>{t.options.save}</Button>
         <Button variant="ghost" onClick={onClose}>
-          Cancel
+          {t.options.cancel}
         </Button>
       </div>
     </Sheet>

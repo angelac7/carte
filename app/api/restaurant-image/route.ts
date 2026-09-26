@@ -6,6 +6,7 @@ import { checkRateLimit } from "@/lib/rate-limit";
 import { readImageUpload } from "@/lib/read-image-upload";
 import { deleteStoredPhoto, storeRestaurantImage } from "@/lib/storage/dish-photos";
 import { reportError } from "@/lib/report-error";
+import { ownerStrings } from "@/lib/owner-language";
 
 const Kind = z.enum(["logo", "cover"]);
 
@@ -16,14 +17,15 @@ function fail(message: string, status: number) {
 /** Adds or replaces the restaurant's logo or cover photo. */
 export async function POST(req: Request) {
   const owner = await getOwnerContext();
-  if (!owner) return fail("Log in to manage your restaurant.", 401);
+  const { t } = await ownerStrings();
+  if (!owner) return fail(t.api.loginRestaurant, 401);
   if (!(await checkRateLimit(`photo-upload:${owner.user.id}`, 60, 60 * 60 * 1000))) {
-    return fail("Too many uploads in the last hour. Try again later.", 429);
+    return fail(t.api.tooManyUploads, 429);
   }
   const form = await req.formData().catch(() => null);
   const kind = Kind.safeParse(form?.get("kind"));
-  if (!kind.success) return fail("Choose a logo or a cover photo.", 400);
-  const image = await readImageUpload(form?.get("image"));
+  if (!kind.success) return fail(t.api.chooseImage, 400);
+  const image = await readImageUpload(form?.get("image"), t.api.image);
   if (!image.ok) return fail(image.message, image.status);
 
   try {
@@ -46,17 +48,18 @@ export async function POST(req: Request) {
     return NextResponse.json({ url });
   } catch (err) {
     reportError("Restaurant image upload failed", err);
-    return fail("The image couldn't be saved. Try again.", 502);
+    return fail(t.api.imageSaveFailed, 502);
   }
 }
 
 /** Removes the restaurant's logo or cover photo. */
 export async function DELETE(req: Request) {
   const owner = await getOwnerContext();
-  if (!owner) return fail("Log in to manage your restaurant.", 401);
+  const { t } = await ownerStrings();
+  if (!owner) return fail(t.api.loginRestaurant, 401);
   const body = (await req.json().catch(() => null)) as { kind?: unknown } | null;
   const kind = Kind.safeParse(body?.kind);
-  if (!kind.success) return fail("Choose a logo or a cover photo.", 400);
+  if (!kind.success) return fail(t.api.chooseImage, 400);
   try {
     const previous = (await getRestaurantImages(owner.supabase, owner.restaurant.id))[
       kind.data === "logo" ? "logo_url" : "cover_url"
@@ -66,6 +69,6 @@ export async function DELETE(req: Request) {
     return NextResponse.json({ ok: true });
   } catch (err) {
     reportError("Removing a restaurant image failed", err);
-    return fail("The image couldn't be removed. Try again.", 502);
+    return fail(t.api.imageRemoveFailed, 502);
   }
 }

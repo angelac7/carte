@@ -1,20 +1,25 @@
-type ProgressBarProps = { done: number; total: number };
+type ProgressBarProps = {
+  done: number;
+  total: number;
+  /** Like "3 of 10 confirmed". */
+  text: string;
+  /** What's being counted, for screen readers. */
+  label: string;
+};
 
 /** Shows how many dishes have been confirmed. */
-export function ProgressBar({ done, total }: ProgressBarProps) {
+export function ProgressBar({ done, total, text, label }: ProgressBarProps) {
   const percent = total ? Math.round((done / total) * 100) : 0;
   return (
     <div>
       <div className="flex items-baseline justify-between text-sm">
-        <span className="font-medium">
-          {done} of {total} confirmed
-        </span>
+        <span className="font-medium">{text}</span>
         <span className="font-mono text-muted tabular-nums">{percent}%</span>
       </div>
       <div
         className="mt-3 h-2.5 overflow-hidden rounded-full shadow-pressed-sm"
         role="progressbar"
-        aria-label="Dishes confirmed"
+        aria-label={label}
         aria-valuemin={0}
         aria-valuemax={total}
         aria-valuenow={done}

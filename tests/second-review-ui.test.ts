@@ -92,7 +92,7 @@ it("blocks new menu uploads while the previous menu saves", async () => {
   await act(async () => finish());
   expect(saveDishes).toHaveBeenCalledWith(expect.any(Array), { skipExisting: true });
   expect(
-    screen.getByText("Saved 1 dish to your menu. Review each one to confirm its allergens."),
+    screen.getByText("Saved 1 dish to your menu. Review it to confirm its allergens."),
   ).toBeDefined();
 });
 it("keeps diary edits open and explains a failed device save", () => {

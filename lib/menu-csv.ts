@@ -133,6 +133,42 @@ export type ImportRow = {
 
 export type ImportProblem = { line: number; message: string };
 
+/** The words for problems in a file, so the dashboard can show them in the owner's language. */
+export type ImportMessages = {
+  empty: string;
+  noName: string;
+  tooMany: string;
+  needsName: string;
+  tooLong: string;
+  notNumber: string;
+  calories: string;
+  spice: string;
+  unknown: string;
+  allergen: string;
+  item: string;
+  diet: string;
+};
+
+const ENGLISH: ImportMessages = {
+  empty: "The file is empty.",
+  noName: "There's no “name” column.",
+  tooMany: "A spreadsheet can have up to {max} dishes.",
+  needsName: "Every dish needs a name.",
+  tooLong: "The {field} is longer than {max} characters.",
+  notNumber: "{what} should be a whole number from {min} to {max}.",
+  calories: "Calories",
+  spice: "Spice",
+  unknown: "Unknown {what} “{value}”.",
+  allergen: "allergen",
+  item: "item",
+  diet: "diet label",
+};
+
+const fill = (template: string, values: Record<string, string | number>) =>
+  template.replace(/\{(\w+)\}/g, (whole, key: string) =>
+    key in values ? String(values[key]) : whole,
+  );
+
 const HEADER_ALIASES: Record<string, (typeof CSV_COLUMNS)[number]> = {
   dish: "name",
   dish_name: "name",
@@ -162,6 +198,7 @@ function readList<T extends string>(
   what: string,
   line: number,
   problems: ImportProblem[],
+  messages: ImportMessages,
 ): T[] {
   const found: T[] = [];
   for (const raw of value.split(/[;,]/)) {
@@ -170,7 +207,7 @@ function readList<T extends string>(
     if ((allowed as readonly string[]).includes(item)) {
       if (!found.includes(item as T)) found.push(item as T);
     } else {
-      problems.push({ line, message: `Unknown ${what} “${raw.trim()}”.` });
+      problems.push({ line, message: fill(messages.unknown, { what, value: raw.trim() }) });
     }
   }
   return found;
@@ -183,12 +220,13 @@ function readNumber(
   what: string,
   line: number,
   problems: ImportProblem[],
+  messages: ImportMessages,
 ): number | null | undefined {
   const text = value.trim().replace(/,/g, "");
   if (text === "") return null;
   const number = Number(text);
   if (!Number.isInteger(number) || number < min || number > max) {
-    problems.push({ line, message: `${what} should be a whole number from ${min} to ${max}.` });
+    problems.push({ line, message: fill(messages.notNumber, { what, min, max }) });
     return undefined;
   }
   return number;
@@ -197,18 +235,21 @@ function readNumber(
 const LIMITS = { name: 120, section: 80, description: 500, price: 20, notes: 2000 } as const;
 
 /** Reads an uploaded spreadsheet into rows, listing anything it couldn't understand. */
-export function readImport(text: string): { rows: ImportRow[]; problems: ImportProblem[] } {
+export function readImport(
+  text: string,
+  messages: ImportMessages = ENGLISH,
+): { rows: ImportRow[]; problems: ImportProblem[] } {
   const problems: ImportProblem[] = [];
   const [header, ...body] = parseCsv(text);
-  if (!header) return { rows: [], problems: [{ line: 1, message: "The file is empty." }] };
+  if (!header) return { rows: [], problems: [{ line: 1, message: messages.empty }] };
   const columns = header.map(columnFor);
   if (!columns.includes("name")) {
-    return { rows: [], problems: [{ line: 1, message: "There's no “name” column." }] };
+    return { rows: [], problems: [{ line: 1, message: messages.noName }] };
   }
   if (body.length > MAX_IMPORT_ROWS) {
     return {
       rows: [],
-      problems: [{ line: 1, message: `A spreadsheet can have up to ${MAX_IMPORT_ROWS} dishes.` }],
+      problems: [{ line: 1, message: fill(messages.tooMany, { max: MAX_IMPORT_ROWS }) }],
     };
   }
 
@@ -222,13 +263,13 @@ export function readImport(text: string): { rows: ImportRow[]; problems: ImportP
     };
     const before = problems.length;
     const name = cell("name") ?? "";
-    if (!name) problems.push({ line, message: "Every dish needs a name." });
+    if (!name) problems.push({ line, message: messages.needsName });
     for (const field of ["name", "section", "description", "price", "notes"] as const) {
       const value = cell(field);
       if (value !== undefined && value.length > LIMITS[field]) {
         problems.push({
           line,
-          message: `The ${field} is longer than ${LIMITS[field]} characters.`,
+          message: fill(messages.tooLong, { field, max: LIMITS[field] }),
         });
       }
     }
@@ -245,29 +286,36 @@ export function readImport(text: string): { rows: ImportRow[]; problems: ImportP
     text("notes");
     const calories = cell("calories");
     if (calories !== undefined) {
-      const value = readNumber(calories, 0, 5000, "Calories", line, problems);
+      const value = readNumber(calories, 0, 5000, messages.calories, line, problems, messages);
       if (value !== undefined) row.calories = value;
     }
     const spice = cell("spice");
     if (spice !== undefined) {
-      const value = readNumber(spice, 0, 3, "Spice", line, problems);
+      const value = readNumber(spice, 0, 3, messages.spice, line, problems, messages);
       if (value !== undefined) row.spice = value;
     }
     const allergens = cell("allergens");
     if (allergens !== undefined)
-      row.allergens = readList(allergens, ALLERGENS, "allergen", line, problems);
+      row.allergens = readList(allergens, ALLERGENS, messages.allergen, line, problems, messages);
     const mayContain = cell("may_contain");
     if (mayContain !== undefined)
-      row.may_contain = readList(mayContain, ALLERGENS, "allergen", line, problems);
+      row.may_contain = readList(
+        mayContain,
+        ALLERGENS,
+        messages.allergen,
+        line,
+        problems,
+        messages,
+      );
     const removable = cell("can_leave_out");
     if (removable !== undefined)
-      row.removable = readList(removable, ALLERGENS, "allergen", line, problems);
+      row.removable = readList(removable, ALLERGENS, messages.allergen, line, problems, messages);
     const also = cell("also_contains");
     if (also !== undefined)
-      row.also_contains = readList(also, OTHER_AVOIDS, "item", line, problems);
+      row.also_contains = readList(also, OTHER_AVOIDS, messages.item, line, problems, messages);
     const tags = cell("diet_labels");
     if (tags !== undefined)
-      row.dietary_tags = readList(tags, DIETARY_TAGS, "diet label", line, problems);
+      row.dietary_tags = readList(tags, DIETARY_TAGS, messages.diet, line, problems, messages);
     const special = cell("special");
     if (special !== undefined) row.special = /^(yes|y|true|1|x)$/i.test(special);
     if (problems.length === before) rows.push(row);

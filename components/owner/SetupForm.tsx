@@ -4,6 +4,7 @@ import { createRestaurantAction, type SetupState } from "@/app/dashboard/setup/a
 import { Button } from "@/components/ui/button";
 import { fieldClass, labelClass } from "@/components/ui/field";
 import { Notice } from "@/components/ui/notice";
+import { useOwnerText } from "@/components/owner/OwnerLanguage";
 import { slugify } from "@/lib/slug";
 
 export function SetupForm({ next = "/dashboard" }: { next?: string }) {
@@ -11,6 +12,7 @@ export function SetupForm({ next = "/dashboard" }: { next?: string }) {
     createRestaurantAction,
     {},
   );
+  const { t } = useOwnerText();
   const [name, setName] = useState("");
   const [customSlug, setCustomSlug] = useState<string | null>(null);
   const slug = customSlug ?? slugify(name);
@@ -22,7 +24,7 @@ export function SetupForm({ next = "/dashboard" }: { next?: string }) {
     >
       <input type="hidden" name="next" value={next} />
       <label className="block">
-        <span className={labelClass}>Restaurant name</span>
+        <span className={labelClass}>{t.setup.name}</span>
         <input
           name="name"
           required
@@ -34,9 +36,11 @@ export function SetupForm({ next = "/dashboard" }: { next?: string }) {
       </label>
 
       <label className="block">
-        <span className={labelClass}>Menu link</span>
+        <span className={labelClass}>{t.setup.link}</span>
         <span className="mt-1 flex items-center rounded-control bg-paper shadow-pressed transition-shadow duration-200 focus-within:shadow-well focus-within:outline-2 focus-within:outline-offset-3 focus-within:outline-accent">
-          <span className="pl-4 font-mono text-sm text-muted">/r/</span>
+          <span dir="ltr" className="ps-4 font-mono text-sm text-muted">
+            /r/
+          </span>
           <input
             name="slug"
             required
@@ -48,9 +52,7 @@ export function SetupForm({ next = "/dashboard" }: { next?: string }) {
             className="w-full bg-transparent px-1 py-3 font-mono text-base focus:outline-none sm:text-sm"
           />
         </span>
-        <span className="mt-1 block text-xs text-muted">
-          Diners open your menu at this link. Use lowercase letters, numbers, and dashes.
-        </span>
+        <span className="mt-1 block text-xs text-muted">{t.setup.linkHint}</span>
       </label>
 
       {state.error && (
@@ -60,7 +62,7 @@ export function SetupForm({ next = "/dashboard" }: { next?: string }) {
       )}
 
       <Button type="submit" disabled={pending} shine>
-        {pending ? "Creating…" : "Create restaurant"}
+        {pending ? t.setup.creating : t.setup.create}
       </Button>
     </form>
   );

@@ -22,57 +22,53 @@ export type DishHistoryEntry = {
   safety: DishSafety;
 };
 
-export const ACTION_LABELS: Record<HistoryAction, string> = {
-  recorded: "History started",
-  added: "Added",
-  edited: "Changed",
-  confirmed: "Confirmed",
-  deleted: "Deleted",
+/** The parts of a dish's allergen information the history compares. */
+export const HISTORY_FIELDS = [
+  "allergens",
+  "may_contain",
+  "removable",
+  "dietary_tags",
+  "also_contains",
+] as const;
+export type HistoryField = (typeof HISTORY_FIELDS)[number];
+
+/** One part that changed: a field, or the allergens of one add-on. Values are list codes. */
+export type ChangeLine = {
+  field: HistoryField | "addon";
+  addon?: string;
+  added: string[];
+  removed: string[];
+  now: string[];
 };
 
-const FIELDS = [
-  ["allergens", "Contains"],
-  ["may_contain", "May contain"],
-  ["removable", "Can leave out"],
-  ["dietary_tags", "Diet labels"],
-  ["also_contains", "Also contains"],
-] as const;
-
-export type ChangeLine = { label: string; added: string[]; removed: string[]; now: string[] };
+const diff = (before: readonly string[], now: readonly string[]) => ({
+  added: now.filter((value) => !before.includes(value)),
+  removed: before.filter((value) => !now.includes(value)),
+});
 
 /**
  * What changed in each part of a dish's allergen information. With nothing earlier to compare
  * to, everything it lists counts as added.
  */
 export function describeChange(previous: DishSafety | null, current: DishSafety): ChangeLine[] {
-  const lines: ChangeLine[] = FIELDS.map(([field, label]) => {
-    const before = previous?.[field] ?? [];
+  const lines: ChangeLine[] = HISTORY_FIELDS.map((field) => {
     const now = current[field] ?? [];
-    return {
-      label,
-      added: now.filter((value) => !before.includes(value)),
-      removed: before.filter((value) => !now.includes(value)),
-      now,
-    };
+    return { field, ...diff(previous?.[field] ?? [], now), now };
   });
   const addons = (safety: DishSafety | null) =>
-    new Map((safety?.addon_allergens ?? []).map((a) => [a.label, a.allergens.join(", ")]));
+    new Map((safety?.addon_allergens ?? []).map((a) => [a.label, a.allergens]));
   const [before, now] = [addons(previous), addons(current)];
   for (const [label, allergens] of now) {
-    const earlier = before.get(label);
-    if (earlier !== allergens) {
-      lines.push({
-        label: `Add-on “${label}” contains`,
-        added: [allergens],
-        removed: earlier ? [earlier] : [],
-        now: [allergens],
-      });
-    }
+    lines.push({
+      field: "addon",
+      addon: label,
+      ...diff(before.get(label) ?? [], allergens),
+      now: allergens,
+    });
   }
   for (const [label, allergens] of before) {
-    if (!now.has(label)) {
-      lines.push({ label: `Add-on “${label}” contains`, added: [], removed: [allergens], now: [] });
-    }
+    if (!now.has(label))
+      lines.push({ field: "addon", addon: label, added: [], removed: allergens, now: [] });
   }
   return lines.filter((line) => line.added.length > 0 || line.removed.length > 0);
 }

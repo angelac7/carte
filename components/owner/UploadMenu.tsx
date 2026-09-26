@@ -6,24 +6,25 @@ import { OwnerPageHeader } from "@/components/owner/OwnerPageHeader";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { Notice } from "@/components/ui/notice";
 import { Skeleton } from "@/components/ui/skeleton";
-import { saveDishes, streamMenuImage } from "@/lib/api-client";
+import { MenuStoppedError, saveDishes, streamMenuImage } from "@/lib/api-client";
 import { MENU_PHOTO_SIDE, shrinkImage } from "@/lib/image";
 import { isSupportedImage } from "@/lib/upload-rules";
+import { useOwnerText } from "@/components/owner/OwnerLanguage";
+import { DINER_STRINGS } from "@/lib/i18n/diner-strings";
+import { fmt, plural } from "@/lib/i18n/owner/format";
 import type { ExtractedDish } from "@/types/menu";
 
 type Status = "idle" | "reading" | "ready" | "saving" | "saved" | "error";
 
-function savedMessage(added: number, read: number): string {
-  const skipped = read - added;
-  if (added === 0)
-    return "Every one of these dishes is already on your menu, so nothing new was added.";
-  const saved = `Saved ${added} ${added === 1 ? "dish" : "dishes"} to your menu. Review each one to confirm its allergens.`;
-  return skipped > 0
-    ? `${saved} ${skipped} ${skipped === 1 ? "was" : "were"} already on your menu, so ${skipped === 1 ? "it wasn’t" : "they weren’t"} added again.`
-    : saved;
-}
-
 export default function UploadPage() {
+  const { t, language } = useOwnerText();
+  const d = DINER_STRINGS[language];
+  function savedMessage(added: number, read: number): string {
+    const skipped = read - added;
+    if (added === 0) return t.upload.nothingNew;
+    const saved = plural(t.upload.saved, added, language);
+    return skipped > 0 ? `${saved} ${plural(t.upload.skipped, skipped, language)}` : saved;
+  }
   const [dishes, setDishes] = useState<ExtractedDish[]>([]);
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState("");
@@ -36,7 +37,7 @@ export default function UploadPage() {
     if (pending.current) return;
     if (!isSupportedImage(file.type)) {
       setStatus("error");
-      setError("Use a JPG, PNG, or WebP image of your menu.");
+      setError(t.upload.wrongType);
       return;
     }
     pending.current = true;
@@ -53,7 +54,13 @@ export default function UploadPage() {
     } catch (err) {
       // Keep any dishes already read; the message says whether the menu was cut short.
       setStatus("error");
-      setError(err instanceof Error ? err.message : "Carte couldn't read that menu. Try again.");
+      setError(
+        err instanceof MenuStoppedError
+          ? t.upload.stopped
+          : err instanceof Error
+            ? err.message
+            : t.upload.readFailed,
+      );
     } finally {
       pending.current = false;
     }
@@ -70,7 +77,7 @@ export default function UploadPage() {
       setStatus("saved");
     } catch {
       setStatus("error");
-      setError("Your dishes weren't saved. Check that Carte is still running, then try again.");
+      setError(t.upload.saveFailed);
     } finally {
       pending.current = false;
     }
@@ -81,10 +88,7 @@ export default function UploadPage() {
 
   return (
     <main id="main" className="mx-auto max-w-3xl px-5 py-12 sm:py-16">
-      <OwnerPageHeader
-        title="Turn your menu into an allergen guide."
-        intro="Upload a photo of your menu. Carte lists every dish and suggests allergens, then you confirm each one before diners see it."
-      />
+      <OwnerPageHeader title={t.upload.title} intro={t.upload.intro} />
 
       <label
         onDragOver={(e) => {
@@ -116,12 +120,10 @@ export default function UploadPage() {
           }}
         />
         <span className="font-serif text-3xl tracking-tight">
-          {reading ? "Reading your menu…" : "Drop a menu photo here"}
+          {reading ? t.upload.reading : t.upload.drop}
         </span>
         <span className="mt-2 text-sm text-muted">
-          {reading
-            ? `Dishes from ${fileName} appear below as Carte reads them.`
-            : "Or click to choose a file. JPG, PNG, or WebP, up to 10 MB."}
+          {reading ? fmt(t.upload.readingFile, { file: fileName }) : t.upload.chooseFile}
         </span>
       </label>
 
@@ -154,19 +156,21 @@ export default function UploadPage() {
                 aria-live="polite"
                 className="font-serif text-4xl leading-none tracking-tighter sm:text-5xl"
               >
-                {`${dishes.length} ${dishes.length === 1 ? "dish" : "dishes"} ${reading ? "so far" : "found"}`}
+                {plural(reading ? t.upload.soFar : t.upload.found, dishes.length, language)}
               </h2>
-              <p className="mt-1 text-sm text-muted">
-                Allergens are suggestions. You’ll confirm each dish on the next step.
-              </p>
+              <p className="mt-1 text-sm text-muted">{t.upload.suggestions}</p>
             </div>
             {status === "saved" ? (
               <ButtonLink href="/dashboard/review" variant="basil" shine>
-                Review dishes
+                {t.upload.review}
               </ButtonLink>
             ) : (
               <Button onClick={saveAll} disabled={reading || status === "saving"} shine>
-                {reading ? "Still reading…" : status === "saving" ? "Saving…" : "Save to menu"}
+                {reading
+                  ? t.upload.stillReading
+                  : status === "saving"
+                    ? t.upload.saving
+                    : t.upload.save}
               </Button>
             )}
           </div>
@@ -187,10 +191,10 @@ export default function UploadPage() {
                 {(dish.likely_allergens.length > 0 || dish.dietary_tags.length > 0) && (
                   <div className="mt-3 flex flex-wrap gap-2">
                     {dish.likely_allergens.map((allergen) => (
-                      <Chip key={allergen} label={allergen} tone="allergen" />
+                      <Chip key={allergen} label={d.allergens[allergen]} tone="allergen" />
                     ))}
                     {dish.dietary_tags.map((tag) => (
-                      <Chip key={tag} label={tag} tone="tag" />
+                      <Chip key={tag} label={d.tags[tag]} tone="tag" />
                     ))}
                   </div>
                 )}
