@@ -306,6 +306,10 @@ export const vi: OwnerStrings = {
     restored:
       "Đã trở lại chất gây dị ứng trước đó. Món giờ chưa được xác nhận, nên khách sẽ không thấy cho đến khi bạn kiểm tra và xác nhận trong Kiểm tra món.",
     failed: "Không khôi phục được phiên bản đó. Có thể món đã bị xóa.",
+    changed:
+      "Món này đã thay đổi sau khi bạn mở lịch sử, nên chưa khôi phục gì. Hãy xem phiên bản mới nhất bên dưới rồi thử lại.",
+    checkAddons:
+      "Đã trở lại chất gây dị ứng trước đó, nhưng các món thêm đã thay đổi kể từ phiên bản đó. Hãy kiểm tra chất gây dị ứng của từng món thêm trong Kiểm tra món trước khi xác nhận món.",
     empty: "Chưa có thay đổi nào.",
     by: "bởi {who}",
     you: "bạn",

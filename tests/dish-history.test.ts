@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
 import {
   describeChange,
+  latestEntryByDish,
   latestEntryIds,
+  restoreAddonAllergens,
   withPrevious,
   type DishHistoryEntry,
   type DishSafety,
@@ -87,5 +89,39 @@ describe("history lists", () => {
 
   it("knows which entry is each dish's current version", () => {
     expect([...latestEntryIds(entries)]).toEqual([4, 3]);
+    expect(latestEntryByDish(entries)).toEqual(
+      new Map([
+        ["soup", 4],
+        ["tea", 3],
+      ]),
+    );
+  });
+});
+
+describe("restoring add-on allergens", () => {
+  const egg = { label: "Add egg", price: "2", allergens: ["eggs"] };
+  const cheese = { label: "Cheese", price: "1", allergens: ["milk"] };
+
+  it("puts back the allergens an earlier version recorded for each add-on", () => {
+    const result = restoreAddonAllergens(
+      [{ ...egg, allergens: ["eggs", "milk"] }],
+      [{ label: "Add egg", allergens: ["eggs"] }],
+    );
+    expect(result).toEqual({ addons: [egg], unsure: false });
+  });
+
+  it("keeps allergens the earlier version can't account for, and says to check", () => {
+    const result = restoreAddonAllergens(
+      [egg, cheese],
+      [{ label: "Add egg", allergens: ["eggs"] }],
+    );
+    expect(result).toEqual({ addons: [egg, cheese], unsure: true });
+  });
+
+  it("says to check when an add-on from that version is gone", () => {
+    expect(restoreAddonAllergens([], [{ label: "Add egg", allergens: ["eggs"] }]).unsure).toBe(
+      true,
+    );
+    expect(restoreAddonAllergens([{ ...egg, allergens: [] }], []).unsure).toBe(false);
   });
 });

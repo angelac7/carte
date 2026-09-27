@@ -6,7 +6,12 @@ import { emailsFor } from "@/lib/account";
 import { requireRestaurant } from "@/lib/auth";
 import { listDishHistory } from "@/lib/db/dish-history";
 import { isAllergen, isDietaryTag, isOtherAvoid } from "@/lib/allergens";
-import { describeChange, latestEntryIds, withPrevious, type DishSafety } from "@/lib/dish-history";
+import {
+  describeChange,
+  latestEntryByDish,
+  withPrevious,
+  type DishSafety,
+} from "@/lib/dish-history";
 import { formatList } from "@/lib/format-list";
 import { DINER_STRINGS } from "@/lib/i18n/diner-strings";
 import { fmt } from "@/lib/i18n/owner/format";
@@ -54,7 +59,7 @@ function Summary({
 export default async function HistoryPage({
   searchParams,
 }: {
-  searchParams: Promise<{ restored?: string; failed?: string }>;
+  searchParams: Promise<{ result?: string }>;
 }) {
   const { supabase, user, restaurant } = await requireRestaurant("/dashboard/history");
   const params = await searchParams;
@@ -65,10 +70,17 @@ export default async function HistoryPage({
   const emails = await emailsFor(people.filter((id) => id !== user.id)).catch(
     () => new Map<string, string>(),
   );
-  const latest = latestEntryIds(entries);
+  const latestByDish = latestEntryByDish(entries);
+  const latest = new Set(latestByDish.values());
   const deletedDishes = new Set(
     entries.filter((e) => latest.has(e.id) && e.action === "deleted").map((e) => e.menu_item_id),
   );
+  const notice = {
+    restored: { tone: "success", text: t.history.restored },
+    "check-addons": { tone: "warning", text: t.history.checkAddons },
+    changed: { tone: "warning", text: t.history.changed },
+    missing: { tone: "warning", text: t.history.failed },
+  }[params.result ?? ""] as { tone: "success" | "warning"; text: string } | undefined;
   const when = new Intl.DateTimeFormat(htmlLang(language), {
     dateStyle: "medium",
     timeStyle: "short",
@@ -85,14 +97,13 @@ export default async function HistoryPage({
         </ButtonLink>
       </OwnerPageHeader>
 
-      {params.restored && (
-        <Notice tone="success" className="mt-8">
-          {t.history.restored}
-        </Notice>
-      )}
-      {params.failed && (
-        <Notice tone="warning" role="alert" className="mt-8">
-          {t.history.failed}
+      {notice && (
+        <Notice
+          tone={notice.tone}
+          role={notice.tone === "warning" ? "alert" : undefined}
+          className="mt-8"
+        >
+          {notice.text}
         </Notice>
       )}
 
@@ -147,6 +158,11 @@ export default async function HistoryPage({
                 {canRestore && (
                   <form action={restoreVersionAction} className="mt-2">
                     <input type="hidden" name="entry" value={entry.id} />
+                    <input
+                      type="hidden"
+                      name="latest"
+                      value={latestByDish.get(entry.menu_item_id)}
+                    />
                     <Button type="submit" variant="ghost" size="sm">
                       {t.history.goBack}
                     </Button>

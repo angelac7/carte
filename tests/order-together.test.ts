@@ -54,6 +54,18 @@ describe("order together", () => {
     expect((await read("cafe")).status).toBe(404);
   });
 
+  it("gives each table its own allowance, so a restaurant's shared Wi-Fi doesn't block it", async () => {
+    await GET(new Request(`http://localhost/api/table?code=${code}&restaurant=cafe`));
+    const keys = mocks.checkRateLimit.mock.calls.map(([key, limit]) => [key, limit]);
+    expect(keys).toEqual([
+      [`table-read:${code}`, 2400],
+      ["table-read-ip:ip", 9000],
+    ]);
+    mocks.checkRateLimit.mockResolvedValueOnce(true).mockResolvedValueOnce(false);
+    const read = GET(new Request(`http://localhost/api/table?code=${code}&restaurant=cafe`));
+    expect((await read).status).toBe(429);
+  });
+
   it("changes one line, and says when the order has ended", async () => {
     const put = (body: unknown) => PUT(json("PUT", body));
     expect(await (await put({ code, line: `${dish}|1|0`, quantity: 3 })).json()).toEqual({

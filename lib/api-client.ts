@@ -1,5 +1,6 @@
 import { prepareChatHistory } from "@/lib/chat-history";
 import type { TableAllergyEntry } from "@/lib/table-allergies";
+import { TableChangeRejectedError } from "@/lib/table-sync";
 import type { DishSummaries } from "@/lib/dish-summaries";
 import type { DinerFilters } from "@/lib/menu-filters";
 import { createLineReader, parseJsonLine } from "@/lib/json-lines";
@@ -246,6 +247,7 @@ async function tableRequest<T>(init: RequestInit, query = ""): Promise<T> {
   });
   const data = await res.json().catch(() => ({}));
   if (res.status === 404) throw new TableEndedError(data.error ?? "Ended");
+  if (res.status === 400) throw new TableChangeRejectedError(data.error ?? "Change not accepted.");
   if (!res.ok) throw new Error(data.error ?? "Shared order failed.");
   return data as T;
 }

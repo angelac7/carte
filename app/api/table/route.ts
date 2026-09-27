@@ -33,6 +33,25 @@ function fail(error: string, status: number) {
   return NextResponse.json({ error }, { status });
 }
 
+const TEN_MINUTES = 10 * 60 * 1000;
+// A phone checks the table every 4 seconds, about 150 times in 10 minutes.
+const LIMITS = {
+  read: { table: 2400, network: 9000 },
+  change: { table: 600, network: 3000 },
+};
+
+/**
+ * Each table gets its own allowance, so a restaurant's diners sharing one Wi-Fi address don't use
+ * up each other's. A looser allowance per address still stops anyone trying code after code.
+ */
+async function withinLimits(kind: keyof typeof LIMITS, code: string, req: Request) {
+  const [table, network] = await Promise.all([
+    checkRateLimit(`table-${kind}:${code}`, LIMITS[kind].table, TEN_MINUTES),
+    checkRateLimit(`table-${kind}-ip:${clientKey(req)}`, LIMITS[kind].network, TEN_MINUTES),
+  ]);
+  return table && network;
+}
+
 async function restaurantFor(slug: string) {
   return getRestaurantBySlug(await createClient(), slug);
 }
@@ -57,9 +76,7 @@ export async function GET(req: Request) {
   const code = Code.safeParse(params.get("code"));
   const slug = Slug.safeParse(params.get("restaurant"));
   if (!code.success || !slug.success) return fail("Invalid order.", 400);
-  if (!(await checkRateLimit(`table-read:${clientKey(req)}`, 600, 10 * 60 * 1000))) {
-    return fail("Too many requests.", 429);
-  }
+  if (!(await withinLimits("read", code.data, req))) return fail("Too many requests.", 429);
   const [order, restaurant] = await Promise.all([
     getSharedOrder(code.data),
     restaurantFor(slug.data),
@@ -79,7 +96,7 @@ export async function PUT(req: Request) {
     .object({ code: Code, line: LineKey, quantity: z.number().int().min(0).max(20) })
     .safeParse(await req.json().catch(() => null));
   if (!parsed.success) return fail("Invalid change.", 400);
-  if (!(await checkRateLimit(`table-change:${clientKey(req)}`, 300, 10 * 60 * 1000))) {
+  if (!(await withinLimits("change", parsed.data.code, req))) {
     return fail("Too many changes. Slow down a little.", 429);
   }
   try {
@@ -97,7 +114,7 @@ export async function PATCH(req: Request) {
     .object({ code: Code, person: Person, entry: AllergyEntry.nullable() })
     .safeParse(await req.json().catch(() => null));
   if (!parsed.success) return fail("Invalid allergies.", 400);
-  if (!(await checkRateLimit(`table-change:${clientKey(req)}`, 300, 10 * 60 * 1000))) {
+  if (!(await withinLimits("change", parsed.data.code, req))) {
     return fail("Too many changes. Slow down a little.", 429);
   }
   try {

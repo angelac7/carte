@@ -5,6 +5,9 @@ type Lines = Record<string, number>;
 type Snapshot = { lines: Lines; allergies: TableAllergies };
 type AllergyWrite = { person: string; entry: TableAllergyEntry | null };
 
+/** The table turned a change down for good, like adding a dish the kitchen just took off. */
+export class TableChangeRejectedError extends Error {}
+
 /** One ordered write stream per table. Pending intent survives failures and masks stale reads. */
 export class TableSync {
   private lines = new Map<string, number>();
@@ -92,7 +95,12 @@ export class TableSync {
         while (this.active && (this.lines.size || this.allergy)) {
           if (this.allergy) {
             const intent = this.allergy;
-            const all = await this.io.allergies(intent.person, intent.entry);
+            const all = await this.io.allergies(intent.person, intent.entry).catch((error) => {
+              // Retrying a change the table turned down would hold up every change after it.
+              if (error instanceof TableChangeRejectedError && this.allergy === intent)
+                this.allergy = undefined;
+              throw error;
+            });
             if (!this.active) return;
             if (this.allergy === intent) {
               this.allergy = undefined;
@@ -100,10 +108,15 @@ export class TableSync {
             }
           } else {
             const [line, quantity] = this.lines.entries().next().value!;
-            const saved = await this.io.line(line, quantity);
+            // A change the table turns down is dropped, not retried forever ahead of later ones;
+            // the next read shows what the table really has.
+            const saved = await this.io.line(line, quantity).catch((error) => {
+              if (error instanceof TableChangeRejectedError) return null;
+              throw error;
+            });
             if (!this.active) return;
             if (this.lines.get(line) === quantity) this.lines.delete(line);
-            this.io.showLines(this.overlay(saved));
+            if (saved) this.io.showLines(this.overlay(saved));
           }
         }
         if (this.active) this.io.status("synced");

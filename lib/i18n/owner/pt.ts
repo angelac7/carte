@@ -316,6 +316,10 @@ export const pt: OwnerStrings = {
     restored:
       "Os alérgenos anteriores voltaram. O prato ficou sem confirmação, então os clientes não vão vê-lo até você conferir e confirmar em Revisar pratos.",
     failed: "Não foi possível restaurar essa versão. O prato pode ter sido excluído.",
+    changed:
+      "Este prato mudou depois que você abriu o histórico, então nada foi restaurado. Veja a versão mais recente abaixo e tente de novo.",
+    checkAddons:
+      "Os alérgenos anteriores voltaram, mas os adicionais do prato mudaram desde aquela versão. Confira os alérgenos de cada adicional em Revisar pratos antes de confirmar o prato.",
     empty: "Ainda não há mudanças.",
     by: "por {who}",
     you: "você",

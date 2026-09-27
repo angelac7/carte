@@ -327,6 +327,10 @@ export const de: OwnerStrings = {
       "Die früheren Allergene sind zurück. Das Gericht ist jetzt unbestätigt, daher sehen Gäste es erst, wenn Sie es unter Gerichte prüfen kontrolliert und bestätigt haben.",
     failed:
       "Diese Version konnte nicht wiederhergestellt werden. Das Gericht wurde möglicherweise gelöscht.",
+    changed:
+      "Dieses Gericht wurde geändert, nachdem Sie den Verlauf geöffnet haben, daher wurde nichts wiederhergestellt. Sehen Sie sich unten die neueste Version an und versuchen Sie es erneut.",
+    checkAddons:
+      "Die früheren Allergene sind zurück, aber die Extras des Gerichts haben sich seit dieser Version geändert. Prüfen Sie unter Gerichte prüfen die Allergene jedes Extras, bevor Sie das Gericht bestätigen.",
     empty: "Noch keine Änderungen.",
     by: "von {who}",
     you: "Ihnen",

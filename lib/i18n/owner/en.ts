@@ -313,6 +313,10 @@ export const en = {
     restored:
       "The earlier allergens are back. The dish is unconfirmed now, so diners won't see it until you check and confirm it in Review dishes.",
     failed: "That version couldn't be restored. The dish may have been deleted.",
+    changed:
+      "This dish changed after you opened its history, so nothing was restored. Look at its latest version below, then try again.",
+    checkAddons:
+      "The earlier allergens are back, but the dish’s add-ons have changed since that version. Check each add-on’s allergens in Review dishes before you confirm the dish.",
     empty: "No changes yet.",
     by: "by {who}",
     you: "you",

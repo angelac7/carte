@@ -317,6 +317,10 @@ export const tl: OwnerStrings = {
     restored:
       "Naibalik ang dating allergen. Hindi na kumpirmado ang putahe, kaya hindi ito makikita ng mga kumakain hangga't hindi mo sinusuri at kinukumpirma sa Suriin ang mga putahe.",
     failed: "Hindi maibalik ang bersyong iyon. Baka nabura na ang putahe.",
+    changed:
+      "Nagbago ang putaheng ito pagkatapos mong buksan ang kasaysayan nito, kaya walang naibalik. Tingnan ang pinakabagong bersyon sa ibaba, saka subukan ulit.",
+    checkAddons:
+      "Naibalik ang dating allergen, pero nagbago ang mga dagdag ng putahe mula sa bersyong iyon. Suriin ang allergen ng bawat dagdag sa Suriin ang mga putahe bago kumpirmahin ang putahe.",
     empty: "Wala pang pagbabago.",
     by: "ni {who}",
     you: "ikaw",

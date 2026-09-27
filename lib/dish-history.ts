@@ -85,15 +85,41 @@ export function withPrevious(entries: DishHistoryEntry[]) {
   }));
 }
 
-/** The newest entry for each dish: what the dish says right now, so there's nothing to go back to. */
-export function latestEntryIds(entries: DishHistoryEntry[]): Set<number> {
-  const seen = new Set<string>();
-  const latest = new Set<number>();
+/** Each dish's newest entry, by dish: what the dish says right now. */
+export function latestEntryByDish(entries: DishHistoryEntry[]): Map<string, number> {
+  const latest = new Map<string, number>();
   for (const entry of entries) {
-    if (!seen.has(entry.menu_item_id)) {
-      seen.add(entry.menu_item_id);
-      latest.add(entry.id);
-    }
+    if (!latest.has(entry.menu_item_id)) latest.set(entry.menu_item_id, entry.id);
   }
   return latest;
+}
+
+/** The newest entry for each dish: what the dish says right now, so there's nothing to go back to. */
+export function latestEntryIds(entries: DishHistoryEntry[]): Set<number> {
+  return new Set(latestEntryByDish(entries).values());
+}
+
+/**
+ * A dish's current add-ons with the allergens an earlier version recorded for them, matched by
+ * name. Versions only record add-ons that had allergens, so an add-on the version doesn't name
+ * either had none then or didn't exist yet; it keeps its current allergens, erring toward telling
+ * diners more. `unsure` means the owner should check the add-ons: one from that version is gone,
+ * or one keeps allergens the version can't account for.
+ */
+export function restoreAddonAllergens<Addon extends { label: string; allergens: string[] }>(
+  addons: Addon[],
+  recorded: DishSafety["addon_allergens"],
+): { addons: Addon[]; unsure: boolean } {
+  const earlier = new Map(recorded.map((addon) => [addon.label, addon.allergens]));
+  const labels = new Set(addons.map((addon) => addon.label));
+  const unsure =
+    recorded.some((addon) => !labels.has(addon.label)) ||
+    addons.some((addon) => !earlier.has(addon.label) && addon.allergens.length > 0);
+  return {
+    addons: addons.map((addon) => {
+      const allergens = earlier.get(addon.label);
+      return allergens ? { ...addon, allergens } : addon;
+    }),
+    unsure,
+  };
 }

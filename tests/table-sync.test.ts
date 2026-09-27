@@ -1,5 +1,5 @@
 import { expect, it, vi } from "vitest";
-import { TableSync } from "@/lib/table-sync";
+import { TableChangeRejectedError, TableSync } from "@/lib/table-sync";
 function setup() {
   const io = {
     read: vi.fn(async () => ({ lines: {}, allergies: {} })),
@@ -71,4 +71,17 @@ it("retains failed quantities for reconnect and ignores responses after leaving"
   io.showLines.mockClear();
   await sync.refresh();
   expect(io.showLines).not.toHaveBeenCalled();
+});
+it("drops a change the table turns down, so later changes still go through", async () => {
+  const { sync, io } = setup();
+  // Taking off a dish the owner has since unconfirmed, then adding another.
+  io.line.mockRejectedValueOnce(new TableChangeRejectedError("That dish can't be added."));
+  sync.quantity("gone", 0);
+  sync.quantity("dish", 2);
+  await sync.flush();
+  expect(io.line.mock.calls.map((c) => c[0])).toEqual(["gone", "dish"]);
+  expect(io.status).toHaveBeenLastCalledWith("synced");
+  await sync.refresh();
+  expect(io.line).toHaveBeenCalledTimes(2);
+  expect(io.read).toHaveBeenCalledTimes(1);
 });

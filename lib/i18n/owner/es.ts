@@ -318,6 +318,10 @@ export const es: OwnerStrings = {
     restored:
       "Se restauraron los alérgenos anteriores. El plato quedó sin confirmar, así que los clientes no lo verán hasta que lo revise y lo confirme en Revisar platos.",
     failed: "No se pudo restaurar esa versión. Es posible que el plato se haya eliminado.",
+    changed:
+      "Este plato cambió después de que abriera su historial, así que no se restauró nada. Mire su versión más reciente abajo e inténtelo de nuevo.",
+    checkAddons:
+      "Los alérgenos anteriores volvieron, pero los extras del plato cambiaron desde esa versión. Revise los alérgenos de cada extra en Revisar platos antes de confirmar el plato.",
     empty: "Aún no hay cambios.",
     by: "por {who}",
     you: "usted",

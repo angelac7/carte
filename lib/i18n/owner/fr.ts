@@ -324,6 +324,10 @@ export const fr: OwnerStrings = {
     restored:
       "Les allergènes précédents sont rétablis. Le plat n’est plus confirmé, les clients ne le verront donc pas avant que vous l’ayez vérifié et confirmé dans Vérifier les plats.",
     failed: "Cette version n’a pas pu être rétablie. Le plat a peut-être été supprimé.",
+    changed:
+      "Ce plat a changé après l’ouverture de son historique, donc rien n’a été rétabli. Regardez sa dernière version ci-dessous, puis réessayez.",
+    checkAddons:
+      "Les allergènes précédents sont rétablis, mais les suppléments du plat ont changé depuis cette version. Vérifiez les allergènes de chaque supplément dans Vérifier les plats avant de confirmer le plat.",
     empty: "Aucun changement pour l’instant.",
     by: "par {who}",
     you: "vous",
