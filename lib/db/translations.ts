@@ -77,6 +77,8 @@ export async function saveTranslations(
             notes,
             section,
             options,
+            // An AI translation replaces any earlier correction, made for the dish's old text.
+            edited_at: null,
           },
         ]
       : [];

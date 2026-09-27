@@ -16,6 +16,8 @@ export const de: OwnerStrings = {
     mainNav: "Hauptmenü",
   },
   nav: {
+    menus: "Saisonkarten",
+    translations: "Übersetzungen",
     label: "Mein Restaurant",
     dashboard: "Übersicht",
     upload: "Hochladen",
@@ -125,6 +127,14 @@ export const de: OwnerStrings = {
     errorSave: "Ihr Restaurant konnte nicht gespeichert werden. Versuchen Sie es erneut.",
   },
   upload: {
+    asDraft: "Als Entwurf speichern",
+    asDraftHint:
+      "Ihre aktuelle Karte bleibt online, während Sie die neuen Gerichte prüfen. Veröffentlichen Sie den Entwurf, sobald alle bestätigt sind.",
+    draftSaved: {
+      one: "{count} Gericht im Entwurf gespeichert. Bestätigen Sie es unter Gerichte prüfen und veröffentlichen Sie dann den Entwurf.",
+      other:
+        "{count} Gerichte im Entwurf gespeichert. Bestätigen Sie jedes unter Gerichte prüfen und veröffentlichen Sie dann den Entwurf.",
+    },
     title: "Machen Sie aus Ihrer Karte einen Allergenführer.",
     intro:
       "Laden Sie ein Foto Ihrer Speisekarte hoch. Carte listet jedes Gericht auf und schlägt Allergene vor; Sie bestätigen jedes Gericht, bevor Gäste es sehen.",
@@ -157,6 +167,16 @@ export const de: OwnerStrings = {
     },
   },
   review: {
+    offSeason: "Ausgeblendet: seine Saisonkarte ist aus",
+    draftBadge: "Entwurf",
+    draftConfirmed: "✓ Zur Veröffentlichung bestätigt",
+    filterDraft: "Entwurf",
+    draftBanner: {
+      one: "Ihr Entwurf hat {count} Gericht, {confirmed} bestätigt. Gäste sehen Ihre aktuelle Karte, bis Sie ihn veröffentlichen.",
+      other:
+        "Ihr Entwurf hat {count} Gerichte, {confirmed} bestätigt. Gäste sehen Ihre aktuelle Karte, bis Sie ihn veröffentlichen.",
+    },
+    goPublish: "Entwurf veröffentlichen",
     title: "Gerichte prüfen",
     intro:
       "Prüfen Sie die Angaben und Allergene jedes Gerichts und bestätigen Sie es dann. Gäste sehen nur Gerichte, die Sie bestätigt haben.",
@@ -397,6 +417,7 @@ export const de: OwnerStrings = {
       "Bestätigen Sie zuerst einige Gerichte. Nur bestätigte Gerichte stehen in der Tabelle.",
   },
   spreadsheet: {
+    backupLink: "Alles sichern, auch Größen, Extras und Ihr Profil",
     title: "Tabelle",
     intro:
       "Laden Sie Ihre Karte herunter, bearbeiten Sie sie in Excel oder Google Sheets und laden Sie sie wieder hoch. Praktisch, um viele Preise oder Allergene auf einmal zu ändern.",
@@ -465,6 +486,115 @@ export const de: OwnerStrings = {
       notes: "Hinweise",
       special: "Tagesempfehlung",
     },
+  },
+  draft: {
+    title: "Entwurf veröffentlichen",
+    intro:
+      "Ein Entwurf ist eine neue Karte, die Sie vorbereiten, während Gäste weiter die aktuelle sehen. Sobald jedes Gericht im Entwurf bestätigt ist, veröffentlichen Sie ihn in einem Schritt.",
+    none: "Es gibt keinen Entwurf. Laden Sie dafür eine Karte hoch und wählen Sie „Als Entwurf speichern“, oder stellen Sie eine Sicherung wieder her.",
+    upload: "Karte hochladen",
+    counts: {
+      one: "{count} Gericht im Entwurf, {confirmed} bestätigt.",
+      other: "{count} Gerichte im Entwurf, {confirmed} bestätigt.",
+    },
+    confirmFirst:
+      "Bestätigen Sie jedes Gericht im Entwurf unter Gerichte prüfen, bevor Sie veröffentlichen.",
+    review: "Gerichte prüfen",
+    replace: "Meine aktuelle Karte ersetzen",
+    replaceHint: {
+      one: "Ihr aktuelles Gericht wird samt Foto entfernt, und der Entwurf tritt an seine Stelle.",
+      other:
+        "Ihre {count} aktuellen Gerichte werden samt Fotos entfernt, und der Entwurf tritt an ihre Stelle.",
+    },
+    add: "Zu meiner aktuellen Karte hinzufügen",
+    addHint: "Die Gerichte aus dem Entwurf kommen zu denen hinzu, die Gäste schon sehen.",
+    publish: "Veröffentlichen",
+    published: {
+      one: "{count} Gericht veröffentlicht. Gäste sehen es jetzt.",
+      other: "{count} Gerichte veröffentlicht. Gäste sehen sie jetzt.",
+    },
+    discardTitle: "Entwurf verwerfen",
+    discardHint: "Löscht alle Gerichte im Entwurf. Ihre aktuelle Karte ändert sich nicht.",
+    discardConfirm: "Ja, alle Gerichte im Entwurf löschen",
+    discard: "Verwerfen",
+    discarded: "Der Entwurf wurde verworfen.",
+    failed: "Das hat nicht geklappt. Laden Sie die Seite neu und versuchen Sie es erneut.",
+  },
+  menus: {
+    title: "Saisonkarten",
+    intro:
+      "Fassen Sie Gerichte zusammen, die es nur manchmal gibt, etwa Brunch oder eine Festtagskarte, und schalten Sie sie gemeinsam ein und aus. Solange eine aus ist, sehen Gäste ihre Gerichte nicht. Sie bleiben bestätigt, daher wirkt das Wiedereinschalten sofort.",
+    newLabel: "Neue Saisonkarte",
+    placeholder: "Zum Beispiel: Brunch",
+    create: "Hinzufügen",
+    empty: "Noch keine Saisonkarten.",
+    on: "Ein",
+    off: "Aus",
+    onText: "Gäste sehen diese Gerichte.",
+    offText: "Für Gäste ausgeblendet.",
+    switchOn: "Einschalten",
+    switchOff: "Ausschalten",
+    dishCount: {
+      one: "{count} Gericht",
+      other: "{count} Gerichte",
+    },
+    choose: "Gerichte wählen",
+    save: "Gerichte speichern",
+    inOther: "jetzt in {name}",
+    rename: "Umbenennen",
+    saveName: "Namen speichern",
+    remove: "Löschen",
+    removeHint: "Ihre Gerichte kommen zurück auf Ihre normale Karte.",
+    errorName: "Geben Sie einen Namen mit höchstens 60 Zeichen ein.",
+    failed: "Das wurde nicht gespeichert. Laden Sie die Seite neu und versuchen Sie es erneut.",
+  },
+  translations: {
+    title: "Übersetzungen",
+    intro:
+      "Die KI von Carte übersetzt Ihre Gerichte für Gäste. Korrigieren Sie hier jede Formulierung; Ihre Fassung bleibt, bis sich der Text des Gerichts ändert. Namen von Allergenen und Ernährungsweisen nutzen immer die geprüften Übersetzungen von Carte und lassen sich nicht ändern.",
+    language: "Sprache",
+    show: "Anzeigen",
+    confirmFirst:
+      "Nur bestätigte Gerichte werden übersetzt. Bestätigen Sie zuerst einige Gerichte.",
+    allOriginal: "Ihre Gerichte sind bereits in dieser Sprache geschrieben.",
+    original: "Original",
+    name: "Name",
+    description: "Beschreibung",
+    notes: "Hinweise der Küche",
+    section: "Rubrik der Karte",
+    option: "Größe oder Extra {number}",
+    notYet:
+      "Noch nicht übersetzt. Gäste sehen bis dahin das Original, oder geben Sie hier eine Übersetzung ein.",
+    edited: "Von Ihrem Team korrigiert",
+    save: "Übersetzung speichern",
+    saved: "Übersetzung gespeichert.",
+    incomplete: "Füllen Sie jeden Teil aus, den das Original hat.",
+    failed:
+      "Die Übersetzung konnte nicht gespeichert werden. Laden Sie die Seite neu und versuchen Sie es erneut.",
+  },
+  backup: {
+    title: "Sicherung",
+    intro:
+      "Alles zu Ihrer Karte in einer Datei: Gerichte mit Größen, Extras und Servierzeiten, Saisonkarten, korrigierte Übersetzungen und Ihr Profil. Fotos sind nicht enthalten.",
+    downloadTitle: "1. Sicherung herunterladen",
+    download: "Sicherung herunterladen",
+    restoreTitle: "2. Sicherung wiederherstellen",
+    restoreText:
+      "Wiederhergestellte Gerichte kommen als Entwurf, daher sehen Gäste weiter Ihre aktuelle Karte. Prüfen und bestätigen Sie jedes Gericht und veröffentlichen Sie dann den Entwurf.",
+    fileLabel: "Sicherungsdatei",
+    profileToo:
+      "Auch das Profil wiederherstellen: Beschreibung, Kontakt, Öffnungszeiten und Einstellungen",
+    restore: "Wiederherstellen",
+    restoring: "Wird wiederhergestellt…",
+    restored: {
+      one: "{count} Gericht als Entwurf wiederhergestellt.",
+      other: "{count} Gerichte als Entwurf wiederhergestellt.",
+    },
+    draftExists: "Sie haben bereits einen Entwurf. Veröffentlichen oder verwerfen Sie ihn zuerst.",
+    badFile: "Diese Datei ist keine Carte-Sicherung oder ist beschädigt.",
+    tooBig: "Diese Datei ist größer als 5 MB.",
+    failed: "Die Sicherung konnte nicht wiederhergestellt werden. Versuchen Sie es erneut.",
+    goDraft: "Zum Entwurf",
   },
   profile: {
     title: "Restaurantprofil",

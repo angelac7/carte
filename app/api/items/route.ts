@@ -22,6 +22,8 @@ const SaveRequest = z.object({
   items: z.array(ExtractedDishSchema).max(300),
   // Menu uploads skip dishes already on the menu; dishes added by hand never do.
   skipExisting: z.boolean().optional(),
+  // Saved into the draft menu, hidden from diners until the owner publishes it.
+  draft: z.boolean().optional(),
 });
 const Version = z.number().int().positive();
 const DeleteRequest = z.union([
@@ -55,14 +57,17 @@ export async function POST(req: Request) {
   if (!owner) return fail(t.api.loginMenu, 401);
   const parsed = SaveRequest.safeParse(await req.json().catch(() => null));
   if (!parsed.success) return fail(t.api.badDishes);
-  const { items, skipExisting } = parsed.data;
+  const { items, skipExisting, draft = false } = parsed.data;
+  // A draft usually repeats much of the current menu, so only the draft itself counts as existing.
   const toAdd = skipExisting
     ? withoutDuplicates(
-        (await listDishes(owner.supabase, owner.restaurant.id)).map((dish) => dish.name),
+        (await listDishes(owner.supabase, owner.restaurant.id))
+          .filter((dish) => !!dish.draft === draft)
+          .map((dish) => dish.name),
         items,
       )
     : items;
-  return NextResponse.json(await addDishes(owner.supabase, owner.restaurant.id, toAdd));
+  return NextResponse.json(await addDishes(owner.supabase, owner.restaurant.id, toAdd, { draft }));
 }
 
 /** Updates one dish's details, allergens, tags, notes, or confirmation. */

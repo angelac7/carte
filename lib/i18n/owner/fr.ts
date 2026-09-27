@@ -16,6 +16,8 @@ export const fr: OwnerStrings = {
     mainNav: "Principal",
   },
   nav: {
+    menus: "Menus saisonniers",
+    translations: "Traductions",
     label: "Mon restaurant",
     dashboard: "Tableau de bord",
     upload: "Importer",
@@ -125,6 +127,14 @@ export const fr: OwnerStrings = {
     errorSave: "Votre restaurant n’a pas pu être enregistré. Réessayez.",
   },
   upload: {
+    asDraft: "Enregistrer comme brouillon",
+    asDraftHint:
+      "Votre carte actuelle reste en ligne pendant que vous vérifiez les nouveaux plats. Publiez le brouillon une fois qu’ils sont tous confirmés.",
+    draftSaved: {
+      one: "{count} plat enregistré dans votre brouillon. Confirmez-le dans Vérifier les plats, puis publiez le brouillon.",
+      other:
+        "{count} plats enregistrés dans votre brouillon. Confirmez-les dans Vérifier les plats, puis publiez le brouillon.",
+    },
     title: "Transformez votre menu en guide des allergènes.",
     intro:
       "Importez une photo de votre menu. Carte liste chaque plat et suggère ses allergènes, puis vous confirmez chacun avant que les clients ne le voient.",
@@ -158,6 +168,16 @@ export const fr: OwnerStrings = {
     },
   },
   review: {
+    offSeason: "Masqué : son menu saisonnier est désactivé",
+    draftBadge: "Brouillon",
+    draftConfirmed: "✓ Confirmé pour la publication",
+    filterDraft: "Brouillon",
+    draftBanner: {
+      one: "Votre brouillon compte {count} plat, {confirmed} confirmé. Les clients voient votre carte actuelle jusqu’à sa publication.",
+      other:
+        "Votre brouillon compte {count} plats, {confirmed} confirmés. Les clients voient votre carte actuelle jusqu’à sa publication.",
+    },
+    goPublish: "Publier le brouillon",
     title: "Vérifier les plats",
     intro:
       "Vérifiez les informations et les allergènes de chaque plat, puis confirmez-le. Les clients ne voient que les plats que vous avez confirmés.",
@@ -394,6 +414,7 @@ export const fr: OwnerStrings = {
       "Confirmez d’abord des plats. Seuls les plats confirmés figurent dans le tableau.",
   },
   spreadsheet: {
+    backupLink: "Tout sauvegarder, y compris les tailles, les suppléments et votre profil",
     title: "Tableur",
     intro:
       "Téléchargez votre menu, modifiez-le dans Excel ou Google Sheets, puis réimportez-le. Pratique pour changer beaucoup de prix ou d’allergènes d’un coup.",
@@ -461,6 +482,111 @@ export const fr: OwnerStrings = {
       notes: "notes",
       special: "suggestion du jour",
     },
+  },
+  draft: {
+    title: "Publier votre brouillon",
+    intro:
+      "Un brouillon est une nouvelle carte que vous préparez pendant que les clients voient toujours l’actuelle. Quand chaque plat du brouillon est confirmé, publiez-le en une fois.",
+    none: "Il n’y a pas de brouillon. Pour en commencer un, importez une carte et choisissez « Enregistrer comme brouillon », ou restaurez une sauvegarde.",
+    upload: "Importer une carte",
+    counts: {
+      one: "{count} plat en brouillon, {confirmed} confirmé.",
+      other: "{count} plats en brouillon, {confirmed} confirmés.",
+    },
+    confirmFirst: "Confirmez chaque plat du brouillon dans Vérifier les plats avant de publier.",
+    review: "Vérifier les plats",
+    replace: "Remplacer ma carte actuelle",
+    replaceHint: {
+      one: "Votre plat actuel est supprimé, avec sa photo, et le brouillon prend sa place.",
+      other:
+        "Vos {count} plats actuels sont supprimés, avec leurs photos, et le brouillon prend leur place.",
+    },
+    add: "Ajouter à ma carte actuelle",
+    addHint: "Les plats du brouillon rejoignent ceux que les clients voient déjà.",
+    publish: "Publier",
+    published: {
+      one: "{count} plat publié. Les clients le voient maintenant.",
+      other: "{count} plats publiés. Les clients les voient maintenant.",
+    },
+    discardTitle: "Jeter le brouillon",
+    discardHint: "Supprime tous les plats du brouillon. Votre carte actuelle ne change pas.",
+    discardConfirm: "Oui, supprimer tous les plats du brouillon",
+    discard: "Jeter",
+    discarded: "Le brouillon a été jeté.",
+    failed: "Cela n’a pas fonctionné. Rechargez la page et réessayez.",
+  },
+  menus: {
+    title: "Menus saisonniers",
+    intro:
+      "Regroupez les plats que vous ne servez que parfois, comme le brunch ou un menu de fête, et activez-les ou désactivez-les ensemble. Tant qu’un menu est désactivé, les clients ne voient pas ses plats. Ils restent confirmés, donc le réactiver prend effet aussitôt.",
+    newLabel: "Nouveau menu saisonnier",
+    placeholder: "Par exemple : Brunch",
+    create: "Ajouter",
+    empty: "Pas encore de menu saisonnier.",
+    on: "Activé",
+    off: "Désactivé",
+    onText: "Les clients voient ces plats.",
+    offText: "Masqué pour les clients.",
+    switchOn: "Activer",
+    switchOff: "Désactiver",
+    dishCount: {
+      one: "{count} plat",
+      other: "{count} plats",
+    },
+    choose: "Choisir les plats",
+    save: "Enregistrer les plats",
+    inOther: "désormais dans {name}",
+    rename: "Renommer",
+    saveName: "Enregistrer le nom",
+    remove: "Supprimer",
+    removeHint: "Ses plats retournent sur votre carte habituelle.",
+    errorName: "Donnez-lui un nom de 60 caractères maximum.",
+    failed: "L’enregistrement a échoué. Rechargez la page et réessayez.",
+  },
+  translations: {
+    title: "Traductions",
+    intro:
+      "L’IA de Carte traduit vos plats pour les clients. Corrigez ici n’importe quelle formulation ; votre version est conservée jusqu’à ce que le texte du plat change. Les noms d’allergènes et de régimes utilisent toujours les traductions vérifiées de Carte et ne peuvent pas être modifiés.",
+    language: "Langue",
+    show: "Afficher",
+    confirmFirst: "Seuls les plats confirmés sont traduits. Confirmez d’abord quelques plats.",
+    allOriginal: "Vos plats sont déjà rédigés dans cette langue.",
+    original: "Original",
+    name: "Nom",
+    description: "Description",
+    notes: "Notes de cuisine",
+    section: "Rubrique de la carte",
+    option: "Taille ou supplément {number}",
+    notYet:
+      "Pas encore traduit. Les clients voient l’original d’ici là, ou saisissez une traduction ici.",
+    edited: "Corrigée par votre équipe",
+    save: "Enregistrer la traduction",
+    saved: "Traduction enregistrée.",
+    incomplete: "Remplissez chaque partie présente dans l’original.",
+    failed: "La traduction n’a pas pu être enregistrée. Rechargez la page et réessayez.",
+  },
+  backup: {
+    title: "Sauvegarde",
+    intro:
+      "Toute votre carte dans un seul fichier : les plats avec leurs tailles, suppléments et horaires, les menus saisonniers, les traductions corrigées et votre profil. Les photos ne sont pas incluses.",
+    downloadTitle: "1. Télécharger une sauvegarde",
+    download: "Télécharger la sauvegarde",
+    restoreTitle: "2. Restaurer une sauvegarde",
+    restoreText:
+      "Les plats restaurés arrivent en brouillon, donc les clients voient toujours votre carte actuelle. Vérifiez et confirmez chaque plat, puis publiez le brouillon.",
+    fileLabel: "Fichier de sauvegarde",
+    profileToo: "Restaurer aussi le profil : description, coordonnées, horaires et réglages",
+    restore: "Restaurer",
+    restoring: "Restauration…",
+    restored: {
+      one: "{count} plat restauré en brouillon.",
+      other: "{count} plats restaurés en brouillon.",
+    },
+    draftExists: "Vous avez déjà un brouillon. Publiez-le ou jetez-le d’abord.",
+    badFile: "Ce fichier n’est pas une sauvegarde Carte, ou il est endommagé.",
+    tooBig: "Ce fichier dépasse 5 Mo.",
+    failed: "La sauvegarde n’a pas pu être restaurée. Réessayez.",
+    goDraft: "Aller au brouillon",
   },
   profile: {
     title: "Profil du restaurant",

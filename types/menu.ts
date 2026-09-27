@@ -128,6 +128,14 @@ export const MenuItemSchema = z.object({
   available_until: ServingTimeSchema.nullable().optional(),
   // Set only by the photo upload route, never by dish edits.
   photo_url: z.string().nullable().optional(),
+  /** Part of a draft menu, hidden from diners until the draft is published. Never set by edits. */
+  draft: z.boolean().optional(),
+  /** A draft dish the owner has confirmed, ready to publish. Set by the database. */
+  draft_confirmed: z.boolean().optional(),
+  /** The seasonal menu, like "Brunch", the dish belongs to. Changed only on that page. */
+  group_id: z.string().nullable().optional(),
+  /** False while the dish's seasonal menu is switched off, when diners don't see it. */
+  in_season: z.boolean().optional(),
 });
 
 export type ExtractedDish = z.infer<typeof ExtractedDishSchema>;

@@ -35,7 +35,7 @@ export type Restaurant = {
 const RESTAURANT_COLUMNS =
   "id, name, slug, cuisine, city, timezone, phone, website, reservation_url, price_range, logo_url, cover_url, suspended, kitchen_practices, features, currency";
 const DISH_COLUMNS =
-  "id, name, description, price, allergens, dietary_tags, notes, confirmed, photo_url, revision, source_language, section, sort_order, sold_out_on, special, available_from, available_until, sizes, addons, allergen_list, removable, may_contain, spice, also_contains, also_checked, calories";
+  "id, name, description, price, allergens, dietary_tags, notes, confirmed, photo_url, revision, source_language, section, sort_order, sold_out_on, special, available_from, available_until, sizes, addons, allergen_list, removable, may_contain, spice, also_contains, also_checked, calories, draft, draft_confirmed, group_id, in_season";
 
 /** Every restaurant a person can work on: the ones they own first, then ones they help edit. */
 export async function listMyRestaurants(
@@ -132,7 +132,10 @@ export async function listDishes(
   return (data ?? []) as unknown as MenuItem[];
 }
 
-/** Only dishes the owner has confirmed. Used for everything diners see. */
+/**
+ * Only dishes the owner has confirmed, leaving out seasonal menus that are switched off. Used
+ * for everything diners see. Draft dishes are never confirmed, so they never appear here.
+ */
 export async function getConfirmedDishes(
   supabase: SupabaseClient,
   restaurantId: string,
@@ -142,6 +145,7 @@ export async function getConfirmedDishes(
     .select(DISH_COLUMNS)
     .eq("restaurant_id", restaurantId)
     .eq("confirmed", true)
+    .eq("in_season", true)
     .order("sort_order")
     .order("created_at");
   if (error) throw error;
@@ -153,6 +157,7 @@ export async function addDishes(
   supabase: SupabaseClient,
   restaurantId: string,
   dishes: ExtractedDish[],
+  { draft = false }: { draft?: boolean } = {},
 ): Promise<MenuItem[]> {
   if (dishes.length === 0) return [];
   // New dishes go after the existing ones, in the order they were read or added.
@@ -178,6 +183,7 @@ export async function addDishes(
     dietary_tags: dish.dietary_tags,
     notes: "",
     confirmed: false,
+    draft,
   }));
   const { data, error } = await supabase.from("menu_items").insert(rows).select(DISH_COLUMNS);
   if (error) throw error;
@@ -337,6 +343,7 @@ export async function getConfirmedDish(
     .eq("id", dishId)
     .eq("restaurant_id", restaurantId)
     .eq("confirmed", true)
+    .eq("in_season", true)
     .maybeSingle();
   if (error) throw error;
   return data as unknown as MenuItem | null;

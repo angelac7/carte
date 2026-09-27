@@ -16,6 +16,8 @@ export const tl: OwnerStrings = {
     mainNav: "Pangunahin",
   },
   nav: {
+    menus: "Pana-panahong menu",
+    translations: "Mga salin",
     label: "Aking restawran",
     dashboard: "Dashboard",
     upload: "Mag-upload",
@@ -126,6 +128,13 @@ export const tl: OwnerStrings = {
     errorSave: "Hindi ma-save ang restawran mo. Subukan ulit.",
   },
   upload: {
+    asDraft: "I-save bilang draft",
+    asDraftHint:
+      "Nananatiling nakikita ang kasalukuyang menu mo habang sinusuri mo ang mga bagong putahe. I-publish ang draft kapag kumpirmado na lahat.",
+    draftSaved: {
+      other:
+        "Na-save ang {count} putahe sa draft mo. Kumpirmahin ang bawat isa sa Suriin ang mga putahe, saka i-publish ang draft.",
+    },
     title: "Gawing gabay sa allergen ang menu mo.",
     intro:
       "Mag-upload ng litrato ng menu mo. Ililista ng Carte ang bawat putahe at magmumungkahi ng allergen, saka mo kukumpirmahin ang bawat isa bago ito makita ng mga kumakain.",
@@ -156,6 +165,15 @@ export const tl: OwnerStrings = {
     },
   },
   review: {
+    offSeason: "Nakatago: naka-off ang pana-panahong menu nito",
+    draftBadge: "Draft",
+    draftConfirmed: "✓ Kumpirmado para sa pag-publish",
+    filterDraft: "Draft",
+    draftBanner: {
+      other:
+        "May {count} putahe ang draft mo, {confirmed} ang kumpirmado. Ang kasalukuyang menu mo pa rin ang nakikita ng mga kumakain hangga't hindi mo ito naipa-publish.",
+    },
+    goPublish: "I-publish ang draft",
     title: "Suriin ang mga putahe",
     intro:
       "Suriin ang detalye at allergen ng bawat putahe, saka kumpirmahin. Ang mga putaheng kinumpirma mo lang ang nakikita ng mga kumakain.",
@@ -386,6 +404,7 @@ export const tl: OwnerStrings = {
       "Kumpirmahin muna ang ilang putahe. Ang mga kumpirmadong putahe lang ang nasa tsart.",
   },
   spreadsheet: {
+    backupLink: "I-back up ang lahat, pati mga laki, dagdag, at ang profile mo",
     title: "Spreadsheet",
     intro:
       "I-download ang menu mo, baguhin sa Excel o Google Sheets, at i-upload ulit. Madali para magpalit ng maraming presyo o allergen nang sabay-sabay.",
@@ -449,6 +468,108 @@ export const tl: OwnerStrings = {
       notes: "tala",
       special: "espesyal",
     },
+  },
+  draft: {
+    title: "I-publish ang draft mo",
+    intro:
+      "Ang draft ay bagong menu na inihahanda mo habang nakikita pa ng mga kumakain ang kasalukuyan. Kapag kumpirmado na ang bawat putahe sa draft, i-publish ito nang isang hakbang.",
+    none: "Walang draft. Para magsimula, mag-upload ng menu at piliin ang “I-save bilang draft”, o i-restore ang isang backup.",
+    upload: "Mag-upload ng menu",
+    counts: {
+      other: "{count} putahe sa draft, {confirmed} ang kumpirmado.",
+    },
+    confirmFirst:
+      "Kumpirmahin ang bawat putahe sa draft sa Suriin ang mga putahe bago mag-publish.",
+    review: "Suriin ang mga putahe",
+    replace: "Palitan ang kasalukuyang menu ko",
+    replaceHint: {
+      other:
+        "Buburahin ang {count} kasalukuyang putahe mo, kasama ang mga litrato, at ang draft ang papalit.",
+    },
+    add: "Idagdag sa kasalukuyang menu ko",
+    addHint: "Madadagdag ang mga putahe sa draft sa mga nakikita na ng mga kumakain.",
+    publish: "I-publish",
+    published: {
+      other: "Na-publish ang {count} putahe. Nakikita na ito ng mga kumakain.",
+    },
+    discardTitle: "Itapon ang draft",
+    discardHint: "Binubura ang bawat putahe sa draft. Hindi nagbabago ang kasalukuyang menu mo.",
+    discardConfirm: "Oo, burahin ang bawat putahe sa draft",
+    discard: "Itapon",
+    discarded: "Naitapon na ang draft.",
+    failed: "Hindi ito gumana. I-reload ang page at subukan ulit.",
+  },
+  menus: {
+    title: "Pana-panahong menu",
+    intro:
+      "Pagsama-samahin ang mga putaheng paminsan-minsan mo lang inihahain, gaya ng brunch o menu sa pista, at i-on at i-off ang mga ito nang sabay. Habang naka-off, hindi nakikita ng mga kumakain ang mga putahe nito. Nananatili silang kumpirmado, kaya agad itong gagana kapag in-on ulit.",
+    newLabel: "Bagong pana-panahong menu",
+    placeholder: "Halimbawa: Brunch",
+    create: "Idagdag",
+    empty: "Wala pang pana-panahong menu.",
+    on: "Naka-on",
+    off: "Naka-off",
+    onText: "Nakikita ng mga kumakain ang mga putaheng ito.",
+    offText: "Nakatago sa mga kumakain.",
+    switchOn: "I-on",
+    switchOff: "I-off",
+    dishCount: {
+      other: "{count} putahe",
+    },
+    choose: "Pumili ng putahe",
+    save: "I-save ang mga putahe",
+    inOther: "nasa {name} ngayon",
+    rename: "Palitan ang pangalan",
+    saveName: "I-save ang pangalan",
+    remove: "Burahin",
+    removeHint: "Babalik ang mga putahe nito sa karaniwang menu mo.",
+    errorName: "Bigyan ito ng pangalang hanggang 60 character.",
+    failed: "Hindi ito na-save. I-reload ang page at subukan ulit.",
+  },
+  translations: {
+    title: "Mga salin",
+    intro:
+      "Isinasalin ng AI ng Carte ang mga putahe mo para sa mga kumakain. Itama rito ang anumang salita; mananatili ang bersyon mo hangga't hindi nagbabago ang sariling teksto ng putahe. Laging gamit ng mga pangalan ng allergen at diet ang mga nasuring salin ng Carte at hindi mababago.",
+    language: "Wika",
+    show: "Ipakita",
+    confirmFirst:
+      "Ang mga kumpirmadong putahe lang ang isinasalin. Kumpirmahin muna ang ilang putahe.",
+    allOriginal: "Nakasulat na sa wikang ito ang mga putahe mo.",
+    original: "Orihinal",
+    name: "Pangalan",
+    description: "Paglalarawan",
+    notes: "Tala ng kusina",
+    section: "Seksyon ng menu",
+    option: "Laki o dagdag {number}",
+    notYet:
+      "Hindi pa naisasalin. Orihinal ang nakikita ng mga kumakain hanggang doon, o mag-type ng salin dito.",
+    edited: "Itinama ng team mo",
+    save: "I-save ang salin",
+    saved: "Na-save ang salin.",
+    incomplete: "Punan ang bawat bahaging mayroon ang orihinal.",
+    failed: "Hindi ma-save ang salin. I-reload ang page at subukan ulit.",
+  },
+  backup: {
+    title: "Backup",
+    intro:
+      "Lahat tungkol sa menu mo sa iisang file: mga putahe kasama ang laki, dagdag, at oras ng paghahain, mga pana-panahong menu, mga itinamang salin, at ang profile mo. Hindi kasama ang mga litrato.",
+    downloadTitle: "1. Mag-download ng backup",
+    download: "I-download ang backup",
+    restoreTitle: "2. Mag-restore ng backup",
+    restoreText:
+      "Darating bilang draft ang mga na-restore na putahe, kaya ang kasalukuyang menu mo pa rin ang nakikita ng mga kumakain. Suriin at kumpirmahin ang bawat putahe, saka i-publish ang draft.",
+    fileLabel: "File ng backup",
+    profileToo: "I-restore din ang profile: paglalarawan, contact, oras, at settings",
+    restore: "I-restore",
+    restoring: "Nire-restore…",
+    restored: {
+      other: "Na-restore ang {count} putahe bilang draft.",
+    },
+    draftExists: "May draft ka na. I-publish o itapon muna ito.",
+    badFile: "Hindi backup ng Carte ang file na iyan, o sira ito.",
+    tooBig: "Lampas 5 MB ang file na iyan.",
+    failed: "Hindi ma-restore ang backup. Subukan ulit.",
+    goDraft: "Pumunta sa draft",
   },
   profile: {
     title: "Profile ng restawran",

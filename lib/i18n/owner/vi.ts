@@ -16,6 +16,8 @@ export const vi: OwnerStrings = {
     mainNav: "Chính",
   },
   nav: {
+    menus: "Thực đơn theo mùa",
+    translations: "Bản dịch",
     label: "Nhà hàng của tôi",
     dashboard: "Bảng điều khiển",
     upload: "Tải lên",
@@ -121,6 +123,13 @@ export const vi: OwnerStrings = {
     errorSave: "Không lưu được nhà hàng. Hãy thử lại.",
   },
   upload: {
+    asDraft: "Lưu thành bản nháp",
+    asDraftHint:
+      "Thực đơn hiện tại vẫn hiển thị trong lúc bạn kiểm tra các món mới. Đăng bản nháp khi tất cả đã được xác nhận.",
+    draftSaved: {
+      other:
+        "Đã lưu {count} món vào bản nháp. Hãy xác nhận từng món trong Kiểm tra món, rồi đăng bản nháp.",
+    },
     title: "Biến thực đơn của bạn thành hướng dẫn về chất gây dị ứng.",
     intro:
       "Tải lên ảnh thực đơn. Carte liệt kê từng món và gợi ý chất gây dị ứng, sau đó bạn xác nhận từng món trước khi khách nhìn thấy.",
@@ -148,6 +157,15 @@ export const vi: OwnerStrings = {
     },
   },
   review: {
+    offSeason: "Đang ẩn: thực đơn theo mùa của món đang tắt",
+    draftBadge: "Bản nháp",
+    draftConfirmed: "✓ Đã xác nhận để đăng",
+    filterDraft: "Bản nháp",
+    draftBanner: {
+      other:
+        "Bản nháp có {count} món, {confirmed} món đã xác nhận. Khách vẫn thấy thực đơn hiện tại cho đến khi bạn đăng.",
+    },
+    goPublish: "Đăng bản nháp",
     title: "Kiểm tra món",
     intro:
       "Kiểm tra thông tin và chất gây dị ứng của từng món rồi xác nhận. Khách chỉ thấy những món bạn đã xác nhận.",
@@ -373,6 +391,7 @@ export const vi: OwnerStrings = {
     confirmFirst: "Hãy xác nhận vài món trước. Chỉ món đã xác nhận mới có trong bảng.",
   },
   spreadsheet: {
+    backupLink: "Sao lưu mọi thứ, kể cả cỡ, món thêm và hồ sơ",
     title: "Bảng tính",
     intro:
       "Tải thực đơn về, sửa trong Excel hoặc Google Sheets rồi tải lên lại. Tiện khi cần đổi nhiều giá hoặc chất gây dị ứng cùng lúc.",
@@ -435,6 +454,105 @@ export const vi: OwnerStrings = {
       notes: "ghi chú",
       special: "món đặc biệt",
     },
+  },
+  draft: {
+    title: "Đăng bản nháp",
+    intro:
+      "Bản nháp là thực đơn mới bạn chuẩn bị trong khi khách vẫn thấy thực đơn hiện tại. Khi mọi món trong bản nháp đã được xác nhận, hãy đăng một lần.",
+    none: "Chưa có bản nháp. Để bắt đầu, hãy tải thực đơn lên và chọn “Lưu thành bản nháp”, hoặc khôi phục một bản sao lưu.",
+    upload: "Tải thực đơn lên",
+    counts: {
+      other: "{count} món trong bản nháp, {confirmed} món đã xác nhận.",
+    },
+    confirmFirst: "Hãy xác nhận mọi món trong bản nháp ở Kiểm tra món trước khi đăng.",
+    review: "Kiểm tra món",
+    replace: "Thay thực đơn hiện tại",
+    replaceHint: {
+      other: "{count} món hiện tại sẽ bị xóa cùng ảnh, và bản nháp thế chỗ.",
+    },
+    add: "Thêm vào thực đơn hiện tại",
+    addHint: "Các món trong bản nháp được thêm vào những món khách đang thấy.",
+    publish: "Đăng",
+    published: {
+      other: "Đã đăng {count} món. Khách đã thấy ngay.",
+    },
+    discardTitle: "Bỏ bản nháp",
+    discardHint: "Xóa mọi món trong bản nháp. Thực đơn hiện tại không thay đổi.",
+    discardConfirm: "Có, xóa mọi món trong bản nháp",
+    discard: "Bỏ",
+    discarded: "Đã bỏ bản nháp.",
+    failed: "Không thành công. Hãy tải lại trang rồi thử lại.",
+  },
+  menus: {
+    title: "Thực đơn theo mùa",
+    intro:
+      "Gom những món bạn chỉ phục vụ đôi khi, như brunch hay thực đơn ngày lễ, và bật tắt chúng cùng nhau. Khi một thực đơn đang tắt, khách không thấy các món của nó. Các món vẫn được xác nhận, nên bật lại là có hiệu lực ngay.",
+    newLabel: "Thực đơn theo mùa mới",
+    placeholder: "Ví dụ: Brunch",
+    create: "Thêm",
+    empty: "Chưa có thực đơn theo mùa nào.",
+    on: "Bật",
+    off: "Tắt",
+    onText: "Khách thấy các món này.",
+    offText: "Đang ẩn với khách.",
+    switchOn: "Bật",
+    switchOff: "Tắt",
+    dishCount: {
+      other: "{count} món",
+    },
+    choose: "Chọn món",
+    save: "Lưu món",
+    inOther: "đang ở {name}",
+    rename: "Đổi tên",
+    saveName: "Lưu tên",
+    remove: "Xóa",
+    removeHint: "Các món của nó trở lại thực đơn thường.",
+    errorName: "Hãy đặt tên tối đa 60 ký tự.",
+    failed: "Chưa lưu được. Hãy tải lại trang rồi thử lại.",
+  },
+  translations: {
+    title: "Bản dịch",
+    intro:
+      "AI của Carte dịch các món của bạn cho khách. Bạn có thể sửa bất kỳ câu chữ nào ở đây; bản của bạn được giữ cho đến khi nội dung của món thay đổi. Tên chất gây dị ứng và chế độ ăn luôn dùng bản dịch đã kiểm tra của Carte và không thể thay đổi.",
+    language: "Ngôn ngữ",
+    show: "Hiển thị",
+    confirmFirst: "Chỉ các món đã xác nhận mới được dịch. Hãy xác nhận vài món trước.",
+    allOriginal: "Các món của bạn đã được viết bằng ngôn ngữ này.",
+    original: "Bản gốc",
+    name: "Tên",
+    description: "Mô tả",
+    notes: "Ghi chú của bếp",
+    section: "Mục trong thực đơn",
+    option: "Cỡ hoặc món thêm {number}",
+    notYet:
+      "Chưa được dịch. Cho đến lúc đó khách thấy bản gốc, hoặc bạn có thể nhập bản dịch ở đây.",
+    edited: "Đã được nhóm của bạn sửa",
+    save: "Lưu bản dịch",
+    saved: "Đã lưu bản dịch.",
+    incomplete: "Hãy điền mọi phần mà bản gốc có.",
+    failed: "Không lưu được bản dịch. Hãy tải lại trang rồi thử lại.",
+  },
+  backup: {
+    title: "Sao lưu",
+    intro:
+      "Mọi thứ về thực đơn trong một tệp: các món cùng cỡ, món thêm và giờ phục vụ, thực đơn theo mùa, bản dịch đã sửa và hồ sơ của bạn. Không gồm ảnh.",
+    downloadTitle: "1. Tải bản sao lưu",
+    download: "Tải bản sao lưu",
+    restoreTitle: "2. Khôi phục bản sao lưu",
+    restoreText:
+      "Các món khôi phục sẽ vào bản nháp, nên khách vẫn thấy thực đơn hiện tại. Hãy kiểm tra và xác nhận từng món, rồi đăng bản nháp.",
+    fileLabel: "Tệp sao lưu",
+    profileToo: "Khôi phục cả hồ sơ: mô tả, liên hệ, giờ mở cửa và cài đặt",
+    restore: "Khôi phục",
+    restoring: "Đang khôi phục…",
+    restored: {
+      other: "Đã khôi phục {count} món thành bản nháp.",
+    },
+    draftExists: "Bạn đã có một bản nháp. Hãy đăng hoặc bỏ nó trước.",
+    badFile: "Tệp này không phải bản sao lưu của Carte, hoặc đã bị hỏng.",
+    tooBig: "Tệp này lớn hơn 5 MB.",
+    failed: "Không khôi phục được bản sao lưu. Hãy thử lại.",
+    goDraft: "Đến bản nháp",
   },
   profile: {
     title: "Hồ sơ nhà hàng",

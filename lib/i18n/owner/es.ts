@@ -16,6 +16,8 @@ export const es: OwnerStrings = {
     mainNav: "Principal",
   },
   nav: {
+    menus: "Menús de temporada",
+    translations: "Traducciones",
     label: "Mi restaurante",
     dashboard: "Panel",
     upload: "Subir",
@@ -123,6 +125,14 @@ export const es: OwnerStrings = {
     errorSave: "No se pudo guardar su restaurante. Inténtelo de nuevo.",
   },
   upload: {
+    asDraft: "Guardar como borrador",
+    asDraftHint:
+      "Su menú actual sigue visible mientras revisa los platos nuevos. Publique el borrador cuando estén todos confirmados.",
+    draftSaved: {
+      one: "{count} plato guardado en su borrador. Confírmelo en Revisar platos y luego publique el borrador.",
+      other:
+        "{count} platos guardados en su borrador. Confírmelos en Revisar platos y luego publique el borrador.",
+    },
     title: "Convierta su menú en una guía de alérgenos.",
     intro:
       "Suba una foto de su menú. Carte lista cada plato y sugiere sus alérgenos; usted confirma cada uno antes de que lo vean los clientes.",
@@ -154,6 +164,16 @@ export const es: OwnerStrings = {
     },
   },
   review: {
+    offSeason: "Oculto: su menú de temporada está desactivado",
+    draftBadge: "Borrador",
+    draftConfirmed: "✓ Confirmado para publicar",
+    filterDraft: "Borrador",
+    draftBanner: {
+      one: "Su borrador tiene {count} plato, {confirmed} confirmado. Los clientes siguen viendo su menú actual hasta que lo publique.",
+      other:
+        "Su borrador tiene {count} platos, {confirmed} confirmados. Los clientes siguen viendo su menú actual hasta que lo publique.",
+    },
+    goPublish: "Publicar el borrador",
     title: "Revisar platos",
     intro:
       "Revise los datos y alérgenos de cada plato y luego confírmelo. Los clientes solo ven los platos que usted ha confirmado.",
@@ -387,6 +407,7 @@ export const es: OwnerStrings = {
       "Confirme primero algunos platos. Solo aparecen en la tabla los platos confirmados.",
   },
   spreadsheet: {
+    backupLink: "Haga una copia de seguridad de todo, incluidos tamaños, extras y su perfil",
     title: "Hoja de cálculo",
     intro:
       "Descargue su menú, edítelo en Excel o Google Sheets y vuelva a subirlo. Útil para cambiar muchos precios o alérgenos a la vez.",
@@ -451,6 +472,111 @@ export const es: OwnerStrings = {
       notes: "notas",
       special: "especial",
     },
+  },
+  draft: {
+    title: "Publicar su borrador",
+    intro:
+      "Un borrador es un menú nuevo que prepara mientras los clientes siguen viendo el actual. Cuando todos sus platos estén confirmados, publíquelo de una vez.",
+    none: "No hay ningún borrador. Para empezar uno, suba un menú y elija “Guardar como borrador”, o restaure una copia de seguridad.",
+    upload: "Subir un menú",
+    counts: {
+      one: "{count} plato en borrador, {confirmed} confirmado.",
+      other: "{count} platos en borrador, {confirmed} confirmados.",
+    },
+    confirmFirst: "Confirme cada plato del borrador en Revisar platos antes de publicar.",
+    review: "Revisar platos",
+    replace: "Reemplazar mi menú actual",
+    replaceHint: {
+      one: "Se elimina su plato actual, con su foto, y el borrador ocupa su lugar.",
+      other:
+        "Se eliminan sus {count} platos actuales, con sus fotos, y el borrador ocupa su lugar.",
+    },
+    add: "Añadir a mi menú actual",
+    addHint: "Los platos del borrador se suman a los que los clientes ya ven.",
+    publish: "Publicar",
+    published: {
+      one: "Se publicó {count} plato. Los clientes ya lo ven.",
+      other: "Se publicaron {count} platos. Los clientes ya los ven.",
+    },
+    discardTitle: "Descartar el borrador",
+    discardHint: "Elimina todos los platos del borrador. Su menú actual no cambia.",
+    discardConfirm: "Sí, eliminar todos los platos del borrador",
+    discard: "Descartar",
+    discarded: "Se descartó el borrador.",
+    failed: "No funcionó. Vuelva a cargar la página e inténtelo de nuevo.",
+  },
+  menus: {
+    title: "Menús de temporada",
+    intro:
+      "Agrupe los platos que solo sirve a veces, como el brunch o un menú festivo, y actívelos y desactívelos juntos. Mientras un menú está desactivado, los clientes no ven sus platos. Siguen confirmados, así que al activarlo de nuevo aparecen al instante.",
+    newLabel: "Nuevo menú de temporada",
+    placeholder: "Por ejemplo: Brunch",
+    create: "Añadir",
+    empty: "Aún no hay menús de temporada.",
+    on: "Activado",
+    off: "Desactivado",
+    onText: "Los clientes ven estos platos.",
+    offText: "Oculto para los clientes.",
+    switchOn: "Activar",
+    switchOff: "Desactivar",
+    dishCount: {
+      one: "{count} plato",
+      other: "{count} platos",
+    },
+    choose: "Elegir platos",
+    save: "Guardar platos",
+    inOther: "ahora en {name}",
+    rename: "Cambiar nombre",
+    saveName: "Guardar nombre",
+    remove: "Eliminar",
+    removeHint: "Sus platos vuelven a su menú habitual.",
+    errorName: "Póngale un nombre de hasta 60 caracteres.",
+    failed: "No se guardó. Vuelva a cargar la página e inténtelo de nuevo.",
+  },
+  translations: {
+    title: "Traducciones",
+    intro:
+      "La IA de Carte traduce sus platos para los clientes. Corrija aquí cualquier texto; su versión se mantiene hasta que cambie el texto del plato. Los nombres de alérgenos y dietas siempre usan las traducciones revisadas de Carte y no se pueden cambiar.",
+    language: "Idioma",
+    show: "Mostrar",
+    confirmFirst: "Solo se traducen los platos confirmados. Confirme algunos platos primero.",
+    allOriginal: "Sus platos ya están escritos en este idioma.",
+    original: "Original",
+    name: "Nombre",
+    description: "Descripción",
+    notes: "Notas de cocina",
+    section: "Sección del menú",
+    option: "Tamaño o extra {number}",
+    notYet:
+      "Aún sin traducir. Los clientes ven el original hasta entonces, o escriba aquí una traducción.",
+    edited: "Corregida por su equipo",
+    save: "Guardar traducción",
+    saved: "Traducción guardada.",
+    incomplete: "Complete cada parte que tiene el original.",
+    failed: "No se pudo guardar la traducción. Vuelva a cargar la página e inténtelo de nuevo.",
+  },
+  backup: {
+    title: "Copia de seguridad",
+    intro:
+      "Todo su menú en un solo archivo: los platos con sus tamaños, extras y horarios, los menús de temporada, las traducciones corregidas y su perfil. Las fotos no se incluyen.",
+    downloadTitle: "1. Descargar una copia",
+    download: "Descargar copia de seguridad",
+    restoreTitle: "2. Restaurar una copia",
+    restoreText:
+      "Los platos restaurados llegan como borrador, así que los clientes siguen viendo su menú actual. Revise y confirme cada plato y luego publique el borrador.",
+    fileLabel: "Archivo de copia de seguridad",
+    profileToo: "Restaurar también el perfil: descripción, contacto, horario y ajustes",
+    restore: "Restaurar",
+    restoring: "Restaurando…",
+    restored: {
+      one: "Se restauró {count} plato como borrador.",
+      other: "Se restauraron {count} platos como borrador.",
+    },
+    draftExists: "Ya tiene un borrador. Publíquelo o descártelo primero.",
+    badFile: "Ese archivo no es una copia de seguridad de Carte, o está dañado.",
+    tooBig: "Ese archivo pesa más de 5 MB.",
+    failed: "No se pudo restaurar la copia. Inténtelo de nuevo.",
+    goDraft: "Ir al borrador",
   },
   profile: {
     title: "Perfil del restaurante",

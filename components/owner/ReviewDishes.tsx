@@ -45,7 +45,7 @@ import { tagConflictMessages } from "@/lib/tag-conflicts";
 import { toggleValue } from "@/lib/toggle-value";
 import type { MenuItem } from "@/types/menu";
 
-type Filter = "all" | "review" | "confirmed";
+type Filter = "all" | "review" | "confirmed" | "draft";
 type DishDetails = {
   name: string;
   description: string;
@@ -301,6 +301,8 @@ function AvailabilityControls({
 
 /** Confirmed against today's full allergen list, not just the original 9. */
 const checkedForAll = (dish: MenuItem) => (dish.allergen_list ?? 1) >= ALLERGEN_LIST_VERSION;
+/** Confirmed for diners, or, for a draft dish, confirmed for when the draft is published. */
+const isConfirmed = (dish: MenuItem) => dish.confirmed || (!!dish.draft && !!dish.draft_confirmed);
 
 export default function ReviewDishes({ timezone }: { timezone: string }) {
   const { t, language } = useOwnerText();
@@ -397,7 +399,7 @@ export default function ReviewDishes({ timezone }: { timezone: string }) {
 
   async function confirmDish(dish: MenuItem) {
     const saved = await save({ ...dish, confirmed: true }, { confirm: true });
-    if (saved?.confirmed) toast(fmt(t.review.toastConfirmed, { name: saved.name }));
+    if (saved && isConfirmed(saved)) toast(fmt(t.review.toastConfirmed, { name: saved.name }));
   }
 
   async function saveDetails(dish: MenuItem, details: DishDetails) {
@@ -532,18 +534,22 @@ export default function ReviewDishes({ timezone }: { timezone: string }) {
   }
 
   const total = dishes.length;
-  const done = dishes.filter((dish) => dish.confirmed && checkedForAll(dish)).length;
-  const olderList = dishes.filter((dish) => dish.confirmed && !checkedForAll(dish)).length;
+  const done = dishes.filter((dish) => isConfirmed(dish) && checkedForAll(dish)).length;
+  const olderList = dishes.filter((dish) => isConfirmed(dish) && !checkedForAll(dish)).length;
   const alsoUnchecked = dishes.filter(
-    (dish) => dish.confirmed && checkedForAll(dish) && !dish.also_checked,
+    (dish) => isConfirmed(dish) && checkedForAll(dish) && !dish.also_checked,
   ).length;
+  const drafts = dishes.filter((dish) => dish.draft);
+  const draftsConfirmed = drafts.filter((dish) => dish.draft_confirmed).length;
   const needle = search.trim().toLowerCase();
   const shown = dishes.filter(
     (dish) =>
       (filter === "all" ||
-        (filter === "confirmed"
-          ? dish.confirmed && checkedForAll(dish)
-          : !(dish.confirmed && checkedForAll(dish)))) &&
+        (filter === "draft"
+          ? dish.draft
+          : filter === "confirmed"
+            ? isConfirmed(dish) && checkedForAll(dish)
+            : !(isConfirmed(dish) && checkedForAll(dish)))) &&
       (!needle || dish.name.toLowerCase().includes(needle)),
   );
   // Reordering only makes sense with the whole menu in view.
@@ -555,6 +561,9 @@ export default function ReviewDishes({ timezone }: { timezone: string }) {
     { key: "all", label: t.review.filterAll, count: total },
     { key: "review", label: t.review.filterReview, count: total - done },
     { key: "confirmed", label: t.review.filterConfirmed, count: done },
+    ...(drafts.length > 0
+      ? [{ key: "draft" as const, label: t.review.filterDraft, count: drafts.length }]
+      : []),
   ];
 
   return (
@@ -605,6 +614,15 @@ export default function ReviewDishes({ timezone }: { timezone: string }) {
               language,
             ),
           })}
+        </Notice>
+      )}
+
+      {drafts.length > 0 && (
+        <Notice tone="success" className="mt-6">
+          {plural(t.review.draftBanner, drafts.length, language, { confirmed: draftsConfirmed })}{" "}
+          <ButtonLink href="/dashboard/draft" variant="secondary" size="sm" className="ms-1">
+            {t.review.goPublish}
+          </ButtonLink>
         </Notice>
       )}
 
@@ -735,7 +753,7 @@ export default function ReviewDishes({ timezone }: { timezone: string }) {
                               aria-hidden="true"
                               className={cn(
                                 "absolute inset-y-8 start-0 w-1.5 rounded-e-full",
-                                dish.confirmed ? "bg-basil" : "bg-saffron",
+                                isConfirmed(dish) ? "bg-basil" : "bg-saffron",
                               )}
                             />
                             {editingId === dish.id ? (
@@ -754,6 +772,20 @@ export default function ReviewDishes({ timezone }: { timezone: string }) {
                               <div className="flex items-start justify-between gap-4">
                                 <div className="min-w-0 flex-1">
                                   <DishHeader name={dish.name} price={dish.price} as="h2" />
+                                  {(dish.draft || dish.in_season === false) && (
+                                    <p className="mt-2 flex flex-wrap gap-2 text-xs font-medium">
+                                      {dish.draft && (
+                                        <span className="rounded-full bg-accent/10 px-2.5 py-1 text-accent">
+                                          {t.review.draftBadge}
+                                        </span>
+                                      )}
+                                      {dish.in_season === false && (
+                                        <span className="rounded-full bg-ink/10 px-2.5 py-1">
+                                          {t.review.offSeason}
+                                        </span>
+                                      )}
+                                    </p>
+                                  )}
                                   {dish.description && (
                                     <p className="mt-1 max-w-prose text-sm leading-relaxed text-muted">
                                       {dish.description}
@@ -1003,14 +1035,14 @@ export default function ReviewDishes({ timezone }: { timezone: string }) {
                             </label>
 
                             <div className="mt-6 flex items-center justify-between border-t border-ink/10 pt-5">
-                              {dish.confirmed && checkedForAll(dish) && dish.also_checked ? (
+                              {isConfirmed(dish) && checkedForAll(dish) && dish.also_checked ? (
                                 <p className="text-sm font-medium text-basil">
-                                  {t.review.confirmed}
+                                  {dish.draft ? t.review.draftConfirmed : t.review.confirmed}
                                 </p>
-                              ) : dish.confirmed && checkedForAll(dish) ? (
+                              ) : isConfirmed(dish) && checkedForAll(dish) ? (
                                 <div className="flex flex-wrap items-center gap-3">
                                   <p className="text-sm font-medium text-basil">
-                                    {t.review.confirmed}
+                                    {dish.draft ? t.review.draftConfirmed : t.review.confirmed}
                                   </p>
                                   <Button
                                     variant="secondary"
@@ -1021,7 +1053,7 @@ export default function ReviewDishes({ timezone }: { timezone: string }) {
                                     {t.review.confirmAlso}
                                   </Button>
                                 </div>
-                              ) : dish.confirmed ? (
+                              ) : isConfirmed(dish) ? (
                                 <div className="flex flex-wrap items-center gap-3">
                                   <Button
                                     variant="basil"

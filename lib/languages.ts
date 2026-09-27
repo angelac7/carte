@@ -23,6 +23,11 @@ export function textDirection(code: LanguageCode): "rtl" | "ltr" {
 }
 
 export type LanguageCode = (typeof LANGUAGES)[number]["code"];
+/** Every language code, like "es", for validation. */
+export const LANGUAGE_CODES = LANGUAGES.map((language) => language.code) as [
+  LanguageCode,
+  ...LanguageCode[],
+];
 
 /** Fallback UI/staff language when no preference is available. Dish source languages are independent. */
 export const ORIGINAL_LANGUAGE: LanguageCode = "en";

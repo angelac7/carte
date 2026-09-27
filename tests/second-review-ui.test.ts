@@ -90,7 +90,7 @@ it("blocks new menu uploads while the previous menu saves", async () => {
   });
   expect(streamMenuImage).toHaveBeenCalledTimes(1);
   await act(async () => finish());
-  expect(saveDishes).toHaveBeenCalledWith(expect.any(Array), { skipExisting: true });
+  expect(saveDishes).toHaveBeenCalledWith(expect.any(Array), { skipExisting: true, draft: false });
   expect(
     screen.getByText("Saved 1 dish to your menu. Review it to confirm its allergens."),
   ).toBeDefined();

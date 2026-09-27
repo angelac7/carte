@@ -19,10 +19,10 @@ type Status = "idle" | "reading" | "ready" | "saving" | "saved" | "error";
 export default function UploadPage() {
   const { t, language } = useOwnerText();
   const d = DINER_STRINGS[language];
-  function savedMessage(added: number, read: number): string {
+  function savedMessage(added: number, read: number, draft: boolean): string {
     const skipped = read - added;
     if (added === 0) return t.upload.nothingNew;
-    const saved = plural(t.upload.saved, added, language);
+    const saved = plural(draft ? t.upload.draftSaved : t.upload.saved, added, language);
     return skipped > 0 ? `${saved} ${plural(t.upload.skipped, skipped, language)}` : saved;
   }
   const [dishes, setDishes] = useState<ExtractedDish[]>([]);
@@ -31,6 +31,8 @@ export default function UploadPage() {
   const [addedCount, setAddedCount] = useState(0);
   const [fileName, setFileName] = useState("");
   const [dragging, setDragging] = useState(false);
+  // A draft lets the owner check a whole new menu while diners keep seeing the current one.
+  const [asDraft, setAsDraft] = useState(false);
   const pending = useRef(false);
 
   async function readMenu(file: File) {
@@ -71,8 +73,8 @@ export default function UploadPage() {
     pending.current = true;
     setStatus("saving");
     try {
-      // Skip dishes already on the menu, so uploading the same menu twice doesn't double it.
-      const added = await saveDishes(dishes, { skipExisting: true });
+      // Skip dishes already on the menu, or in the draft, so uploading twice doesn't double it.
+      const added = await saveDishes(dishes, { skipExisting: true, draft: asDraft });
       setAddedCount(added.length);
       setStatus("saved");
     } catch {
@@ -175,9 +177,25 @@ export default function UploadPage() {
             )}
           </div>
 
+          {status !== "saved" && (
+            <label className="mt-4 flex max-w-prose items-start gap-3 text-sm">
+              <input
+                type="checkbox"
+                checked={asDraft}
+                disabled={busy}
+                onChange={(event) => setAsDraft(event.target.checked)}
+                className="mt-1"
+              />
+              <span>
+                <span className="font-medium">{t.upload.asDraft}</span>
+                <span className="block text-muted">{t.upload.asDraftHint}</span>
+              </span>
+            </label>
+          )}
+
           {status === "saved" && (
             <Notice tone="success" className="mt-4">
-              {savedMessage(addedCount, dishes.length)}
+              {savedMessage(addedCount, dishes.length, asDraft)}
             </Notice>
           )}
 

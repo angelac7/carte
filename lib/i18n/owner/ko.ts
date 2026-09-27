@@ -16,6 +16,8 @@ export const ko: OwnerStrings = {
     mainNav: "주 메뉴",
   },
   nav: {
+    menus: "시즌 메뉴",
+    translations: "번역",
     label: "내 레스토랑",
     dashboard: "대시보드",
     upload: "업로드",
@@ -121,6 +123,13 @@ export const ko: OwnerStrings = {
     errorSave: "레스토랑을 저장하지 못했습니다. 다시 시도하세요.",
   },
   upload: {
+    asDraft: "초안으로 저장",
+    asDraftHint:
+      "새 요리를 확인하는 동안 현재 메뉴는 그대로 보입니다. 모두 확인되면 초안을 게시하세요.",
+    draftSaved: {
+      other:
+        "요리 {count}개를 초안에 저장했습니다. 요리 검토에서 하나씩 확인한 뒤 초안을 게시하세요.",
+    },
     title: "메뉴를 알레르기 안내서로 바꿔 보세요.",
     intro:
       "메뉴 사진을 업로드하세요. Carte가 모든 요리를 목록으로 만들고 알레르기 성분을 제안하면, 손님에게 보이기 전에 직접 하나씩 확인합니다.",
@@ -148,6 +157,15 @@ export const ko: OwnerStrings = {
     },
   },
   review: {
+    offSeason: "숨김: 시즌 메뉴가 꺼져 있음",
+    draftBadge: "초안",
+    draftConfirmed: "✓ 게시용으로 확인됨",
+    filterDraft: "초안",
+    draftBanner: {
+      other:
+        "초안에 요리 {count}개가 있고 {confirmed}개가 확인되었습니다. 게시하기 전까지 손님에게는 현재 메뉴가 보입니다.",
+    },
+    goPublish: "초안 게시",
     title: "요리 검토",
     intro:
       "각 요리의 정보와 알레르기 성분을 확인한 뒤 확정하세요. 손님에게는 확인한 요리만 보입니다.",
@@ -373,6 +391,7 @@ export const ko: OwnerStrings = {
     confirmFirst: "먼저 요리를 확인하세요. 확인된 요리만 표에 나옵니다.",
   },
   spreadsheet: {
+    backupLink: "크기, 추가 옵션, 프로필까지 모두 백업",
     title: "스프레드시트",
     intro:
       "메뉴를 내려받아 Excel이나 Google 스프레드시트에서 수정한 뒤 다시 업로드하세요. 가격이나 알레르기 성분을 한꺼번에 많이 바꿀 때 편리합니다.",
@@ -436,6 +455,105 @@ export const ko: OwnerStrings = {
       notes: "메모",
       special: "추천 메뉴",
     },
+  },
+  draft: {
+    title: "초안 게시",
+    intro:
+      "초안은 손님이 현재 메뉴를 보는 동안 준비하는 새 메뉴입니다. 초안의 모든 요리가 확인되면 한 번에 게시하세요.",
+    none: "초안이 없습니다. 시작하려면 메뉴를 업로드하고 “초안으로 저장”을 선택하거나 백업을 복원하세요.",
+    upload: "메뉴 업로드",
+    counts: {
+      other: "초안 요리 {count}개, {confirmed}개 확인됨.",
+    },
+    confirmFirst: "게시하기 전에 요리 검토에서 초안의 모든 요리를 확인하세요.",
+    review: "요리 검토",
+    replace: "현재 메뉴를 교체",
+    replaceHint: {
+      other: "현재 요리 {count}개가 사진과 함께 삭제되고 초안이 그 자리를 대신합니다.",
+    },
+    add: "현재 메뉴에 추가",
+    addHint: "초안의 요리가 손님이 이미 보는 요리에 더해집니다.",
+    publish: "게시",
+    published: {
+      other: "요리 {count}개를 게시했습니다. 이제 손님에게 보입니다.",
+    },
+    discardTitle: "초안 버리기",
+    discardHint: "초안의 요리를 모두 삭제합니다. 현재 메뉴는 바뀌지 않습니다.",
+    discardConfirm: "네, 초안의 요리를 모두 삭제합니다",
+    discard: "버리기",
+    discarded: "초안을 버렸습니다.",
+    failed: "처리하지 못했습니다. 페이지를 새로고침한 뒤 다시 시도하세요.",
+  },
+  menus: {
+    title: "시즌 메뉴",
+    intro:
+      "브런치나 명절 메뉴처럼 가끔만 내는 요리를 묶어서 한꺼번에 켜고 끄세요. 꺼져 있는 동안 손님은 그 요리를 볼 수 없습니다. 확인된 상태는 그대로라서 다시 켜면 바로 적용됩니다.",
+    newLabel: "새 시즌 메뉴",
+    placeholder: "예: 브런치",
+    create: "추가",
+    empty: "아직 시즌 메뉴가 없습니다.",
+    on: "켜짐",
+    off: "꺼짐",
+    onText: "손님에게 이 요리들이 보입니다.",
+    offText: "손님에게 숨겨져 있습니다.",
+    switchOn: "켜기",
+    switchOff: "끄기",
+    dishCount: {
+      other: "요리 {count}개",
+    },
+    choose: "요리 선택",
+    save: "요리 저장",
+    inOther: "현재 {name}에 포함",
+    rename: "이름 바꾸기",
+    saveName: "이름 저장",
+    remove: "삭제",
+    removeHint: "포함된 요리는 일반 메뉴로 돌아갑니다.",
+    errorName: "60자 이내로 이름을 입력하세요.",
+    failed: "저장하지 못했습니다. 페이지를 새로고침한 뒤 다시 시도하세요.",
+  },
+  translations: {
+    title: "번역",
+    intro:
+      "Carte의 AI가 손님을 위해 요리를 번역합니다. 여기서 어떤 표현이든 고칠 수 있으며, 고친 내용은 요리 자체의 글이 바뀔 때까지 유지됩니다. 알레르기 성분과 식단 이름은 항상 Carte가 확인한 번역을 사용하며 바꿀 수 없습니다.",
+    language: "언어",
+    show: "보기",
+    confirmFirst: "확인된 요리만 번역됩니다. 먼저 요리를 확인하세요.",
+    allOriginal: "요리가 이미 이 언어로 작성되어 있습니다.",
+    original: "원문",
+    name: "이름",
+    description: "설명",
+    notes: "주방 메모",
+    section: "메뉴 구역",
+    option: "크기 또는 추가 옵션 {number}",
+    notYet:
+      "아직 번역되지 않았습니다. 그때까지 손님에게는 원문이 보이며, 여기에 번역을 입력할 수도 있습니다.",
+    edited: "팀에서 수정함",
+    save: "번역 저장",
+    saved: "번역을 저장했습니다.",
+    incomplete: "원문에 있는 모든 부분을 채우세요.",
+    failed: "번역을 저장하지 못했습니다. 페이지를 새로고침한 뒤 다시 시도하세요.",
+  },
+  backup: {
+    title: "백업",
+    intro:
+      "메뉴의 모든 것을 파일 하나에: 크기, 추가 옵션, 제공 시간을 포함한 요리, 시즌 메뉴, 수정한 번역, 프로필. 사진은 포함되지 않습니다.",
+    downloadTitle: "1. 백업 내려받기",
+    download: "백업 내려받기",
+    restoreTitle: "2. 백업 복원",
+    restoreText:
+      "복원한 요리는 초안으로 들어오므로 손님에게는 현재 메뉴가 계속 보입니다. 요리를 하나씩 확인한 뒤 초안을 게시하세요.",
+    fileLabel: "백업 파일",
+    profileToo: "프로필도 복원: 소개, 연락처, 영업시간, 설정",
+    restore: "복원",
+    restoring: "복원 중…",
+    restored: {
+      other: "요리 {count}개를 초안으로 복원했습니다.",
+    },
+    draftExists: "이미 초안이 있습니다. 먼저 게시하거나 버리세요.",
+    badFile: "Carte 백업 파일이 아니거나 손상되었습니다.",
+    tooBig: "파일이 5MB를 넘습니다.",
+    failed: "백업을 복원하지 못했습니다. 다시 시도하세요.",
+    goDraft: "초안으로 이동",
   },
   profile: {
     title: "레스토랑 프로필",

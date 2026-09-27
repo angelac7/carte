@@ -16,6 +16,8 @@ export const pt: OwnerStrings = {
     mainNav: "Principal",
   },
   nav: {
+    menus: "Cardápios sazonais",
+    translations: "Traduções",
     label: "Meu restaurante",
     dashboard: "Painel",
     upload: "Enviar",
@@ -122,6 +124,14 @@ export const pt: OwnerStrings = {
     errorSave: "Não foi possível salvar seu restaurante. Tente de novo.",
   },
   upload: {
+    asDraft: "Salvar como rascunho",
+    asDraftHint:
+      "Seu cardápio atual continua no ar enquanto você confere os pratos novos. Publique o rascunho quando todos estiverem confirmados.",
+    draftSaved: {
+      one: "{count} prato salvo no rascunho. Confirme-o em Revisar pratos e depois publique o rascunho.",
+      other:
+        "{count} pratos salvos no rascunho. Confirme cada um em Revisar pratos e depois publique o rascunho.",
+    },
     title: "Transforme seu cardápio em um guia de alérgenos.",
     intro:
       "Envie uma foto do seu cardápio. O Carte lista cada prato e sugere os alérgenos; você confirma cada um antes que os clientes o vejam.",
@@ -152,6 +162,16 @@ export const pt: OwnerStrings = {
     },
   },
   review: {
+    offSeason: "Oculto: o cardápio sazonal dele está desligado",
+    draftBadge: "Rascunho",
+    draftConfirmed: "✓ Confirmado para publicar",
+    filterDraft: "Rascunho",
+    draftBanner: {
+      one: "Seu rascunho tem {count} prato, {confirmed} confirmado. Os clientes continuam vendo o cardápio atual até você publicá-lo.",
+      other:
+        "Seu rascunho tem {count} pratos, {confirmed} confirmados. Os clientes continuam vendo o cardápio atual até você publicá-lo.",
+    },
+    goPublish: "Publicar o rascunho",
     title: "Revisar pratos",
     intro:
       "Confira as informações e os alérgenos de cada prato e depois confirme. Os clientes só veem os pratos que você confirmou.",
@@ -384,6 +404,7 @@ export const pt: OwnerStrings = {
     confirmFirst: "Confirme alguns pratos primeiro. Só pratos confirmados entram na tabela.",
   },
   spreadsheet: {
+    backupLink: "Faça backup de tudo, incluindo tamanhos, adicionais e seu perfil",
     title: "Planilha",
     intro:
       "Baixe seu cardápio, edite no Excel ou no Google Sheets e envie de novo. Útil para mudar muitos preços ou alérgenos de uma vez.",
@@ -448,6 +469,110 @@ export const pt: OwnerStrings = {
       notes: "observações",
       special: "especial",
     },
+  },
+  draft: {
+    title: "Publicar seu rascunho",
+    intro:
+      "Um rascunho é um cardápio novo que você prepara enquanto os clientes continuam vendo o atual. Quando todos os pratos do rascunho estiverem confirmados, publique de uma vez.",
+    none: "Não há rascunho. Para começar um, envie um cardápio e escolha “Salvar como rascunho”, ou restaure um backup.",
+    upload: "Enviar um cardápio",
+    counts: {
+      one: "{count} prato no rascunho, {confirmed} confirmado.",
+      other: "{count} pratos no rascunho, {confirmed} confirmados.",
+    },
+    confirmFirst: "Confirme cada prato do rascunho em Revisar pratos antes de publicar.",
+    review: "Revisar pratos",
+    replace: "Substituir meu cardápio atual",
+    replaceHint: {
+      one: "Seu prato atual é removido, com a foto, e o rascunho toma o lugar dele.",
+      other:
+        "Seus {count} pratos atuais são removidos, com as fotos, e o rascunho toma o lugar deles.",
+    },
+    add: "Adicionar ao meu cardápio atual",
+    addHint: "Os pratos do rascunho se juntam aos que os clientes já veem.",
+    publish: "Publicar",
+    published: {
+      one: "{count} prato publicado. Os clientes já o veem.",
+      other: "{count} pratos publicados. Os clientes já os veem.",
+    },
+    discardTitle: "Descartar o rascunho",
+    discardHint: "Exclui todos os pratos do rascunho. Seu cardápio atual não muda.",
+    discardConfirm: "Sim, excluir todos os pratos do rascunho",
+    discard: "Descartar",
+    discarded: "O rascunho foi descartado.",
+    failed: "Não funcionou. Recarregue a página e tente de novo.",
+  },
+  menus: {
+    title: "Cardápios sazonais",
+    intro:
+      "Agrupe pratos que você só serve às vezes, como o brunch ou um cardápio de festas, e ligue e desligue todos juntos. Enquanto um está desligado, os clientes não veem os pratos dele. Eles continuam confirmados, então ligar de novo vale na hora.",
+    newLabel: "Novo cardápio sazonal",
+    placeholder: "Por exemplo: Brunch",
+    create: "Adicionar",
+    empty: "Ainda não há cardápios sazonais.",
+    on: "Ligado",
+    off: "Desligado",
+    onText: "Os clientes veem estes pratos.",
+    offText: "Oculto para os clientes.",
+    switchOn: "Ligar",
+    switchOff: "Desligar",
+    dishCount: {
+      one: "{count} prato",
+      other: "{count} pratos",
+    },
+    choose: "Escolher pratos",
+    save: "Salvar pratos",
+    inOther: "agora em {name}",
+    rename: "Renomear",
+    saveName: "Salvar nome",
+    remove: "Excluir",
+    removeHint: "Os pratos dele voltam para o seu cardápio normal.",
+    errorName: "Dê um nome de até 60 caracteres.",
+    failed: "Não foi salvo. Recarregue a página e tente de novo.",
+  },
+  translations: {
+    title: "Traduções",
+    intro:
+      "A IA do Carte traduz seus pratos para os clientes. Corrija aqui qualquer texto; sua versão fica até o texto do prato mudar. Os nomes de alérgenos e dietas sempre usam as traduções revisadas do Carte e não podem ser alterados.",
+    language: "Idioma",
+    show: "Mostrar",
+    confirmFirst: "Só pratos confirmados são traduzidos. Confirme alguns pratos primeiro.",
+    allOriginal: "Seus pratos já estão escritos neste idioma.",
+    original: "Original",
+    name: "Nome",
+    description: "Descrição",
+    notes: "Observações da cozinha",
+    section: "Seção do cardápio",
+    option: "Tamanho ou adicional {number}",
+    notYet: "Ainda não traduzido. Os clientes veem o original até lá, ou digite uma tradução aqui.",
+    edited: "Corrigida pela sua equipe",
+    save: "Salvar tradução",
+    saved: "Tradução salva.",
+    incomplete: "Preencha cada parte que o original tem.",
+    failed: "Não foi possível salvar a tradução. Recarregue a página e tente de novo.",
+  },
+  backup: {
+    title: "Backup",
+    intro:
+      "Tudo sobre o seu cardápio em um só arquivo: os pratos com tamanhos, adicionais e horários, os cardápios sazonais, as traduções corrigidas e seu perfil. As fotos não estão incluídas.",
+    downloadTitle: "1. Baixar um backup",
+    download: "Baixar backup",
+    restoreTitle: "2. Restaurar um backup",
+    restoreText:
+      "Os pratos restaurados chegam como rascunho, então os clientes continuam vendo o cardápio atual. Confira e confirme cada prato e depois publique o rascunho.",
+    fileLabel: "Arquivo de backup",
+    profileToo: "Restaurar também o perfil: descrição, contato, horários e ajustes",
+    restore: "Restaurar",
+    restoring: "Restaurando…",
+    restored: {
+      one: "{count} prato restaurado como rascunho.",
+      other: "{count} pratos restaurados como rascunho.",
+    },
+    draftExists: "Você já tem um rascunho. Publique ou descarte primeiro.",
+    badFile: "Esse arquivo não é um backup do Carte, ou está danificado.",
+    tooBig: "Esse arquivo tem mais de 5 MB.",
+    failed: "Não foi possível restaurar o backup. Tente de novo.",
+    goDraft: "Ir para o rascunho",
   },
   profile: {
     title: "Perfil do restaurante",

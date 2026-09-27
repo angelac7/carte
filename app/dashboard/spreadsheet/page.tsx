@@ -1,3 +1,4 @@
+import Link from "@/components/OfflineLink";
 import { OwnerPageHeader } from "@/components/owner/OwnerPageHeader";
 import { SpreadsheetImport } from "@/components/owner/SpreadsheetImport";
 import { buttonClass } from "@/components/ui/button";
@@ -23,6 +24,11 @@ export default async function SpreadsheetPage() {
         <a href="/api/menu-spreadsheet" download className={`mt-5 ${buttonClass()}`}>
           {t.spreadsheet.download}
         </a>
+        <p className="mt-4 text-sm">
+          <Link href="/dashboard/backup" className="underline underline-offset-4 hover:text-accent">
+            {t.spreadsheet.backupLink}
+          </Link>
+        </p>
       </section>
 
       <section className={panelClass}>

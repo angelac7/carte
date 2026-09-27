@@ -50,9 +50,14 @@ export async function fetchDishes(): Promise<MenuItem[]> {
   return res.json() as Promise<MenuItem[]>;
 }
 
-/** Saves dishes and returns the ones added. With `skipExisting`, dishes already on the menu are left out. */
-export const saveDishes = (items: ExtractedDish[], options: { skipExisting?: boolean } = {}) =>
-  sendToItems<MenuItem[]>("POST", { items, ...options });
+/**
+ * Saves dishes and returns the ones added. With `skipExisting`, dishes already on the menu are left
+ * out. With `draft`, they go into the draft menu, and only dishes already in the draft are skipped.
+ */
+export const saveDishes = (
+  items: ExtractedDish[],
+  options: { skipExisting?: boolean; draft?: boolean } = {},
+) => sendToItems<MenuItem[]>("POST", { items, ...options });
 /** Saves a dish. `confirm` is only for the Confirm button: it vouches for every allergen. */
 export const updateDish = (dish: MenuItem, options: { confirm?: boolean } = {}) =>
   sendToItems<MenuItem>("PUT", { ...dish, ...options });
