@@ -44,7 +44,7 @@ export default async function DashboardHome() {
   ]);
 
   // Catch up on explanations for any confirmed dish that doesn't have one yet.
-  after(() => prepareExplanations(dishes, restaurant.name));
+  after(() => prepareExplanations(dishes, restaurant));
 
   const confirmed = dishes.filter((dish) => dish.confirmed).length;
   const needReview = dishes.length - confirmed;

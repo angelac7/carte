@@ -57,6 +57,14 @@ Rate limits use atomic Supabase counters shared across server instances. Apply a
 
 Set `NEXT_PUBLIC_SITE_URL` to your production origin (for example `https://carte.example`). In Supabase Authentication URL Configuration, set the Site URL and allow that origin's `/auth/callback` redirect, including query parameters. Password recovery starts at `/forgot-password`; open the email in the same browser to complete the PKCE flow. Claim destinations are retained through login, signup, and restaurant setup.
 
+## AI spending limits
+
+Every AI call is counted in Supabase's `ai_usage` table, by day, restaurant, and feature; nothing
+about the diner is kept. Each restaurant can use 500 calls a day and all of Carte 3,000 (UTC days).
+Past a limit, diners get the usual "try again soon" answer, translations show dishes as written,
+and nothing is charged. Change the limits with `AI_DAILY_LIMIT_PER_RESTAURANT` and `AI_DAILY_LIMIT`.
+Administrators see the counts at `/admin/ai`.
+
 ## Accounts and database
 
 Carte stores restaurants, dishes, and translations in Supabase. The schema and Row Level Security

@@ -28,6 +28,16 @@ export async function rest<T = unknown>(path: string, init: RequestInit = {}): P
   return (text ? JSON.parse(text) : null) as T;
 }
 
+/** Reads the database the way anyone could, with the public key every browser has. */
+export async function publicRest<T = unknown>(path: string): Promise<T> {
+  const key = env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+  const response = await fetch(`${base}/rest/v1/${path}`, {
+    headers: { apikey: key, Authorization: `Bearer ${key}` },
+  });
+  if (!response.ok) throw new Error(`${path}: ${response.status} ${await response.text()}`);
+  return (await response.json()) as T;
+}
+
 export type TempOwner = { id: string; email: string; password: string };
 
 export async function createOwner(): Promise<TempOwner> {

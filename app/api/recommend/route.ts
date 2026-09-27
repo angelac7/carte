@@ -8,6 +8,7 @@ import { checkRateLimit, clientKey } from "@/lib/rate-limit";
 import { createClient } from "@/lib/supabase/server";
 import { RecommendRequestSchema } from "@/types/recommend";
 import { reportError } from "@/lib/report-error";
+import { allowAiCall } from "@/lib/ai-budget";
 
 /** Suggests dishes from a restaurant's confirmed menu, after applying the diner's filters. */
 export async function POST(req: Request) {
@@ -34,6 +35,8 @@ export async function POST(req: Request) {
       return NextResponse.json({ recommendation: { picks: [], note: "" } });
     }
 
+    if (!(await allowAiCall("recommend", restaurant.id)))
+      return NextResponse.json({ error: "limit" }, { status: 429 });
     const recommendation = await recommendDishes(
       dishes,
       parsed.data,

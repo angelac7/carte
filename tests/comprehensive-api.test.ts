@@ -2,6 +2,7 @@ import { beforeEach, expect, it, vi } from "vitest";
 vi.mock("server-only", () => ({}));
 vi.mock("@/lib/rate-limit", () => ({ checkRateLimit: async () => true, clientKey: () => "test" }));
 vi.mock("@/lib/supabase/server", () => ({ createClient: async () => ({}) }));
+vi.mock("@/lib/ai-budget", () => ({ allowAiCall: async () => true }));
 vi.mock("@/lib/read-image-upload", () => ({
   readImageUpload: async () => ({ ok: true, base64: "image", mediaType: "image/jpeg" }),
 }));

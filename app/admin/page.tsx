@@ -31,6 +31,9 @@ export default async function AdminPage({
           <ButtonLink href="/admin/claims" variant="secondary">
             Review map claims
           </ButtonLink>
+          <ButtonLink href="/admin/ai" variant="secondary">
+            AI use
+          </ButtonLink>
           <ButtonLink href="/dashboard" variant="ghost">
             Dashboard
           </ButtonLink>

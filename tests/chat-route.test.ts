@@ -13,6 +13,7 @@ vi.mock("@/lib/ai/chat", () => ({
     yield "Try the salad.";
   }),
 }));
+vi.mock("@/lib/ai-budget", () => ({ allowAiCall: async () => true }));
 import { POST } from "@/app/api/chat/route";
 import { getConfirmedDishes } from "@/lib/db";
 import { streamMenuAnswer } from "@/lib/ai/chat";

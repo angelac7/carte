@@ -8,6 +8,7 @@ import { filterDishes } from "@/lib/menu-filters";
 import { PhotoMatchRequestSchema } from "@/types/camera";
 import { createClient } from "@/lib/supabase/server";
 import { reportError } from "@/lib/report-error";
+import { allowAiCall } from "@/lib/ai-budget";
 
 /** Finds which of a restaurant's confirmed dishes a photo shows. */
 export async function POST(req: Request) {
@@ -35,6 +36,8 @@ export async function POST(req: Request) {
     const dishes = filterDishes(await getConfirmedDishes(supabase, restaurant.id), parsed.data);
     if (dishes.length === 0) return NextResponse.json({ matches: [] });
 
+    if (!(await allowAiCall("photo-match", restaurant.id)))
+      return NextResponse.json({ error: "limit" }, { status: 429 });
     const matches = await matchDishPhoto(
       image.base64,
       image.mediaType,

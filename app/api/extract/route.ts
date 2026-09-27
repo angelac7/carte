@@ -8,6 +8,7 @@ import { readImageUpload } from "@/lib/read-image-upload";
 import type { MenuStreamEvent } from "@/types/menu-stream";
 import { reportError } from "@/lib/report-error";
 import { ownerStrings } from "@/lib/owner-language";
+import { allowAiCall } from "@/lib/ai-budget";
 
 function fail(message: string, status: number) {
   return NextResponse.json({ error: message }, { status });
@@ -24,6 +25,8 @@ export async function POST(req: Request) {
   const form = await req.formData().catch(() => null);
   const image = await readImageUpload(form?.get("menu"), t.api.image);
   if (!image.ok) return fail(image.message, image.status);
+  if (!(await allowAiCall("menu-upload", owner.restaurant.id)))
+    return fail(t.api.tooManyMenus, 429);
   return ndjsonResponse(readMenu(image.base64, image.mediaType, req.signal, t.api));
 }
 

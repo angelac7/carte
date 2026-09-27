@@ -8,6 +8,7 @@ import { checkRateLimit, clientKey } from "@/lib/rate-limit";
 import { isValidSlug } from "@/lib/slug";
 import { createClient } from "@/lib/supabase/server";
 import { reportError } from "@/lib/report-error";
+import { allowAiCall } from "@/lib/ai-budget";
 
 export const dynamic = "force-dynamic";
 
@@ -42,7 +43,8 @@ export async function GET(req: Request) {
     // so a dish the AI keeps getting wrong can't run up the bill. Until then it shows as written.
     if (
       missing.length > 0 &&
-      (await checkRateLimit(`translate-ai:${restaurant.id}:${language}`, 6, 60 * 60 * 1000))
+      (await checkRateLimit(`translate-ai:${restaurant.id}:${language}`, 6, 60 * 60 * 1000)) &&
+      (await allowAiCall("translate", restaurant.id))
     ) {
       const fresh = await translateDishes(missing, languageName(language));
       await saveTranslations(language, missing, fresh);

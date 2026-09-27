@@ -2,6 +2,7 @@ import "server-only";
 import { explainDish } from "@/lib/ai/explain";
 import { dishesWithoutInsight, saveInsight } from "@/lib/db/insights";
 import { languageName, type LanguageCode } from "@/lib/languages";
+import { allowAiCall } from "@/lib/ai-budget";
 import { checkRateLimit } from "@/lib/rate-limit";
 import type { MenuItem } from "@/types/menu";
 import { reportError } from "@/lib/report-error";
@@ -18,7 +19,7 @@ const RETRY_AFTER_MS = 10 * 60 * 1000;
  */
 export async function prepareExplanations(
   dishes: MenuItem[],
-  restaurantName: string,
+  restaurant: { id: string; name: string },
   language: LanguageCode = "en",
 ): Promise<number> {
   const missing = await dishesWithoutInsight(
@@ -32,7 +33,9 @@ export async function prepareExplanations(
         try {
           const key = `prepare-explanation:${dish.id}:${language}`;
           if (!(await checkRateLimit(key, 1, RETRY_AFTER_MS))) return;
-          const insight = await explainDish(dish, languageName(language), restaurantName);
+          // Past today's AI limit, the rest wait for a later run.
+          if (!(await allowAiCall("explain", restaurant.id))) return;
+          const insight = await explainDish(dish, languageName(language), restaurant.name);
           await saveInsight(dish, language, insight);
           written++;
         } catch (err) {

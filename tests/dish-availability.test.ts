@@ -16,6 +16,7 @@ vi.mock("@/lib/db", () => ({
 vi.mock("@/lib/supabase/server", () => ({ createClient: vi.fn(async () => ({})) }));
 vi.mock("@/lib/rate-limit", () => ({ checkRateLimit: async () => true, clientKey: () => "ip" }));
 vi.mock("@/lib/ai/recommend", () => ({ recommendDishes: mocks.recommendDishes }));
+vi.mock("@/lib/ai-budget", () => ({ allowAiCall: async () => true }));
 import { POST as recommend } from "@/app/api/recommend/route";
 import { POST as soldOut } from "@/app/api/items/sold-out/route";
 import { dishAvailability, inServingWindow, restaurantClock } from "@/lib/availability";

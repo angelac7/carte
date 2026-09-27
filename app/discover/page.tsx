@@ -51,6 +51,7 @@ import {
   RESTAURANT_FEATURES,
 } from "@/lib/restaurant-profile";
 import { createClient } from "@/lib/supabase/server";
+import { allowAiCall } from "@/lib/ai-budget";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "Discover | Carte" };
@@ -277,7 +278,8 @@ export default async function DiscoverPage({ searchParams }: DiscoverProps) {
     const allowed =
       dishes.length === 0 &&
       isPhrase &&
-      (await checkRateLimit(`craving:${clientKeyFromHeaders(headerStore)}`, 20, 10 * 60 * 1000));
+      (await checkRateLimit(`craving:${clientKeyFromHeaders(headerStore)}`, 20, 10 * 60 * 1000)) &&
+      (await allowAiCall("craving", null));
     if (dishes.length === 0 && isPhrase && allowed) {
       const terms = await cravingToTerms(query).catch(() => [] as string[]);
       if (terms.length > 0) {

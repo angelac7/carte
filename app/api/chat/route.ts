@@ -11,6 +11,7 @@ import { createClient } from "@/lib/supabase/server";
 import { ChatRequestSchema, type ChatMessage, type ChatStreamEvent } from "@/types/chat";
 import type { MenuItem } from "@/types/menu";
 import { reportError } from "@/lib/report-error";
+import { allowAiCall } from "@/lib/ai-budget";
 
 const QUESTIONS_PER_WINDOW = 20;
 const WINDOW_MS = 10 * 60 * 1000; // 10 minutes
@@ -33,6 +34,8 @@ export async function POST(req: Request) {
 
     const dishes = filterDishes(await getConfirmedDishes(supabase, restaurant.id), parsed.data);
     const { language, messages } = parsed.data;
+    if (!(await allowAiCall("chat", restaurant.id)))
+      return NextResponse.json({ error: "limit" }, { status: 429 });
     return ndjsonResponse(answer(dishes, languageName(language), messages, req.signal));
   } catch (err) {
     reportError("Menu chat failed", err);

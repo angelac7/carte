@@ -7,6 +7,7 @@ import { readImageUpload } from "@/lib/read-image-upload";
 import type { SupportedImageType } from "@/lib/upload-rules";
 import type { ScanStreamEvent } from "@/types/menu-stream";
 import { reportError } from "@/lib/report-error";
+import { allowAiCall } from "@/lib/ai-budget";
 
 /** Reads and translates a paper menu from a restaurant that isn't on Carte. Nothing is stored. */
 export async function POST(req: Request) {
@@ -20,6 +21,8 @@ export async function POST(req: Request) {
   const image = await readImageUpload(form?.get("image"));
   if (!image.ok) return NextResponse.json({ error: image.message }, { status: image.status });
 
+  if (!(await allowAiCall("scan", null)))
+    return NextResponse.json({ error: "limit" }, { status: 429 });
   return ndjsonResponse(
     scanMenu(image.base64, image.mediaType, languageName(language), req.signal),
   );

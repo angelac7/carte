@@ -3,6 +3,7 @@ const mocks = vi.hoisted(() => ({
   checkRateLimit: vi.fn(),
   translateDishes: vi.fn(),
   saveTranslations: vi.fn(),
+  allowAiCall: vi.fn(),
 }));
 vi.mock("server-only", () => ({}));
 vi.mock("@/lib/report-error", () => ({ reportError: vi.fn() }));
@@ -26,12 +27,14 @@ vi.mock("@/lib/db/translations", () => ({
   saveTranslations: mocks.saveTranslations,
 }));
 vi.mock("@/lib/ai/translate", () => ({ translateDishes: mocks.translateDishes }));
+vi.mock("@/lib/ai-budget", () => ({ allowAiCall: mocks.allowAiCall }));
 import { GET } from "@/app/api/translations/route";
 
 const read = () => GET(new Request("https://carte.test/api/translations?restaurant=cafe&lang=en"));
 
 beforeEach(() => {
   vi.resetAllMocks();
+  mocks.allowAiCall.mockResolvedValue(true);
   mocks.translateDishes.mockResolvedValue([
     { id: "tea", name: "Tea", description: "", notes: "", section: "", options: [] },
   ]);
@@ -50,5 +53,12 @@ it("stops paying for a menu's translation after a few tries an hour, and shows w
   const response = await read();
   expect(response.status).toBe(200);
   expect(Object.keys((await response.json()).translations)).toEqual(["soup"]);
+  expect(mocks.translateDishes).not.toHaveBeenCalled();
+});
+
+it("shows what it has once the restaurant reaches today's AI limit", async () => {
+  mocks.checkRateLimit.mockResolvedValue(true);
+  mocks.allowAiCall.mockResolvedValue(false);
+  expect(Object.keys((await (await read()).json()).translations)).toEqual(["soup"]);
   expect(mocks.translateDishes).not.toHaveBeenCalled();
 });

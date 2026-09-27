@@ -8,6 +8,7 @@ import { checkRateLimit, clientKey } from "@/lib/rate-limit";
 import { isValidSlug } from "@/lib/slug";
 import { createClient } from "@/lib/supabase/server";
 import { reportError } from "@/lib/report-error";
+import { allowAiCall } from "@/lib/ai-budget";
 
 export const dynamic = "force-dynamic";
 
@@ -38,6 +39,8 @@ export async function GET(req: Request) {
     const cached = await getCachedInsight(dish, language);
     if (cached) return NextResponse.json({ insight: cached });
 
+    if (!(await allowAiCall("explain", restaurant.id)))
+      return NextResponse.json({ error: "Too many requests. Try again soon." }, { status: 429 });
     const insight = await explainDish(dish, languageName(language), restaurant.name);
     await saveInsight(dish, language, insight);
     return NextResponse.json({ insight });

@@ -1,14 +1,25 @@
 import { expect, test } from "@playwright/test";
-import { createOwner, createRestaurant, deleteOwner, logIn, rest, type TempOwner } from "./helpers";
+import {
+  createOwner,
+  createRestaurant,
+  deleteOwner,
+  logIn,
+  publicRest,
+  rest,
+  type TempOwner,
+} from "./helpers";
 
 let admin: TempOwner;
 let owner: TempOwner;
 let slug: string;
+let restaurantId: string;
 
 test.beforeAll(async () => {
   [admin, owner] = await Promise.all([createOwner(), createOwner()]);
   await rest("carte_admins", { method: "POST", body: JSON.stringify({ user_id: admin.id }) });
-  ({ slug } = await createRestaurant(owner, [{ name: "Green Salad", price: "$9" }]));
+  ({ slug, id: restaurantId } = await createRestaurant(owner, [
+    { name: "Green Salad", price: "$9" },
+  ]));
 });
 test.afterAll(async () => {
   await deleteOwner(owner);
@@ -31,6 +42,9 @@ test("an administrator suspends a menu, which hides it from diners, then restore
   await expect(row).toContainText("1 of 1 confirmed");
   await row.getByRole("button", { name: "Suspend" }).click();
   await expect(row).toContainText("Suspended");
+  // Gone even for someone asking the database directly with the public key.
+  expect(await publicRest(`restaurants?slug=eq.${slug}&select=id`)).toEqual([]);
+  expect(await publicRest(`menu_items?restaurant_id=eq.${restaurantId}&select=id`)).toEqual([]);
 
   // The menu page streams, so a missing menu shows the not-found page rather than a 404 status.
   const diner = await (await browser.newContext()).newPage();
@@ -47,4 +61,21 @@ test("an administrator suspends a menu, which hides it from diners, then restore
   await expect(row).toContainText("Menu link only");
   await diner.goto(`/r/${slug}`);
   await expect(diner.getByRole("heading", { name: "Green Salad", level: 3 })).toBeVisible();
+});
+
+test("administrators see how much AI each restaurant used", async ({ browser }) => {
+  await rest("ai_usage", {
+    method: "POST",
+    body: JSON.stringify({ restaurant_id: restaurantId, feature: "chat", calls: 7 }),
+  });
+  const ownerPage = await (await browser.newContext()).newPage();
+  await logIn(ownerPage, owner);
+  expect((await ownerPage.goto("/admin/ai"))?.status()).toBe(404);
+
+  const adminPage = await (await browser.newContext()).newPage();
+  await logIn(adminPage, admin);
+  await adminPage.goto("/admin/ai");
+  const row = adminPage.getByRole("row").filter({ hasText: "Test Kitchen" });
+  await expect(row).toContainText("7 of 500");
+  await expect(row).toContainText("Menu assistant");
 });

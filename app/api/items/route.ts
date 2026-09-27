@@ -98,7 +98,7 @@ export async function PUT(req: Request) {
   });
   if (!updated) return fail(t.api.dishConflict, 409);
   // Explain a newly confirmed dish right away, so the first diner to open it doesn't wait.
-  if (updated.confirmed) after(() => prepareExplanations([updated], owner.restaurant.name));
+  if (updated.confirmed) after(() => prepareExplanations([updated], owner.restaurant));
   return NextResponse.json(updated);
 }
 
