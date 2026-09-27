@@ -23,17 +23,22 @@ export async function getCachedTranslations(
 ): Promise<{ found: MenuTranslations; missing: MenuItem[] }> {
   if (dishes.length === 0) return { found: {}, missing: [] };
 
-  const { data, error } = await createAdminClient()
-    .from("translations")
-    .select("menu_item_id, source_hash, name, description, notes, section, options")
-    .eq("language", language)
-    .in(
-      "menu_item_id",
-      dishes.map((dish) => dish.id),
-    );
-  if (error) throw error;
+  const rows: TranslationRow[] = [];
+  // A hundred ids at a time keeps the request short enough for large menus.
+  for (let i = 0; i < dishes.length; i += 100) {
+    const { data, error } = await createAdminClient()
+      .from("translations")
+      .select("menu_item_id, source_hash, name, description, notes, section, options")
+      .eq("language", language)
+      .in(
+        "menu_item_id",
+        dishes.slice(i, i + 100).map((dish) => dish.id),
+      );
+    if (error) throw error;
+    rows.push(...((data ?? []) as TranslationRow[]));
+  }
 
-  const saved = new Map(((data ?? []) as TranslationRow[]).map((row) => [row.menu_item_id, row]));
+  const saved = new Map(rows.map((row) => [row.menu_item_id, row]));
   const found: MenuTranslations = {};
   const missing: MenuItem[] = [];
   for (const dish of dishes) {

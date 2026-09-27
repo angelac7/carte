@@ -76,3 +76,38 @@ it("keeps only requested translations and preserves their order", async () => {
     { ...translated, section: "", options: [] },
   ]);
 });
+it("keeps the complete translations when another dish comes back incomplete", async () => {
+  const tea: MenuItem = { ...dish, id: "tea", name: "Tea", description: "", notes: "" };
+  vi.mocked(createMessage).mockResolvedValueOnce({
+    dishes: [
+      { id: "dish", name: "Sopa", description: "", notes: "" },
+      { id: "tea", name: "Té", description: "", notes: "" },
+    ],
+  } as never);
+  expect(await translateDishes([dish, tea], "Spanish")).toEqual([
+    { id: "tea", name: "Té", description: "", notes: "", section: "", options: [] },
+  ]);
+});
+it("translates a big menu in batches, keeping the batches that worked", async () => {
+  const dishes = Array.from({ length: 60 }, (_, i): MenuItem => ({
+    ...dish,
+    id: `dish-${i}`,
+    description: "",
+    notes: "",
+  }));
+  vi.mocked(createMessage).mockImplementation(async (request) => {
+    const sent = JSON.parse(String(request.messages[0].content).split("Dishes:\n")[1]) as {
+      id: string;
+    }[];
+    if (sent[0].id === "dish-25") throw new Error("The AI reply was cut off.");
+    return {
+      dishes: sent.map(({ id }) => ({ id, name: "Sopa", description: "", notes: "" })),
+    } as never;
+  });
+  const translated = await translateDishes(dishes, "Spanish");
+  expect(createMessage).toHaveBeenCalledTimes(3);
+  expect(translated.map((d) => d.id)).toEqual([
+    ...dishes.slice(0, 25).map((d) => d.id),
+    ...dishes.slice(50).map((d) => d.id),
+  ]);
+});

@@ -41,13 +41,24 @@ Dishes:
 ${JSON.stringify(source)}`;
 }
 
-/** Translates dish text with AI. Allergen labels are never sent; they use fixed translations. */
-export async function translateDishes(
-  dishes: MenuItem[],
-  languageName: string,
-): Promise<DishTranslation[]> {
-  if (dishes.length === 0) return [];
-  // Saved per restaurant and language, so the careful setting is paid for once.
+/** Dishes per AI request, small enough that a reply is never cut off. */
+export const TRANSLATION_BATCH = 25;
+/** Batches translated at the same time. */
+const PARALLEL_BATCHES = 4;
+
+/** Whether an AI translation has every part the dish has, so it's safe to show and save. */
+function complete(dish: MenuItem, translated: DishTranslation | undefined): boolean {
+  return (
+    !!translated &&
+    (["name", "description", "notes", "section"] as const).every(
+      (key) => !(dish[key] ?? "").trim() || !!translated[key].trim(),
+    ) &&
+    translated.options.length === optionLabels(dish).length &&
+    translated.options.every((label) => !!label.trim())
+  );
+}
+
+async function translateBatch(dishes: MenuItem[], languageName: string) {
   const reply = await createMessage({
     max_tokens: 32000,
     output_config: jsonReply(TRANSLATION_SCHEMA, "high"),
@@ -55,17 +66,37 @@ export async function translateDishes(
   });
   const translations = TranslationReplySchema.parse(parseJsonReply(reply)).dishes;
   const byId = new Map(translations.map((dish) => [dish.id, dish]));
-  return dishes.map((dish) => {
+  return dishes.flatMap((dish) => {
     const translated = byId.get(dish.id);
-    if (
-      !translated ||
-      (["name", "description", "notes", "section"] as const).some(
-        (key) => (dish[key] ?? "").trim() && !translated[key].trim(),
-      ) ||
-      translated.options.length !== optionLabels(dish).length ||
-      translated.options.some((label) => !label.trim())
-    )
-      throw new Error("The translation is incomplete. Please retry.");
-    return translated;
+    return translated && complete(dish, translated) ? [translated] : [];
   });
+}
+
+/**
+ * Translates dish text with AI, a batch at a time. Allergen labels are never sent; they use fixed
+ * translations. Returns only complete translations: a dish left out, or a batch that failed, is
+ * tried again next time rather than costing the whole menu. Throws only if nothing was translated.
+ */
+export async function translateDishes(
+  dishes: MenuItem[],
+  languageName: string,
+): Promise<DishTranslation[]> {
+  if (dishes.length === 0) return [];
+  const batches: MenuItem[][] = [];
+  for (let i = 0; i < dishes.length; i += TRANSLATION_BATCH)
+    batches.push(dishes.slice(i, i + TRANSLATION_BATCH));
+
+  const translated: DishTranslation[] = [];
+  let firstError: unknown;
+  for (let i = 0; i < batches.length; i += PARALLEL_BATCHES) {
+    const results = await Promise.allSettled(
+      batches.slice(i, i + PARALLEL_BATCHES).map((batch) => translateBatch(batch, languageName)),
+    );
+    for (const result of results) {
+      if (result.status === "fulfilled") translated.push(...result.value);
+      else firstError ??= result.reason;
+    }
+  }
+  if (translated.length === 0) throw firstError ?? new Error("The translation is incomplete.");
+  return translated;
 }

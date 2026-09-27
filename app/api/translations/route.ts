@@ -38,7 +38,12 @@ export async function GET(req: Request) {
 
     const dishes = await getConfirmedDishes(supabase, restaurant.id);
     const { found, missing } = await getCachedTranslations(language, dishes);
-    if (missing.length > 0) {
+    // A menu's translation is paid for a few times an hour at most, however many diners open it,
+    // so a dish the AI keeps getting wrong can't run up the bill. Until then it shows as written.
+    if (
+      missing.length > 0 &&
+      (await checkRateLimit(`translate-ai:${restaurant.id}:${language}`, 6, 60 * 60 * 1000))
+    ) {
       const fresh = await translateDishes(missing, languageName(language));
       await saveTranslations(language, missing, fresh);
       for (const { id, name, description, notes, section, options } of fresh)
