@@ -7,6 +7,7 @@ const mocks = vi.hoisted(() => ({
   checkRateLimit: vi.fn(),
 }));
 vi.mock("server-only", () => ({}));
+vi.mock("@/lib/report-error", () => ({ reportError: vi.fn() }));
 vi.mock("@/lib/supabase/server", () => ({ createClient: vi.fn(async () => ({})) }));
 vi.mock("@/lib/db", () => ({ getRestaurantBySlug: mocks.getRestaurantBySlug }));
 vi.mock("@/lib/db/shared-orders", () => ({
@@ -77,5 +78,8 @@ describe("order together", () => {
     expect((await put({ code, line: dish, quantity: 1 })).status).toBe(404);
     mocks.setSharedLine.mockRejectedValueOnce(new Error("unknown dish"));
     expect((await put({ code, line: dish, quantity: 1 })).status).toBe(400);
+    // A hiccup reaching the database isn't a rejection: the phone should try again.
+    mocks.setSharedLine.mockRejectedValueOnce(new Error("fetch failed"));
+    expect((await put({ code, line: dish, quantity: 1 })).status).toBe(503);
   });
 });

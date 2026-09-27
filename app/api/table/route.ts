@@ -10,6 +10,7 @@ import {
   setSharedLine,
 } from "@/lib/db/shared-orders";
 import { checkRateLimit, clientKey } from "@/lib/rate-limit";
+import { reportError } from "@/lib/report-error";
 import { isValidSlug } from "@/lib/slug";
 import { createClient } from "@/lib/supabase/server";
 
@@ -31,6 +32,19 @@ const Lines = z
 
 function fail(error: string, status: number) {
   return NextResponse.json({ error }, { status });
+}
+
+// What the database says when it turns a change down for good. Anything else, like a dropped
+// connection, is worth the phone trying again, so it gets a different answer.
+const REJECTED =
+  /unknown dish|order too long|invalid change|unknown person|invalid allergies|table full/;
+const isRejection = (error: unknown) =>
+  REJECTED.test(String((error as { message?: unknown } | null)?.message ?? ""));
+
+function failedChange(label: string, error: unknown, rejection: string) {
+  if (isRejection(error)) return fail(rejection, 400);
+  reportError(label, error);
+  return fail("The table couldn't be updated. Trying again.", 503);
 }
 
 const TEN_MINUTES = 10 * 60 * 1000;
@@ -103,8 +117,12 @@ export async function PUT(req: Request) {
     const lines = await setSharedLine(parsed.data.code, parsed.data.line, parsed.data.quantity);
     if (!lines) return fail("This shared order has ended.", 404);
     return NextResponse.json({ lines });
-  } catch {
-    return fail("That dish can't be added to this order.", 400);
+  } catch (error) {
+    return failedChange(
+      "Changing a shared table's order failed",
+      error,
+      "That dish can't be added to this order.",
+    );
   }
 }
 
@@ -122,7 +140,11 @@ export async function PATCH(req: Request) {
     const allergies = await setSharedAllergies(code, person, entry);
     if (!allergies) return fail("This shared order has ended.", 404);
     return NextResponse.json({ allergies });
-  } catch {
-    return fail("Your allergies couldn't be shared with this table.", 400);
+  } catch (error) {
+    return failedChange(
+      "Sharing allergies with a table failed",
+      error,
+      "Your allergies couldn't be shared with this table.",
+    );
   }
 }
