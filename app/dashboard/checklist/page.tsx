@@ -27,7 +27,8 @@ export default async function ChecklistPage({
   const s = REVIEW_STRINGS[language];
   const params = await searchParams;
   const target = params.lang && isLanguageCode(params.lang) ? params.lang : language;
-  const dishes = await listDishes(supabase, restaurant.id);
+  // Checks the menu diners see; a draft is checked on its own page before publishing.
+  const dishes = (await listDishes(supabase, restaurant.id)).filter((dish) => !dish.draft);
   const [reviews, translations] = await Promise.all([
     menuReviewDates(supabase, restaurant.id),
     menuReviewTranslations(

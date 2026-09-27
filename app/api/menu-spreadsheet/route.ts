@@ -18,7 +18,9 @@ export async function GET() {
   const owner = await getOwnerContext();
   const { t } = await ownerStrings();
   if (!owner) return fail(t.api.loginMenu, 401);
-  const csv = menuToCsv(await listDishes(owner.supabase, owner.restaurant.id));
+  // The menu as diners know it: a draft waiting to be published stays out of the file.
+  const dishes = await listDishes(owner.supabase, owner.restaurant.id);
+  const csv = menuToCsv(dishes.filter((dish) => !dish.draft));
   const name = `${owner.restaurant.slug}-menu.csv`;
   return new NextResponse(csv, {
     headers: {

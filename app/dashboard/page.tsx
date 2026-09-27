@@ -10,6 +10,7 @@ import { OwnerPageHeader } from "@/components/owner/OwnerPageHeader";
 import { ProgressRing } from "@/components/owner/ProgressRing";
 import { ViewsChart } from "@/components/owner/ViewsChart";
 import { ButtonLink } from "@/components/ui/button";
+import { Notice } from "@/components/ui/notice";
 import { requireRestaurant } from "@/lib/auth";
 import { cn } from "@/lib/cn";
 import { listDishes } from "@/lib/db";
@@ -33,7 +34,7 @@ const panelClass = "rounded-panel bg-paper p-6 shadow-raised sm:p-8";
 export default async function DashboardHome() {
   const { supabase, restaurant } = await requireRestaurant();
   const { t, language } = await ownerStrings();
-  const [dishes, profile, claim, dishViews, daily, reports, interest] = await Promise.all([
+  const [allDishes, profile, claim, dishViews, daily, reports, interest] = await Promise.all([
     listDishes(supabase, restaurant.id),
     getRestaurantProfile(supabase, restaurant.id),
     getClaim(supabase, restaurant.id),
@@ -44,7 +45,12 @@ export default async function DashboardHome() {
   ]);
 
   // Catch up on explanations for any confirmed dish that doesn't have one yet.
-  after(() => prepareExplanations(dishes, restaurant));
+  after(() => prepareExplanations(allDishes, restaurant));
+
+  // The numbers describe the menu diners see; a draft waiting to be published is shown apart.
+  const dishes = allDishes.filter((dish) => !dish.draft);
+  const drafts = allDishes.filter((dish) => dish.draft);
+  const draftsConfirmed = drafts.filter((dish) => dish.draft_confirmed).length;
 
   const confirmed = dishes.filter((dish) => dish.confirmed).length;
   const needReview = dishes.length - confirmed;
@@ -86,6 +92,15 @@ export default async function DashboardHome() {
           {REVIEW_STRINGS[language].title}
         </ButtonLink>
       </OwnerPageHeader>
+
+      {drafts.length > 0 && (
+        <Notice tone="success" className="mt-8">
+          {plural(t.review.draftBanner, drafts.length, language, { confirmed: draftsConfirmed })}{" "}
+          <ButtonLink href="/dashboard/draft" variant="secondary" size="sm" className="ms-1">
+            {t.review.goPublish}
+          </ButtonLink>
+        </Notice>
+      )}
 
       {reports.length > 0 && (
         <div className="mt-12">

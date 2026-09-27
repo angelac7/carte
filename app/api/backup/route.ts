@@ -57,7 +57,13 @@ export async function POST(req: Request) {
     return fail(t.backup.failed, 429);
   const text = await req.text();
   if (text.length > MAX_BYTES) return fail(t.backup.tooBig, 413);
-  const request = RestoreRequest.safeParse(JSON.parse(text || "null"));
+  let body: unknown = null;
+  try {
+    body = JSON.parse(text);
+  } catch {
+    // Not JSON at all: treated like any other file that isn't a backup.
+  }
+  const request = RestoreRequest.safeParse(body);
   const backup = BackupSchema.safeParse(request.success ? request.data.backup : null);
   if (!request.success || !backup.success) return fail(t.backup.badFile);
   try {

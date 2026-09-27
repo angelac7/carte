@@ -81,6 +81,9 @@ test("a draft stays hidden until it's published in place of the current menu", a
   const ownerPage = await (await browser.newContext()).newPage();
   const diner = await (await browser.newContext()).newPage();
   await logIn(ownerPage, owner);
+  // The dashboard shows the draft apart, rather than counting it as dishes needing review.
+  await ownerPage.goto("/dashboard");
+  await expect(ownerPage.getByText("Your draft has 1 dish, 0 confirmed.")).toBeVisible();
   await ownerPage.goto("/dashboard/review");
   await expect(ownerPage.getByText("Your draft has 1 dish, 0 confirmed.")).toBeVisible();
   const stew = ownerPage.locator("article").filter({ hasText: "Winter Stew" });
