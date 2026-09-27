@@ -84,3 +84,20 @@ export async function setSharedLine(
   if (error) throw error;
   return (data as OrderLines | null) ?? null;
 }
+
+/** Changes one line by how much; a change id already counted is ignored. Null when ended. */
+export async function changeSharedLine(
+  code: string,
+  line: string,
+  change: number,
+  id: string,
+): Promise<OrderLines | null> {
+  const { data, error } = await createAdminClient().rpc("change_shared_line", {
+    code,
+    line,
+    change,
+    change_id: id,
+  });
+  if (error) throw error;
+  return (data as OrderLines | null) ?? null;
+}

@@ -101,3 +101,18 @@ it("allows editor-owned previews but prevents clients from forging applied recei
     await db.exec("reset role");
   }
 });
+it("clears previews a day after they expire, keeping recent receipts for retries", async () => {
+  await db.query(
+    `insert into menu_imports(restaurant_id, snapshot, payload, expires_at)
+     values ($1, '[]', '{"tag": "old"}', now() - interval '2 days'),
+            ($1, '[]', '{"tag": "recent"}', now() - interval '1 hour')`,
+    [restaurant],
+  );
+  await preview([]);
+  const tags = (
+    await db.query<{ tag: string }>(
+      "select payload->>'tag' as tag from menu_imports where payload ? 'tag'",
+    )
+  ).rows.map((row) => row.tag);
+  expect(tags).toEqual(["recent"]);
+});

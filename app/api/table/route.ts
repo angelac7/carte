@@ -4,6 +4,7 @@ import { getRestaurantBySlug } from "@/lib/db";
 import { ALLERGENS, OTHER_AVOIDS } from "@/lib/allergens";
 import { SEVERITIES } from "@/lib/diner-prefs";
 import {
+  changeSharedLine,
   createSharedOrder,
   getSharedOrder,
   setSharedAllergies,
@@ -104,17 +105,33 @@ export async function GET(req: Request) {
   );
 }
 
-/** Sets how many of one line the table wants. */
+// How much one tap changed a line, with a random id so a retry isn't counted twice.
+const LineChange = z.object({
+  code: Code,
+  line: LineKey,
+  change: z.number().int().min(-20).max(20),
+  id: Person,
+});
+// Phones that loaded Carte before changes were sent this way set a line's total instead.
+const LineTotal = z.object({
+  code: Code,
+  line: LineKey,
+  quantity: z.number().int().min(0).max(20),
+});
+
+/** Changes how many of one line the table wants. */
 export async function PUT(req: Request) {
-  const parsed = z
-    .object({ code: Code, line: LineKey, quantity: z.number().int().min(0).max(20) })
-    .safeParse(await req.json().catch(() => null));
+  const parsed = z.union([LineChange, LineTotal]).safeParse(await req.json().catch(() => null));
   if (!parsed.success) return fail("Invalid change.", 400);
   if (!(await withinLimits("change", parsed.data.code, req))) {
     return fail("Too many changes. Slow down a little.", 429);
   }
   try {
-    const lines = await setSharedLine(parsed.data.code, parsed.data.line, parsed.data.quantity);
+    const { code, line } = parsed.data;
+    const lines =
+      "change" in parsed.data
+        ? await changeSharedLine(code, line, parsed.data.change, parsed.data.id)
+        : await setSharedLine(code, line, parsed.data.quantity);
     if (!lines) return fail("This shared order has ended.", 404);
     return NextResponse.json({ lines });
   } catch (error) {

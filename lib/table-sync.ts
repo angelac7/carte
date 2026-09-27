@@ -4,13 +4,26 @@ type TableAllergies = Record<string, TableAllergyEntry>;
 type Lines = Record<string, number>;
 type Snapshot = { lines: Lines; allergies: TableAllergies };
 type AllergyWrite = { person: string; entry: TableAllergyEntry | null };
+/** A change to one line, by how much. Its id lets the table recognize a retry. */
+type Change = { line: string; by: number; id: string };
+
+const MAX_QUANTITY = 20;
 
 /** The table turned a change down for good, like adding a dish the kitchen just took off. */
 export class TableChangeRejectedError extends Error {}
 
-/** One ordered write stream per table. Pending intent survives failures and masks stale reads. */
+/**
+ * One ordered write stream per table. Taps are sent as how much they changed a line, so two
+ * phones adding the same dish at once both count. Pending changes survive failures and are shown
+ * on top of the table's order, so a read from before a tap never hides it.
+ */
 export class TableSync {
-  private lines = new Map<string, number>();
+  // The table's order as the table last reported it.
+  private table: Lines;
+  // Changes not sent yet, added up by line.
+  private waiting = new Map<string, number>();
+  // A change sent but not confirmed; after a failure it's sent again with the same id.
+  private sending: Change | null = null;
   private allergy: AllergyWrite | undefined;
   private running: Promise<void> | null = null;
   private active = true;
@@ -20,7 +33,8 @@ export class TableSync {
   constructor(
     private io: {
       read: () => Promise<Snapshot>;
-      line: (line: string, quantity: number) => Promise<Lines>;
+      change: (line: string, by: number, id: string) => Promise<Lines>;
+      newId: () => string;
       allergies: (person: string, entry: TableAllergyEntry | null) => Promise<TableAllergies>;
       showLines: (lines: Lines) => void;
       showAllergies: (allergies: TableAllergies) => void;
@@ -28,21 +42,36 @@ export class TableSync {
       online: () => boolean;
       error: (error: unknown) => void;
     },
-  ) {}
+    /** The order the table started with, until the first read. */
+    table: Lines = {},
+  ) {
+    this.table = { ...table };
+  }
   stop() {
     this.active = false;
   }
-  private overlay(lines: Lines) {
-    const result = { ...lines };
-    for (const [key, quantity] of this.lines) {
-      if (quantity) result[key] = quantity;
-      else delete result[key];
-    }
-    return result;
+  /** What this phone shows: the table's order plus this phone's changes on their way. */
+  private shown(): Lines {
+    const shown = { ...this.table };
+    const apply = (line: string, by: number) => {
+      const quantity = Math.min(MAX_QUANTITY, Math.max(0, (shown[line] ?? 0) + by));
+      if (quantity) shown[line] = quantity;
+      else delete shown[line];
+    };
+    if (this.sending) apply(this.sending.line, this.sending.by);
+    for (const [line, by] of this.waiting) apply(line, by);
+    return shown;
   }
+  /** Sets a line to the quantity the diner chose, sent as the difference from what they saw. */
   quantity(line: string, quantity: number) {
-    this.lines.set(line, quantity);
+    const target = Math.min(MAX_QUANTITY, Math.max(0, quantity));
+    const by = target - (this.shown()[line] ?? 0);
+    if (!by) return;
+    const total = (this.waiting.get(line) ?? 0) + by;
+    if (total) this.waiting.set(line, total);
+    else this.waiting.delete(line);
     this.epoch++;
+    this.io.showLines(this.shown());
     void this.flush().catch(() => {});
   }
   share(person: string, entry: TableAllergyEntry | null, automatic = false): Promise<void> {
@@ -66,7 +95,8 @@ export class TableSync {
       const epoch = this.epoch;
       const snapshot = await this.io.read();
       if (!this.active || epoch !== this.epoch || this.running) return;
-      this.io.showLines(this.overlay(snapshot.lines));
+      this.table = snapshot.lines;
+      this.io.showLines(this.shown());
       this.io.showAllergies(snapshot.allergies);
       this.io.status("synced");
     } catch (error) {
@@ -80,10 +110,13 @@ export class TableSync {
     this.io.status(this.io.online() ? "failed" : "offline");
     this.io.error(error);
   }
+  private hasWrites() {
+    return !!this.sending || this.waiting.size > 0 || !!this.allergy;
+  }
   flush(): Promise<void> {
     if (!this.active) return Promise.resolve();
     if (this.running) return this.running;
-    if (!this.lines.size && !this.allergy) return Promise.resolve();
+    if (!this.hasWrites()) return Promise.resolve();
     if (!this.io.online()) {
       this.io.status("offline");
       return Promise.reject(new Error("Offline"));
@@ -92,7 +125,7 @@ export class TableSync {
     // Defer execution so running is set even if the transport throws synchronously.
     this.running = Promise.resolve()
       .then(async () => {
-        while (this.active && (this.lines.size || this.allergy)) {
+        while (this.active && this.hasWrites()) {
           if (this.allergy) {
             const intent = this.allergy;
             const all = await this.io.allergies(intent.person, intent.entry).catch((error) => {
@@ -107,16 +140,22 @@ export class TableSync {
               this.io.showAllergies(all);
             }
           } else {
-            const [line, quantity] = this.lines.entries().next().value!;
+            if (!this.sending) {
+              const [line, by] = this.waiting.entries().next().value!;
+              this.waiting.delete(line);
+              this.sending = { line, by, id: this.io.newId() };
+            }
+            const { line, by, id } = this.sending;
             // A change the table turns down is dropped, not retried forever ahead of later ones;
             // the next read shows what the table really has.
-            const saved = await this.io.line(line, quantity).catch((error) => {
+            const table = await this.io.change(line, by, id).catch((error) => {
               if (error instanceof TableChangeRejectedError) return null;
               throw error;
             });
             if (!this.active) return;
-            if (this.lines.get(line) === quantity) this.lines.delete(line);
-            if (saved) this.io.showLines(this.overlay(saved));
+            this.sending = null;
+            if (table) this.table = table;
+            this.io.showLines(this.shown());
           }
         }
         if (this.active) this.io.status("synced");

@@ -34,6 +34,16 @@ test("two diners add to one shared order from their own phones", async ({ browse
   await dishCard(second, "Green Salad").getByRole("button", { name: "Add", exact: true }).click();
 
   await expect(first.getByRole("dialog").getByText("Green Salad")).toBeVisible({ timeout: 20_000 });
+
+  // Both diners order one more iced tea at the same moment, and both count.
+  await first.getByRole("dialog").getByRole("button", { name: "Close" }).click();
+  const oneMore = (page: Page) =>
+    dishCard(page, "Iced Tea").getByRole("button", { name: "Add one" });
+  await Promise.all([oneMore(first).click(), oneMore(second).click()]);
+  for (const page of [first, second])
+    await expect(dishCard(page, "Iced Tea").getByText("3", { exact: true })).toBeVisible({
+      timeout: 20_000,
+    });
 });
 
 test("people at a shared table can put everyone's allergies on one card", async ({ browser }) => {

@@ -1,9 +1,9 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import {
+  changeTableLine,
   fetchTableOrder,
   setTableAllergies,
-  setTableLine,
   startTableOrder,
   TableEndedError,
   type TableAllergies,
@@ -65,31 +65,38 @@ export function useTableOrder(
   const starting = useRef(false);
   const leaving = useRef(false);
   const person = useRef<string | null>(null);
+  // The order a table started with on this phone, until the first read.
+  const startedWith = useRef<Lines>({});
 
   useEffect(() => {
     if (!code) return;
     person.current = personFor(code);
-    const sync = new TableSync({
-      read: () => fetchTableOrder(restaurantSlug, code),
-      line: (line, quantity) => setTableLine(code, line, quantity),
-      allergies: (id, entry) => setTableAllergies(code, id, entry),
-      showLines: setOrder,
-      showAllergies: (all) => {
-        setAllergies(all);
-        setMe(person.current);
+    const sync = new TableSync(
+      {
+        read: () => fetchTableOrder(restaurantSlug, code),
+        change: (line, by, id) => changeTableLine(code, line, by, id),
+        newId: () => newPersonId(crypto.getRandomValues(new Uint8Array(12))),
+        allergies: (id, entry) => setTableAllergies(code, id, entry),
+        showLines: setOrder,
+        showAllergies: (all) => {
+          setAllergies(all);
+          setMe(person.current);
+        },
+        status: setSyncStatus,
+        online: () => navigator.onLine,
+        error: (error) => {
+          if (error instanceof TableEndedError) {
+            sync.stop();
+            setCode(null);
+            setEnded(true);
+            setAllergies({});
+            showCodeInAddress(null);
+          }
+        },
       },
-      status: setSyncStatus,
-      online: () => navigator.onLine,
-      error: (error) => {
-        if (error instanceof TableEndedError) {
-          sync.stop();
-          setCode(null);
-          setEnded(true);
-          setAllergies({});
-          showCodeInAddress(null);
-        }
-      },
-    });
+      startedWith.current,
+    );
+    startedWith.current = {};
     engine.current = sync;
     const refresh = () => {
       if (document.visibilityState !== "hidden") void sync.refresh();
@@ -112,13 +119,14 @@ export function useTableOrder(
 
   function setQuantity(line: string, quantity: number) {
     if (leaving.current) return;
+    // At a shared table, the sync shows the change along with everyone else's.
+    if (engine.current) return engine.current.quantity(line, quantity);
     setOrder((previous) => {
       const next = { ...previous };
       if (quantity > 0) next[line] = quantity;
       else delete next[line];
       return next;
     });
-    engine.current?.quantity(line, quantity);
   }
   async function shareAllergies(entry: TableAllergyEntry | null) {
     if (!engine.current || !person.current) throw new Error("Table not connected");
@@ -136,6 +144,7 @@ export function useTableOrder(
     starting.current = true;
     try {
       const started = await startTableOrder(restaurantSlug, order);
+      startedWith.current = started.lines;
       setOrder(started.lines);
       setCode(started.code);
       setEnded(false);

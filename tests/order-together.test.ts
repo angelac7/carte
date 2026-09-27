@@ -4,6 +4,7 @@ const mocks = vi.hoisted(() => ({
   createSharedOrder: vi.fn(),
   getSharedOrder: vi.fn(),
   setSharedLine: vi.fn(),
+  changeSharedLine: vi.fn(),
   checkRateLimit: vi.fn(),
 }));
 vi.mock("server-only", () => ({}));
@@ -14,6 +15,7 @@ vi.mock("@/lib/db/shared-orders", () => ({
   createSharedOrder: mocks.createSharedOrder,
   getSharedOrder: mocks.getSharedOrder,
   setSharedLine: mocks.setSharedLine,
+  changeSharedLine: mocks.changeSharedLine,
 }));
 vi.mock("@/lib/rate-limit", () => ({
   checkRateLimit: mocks.checkRateLimit,
@@ -33,6 +35,7 @@ beforeEach(() => {
   mocks.createSharedOrder.mockResolvedValue({ code, lines: { [dish]: 2 } });
   mocks.getSharedOrder.mockResolvedValue({ restaurantId: "r", lines: { [dish]: 2 } });
   mocks.setSharedLine.mockResolvedValue({ [dish]: 3 });
+  mocks.changeSharedLine.mockResolvedValue({ [dish]: 3 });
 });
 
 describe("order together", () => {
@@ -81,5 +84,17 @@ describe("order together", () => {
     // A hiccup reaching the database isn't a rejection: the phone should try again.
     mocks.setSharedLine.mockRejectedValueOnce(new Error("fetch failed"));
     expect((await put({ code, line: dish, quantity: 1 })).status).toBe(503);
+  });
+
+  it("adds up changes by how much, so two phones adding the same dish both count", async () => {
+    const put = (body: unknown) => PUT(json("PUT", body));
+    const change = { code, line: dish, change: 1, id: "abcdefgh2345" };
+    expect(await (await put(change)).json()).toEqual({ lines: { [dish]: 3 } });
+    expect(mocks.changeSharedLine).toHaveBeenCalledWith(code, dish, 1, "abcdefgh2345");
+    expect(mocks.setSharedLine).not.toHaveBeenCalled();
+    expect((await put({ ...change, change: 21 })).status).toBe(400);
+    expect((await put({ ...change, id: "short" })).status).toBe(400);
+    mocks.changeSharedLine.mockRejectedValueOnce(new Error("unknown dish"));
+    expect((await put(change)).status).toBe(400);
   });
 });

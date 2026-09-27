@@ -286,8 +286,12 @@ export async function setTableAllergies(
   return (await tableRequest<{ allergies: TableAllergies }>({ method: "PATCH", body })).allergies;
 }
 
-export async function setTableLine(code: string, line: string, quantity: number) {
-  const body = JSON.stringify({ code, line, quantity });
+/**
+ * Changes one line by how much the diner tapped, so changes from several phones add up. A retry
+ * reuses the id, and the table ignores a change it has already counted. Returns the table's order.
+ */
+export async function changeTableLine(code: string, line: string, change: number, id: string) {
+  const body = JSON.stringify({ code, line, change, id });
   return (await tableRequest<{ lines: TableLines }>({ method: "PUT", body })).lines;
 }
 
